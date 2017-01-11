@@ -201,6 +201,7 @@ struct Integer
 
 private:
 
+    /// Returns: pointer to internal GMP C struct.
     inout(__mpz_struct)* _ptr() inout { return &_z; }
 
     __mpz_struct _z;
