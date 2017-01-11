@@ -9,9 +9,13 @@ struct Integer
 {
     import std.typecons : Unqual;
 
+    /// Default conversion base.
+    private enum defaultBase = 10;
+
     pragma(inline) @trusted pure nothrow:
 
-    string toString(int base = 10) const
+    /// Convert to string in base `base`.
+    string toString(int base = defaultBase) const
     {
         assert(base >= -2 && base <= -36 ||
                base >= 2 && base <= 62);
@@ -77,19 +81,23 @@ struct Integer
     /// Destruct `this`.
     ~this() { if (_ptr) { __gmpz_clear(_ptr); } }
 
-    // comparison
+    /// Returns: `true` iff `this` equals `rhs`.
     bool opEquals(const ref Integer rhs) const
     {
         return (_ptr == rhs._ptr || // fast compare
                 __gmpz_cmp(_ptr, rhs._ptr) == 0);
     }
+    /// ditto
     bool opEquals(in Integer rhs) const
     {
         return (_ptr == rhs._ptr || // fast compare
                 __gmpz_cmp(_ptr, rhs._ptr) == 0);
     }
+    /// ditto
     bool opEquals(double rhs) const { return __gmpz_cmp_d(_ptr, rhs) == 0; }
+    /// ditto
     bool opEquals(long rhs) const { return __gmpz_cmp_si(_ptr, rhs) == 0; }
+    /// ditto
     bool opEquals(ulong rhs) const { return __gmpz_cmp_ui(_ptr, rhs) == 0; }
 
     // comparison
@@ -191,7 +199,7 @@ struct Integer
         return __gmpz_sizeinbase(_ptr, base);
     }
 
-    private:
+private:
 
     inout(__mpz_struct)* _ptr() inout { return &_z; }
 
