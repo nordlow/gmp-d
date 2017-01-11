@@ -48,8 +48,8 @@ struct Integer
     /// ditto
     this(double value) { __gmpz_init_set_d(_ptr, value); } // TODO Use Optional/Nullable when value is nan, or inf
 
-    /// Construct from `value` in base `base`. TODO Use Optional/Nullable when value is nan, or inf
-    this(const string value, int base = 0)
+    /// Construct from `value` in base `base`.
+    this(const string value, int base = 0) // TODO Use Optional/Nullable when value is nan, or inf
     {
         assert(base == 0 || base >= 2 && base <= 62);
 
