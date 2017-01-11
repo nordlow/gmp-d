@@ -3,6 +3,9 @@
  */
 module gmp;
 
+// import deimos.gmp.gmp;
+// import deimos.gmp.integer;
+
 /** Arbitrary precision signed integer (Z).
  */
 struct Integer
@@ -33,7 +36,7 @@ struct Integer
     /// Construct empty (undefined) from explicit `null`.
     this(typeof(null))
     {
-        __gmpz_init(_ptr);      // TODO remove if this is same as zero bitblit
+        initialize();           // TODO remove if this is same as zero bitblit
         assert(this == Integer.init); // if this is same as default
     }
 
@@ -63,6 +66,11 @@ struct Integer
 
     /// No implicit copy construction.
     @disable this(this);
+
+    private void initialize()
+    {
+        __gmpz_init(_ptr);
+    }
 
     /// Swap content of `this` with `rhs`.
     void swap(ref Integer rhs)
