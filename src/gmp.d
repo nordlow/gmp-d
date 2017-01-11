@@ -239,9 +239,22 @@ private:
 
 }
 
+pure nothrow:
+
+/// convert to string
+@safe unittest
+{
+    alias Z = Integer;          // shorthand
+    assert(Z(42L).toString == `42`);
+    assert(Z(-42L).toString == `-42`);
+    assert(Z(`-101`).toString == `-101`);
+}
+
+@nogc:
+
 /// Returns: absolute value of `x`.
 pragma(inline)
-Integer abs(const ref Integer x) @trusted pure nothrow @nogc
+Integer abs(const ref Integer x) @trusted
 {
     typeof(return) y = null;
     __gmpz_abs(y._ptr, x._ptr);
@@ -250,20 +263,12 @@ Integer abs(const ref Integer x) @trusted pure nothrow @nogc
 
 /// Swap contents of `x` with contents of `y`.
 pragma(inline)
-void swap(ref Integer x, ref Integer y) @trusted pure nothrow @nogc
+void swap(ref Integer x, ref Integer y) @trusted
 {
     x.swap(y);
 }
 
-/// convert to string
-@safe pure nothrow unittest
-{
-    alias Z = Integer;          // shorthand
-    assert(Z(42L).toString == `42`);
-    assert(Z(-42L).toString == `-42`);
-    assert(Z(`-101`).toString == `-101`);
-}
-
+pragma(inline)
 Integer opBinary(string s)(ulong rhs, const auto ref Integer x)
     if (s == "-")
 {
@@ -273,7 +278,7 @@ Integer opBinary(string s)(ulong rhs, const auto ref Integer x)
 }
 
 ///
-@safe pure nothrow @nogc unittest
+@safe unittest
 {
     alias Z = Integer;          // shorthand
     const Z a = 42L;
