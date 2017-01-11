@@ -15,7 +15,8 @@ struct Integer
     /// Default conversion base.
     private enum defaultBase = 10;
 
-    pragma(inline) @trusted pure nothrow:
+    pragma(inline)
+    @trusted pure nothrow:
 
     /// Convert to string in base `base`.
     string toString(int base = defaultBase) const
@@ -239,7 +240,8 @@ private:
 }
 
 /// Returns: absolute value of `x`.
-pragma(inline) Integer abs(const ref Integer x) @trusted pure nothrow @nogc
+pragma(inline)
+Integer abs(const ref Integer x) @trusted pure nothrow @nogc
 {
     typeof(return) y = null;
     __gmpz_abs(y._ptr, x._ptr);
@@ -247,7 +249,8 @@ pragma(inline) Integer abs(const ref Integer x) @trusted pure nothrow @nogc
 }
 
 /// Swap contents of `x` with contents of `y`.
-pragma(inline) void swap(ref Integer x, ref Integer y) @trusted pure nothrow @nogc
+pragma(inline)
+void swap(ref Integer x, ref Integer y) @trusted pure nothrow @nogc
 {
     x.swap(y);
 }
