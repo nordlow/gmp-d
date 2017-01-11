@@ -54,18 +54,30 @@ struct Integer
     {
         assert(base == 0 || base >= 2 && base <= 62);
 
-        char* stringz = cast(char*)malloc(value.length + 1);
+        // @nogc variant of `toStringz` with scoped heap allocation of null-terminated C-string `stringz`
+        char* stringz = cast(char*)qualifiedMalloc(value.length + 1);
         stringz[0 .. value.length] = value[];
         stringz[value.length] = '\0'; // set C null terminator
 
         const int status = __gmpz_init_set_str(_ptr, stringz, base);
 
-        free(stringz);
+        qualifiedFree(stringz);
         assert(status == 0, "Parameter `value` does not contain an integer");
     }
 
-    /// No implicit copy construction.
-    @disable this(this);
+    enum useCopy = false;       // disable copy construction for now
+    static if (useCopy)
+    {
+        this()(auto ref const Integer value)
+        {
+            mpz_init_set(_ptr, value._pt);
+        }
+    }
+    else
+    {
+        /// Disable copy construction.
+        @disable this(this);
+    }
 
     /** Initialize internal struct.
         Cannot be called `init` as that will override builtin type property.
@@ -216,6 +228,14 @@ private:
     inout(__mpz_struct)* _ptr() inout { return &_z; }
 
     __mpz_struct _z;
+
+    // qualified C memory managment
+    static @safe pure nothrow @nogc
+    {
+        pragma(mangle, "malloc") void* qualifiedMalloc(size_t size);
+        pragma(mangle, "free") void qualifiedFree(void* ptr);
+    }
+
 }
 
 /// Returns: absolute value of `x`.
@@ -420,13 +440,6 @@ extern(C)
 
     char *__gmpz_get_str (char*, int, mpz_srcptr);
     size_t __gmpz_sizeinbase (mpz_srcptr, int); // TODO __GMP_NOTHROW __GMP_ATTRIBUTE_PURE;
-
-    // qualified C memory allocations
-    @safe pure nothrow @nogc:
-    void* malloc(size_t size);
-    void* calloc(size_t nmemb, size_t size);
-    void* realloc(void* ptr, size_t size);
-    void free(void* ptr);
 }
 
 // link with C library GNU MP
