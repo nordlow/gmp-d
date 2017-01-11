@@ -1,3 +1,9 @@
-src/*.lst
+# DUB stuff
 .dub
+dub.selections.json
+
+# DMD coverage output
+src/*.lst
+
+# library
 libgmp-d.a
