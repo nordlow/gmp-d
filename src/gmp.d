@@ -43,12 +43,10 @@ struct Integer
 
     /// Construct from `value`.
     this(long value) { __gmpz_init_set_si(_ptr, value); }
-
-    /// Construct from `value`.
+    /// ditto
     this(ulong value) { __gmpz_init_set_ui(_ptr, value); }
-
-    /// Construct from `value`. TODO Use Optional/Nullable when value is nan, or inf
-    this(double value) { __gmpz_init_set_d(_ptr, value); }
+    /// ditto
+    this(double value) { __gmpz_init_set_d(_ptr, value); } // TODO Use Optional/Nullable when value is nan, or inf
 
     /// Construct from `value` in base `base`. TODO Use Optional/Nullable when value is nan, or inf
     this(const string value, int base = 0)
