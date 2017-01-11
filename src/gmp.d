@@ -67,6 +67,9 @@ struct Integer
     /// No implicit copy construction.
     @disable this(this);
 
+    /** Initialize internal struct.
+        Cannot be called `init` as that will override builtin type property.
+     */
     private void initialize()
     {
         __gmpz_init(_ptr);
