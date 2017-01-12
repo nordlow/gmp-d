@@ -10,4 +10,3 @@
   `long` and `ulong` like is done? The motivation should be that these alias to
   `int` and `uint` on non-Posix systems. This sounds like a very unportable
   solution.
-- https://github.com/gchatelet/deimos-mpfr
