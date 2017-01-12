@@ -203,7 +203,7 @@ struct Integer
     }
 
     Integer opBinary(string s, Unsigned)(Unsigned rhs) const
-        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
+        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
             isUnsigned!Unsigned)
     {
         typeof(return) y = null;
@@ -222,10 +222,6 @@ struct Integer
         else static if (s == "/")
         {
             __gmpz_tdiv_q_ui(y._ptr, _ptr, rhs);
-        }
-        else static if (s == "%")
-        {
-            __gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
         }
         else static if (s == "^^")
         {
@@ -290,6 +286,7 @@ struct Integer
         if ((s == "%") &&
             isSigned!Signed)
     {
+        pragma(msg, Signed);
         Integer y = null;
         if (rhs < 0)
         {
@@ -301,12 +298,20 @@ struct Integer
         }
     }
 
-    // ulong opBinary(string s)(ulong rhs) const
-    //     if ((s == "%"))
-    // {
-    //     Integer y = null;
-    //     return __gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
-    // }
+    Unsigned opBinary(string s, Unsigned)(Unsigned rhs) const
+        if ((s == "%") &&
+            isUnsigned!Unsigned)
+    {
+        Integer y = null;
+        if (rhs < 0)
+        {
+            return cast(Unsigned)__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
+        }
+        else
+        {
+            return cast(Unsigned)__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
+        }
+    }
 
     /// Returns: TODO
     ref Integer opOpAssign(string s)(auto ref const Integer rhs)
@@ -685,7 +690,7 @@ version(unittestPhobos) @safe @nogc unittest
         static assert(is(typeof(x % s)  == short));
         static assert(is(typeof(x % b)  == byte));
 
-        // static assert(is(typeof(x % ul)  == ulong));
+        static assert(is(typeof(x % ul)  == ulong));
 
         assert(x % l  == 500L);
         assert(x % ul == BigInt(500));
