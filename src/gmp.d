@@ -227,8 +227,8 @@ struct Integer
     /** Returns: `this` ^^ `power` (mod `modulo`).
         TODO lazily evaluation
      */
-    Integer powm(const ref Integer power, // TODO const auto ref
-                 const ref Integer modulo) const // TODO const auto ref
+    Integer powm(const ref Integer power, // TODO auto ref const
+                 const ref Integer modulo) const // TODO auto ref const
     {
         Integer rop = 0L;       // result
         __gmpz_powm(rop._ptr,
