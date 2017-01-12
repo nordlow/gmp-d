@@ -228,14 +228,16 @@ struct Integer
     /** Returns: `this` ^^ `power` (mod `modulo`).
         TODO lazily evaluation
      */
-    Integer powm()(const ref Integer power, // TODO auto ref const
-                   const ref Integer modulo) const // TODO auto ref const
+    Integer powm()(auto ref Integer power,
+                   auto ref Integer modulo) const
     {
         Integer rop = 0L;       // result
+        pragma(msg, typeof(power));
+        pragma(msg, typeof(modulo));
         __gmpz_powm(rop._ptr,
-                    this.dup._ptr, // TODO dup only if l-value (const ref)
-                    power.dup._ptr, // TODO dup only if l-value (const ref)
-                    modulo.dup._ptr); // TODO dup only if l-value (const ref)
+                    this.dup._ptr, // TODO dup only if ref
+                    power.dup._ptr, // TODO dup only if ref
+                    modulo.dup._ptr); // TODO dup only if ref
         return rop;
     }
 
@@ -430,8 +432,8 @@ pure unittest
     {
         foreach (const ulong j; 2 .. 100000)
         {
-            const p = M(i);       // power
-            const a = Integer(j); // base
+            auto p = M(i);       // power
+            auto a = Integer(j); // base
             auto amp = a % p;
             const b = a.powm(p, p); // result
             assert(b == amp);
