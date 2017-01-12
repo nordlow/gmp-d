@@ -12,6 +12,8 @@ debug import core.stdc.stdio : printf;
 */
 enum isLvalue(alias A) = is(typeof((ref _){}(A)));
 
+version = unittestLong;
+
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
 
@@ -475,7 +477,7 @@ Integer opBinary(string s)(ulong rhs, auto ref const Integer x) @nogc
 }
 
 // Fermats Little Theorem
-pure unittest
+version(unittestLong) pure unittest
 {
     // calculate a mersenne prime, M(p) = 2 ^ p - 1
     Integer M(in ulong p)
@@ -505,7 +507,7 @@ pure unittest
 }
 
 // Euler's Sum of Powers Conjecture counter example
-pure unittest
+version(unittestLong) pure unittest
 {
     debug printf("Running Test: Euler's Sum of Powers Conjecture counter example\n");
 
