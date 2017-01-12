@@ -371,11 +371,19 @@ struct MpZ
     {
         static      if (s == "+")
         {
-            if (rhs < 0) { __gmpz_sub_ui(_ptr, _ptr, rhs); }
-            else         { __gmpz_add_ui(_ptr, _ptr, rhs); }
+            assert(rhs != rhs.min); // TODO special case because -rhs.min is not correct
+            if (rhs < 0)
+            {
+                __gmpz_sub_ui(_ptr, _ptr, -rhs);
+            }
+            else
+            {
+                __gmpz_add_ui(_ptr, _ptr, rhs);
+            }
         }
         else static if (s == "-")
         {
+            static assert(false);
             if (rhs < 0) { __gmpz_add_ui(_ptr, _ptr, rhs); }
             else         { __gmpz_sub_ui(_ptr, _ptr, rhs); }
         }
@@ -639,6 +647,12 @@ version(unittestPhobos) @safe @nogc unittest
     alias BigInt = MpZ;     // Phobos naming convention
     {
         auto b = BigInt("1_000_000_000");
+
+        b += 12345;
+        assert(b == BigInt("1_000_012_345"));
+
+        b += -12345;
+        assert(b == BigInt("1_000_000_000"));
 
         b += 12345;
         assert(b == BigInt("1_000_012_345"));
