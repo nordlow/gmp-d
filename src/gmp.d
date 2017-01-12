@@ -183,11 +183,11 @@ struct Integer
         }
         else static if (s == "/")
         {
-            __gmpz_cdiv_q(y._ptr, _ptr, rhs._ptr);
+            __gmpz_tdiv_q(y._ptr, _ptr, rhs._ptr);
         }
         else static if (s == "%")
         {
-            __gmpz_mod(y._ptr, _ptr, rhs._ptr); // TODO use __gmpz_cdiv_r instead?
+            __gmpz_mod(y._ptr, _ptr, rhs._ptr);
         }
         else
         {
@@ -215,11 +215,11 @@ struct Integer
         }
         else static if (s == "/")
         {
-            __gmpz_cdiv_q_ui(y._ptr, _ptr, rhs);
+            __gmpz_tdiv_q_ui(y._ptr, _ptr, rhs);
         }
         else static if (s == "%")
         {
-            __gmpz_cdiv_r_ui(y._ptr, _ptr, rhs);
+            __gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
         }
         else static if (s == "^^")
         {
@@ -280,6 +280,29 @@ struct Integer
         return y;
     }
 
+    // Unsigned opBinary(string s, Unsigned)(Unsigned rhs) const
+    //     if ((s == "%") &&
+    //         isUnsigned!Unsigned)
+    // {
+    //     Integer y = null;
+    //     return cast(Unsigned)__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
+    // }
+
+    Signed opBinary(string s, Signed)(Signed rhs) const
+        if ((s == "%") &&
+            isSigned!Signed)
+    {
+        Integer y = null;
+        if (rhs < 0)
+        {
+            return cast(Signed)__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
+        }
+        else
+        {
+            return cast(Signed)__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
+        }
+    }
+
     /// Returns: TODO
     ref Integer opOpAssign(string s)(auto ref const Integer rhs)
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
@@ -298,11 +321,11 @@ struct Integer
         }
         else static if (s == "/")
         {
-            __gmpz_cdiv_q(_ptr, _ptr, rhs._ptr);
+            __gmpz_tdiv_q(_ptr, _ptr, rhs._ptr);
         }
         else static if (s == "%")
         {
-            __gmpz_cdiv_r(_ptr, _ptr, rhs._ptr);
+            __gmpz_tdiv_r(_ptr, _ptr, rhs._ptr);
         }
         else
         {
@@ -329,11 +352,11 @@ struct Integer
         }
         else static if (s == "/")
         {
-            __gmpz_cdiv_q_ui(_ptr, _ptr, rhs);
+            __gmpz_tdiv_q_ui(_ptr, _ptr, rhs);
         }
         else static if (s == "%")
         {
-            __gmpz_cdiv_r_ui(_ptr, _ptr, rhs);
+            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs);
         }
         else static if (s == "^^")
         {
@@ -650,12 +673,20 @@ version(unittestPhobos) @safe @nogc unittest
         ulong ul = 2_000_000UL;
         int   i  = 500_000;
         short s  = 30_000;
+        byte b = 50;
 
-        // TODO
-        // assert(is(typeof(x % l)  == long)   && x % l  == 500L);
-        // assert(is(typeof(x % ul) == BigInt) && x % ul == BigInt(500));
-        // assert(is(typeof(x % i)  == int)    && x % i  == 500);
-        // assert(is(typeof(x % s)  == int)    && x % s  == 10500);
+        static assert(is(typeof(x % l)  == long));
+        static assert(is(typeof(x % i)  == int));
+        static assert(is(typeof(x % s)  == short));
+        static assert(is(typeof(x % b)  == byte));
+
+        // TODO static assert(is(typeof(x % ul)  == ulong));
+
+        assert(x % l  == 500L);
+        assert(x % ul == BigInt(500));
+        assert(x % i  == 500);
+        assert(x % s  == 10500);
+        assert(x % b == 0);
     }
 }
 
@@ -787,7 +818,19 @@ extern(C)
     void __gmpz_mul_ui (mpz_ptr, mpz_srcptr, ulong);
 
     void __gmpz_cdiv_q_ui (mpz_ptr, mpz_srcptr, ulong);
-    void __gmpz_cdiv_r_ui (mpz_ptr, mpz_srcptr, ulong);
+    ulong __gmpz_cdiv_r_ui (mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_cdiv_qr_ui (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_cdiv_ui (mpz_srcptr, ulong);
+
+    void __gmpz_fdiv_q_ui (mpz_ptr, mpz_srcptr, ulong);
+    ulong __gmpz_fdiv_r_ui (mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_fdiv_qr_ui (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_fdiv_ui (mpz_srcptr, ulong);
+
+    void __gmpz_tdiv_q_ui (mpz_ptr, mpz_srcptr, ulong);
+    ulong __gmpz_tdiv_r_ui (mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_tdiv_qr_ui (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_tdiv_ui (mpz_srcptr, ulong);
 
     void __gmpz_mod (mpz_ptr, mpz_srcptr, mpz_srcptr);
 
