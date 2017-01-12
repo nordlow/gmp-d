@@ -13,6 +13,11 @@ version = unittestPhobos;
 private enum isSigned(T) = (is(T == long) || is(T == int) || is(T == short) || is(T == byte));
 private enum isUnsigned(T) = (is(T == ulong) || is(T == uint) || is(T == ushort) || is(T == ubyte));
 
+version(unittest)
+{
+    import dbgio;
+}
+
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
 
@@ -38,6 +43,8 @@ struct Integer
         __gmpz_get_str(cast(char*)str.ptr, base, _ptr);
         return str[0] == '-' ? str : str.ptr[0 .. size];
     }
+
+    // TODO toRCString wrapped in UniqueRange
 
     @nogc:
 
@@ -243,7 +250,7 @@ struct Integer
             }
             else
             {
-                __gmpz_sub_ui(y._ptr, _ptr, cast(ulong)rhs); // rhs is positive
+                __gmpz_sub_ui(y._ptr, _ptr, rhs); // rhs is positive
             }
         }
         else static if (s == "*")
@@ -254,7 +261,12 @@ struct Integer
         {
             if (rhs < 0)
             {
-                __gmpz_pow_ui(y._ptr, _ptr, rhs);
+                immutable ulong pos_rhs = -rhs; // make it positive
+                __gmpz_pow_ui(y._ptr, _ptr, pos_rhs); // use positive power
+                if (pos_rhs & 1)                      // if odd power
+                {
+                    __gmpz_neg(y._ptr, y._ptr); // negate result
+                }
             }
             else
             {
@@ -570,7 +582,9 @@ Integer opBinary(string s, Unsigned)(Unsigned x, auto ref const Integer y) @trus
     // exponentiation
     assert(Z(0)^^0 == 1);
     assert(Z(3)^^3 == 27);
+    assert(Z(3)^^(-3) == -27);
     assert(Z(2)^^8 == 256);
+    assert(Z(2)^^(-9) == -512);
 
     assert(Z.pow(2, 8) == 256);
 
