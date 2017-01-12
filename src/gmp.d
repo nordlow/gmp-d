@@ -296,7 +296,6 @@ struct Integer
         }
     }
 
-    /// Returns: TODO
     ref Integer opOpAssign(string s)(auto ref const Integer rhs)
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
@@ -326,7 +325,7 @@ struct Integer
         }
         return this;
     }
-    /// ditto
+
     ref Integer opOpAssign(string s, Unsigned)(Unsigned rhs)
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isUnsigned!Unsigned)
