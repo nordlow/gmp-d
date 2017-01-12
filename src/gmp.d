@@ -517,13 +517,13 @@ pure unittest
 
     Integer r1 = 0;
 outermost:
-    for (ulong a = 1; a <= LIMIT; a++)
+    foreach (const ulong a; 1 .. LIMIT)
     {
-        for (ulong b = a; b <= LIMIT; b++)
+        foreach (const ulong b; a .. LIMIT)
         {
-            for (ulong c = b; c <= LIMIT; c++)
+            foreach (const ulong c; b .. LIMIT)
             {
-                for (ulong d = c; d <= LIMIT; d++)
+                foreach (const ulong d; c .. LIMIT)
                 {
                     r1 = ((Integer(a) ^^ POWER) +
                           (Integer(b) ^^ POWER) +
@@ -612,7 +612,7 @@ extern(C)
     void __gmpz_powm (mpz_ptr, mpz_srcptr, mpz_srcptr, mpz_srcptr);
     void __gmpz_powm_ui (mpz_ptr, mpz_srcptr, ulong, mpz_srcptr);
 
-    void __gmpz_rootrem (mpz_srcptr, mpz_ptr, mpz_ptr, ulong);
+    void __gmpz_rootrem (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
 
     ulong __gmpz_get_ui (mpz_srcptr);
 }
