@@ -429,7 +429,7 @@ Integer opBinary(string s, Unsigned)(Unsigned x, auto ref const Integer y) @trus
     // subtraction
     assert(a - 2 == 40);
     assert(opBinary!"-"(44UL, Z(42)) == 2);
-    // TODO why does this fail?: assert(44UL - Z(42) == 2);
+    // TODO why does this fail when the above call to opBinary doesn't?: assert(44UL - Z(42) == 2);
 
     // multiplication
     assert(a * 1UL == a);
