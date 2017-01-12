@@ -371,10 +371,11 @@ struct MpZ
     {
         static      if (s == "+")
         {
-            assert(rhs != rhs.min); // TODO special case because -rhs.min is not correct
             if (rhs < 0)
             {
-                __gmpz_sub_ui(_ptr, _ptr, -rhs);
+                assert(rhs != rhs.min); // TODO special case because -rhs.min is not correct
+                immutable ulong pos_rhs = -rhs;
+                __gmpz_sub_ui(_ptr, _ptr, pos_rhs);
             }
             else
             {
@@ -383,7 +384,6 @@ struct MpZ
         }
         else static if (s == "-")
         {
-            static assert(false);
             if (rhs < 0) { __gmpz_add_ui(_ptr, _ptr, rhs); }
             else         { __gmpz_sub_ui(_ptr, _ptr, rhs); }
         }
