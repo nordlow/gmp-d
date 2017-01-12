@@ -154,6 +154,9 @@ struct Integer
     /// ditto
     int opCmp(uint rhs) const { return opCmp(cast(ulong)rhs); }
 
+    // cast
+    ulong opCast(T : ulong)() { return __gmpz_get_ui(_ptr); }
+
     /// Add `this` with `rhs`.
     Integer opBinary(string s)(auto ref const Integer rhs) const
         if (s == "+")
@@ -534,7 +537,7 @@ outermost:
                     if (rem == 0UL)
                     {
                         debug printf("Counter Example Found: %lu^5 + %lu^5 + %lu^5 + %lu^5 = %lu^5\n",
-                                     a, b, c, d, __gmpz_get_ui(r1._ptr));
+                                     a, b, c, d, cast(ulong)r1);
                         found = true;
                         break outermost;
                     }
@@ -611,7 +614,7 @@ extern(C)
 
     void __gmpz_rootrem (mpz_srcptr, mpz_ptr, mpz_ptr, ulong);
 
-    ulong __gmpz_get_ui (mpz_srcptr); // TODO map to cast(ulong)
+    ulong __gmpz_get_ui (mpz_srcptr);
 }
 
 // link with C library GNU MP
