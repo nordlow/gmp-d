@@ -273,6 +273,7 @@ struct Integer
         return y;
     }
 
+    /// Remainer propagates modulus type.
     Unqual!Integral opBinary(string s, Integral)(Integral rhs) const
         if ((s == "%") &&
             isIntegral!Integral)
