@@ -384,8 +384,16 @@ struct MpZ
         }
         else static if (s == "-")
         {
-            if (rhs < 0) { __gmpz_add_ui(_ptr, _ptr, rhs); }
-            else         { __gmpz_sub_ui(_ptr, _ptr, rhs); }
+            if (rhs < 0)
+            {
+                assert(rhs != rhs.min); // TODO special case because -rhs.min is not correct
+                immutable ulong pos_rhs = -rhs; // make it positive
+                __gmpz_add_ui(_ptr, _ptr, pos_rhs);
+            }
+            else
+            {
+                __gmpz_sub_ui(_ptr, _ptr, rhs);
+            }
         }
         else static if (s == "*")
         {
@@ -649,36 +657,40 @@ version(unittestPhobos) @safe @nogc unittest
         auto b = BigInt("1_000_000_000");
 
         b += 12345;
-        assert(b == BigInt("1_000_012_345"));
-
+        assert(b == 1_000_012_345);
         b += -12345;
-        assert(b == BigInt("1_000_000_000"));
+        assert(b == 1_000_000_000);
+
+        b -= -12345;
+        assert(b == 1_000_012_345);
+        b -= +12345;
+        assert(b == 1_000_000_000);
 
         b += 12345;
-        assert(b == BigInt("1_000_012_345"));
+        assert(b == 1_000_012_345);
 
         b /= 5UL;
-        assert(b == BigInt("200_002_469"));
+        assert(b == 200_002_469);
     }
 
     {
         auto x = BigInt("123");
         auto y = BigInt("321");
         x += y;
-        assert(x == BigInt("444"));
+        assert(x == 444);
     }
 
     {
         auto x = BigInt("123");
         auto y = BigInt("456");
         BigInt z = x * y;
-        assert(z == BigInt("56088"));
+        assert(z == 56088);
     }
 
     {
         auto x = BigInt("123");
         x *= 300;
-        assert(x == BigInt("36900"));
+        assert(x == 36900);
     }
 
     {
