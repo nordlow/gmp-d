@@ -431,7 +431,7 @@ unittest
     {
         for (ulong j = 2; j <= 100000; j++)
         {
-            const p = M(i);   // power
+            const p = M(i);       // power
             const a = Integer(j); // base
             auto amp = a % p;
             const b = a.powm(p, p); // result
