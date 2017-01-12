@@ -240,20 +240,16 @@ struct Integer
     }
 
     /** Returns: `this` ^^ `power` (mod `modulo`).
-        TODO how do I check if power and module are passed as refs or values?
         TODO lazily evaluation
      */
-    Integer powm()(auto ref Integer power,
-                   auto ref Integer modulo) const
+    Integer powm()(auto ref const Integer power,
+                   auto ref const Integer modulo) const
     {
         Integer rop = 0L;       // result
-        pragma(msg, typeof(power),  ": ", isLvalue!(typeof(power)));
-        pragma(msg, typeof(modulo),  ": ", isLvalue!(typeof(modulo)));
-        pragma(msg, typeof(rop),  ": ", isLvalue!(typeof(rop)));
         __gmpz_powm(rop._ptr,
-                    this.dup._ptr, // TODO dup only if ref
-                    power.dup._ptr, // TODO dup only if ref
-                    modulo.dup._ptr); // TODO dup only if ref
+                    this._ptr,
+                    power._ptr,
+                    modulo._ptr);
         return rop;
     }
 
@@ -569,12 +565,11 @@ extern(C)
     char *__gmpz_get_str (char*, int, mpz_srcptr);
     size_t __gmpz_sizeinbase (mpz_srcptr, int); // TODO __GMP_NOTHROW __GMP_ATTRIBUTE_PURE;
 
-    // TODO add high-level wrappers for these
-    void __gmpz_powm (mpz_srcptr, mpz_ptr, mpz_ptr, mpz_ptr);
+    void __gmpz_powm (mpz_ptr, mpz_srcptr, mpz_srcptr, mpz_srcptr);
 
     void __gmpz_rootrem (mpz_srcptr, mpz_ptr, mpz_ptr, ulong);
 
-    ulong __gmpz_get_ui (mpz_srcptr);
+    ulong __gmpz_get_ui (mpz_srcptr); // TODO map to cast(ulong)
 }
 
 // link with C library GNU MP
