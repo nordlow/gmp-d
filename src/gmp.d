@@ -224,6 +224,20 @@ struct Integer
         return y;
     }
 
+    /** Returns: `this` ^^ `power` (mod `modulo`).
+        TODO lazily evaluation
+     */
+    Integer powm(const ref Integer power, // TODO const auto ref
+                 const ref Integer modulo) const // TODO const auto ref
+    {
+        Integer rop = 0L;
+        __gmpz_powm(rop._ptr,
+                    this.dup._ptr, // TODO dup only if l-value (const ref)
+                    power.dup._ptr, // TODO dup only if l-value (const ref)
+                    modulo.dup._ptr); // TODO dup only if l-value (const ref)
+        return rop;
+    }
+
     /// Returns: number of digits in base `base`.
     size_t sizeInBase(int base) const
     {
@@ -417,15 +431,11 @@ unittest
     {
         for (ulong j = 2; j <= 100000; j++)
         {
-            Integer p = M(i);
-            Integer a = j;
-            Integer lhs = 0L;
-            __gmpz_powm(lhs._ptr,
-                        a._ptr,
-                        p._ptr,
-                        p._ptr);
-            // TODO can we use lazy evaluation on lhs = a^^p (mod p)
-            assert(lhs == a % p);
+            Integer p = M(i);   // power
+            Integer a = j;      // base
+            Integer amp = a % p;
+            Integer b = a.powm(p, p); // result
+            assert(b == amp);
         }
     }
 }
