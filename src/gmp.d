@@ -426,7 +426,7 @@ pure nothrow:
 /// convert to string
 @safe unittest
 {
-    alias Z = Integer;          // shorthand
+    alias Z = Integer;
     assert(Z(42).toString == `42`);
     assert(Z(-42).toString == `-42`);
     assert(Z(`-101`).toString == `-101`);
@@ -462,7 +462,7 @@ Integer opBinary(string s, Unsigned)(Unsigned x, auto ref const Integer y) @trus
 ///
 @safe @nogc unittest
 {
-    alias Z = Integer;          // shorthand
+    alias Z = Integer;
 
     const Z _ = cast(uint)42;
     const Z a = 42;
