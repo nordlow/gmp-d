@@ -428,7 +428,7 @@ Integer opBinary(string s, Unsigned)(Unsigned x, auto ref const Integer y) @trus
 
     // subtraction
     assert(a - 2 == 40);
-    // assert(cast(ulong)44 - a == 2);
+    // TODO assert(44 - a == 2);
 
     // multiplication
     assert(a * 1UL == a);
