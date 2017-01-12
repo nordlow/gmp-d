@@ -19,7 +19,7 @@ version(unittest)
 
 /** Arbitrary precision signed integer (Z).
  */
-struct Integer
+struct MpZ
 {
     import std.typecons : Unqual;
     import std.traits : isSigned, isUnsigned, isIntegral;
@@ -52,7 +52,7 @@ struct Integer
     this(typeof(null))
     {
         initialize();           // TODO remove if this is same as zero bitblit
-        assert(this == Integer.init); // if this is same as default
+        assert(this == MpZ.init); // if this is same as default
     }
 
     /// Construct from `value`.
@@ -93,7 +93,7 @@ struct Integer
     enum useCopy = false;       // disable copy construction for now
     static if (useCopy)
     {
-        this()(auto ref const Integer value)
+        this()(auto ref const MpZ value)
         {
             mpz_init_set(_ptr, value._pt);
         }
@@ -113,13 +113,13 @@ struct Integer
     }
 
     /// Swap content of `this` with `rhs`.
-    void swap(ref Integer rhs)
+    void swap(ref MpZ rhs)
     {
         __gmpz_swap(_ptr, rhs._ptr);
     }
 
     /// Returns: (duplicate) copy of `this`.
-    Integer dup() const
+    MpZ dup() const
     {
         typeof(return) y = void;
         __gmpz_init_set(y._ptr, _ptr);
@@ -130,7 +130,7 @@ struct Integer
     ~this() { if (_ptr) { __gmpz_clear(_ptr); } }
 
     /// Returns: `true` iff `this` equals `rhs`.
-    bool opEquals()(auto ref const Integer rhs) const
+    bool opEquals()(auto ref const MpZ rhs) const
     {
         return (_ptr == rhs._ptr || // fast compare
                 __gmpz_cmp(_ptr, rhs._ptr) == 0);
@@ -147,7 +147,7 @@ struct Integer
     bool opEquals(uint rhs) const { return opEquals(cast(ulong)rhs); }
 
     // comparison
-    int opCmp()(auto ref const Integer rhs) const { return __gmpz_cmp(_ptr, rhs._ptr); }
+    int opCmp()(auto ref const MpZ rhs) const { return __gmpz_cmp(_ptr, rhs._ptr); }
     /// ditto
     int opCmp(double rhs) const { return __gmpz_cmp_d(_ptr, rhs); }
     /// ditto
@@ -162,7 +162,7 @@ struct Integer
     /// Cast to `ulong`.
     ulong opCast(T : ulong)() const { return __gmpz_get_ui(_ptr); }
 
-    Integer opBinary(string s)(auto ref const Integer rhs) const
+    MpZ opBinary(string s)(auto ref const MpZ rhs) const
         if (s == "+" || s == "-" || s == "*" || s == "/" || s == "%")
     {
         typeof(return) y = null;
@@ -193,7 +193,7 @@ struct Integer
         return y;
     }
 
-    Integer opBinary(string s, Unsigned)(Unsigned rhs) const
+    MpZ opBinary(string s, Unsigned)(Unsigned rhs) const
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
             isUnsigned!Unsigned)
     {
@@ -225,7 +225,7 @@ struct Integer
         return y;
     }
 
-    Integer opBinary(string s, Signed)(Signed rhs) const
+    MpZ opBinary(string s, Signed)(Signed rhs) const
         if ((s == "+" || s == "-" || s == "*" || s == "^^") &&
             isSigned!Signed)
     {
@@ -278,7 +278,7 @@ struct Integer
         if ((s == "%") &&
             isIntegral!Integral)
     {
-        Integer y = null;
+        MpZ y = null;
         static if (isSigned!Integral)
         {
             if (rhs < 0)
@@ -300,7 +300,7 @@ struct Integer
         }
     }
 
-    ref Integer opOpAssign(string s)(auto ref const Integer rhs)
+    ref MpZ opOpAssign(string s)(auto ref const MpZ rhs)
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
         static      if (s == "+")
@@ -330,7 +330,7 @@ struct Integer
         return this;
     }
 
-    ref Integer opOpAssign(string s, Unsigned)(Unsigned rhs)
+    ref MpZ opOpAssign(string s, Unsigned)(Unsigned rhs)
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isUnsigned!Unsigned)
     {
@@ -365,7 +365,7 @@ struct Integer
         return this;
     }
 
-    ref Integer opOpAssign(string s, Signed)(Signed rhs)
+    ref MpZ opOpAssign(string s, Signed)(Signed rhs)
         if ((s == "+" || s == "-" || s == "*") &&
             isSigned!Signed)
     {
@@ -391,7 +391,7 @@ struct Integer
     }
 
     /// Returns: negation of `this`.
-    Integer opUnary(string s)() const
+    MpZ opUnary(string s)() const
         if (s == "-")
     {
         typeof(return) y = null;
@@ -400,7 +400,7 @@ struct Integer
     }
 
     /// Returns: `base` raised to the power of `exp`.
-    static Integer pow(ulong base, ulong exp)
+    static MpZ pow(ulong base, ulong exp)
     {
         typeof(return) y = null;
         __gmpz_ui_pow_ui(y._ptr, base, exp);
@@ -410,8 +410,8 @@ struct Integer
     /** Returns: `this` ^^ `power` (mod `modulo`).
         TODO can we somehow capture lazy evaluation?
      */
-    Integer powm()(auto ref const Integer power,
-                   auto ref const Integer modulo) const
+    MpZ powm()(auto ref const MpZ power,
+                   auto ref const MpZ modulo) const
     {
         typeof(return) rop = 0; // result
         __gmpz_powm(rop._ptr,
@@ -421,8 +421,8 @@ struct Integer
         return rop;
     }
     /// ditto
-    Integer powm()(ulong power,
-                   auto ref const Integer modulo) const
+    MpZ powm()(ulong power,
+                   auto ref const MpZ modulo) const
     {
         typeof(return) rop = 0;       // result
         __gmpz_powm_ui(rop._ptr,
@@ -459,7 +459,7 @@ pure nothrow:
 /// convert to string
 @safe unittest
 {
-    alias Z = Integer;
+    alias Z = MpZ;
     assert(Z(42).toString == `42`);
     assert(Z(-42).toString == `-42`);
     assert(Z(`-101`).toString == `-101`);
@@ -467,7 +467,7 @@ pure nothrow:
 
 /// Returns: absolute value of `x`.
 pragma(inline)
-Integer abs(const ref Integer x) @trusted @nogc
+MpZ abs(const ref MpZ x) @trusted @nogc
 {
     typeof(return) y = null;
     __gmpz_abs(y._ptr, x._ptr);
@@ -476,7 +476,7 @@ Integer abs(const ref Integer x) @trusted @nogc
 
 /// Swap contents of `x` with contents of `y`.
 pragma(inline)
-void swap(ref Integer x, ref Integer y) @trusted @nogc
+void swap(ref MpZ x, ref MpZ y) @trusted @nogc
 {
     x.swap(y);
 }
@@ -485,7 +485,7 @@ void swap(ref Integer x, ref Integer y) @trusted @nogc
 /// TODO use http://dlang.org/phobos/std_bigint.html#.BigInt.opBinaryRight instead
 import std.traits : isUnsigned;
 pragma(inline)
-Integer opBinary(string s, Unsigned)(Unsigned x, auto ref const Integer y) @trusted @nogc
+MpZ opBinary(string s, Unsigned)(Unsigned x, auto ref const MpZ y) @trusted @nogc
     if (s == "-" &&
         isUnsigned!Unsigned)
 {
@@ -497,7 +497,7 @@ Integer opBinary(string s, Unsigned)(Unsigned x, auto ref const Integer y) @trus
 ///
 @safe @nogc unittest
 {
-    alias Z = Integer;
+    alias Z = MpZ;
 
     const Z _ = cast(uint)42;
     const Z a = 42;
@@ -636,7 +636,7 @@ Integer opBinary(string s, Unsigned)(Unsigned x, auto ref const Integer y) @trus
 /// Phobos unittests
 version(unittestPhobos) @safe @nogc unittest
 {
-    alias BigInt = Integer;     // Phobos naming convention
+    alias BigInt = MpZ;     // Phobos naming convention
     {
         auto b = BigInt("1_000_000_000");
 
@@ -706,7 +706,7 @@ version(unittestPhobos) @safe @nogc unittest
 pure unittest
 {
     // calculate a mersenne prime, M(p) = 2 ^ p - 1
-    Integer M(ulong p)
+    MpZ M(ulong p)
     {
         typeof(return) x = 2UL;
         x ^^= p;
@@ -724,7 +724,7 @@ pure unittest
             foreach (immutable ulong j; 2 .. 100000)
             {
                 const p = M(i);       // power
-                const a = Integer(j); // base
+                const a = MpZ(j); // base
                 const amp = a % p;
                 const b = a.powm(p, p); // result
                 assert(b == amp);
@@ -750,7 +750,7 @@ pure unittest
     if (unittestLong) // compile but not run unless flagged for because running is slow
     {
         bool found = false;
-        Integer r1 = 0;
+        MpZ r1 = 0;
     outermost:
         foreach (immutable ulong a; 1 .. LIMIT)
         {
@@ -760,11 +760,11 @@ pure unittest
                 {
                     foreach (immutable ulong d; c .. LIMIT)
                     {
-                        r1 = ((Integer(a) ^^ POWER) +
-                              (Integer(b) ^^ POWER) +
-                              (Integer(c) ^^ POWER) +
-                              (Integer(d) ^^ POWER));
-                        Integer rem = 0;
+                        r1 = ((MpZ(a) ^^ POWER) +
+                              (MpZ(b) ^^ POWER) +
+                              (MpZ(c) ^^ POWER) +
+                              (MpZ(d) ^^ POWER));
+                        MpZ rem = 0;
                         __gmpz_rootrem(r1._ptr,
                                        rem._ptr,
                                        r1._ptr,
