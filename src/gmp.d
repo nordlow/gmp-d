@@ -6,6 +6,12 @@ module gmp;
 import std.stdio : writeln;
 debug import core.stdc.stdio : printf;
 
+/** Is `true` if `A` is an l-value, `false` otherwise.
+    See also: https://forum.dlang.org/post/mailman.4192.1454351296.22025.digitalmars-d-learn@puremagic.com
+    TODO Add to Phobos
+*/
+enum isLvalue(alias A) = is(typeof((ref _){}(A)));
+
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
 
@@ -209,6 +215,14 @@ struct Integer
         return y;
     }
 
+    /// Returns: `base` raised to the power of `exp`.
+    static Integer pow(ulong base, ulong exp)
+    {
+        typeof(return) y = null;
+        __gmpz_ui_pow_ui(y._ptr, base, exp);
+        return y;
+    }
+
     ref Integer opOpAssign(string s)(ulong exp)
         if (s == "^^")
     {
@@ -226,14 +240,16 @@ struct Integer
     }
 
     /** Returns: `this` ^^ `power` (mod `modulo`).
+        TODO how do I check if power and module are passed as refs or values?
         TODO lazily evaluation
      */
     Integer powm()(auto ref Integer power,
                    auto ref Integer modulo) const
     {
         Integer rop = 0L;       // result
-        pragma(msg, typeof(power));
-        pragma(msg, typeof(modulo));
+        pragma(msg, typeof(power),  ": ", isLvalue!(typeof(power)));
+        pragma(msg, typeof(modulo),  ": ", isLvalue!(typeof(modulo)));
+        pragma(msg, typeof(rop),  ": ", isLvalue!(typeof(rop)));
         __gmpz_powm(rop._ptr,
                     this.dup._ptr, // TODO dup only if ref
                     power.dup._ptr, // TODO dup only if ref
@@ -541,6 +557,7 @@ extern(C)
     void __gmpz_mod (mpz_ptr, mpz_srcptr, mpz_srcptr);
 
     void __gmpz_pow_ui (mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_ui_pow_ui (mpz_ptr, ulong, ulong);
 
     void __gmpz_swap (mpz_ptr, mpz_ptr); // TODO: __GMP_NOTHROW;
 
