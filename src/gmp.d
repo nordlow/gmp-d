@@ -371,11 +371,13 @@ struct Integer
     {
         static      if (s == "+")
         {
-            __gmpz_add_si(_ptr, _ptr, rhs);
+            if (rhs < 0) { __gmpz_sub_ui(_ptr, _ptr, rhs); }
+            else         { __gmpz_add_ui(_ptr, _ptr, rhs); }
         }
         else static if (s == "-")
         {
-            __gmpz_sub_si(_ptr, _ptr, rhs);
+            if (rhs < 0) { __gmpz_add_ui(_ptr, _ptr, rhs); }
+            else         { __gmpz_sub_ui(_ptr, _ptr, rhs); }
         }
         else static if (s == "*")
         {
@@ -638,7 +640,7 @@ version(unittestPhobos) @safe @nogc unittest
     {
         auto b = BigInt("1_000_000_000");
 
-        b += 12345UL;
+        b += 12345;
         assert(b == BigInt("1_000_012_345"));
 
         b /= 5UL;
@@ -661,7 +663,7 @@ version(unittestPhobos) @safe @nogc unittest
 
     {
         auto x = BigInt("123");
-        x *= 300UL;
+        x *= 300;
         assert(x == BigInt("36900"));
     }
 
