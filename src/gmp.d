@@ -484,9 +484,9 @@ pure unittest
       Fermats little theorem: a ^ p ≡ a (mod p) ∀ prime p
       check Fermats little theorem for a ≤ 100000 and all mersene primes M(p) : p ≤ 127
      */
-    foreach (const ulong i; [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127])
+    foreach (immutable ulong i; [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127])
     {
-        foreach (const ulong j; 2 .. 100000)
+        foreach (immutable ulong j; 2 .. 100000)
         {
             const p = M(i);       // power
             const a = Integer(j); // base
@@ -517,13 +517,13 @@ pure unittest
 
     Integer r1 = 0;
 outermost:
-    foreach (const ulong a; 1 .. LIMIT)
+    foreach (immutable ulong a; 1 .. LIMIT)
     {
-        foreach (const ulong b; a .. LIMIT)
+        foreach (immutable ulong b; a .. LIMIT)
         {
-            foreach (const ulong c; b .. LIMIT)
+            foreach (immutable ulong c; b .. LIMIT)
             {
-                foreach (const ulong d; c .. LIMIT)
+                foreach (immutable ulong d; c .. LIMIT)
                 {
                     r1 = ((Integer(a) ^^ POWER) +
                           (Integer(b) ^^ POWER) +
