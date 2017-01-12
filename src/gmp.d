@@ -9,16 +9,6 @@ debug import core.stdc.stdio : printf;
 enum unittestLong = false;
 version = unittestPhobos;
 
-// local helper traits
-private enum isSigned(T) = (is(T == int) || // most probable first
-                            is(T == long) ||
-                            is(T == short) ||
-                            is(T == byte));
-private enum isUnsigned(T) = (is(T == uint) || // most probable first
-                              is(T == ulong) ||
-                              is(T == ushort) ||
-                              is(T == ubyte));
-
 version(unittest)
 {
     import dbgio;
@@ -32,6 +22,7 @@ version(unittest)
 struct Integer
 {
     import std.typecons : Unqual;
+    import std.traits : isSigned, isUnsigned, isIntegral;
 
     /// Default conversion base.
     private enum defaultBase = 10;
@@ -484,6 +475,8 @@ void swap(ref Integer x, ref Integer y) @trusted @nogc
 {
     x.swap(y);
 }
+
+import std.traits : isUnsigned;
 
 /// Returns: subtraction `x` - `y`. TODO use http://dlang.org/phobos/std_bigint.html#.BigInt.opBinaryRight instead
 pragma(inline)
