@@ -350,6 +350,8 @@ Integer opBinary(string s)(ulong rhs, auto ref const Integer x) @nogc
 @safe @nogc unittest
 {
     alias Z = Integer;          // shorthand
+
+    const Z _ = cast(uint)42;
     const Z a = 42;
     const Z b = 43UL;
     const Z c = 43.0;
