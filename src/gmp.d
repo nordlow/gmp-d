@@ -282,35 +282,27 @@ struct Integer
         return y;
     }
 
-    Signed opBinary(string s, Signed)(Signed rhs) const
+    Unqual!Signed opBinary(string s, Signed)(Signed rhs) const
         if ((s == "%") &&
             isSigned!Signed)
     {
-        pragma(msg, Signed);
         Integer y = null;
         if (rhs < 0)
         {
-            return cast(Signed)__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
+            return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
         }
         else
         {
-            return cast(Signed)__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
+            return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
         }
     }
 
-    Unsigned opBinary(string s, Unsigned)(Unsigned rhs) const
+    Unqual!Unsigned opBinary(string s, Unsigned)(Unsigned rhs) const
         if ((s == "%") &&
             isUnsigned!Unsigned)
     {
         Integer y = null;
-        if (rhs < 0)
-        {
-            return cast(Unsigned)__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
-        }
-        else
-        {
-            return cast(Unsigned)__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
-        }
+        return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
     }
 
     /// Returns: TODO
@@ -679,21 +671,33 @@ version(unittestPhobos) @safe @nogc unittest
 
     {
         auto  x  = BigInt("1_000_000_500");
-        long  l  = 1_000_000L;
-        ulong ul = 2_000_000UL;
-        int   i  = 500_000;
-        short s  = 30_000;
-        byte b = 50;
+
+        ulong ul  = 2_000_000UL;
+        uint ui   = 500_000;
+        ushort us = 30_000;
+        ubyte ub  = 50;
+
+        long  l = 1_000_000L;
+        int   i = 500_000;
+        short s = 30_000;
+        byte b  = 50;
+
+        static assert(is(typeof(x % ul)  == ulong));
+        static assert(is(typeof(x % ui)  == uint));
+        static assert(is(typeof(x % us)  == ushort));
+        static assert(is(typeof(x % ub)  == ubyte));
 
         static assert(is(typeof(x % l)  == long));
         static assert(is(typeof(x % i)  == int));
         static assert(is(typeof(x % s)  == short));
         static assert(is(typeof(x % b)  == byte));
 
-        static assert(is(typeof(x % ul)  == ulong));
+        assert(x % ul == BigInt(500));
+        assert(x % ui == BigInt(500));
+        assert(x % us  == 10500);
+        assert(x % ub == 0);
 
         assert(x % l  == 500L);
-        assert(x % ul == BigInt(500));
         assert(x % i  == 500);
         assert(x % s  == 10500);
         assert(x % b == 0);
