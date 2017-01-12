@@ -197,16 +197,20 @@ struct Integer
         return y;
     }
     /// ditto
-    Integer opBinary(string s)(long rhs) const
-        if (s == "*")
+    Integer opBinary(string s, Signed)(Signed rhs) const
+        if (s == "*" &&
+            (is(Signed == long) ||
+             is(Signed == int)))
     {
         typeof(return) y = null;
         __gmpz_mul_si(y._ptr, this._ptr, rhs);
         return y;
     }
     /// ditto
-    Integer opBinary(string s)(ulong rhs) const
-        if (s == "*")
+    Integer opBinary(string s, Unsigned)(Unsigned rhs) const
+        if (s == "*" &&
+            (is(Unsigned == ulong) ||
+             is(Unsigned == uint)))
     {
         typeof(return) y = null;
         __gmpz_mul_ui(y._ptr, this._ptr, rhs);
@@ -239,6 +243,7 @@ struct Integer
         return y;
     }
 
+    /// Operate and assign `exp`.
     ref Integer opOpAssign(string s)(ulong exp)
         if (s == "^^")
     {
