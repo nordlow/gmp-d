@@ -273,27 +273,26 @@ struct Integer
         return y;
     }
 
-    Unqual!Signed opBinary(string s, Signed)(Signed rhs) const
+    Unqual!Integral opBinary(string s, Integral)(Integral rhs) const
         if ((s == "%") &&
-            isSigned!Signed)
+            isIntegral!Integral)
     {
         Integer y = null;
-        if (rhs < 0)
+        static if (isSigned!Integral)
+        {
+            if (rhs < 0)
+            {
+                return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
+            }
+            else
+            {
+                return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
+            }
+        }
+        else static if (isUnsigned!Integral)
         {
             return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
         }
-        else
-        {
-            return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
-        }
-    }
-
-    Unqual!Unsigned opBinary(string s, Unsigned)(Unsigned rhs) const
-        if ((s == "%") &&
-            isUnsigned!Unsigned)
-    {
-        Integer y = null;
-        return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
     }
 
     /// Returns: TODO
