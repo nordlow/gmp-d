@@ -731,7 +731,7 @@ version(unittestPhobos) @safe @nogc unittest
 // Fermats Little Theorem
 pure unittest
 {
-    // calculate a mersenne prime, M(p) = 2 ^ p - 1
+    // calculate a Mersenne prime, M(p) = 2 ^ p - 1
     MpZ M(ulong p)
     {
         typeof(return) x = 2UL;
