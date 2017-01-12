@@ -421,6 +421,15 @@ Integer opBinary(string s)(ulong rhs, const auto ref Integer x) @nogc
     assert(Z(3L)^^3L == 27L);
     assert(Z(2L)^^8L == 256L);
 
+    // exponentiation plus modulus
+    assert(Z(2L).powm(Z(8L), Z(8L)) == Z(0L));
+    assert(Z(2L).powm(Z(3L), Z(16L)) == Z(8L));
+    assert(Z(3L).powm(Z(3L), Z(16L)) == Z(11L));
+
+    assert(Z(2L).powm(8L, Z(8L)) == Z(0L));
+    assert(Z(2L).powm(3L, Z(16L)) == Z(8L));
+    assert(Z(3L).powm(3L, Z(16L)) == Z(11L));
+
     // swap
     Z x = 42L;
     Z y = 43L;
