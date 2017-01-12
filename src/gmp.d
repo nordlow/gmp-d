@@ -411,7 +411,7 @@ struct MpZ
         TODO can we somehow capture lazy evaluation?
      */
     MpZ powm()(auto ref const MpZ power,
-                   auto ref const MpZ modulo) const
+               auto ref const MpZ modulo) const
     {
         typeof(return) rop = 0; // result
         __gmpz_powm(rop._ptr,
@@ -422,7 +422,7 @@ struct MpZ
     }
     /// ditto
     MpZ powm()(ulong power,
-                   auto ref const MpZ modulo) const
+               auto ref const MpZ modulo) const
     {
         typeof(return) rop = 0;       // result
         __gmpz_powm_ui(rop._ptr,
