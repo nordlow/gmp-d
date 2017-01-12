@@ -380,6 +380,7 @@ Integer opBinary(string s)(ulong rhs, auto ref const Integer x) @nogc
     assert(a == Z(42UL));
     assert(a == 42.0);
     assert(a == 42);
+    assert(a == cast(uint)42);
     assert(a == 42UL);
 
     // non-equality
@@ -389,6 +390,7 @@ Integer opBinary(string s)(ulong rhs, auto ref const Integer x) @nogc
     assert(a < b);
     assert(a < Z(43UL));
     assert(a < 43);
+    assert(a < cast(uint)43);
     assert(a < 43UL);
     assert(a < 43.0);
 
@@ -396,6 +398,7 @@ Integer opBinary(string s)(ulong rhs, auto ref const Integer x) @nogc
     assert(b > a);
     assert(b > Z(42UL));
     assert(b > 42);
+    assert(b > cast(uint)42);
     assert(b > 42UL);
     assert(b > 42.0);
 
@@ -444,6 +447,8 @@ Integer opBinary(string s)(ulong rhs, auto ref const Integer x) @nogc
     assert(Z(0)^^0 == 1);
     assert(Z(3)^^3 == 27);
     assert(Z(2)^^8 == 256);
+
+    assert(Z.pow(2, 8) == 256);
 
     // exponentiation plus modulus
     assert(Z(2).powm(Z(8), Z(8)) == Z(0));
