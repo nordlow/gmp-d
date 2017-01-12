@@ -252,6 +252,17 @@ struct Integer
                     modulo._ptr);
         return rop;
     }
+    /// ditto
+    Integer powm()(ulong power,
+                   auto ref const Integer modulo) const
+    {
+        Integer rop = 0L;       // result
+        __gmpz_powm_ui(rop._ptr,
+                       this._ptr,
+                       power,
+                       modulo._ptr);
+        return rop;
+    }
 
     /// Returns: number of digits in base `base`.
     size_t sizeInBase(int base) const
@@ -566,6 +577,7 @@ extern(C)
     size_t __gmpz_sizeinbase (mpz_srcptr, int); // TODO __GMP_NOTHROW __GMP_ATTRIBUTE_PURE;
 
     void __gmpz_powm (mpz_ptr, mpz_srcptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_powm_ui (mpz_ptr, mpz_srcptr, ulong, mpz_srcptr);
 
     void __gmpz_rootrem (mpz_srcptr, mpz_ptr, mpz_ptr, ulong);
 
