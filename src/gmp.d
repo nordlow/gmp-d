@@ -164,7 +164,7 @@ struct Integer
         if (s == "+")
     {
         typeof(return) y = null;
-        __gmpz_add(y._ptr, this._ptr, rhs._ptr);
+        __gmpz_add(y._ptr, _ptr, rhs._ptr);
         return y;
     }
     /// ditto
@@ -172,7 +172,7 @@ struct Integer
         if (s == "+")
     {
         typeof(return) y = null;
-        __gmpz_add_ui(y._ptr, this._ptr, rhs);
+        __gmpz_add_ui(y._ptr, _ptr, rhs);
         return y;
     }
 
@@ -181,7 +181,7 @@ struct Integer
         if (s == "-")
     {
         typeof(return) y = null;
-        __gmpz_sub(y._ptr, this._ptr, rhs._ptr);
+        __gmpz_sub(y._ptr, _ptr, rhs._ptr);
         return y;
     }
     /// ditto
@@ -189,7 +189,7 @@ struct Integer
         if (s == "-")
     {
         typeof(return) y = null;
-        __gmpz_sub_ui(y._ptr, this._ptr, rhs);
+        __gmpz_sub_ui(y._ptr, _ptr, rhs);
         return y;
     }
 
@@ -198,7 +198,7 @@ struct Integer
         if (s == "*")
     {
         typeof(return) y = null;
-        __gmpz_mul(y._ptr, this._ptr, rhs._ptr);
+        __gmpz_mul(y._ptr, _ptr, rhs._ptr);
         return y;
     }
     /// ditto
@@ -208,7 +208,7 @@ struct Integer
              is(Signed == int)))
     {
         typeof(return) y = null;
-        __gmpz_mul_si(y._ptr, this._ptr, rhs);
+        __gmpz_mul_si(y._ptr, _ptr, rhs);
         return y;
     }
     /// ditto
@@ -218,7 +218,7 @@ struct Integer
              is(Unsigned == uint)))
     {
         typeof(return) y = null;
-        __gmpz_mul_ui(y._ptr, this._ptr, rhs);
+        __gmpz_mul_ui(y._ptr, _ptr, rhs);
         return y;
     }
 
@@ -227,7 +227,7 @@ struct Integer
         if (s == "%")
     {
         typeof(return) y = null;
-        __gmpz_mod(y._ptr, this._ptr, rhs._ptr);
+        __gmpz_mod(y._ptr, _ptr, rhs._ptr);
         return y;
     }
 
@@ -236,7 +236,7 @@ struct Integer
         if (s == "^^")
     {
         typeof(return) y = null;
-        __gmpz_pow_ui(y._ptr, this._ptr, exp);
+        __gmpz_pow_ui(y._ptr, _ptr, exp);
         return y;
     }
 
@@ -252,7 +252,7 @@ struct Integer
     ref Integer opOpAssign(string s)(ulong exp)
         if (s == "^^")
     {
-        __gmpz_pow_ui(this._ptr, this._ptr, exp);
+        __gmpz_pow_ui(_ptr, _ptr, exp);
         return this;
     }
 
@@ -261,7 +261,7 @@ struct Integer
         if (s == "-")
     {
         typeof(return) y = null;
-        __gmpz_neg(y._ptr, this._ptr);
+        __gmpz_neg(y._ptr, _ptr);
         return y;
     }
 
@@ -273,7 +273,7 @@ struct Integer
     {
         typeof(return) rop = 0; // result
         __gmpz_powm(rop._ptr,
-                    this._ptr,
+                    _ptr,
                     power._ptr,
                     modulo._ptr);
         return rop;
@@ -284,7 +284,7 @@ struct Integer
     {
         typeof(return) rop = 0;       // result
         __gmpz_powm_ui(rop._ptr,
-                       this._ptr,
+                       _ptr,
                        power,
                        modulo._ptr);
         return rop;
