@@ -6,12 +6,6 @@ module gmp;
 import std.stdio : writeln;
 debug import core.stdc.stdio : printf;
 
-/** Is `true` if `A` is an l-value, `false` otherwise.
-    See also: https://forum.dlang.org/post/mailman.4192.1454351296.22025.digitalmars-d-learn@puremagic.com
-    TODO Add to Phobos
-*/
-enum isLvalue(alias A) = is(typeof((ref _){}(A)));
-
 // version = unittestLong;
 version = unittestPhobos;
 
