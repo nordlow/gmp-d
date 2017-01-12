@@ -252,7 +252,7 @@ private:
     /// Returns: pointer to internal GMP C struct.
     inout(__mpz_struct)* _ptr() inout { return &_z; }
 
-    __mpz_struct _z;
+    __mpz_struct _z;            // internal libgmp C struct
 
     // qualified C memory managment
     static @safe pure nothrow @nogc
