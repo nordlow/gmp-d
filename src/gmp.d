@@ -480,9 +480,9 @@ pure unittest
     {
         foreach (const ulong j; 2 .. 100000)
         {
-            auto p = M(i);       // power
-            auto a = Integer(j); // base
-            auto amp = a % p;
+            const p = M(i);       // power
+            const a = Integer(j); // base
+            const amp = a % p;
             const b = a.powm(p, p); // result
             assert(b == amp);
         }
