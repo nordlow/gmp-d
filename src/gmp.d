@@ -12,7 +12,7 @@ debug import core.stdc.stdio : printf;
 */
 enum isLvalue(alias A) = is(typeof((ref _){}(A)));
 
-version = unittestLong;
+// version = unittestLong;
 
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
@@ -156,8 +156,8 @@ struct Integer
     /// ditto
     int opCmp(uint rhs) const { return opCmp(cast(ulong)rhs); }
 
-    // cast
-    ulong opCast(T : ulong)() { return __gmpz_get_ui(_ptr); }
+    /// Cast to `ulong`.
+    ulong opCast(T : ulong)() const { return __gmpz_get_ui(_ptr); }
 
     /// Add `this` with `rhs`.
     Integer opBinary(string s)(auto ref const Integer rhs) const
@@ -386,6 +386,8 @@ Integer opBinary(string s)(ulong rhs, auto ref const Integer x) @nogc
     assert(a == 42);
     assert(a == cast(uint)42);
     assert(a == 42UL);
+    assert(_ == 42);
+    assert(c == 43.0);
 
     // non-equality
     assert(a != b);
@@ -621,9 +623,16 @@ extern(C)
     void __gmpz_powm (mpz_ptr, mpz_srcptr, mpz_srcptr, mpz_srcptr);
     void __gmpz_powm_ui (mpz_ptr, mpz_srcptr, ulong, mpz_srcptr);
 
+    ulong __gmpz_get_ui (mpz_srcptr);
+
+    // TODO wrap:
+    void __gmpz_root (mpz_ptr, mpz_srcptr, ulong);
     void __gmpz_rootrem (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
 
-    ulong __gmpz_get_ui (mpz_srcptr);
+    void __gmpz_sqrt (mpz_ptr, mpz_srcptr);
+    void __gmpz_sqrtrem (mpz_ptr, mpz_ptr, mpz_srcptr);
+
+    void __gmpz_perfect_power_p (mpz_ptr, mpz_srcptr);
 }
 
 // link with C library GNU MP
