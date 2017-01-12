@@ -271,7 +271,7 @@ struct Integer
     Integer powm()(auto ref const Integer power,
                    auto ref const Integer modulo) const
     {
-        Integer rop = 0;       // result
+        typeof(return) rop = 0; // result
         __gmpz_powm(rop._ptr,
                     this._ptr,
                     power._ptr,
@@ -282,7 +282,7 @@ struct Integer
     Integer powm()(ulong power,
                    auto ref const Integer modulo) const
     {
-        Integer rop = 0;       // result
+        typeof(return) rop = 0;       // result
         __gmpz_powm_ui(rop._ptr,
                        this._ptr,
                        power,
@@ -339,8 +339,9 @@ void swap(ref Integer x, ref Integer y) @trusted @nogc
     x.swap(y);
 }
 
+/// Returns: subtraction `rhs` - `x`.
 pragma(inline)
-Integer opBinary(string s)(ulong rhs, auto ref const Integer x) @nogc
+Integer opBinary(string s)(ulong rhs, auto ref const Integer x) @trusted @nogc
     if (s == "-")
 {
     typeof(return) y = null;
@@ -484,7 +485,7 @@ version(unittestLong) pure unittest
     // calculate a mersenne prime, M(p) = 2 ^ p - 1
     Integer M(in ulong p)
     {
-        Integer x = 2UL;
+        typeof(return) x = 2UL;
         x ^^= p;
         return x - 1;
     }
