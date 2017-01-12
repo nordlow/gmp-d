@@ -6,7 +6,7 @@ module gmp;
 import std.stdio : writeln;
 debug import core.stdc.stdio : printf;
 
-// version = unittestLong;
+enum unittestLong = false;
 version = unittestPhobos;
 
 // local helper traits
@@ -696,7 +696,7 @@ version(unittestPhobos) @safe @nogc unittest
 }
 
 // Fermats Little Theorem
-version(unittestLong) pure unittest
+pure unittest
 {
     // calculate a mersenne prime, M(p) = 2 ^ p - 1
     Integer M(in ulong p)
@@ -708,25 +708,28 @@ version(unittestLong) pure unittest
 
     debug printf("Running Test: Fermats Little Theorem\n");
 
-    /*
-      Fermats little theorem: a ^ p ≡ a (mod p) ∀ prime p
-      check Fermats little theorem for a ≤ 100000 and all mersene primes M(p) : p ≤ 127
-     */
-    foreach (immutable ulong i; [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127])
+    if (unittestLong) // compile but not run unless flagged for because running is slow
     {
-        foreach (immutable ulong j; 2 .. 100000)
+/*
+  Fermats little theorem: a ^ p ≡ a (mod p) ∀ prime p
+  check Fermats little theorem for a ≤ 100000 and all mersene primes M(p) : p ≤ 127
+*/
+        foreach (immutable ulong i; [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127])
         {
-            const p = M(i);       // power
-            const a = Integer(j); // base
-            const amp = a % p;
-            const b = a.powm(p, p); // result
-            assert(b == amp);
+            foreach (immutable ulong j; 2 .. 100000)
+            {
+                const p = M(i);       // power
+                const a = Integer(j); // base
+                const amp = a % p;
+                const b = a.powm(p, p); // result
+                assert(b == amp);
+            }
         }
     }
 }
 
 // Euler's Sum of Powers Conjecture counter example
-version(unittestLong) pure unittest
+pure unittest
 {
     debug printf("Running Test: Euler's Sum of Powers Conjecture counter example\n");
 
@@ -741,39 +744,41 @@ version(unittestLong) pure unittest
     enum LIMIT = 200;
     enum POWER = 5;
 
-    bool found = false;
-
-    Integer r1 = 0;
-outermost:
-    foreach (immutable ulong a; 1 .. LIMIT)
+    if (unittestLong) // compile but not run unless flagged for because running is slow
     {
-        foreach (immutable ulong b; a .. LIMIT)
+        bool found = false;
+        Integer r1 = 0;
+    outermost:
+        foreach (immutable ulong a; 1 .. LIMIT)
         {
-            foreach (immutable ulong c; b .. LIMIT)
+            foreach (immutable ulong b; a .. LIMIT)
             {
-                foreach (immutable ulong d; c .. LIMIT)
+                foreach (immutable ulong c; b .. LIMIT)
                 {
-                    r1 = ((Integer(a) ^^ POWER) +
-                          (Integer(b) ^^ POWER) +
-                          (Integer(c) ^^ POWER) +
-                          (Integer(d) ^^ POWER));
-                    Integer rem = 0;
-                    __gmpz_rootrem(r1._ptr,
-                                   rem._ptr,
-                                   r1._ptr,
-                                   POWER);
-                    if (rem == 0UL)
+                    foreach (immutable ulong d; c .. LIMIT)
                     {
-                        debug printf("Counter Example Found: %lu^5 + %lu^5 + %lu^5 + %lu^5 = %lu^5\n",
-                                     a, b, c, d, cast(ulong)r1);
-                        found = true;
-                        break outermost;
+                        r1 = ((Integer(a) ^^ POWER) +
+                              (Integer(b) ^^ POWER) +
+                              (Integer(c) ^^ POWER) +
+                              (Integer(d) ^^ POWER));
+                        Integer rem = 0;
+                        __gmpz_rootrem(r1._ptr,
+                                       rem._ptr,
+                                       r1._ptr,
+                                       POWER);
+                        if (rem == 0UL)
+                        {
+                            debug printf("Counter Example Found: %lu^5 + %lu^5 + %lu^5 + %lu^5 = %lu^5\n",
+                                         a, b, c, d, cast(ulong)r1);
+                            found = true;
+                            break outermost;
+                        }
                     }
                 }
             }
         }
+        assert(found);
     }
-    assert(found);
 }
 
 // C API
