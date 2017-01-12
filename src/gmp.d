@@ -56,6 +56,10 @@ struct Integer
     this(ulong value) { __gmpz_init_set_ui(_ptr, value); }
     /// ditto
     this(double value) { __gmpz_init_set_d(_ptr, value); } // TODO Use Optional/Nullable when value is nan, or inf
+    /// ditto
+    this(int value) { this(cast(long)value); }
+    /// ditto
+    this(uint value) { this(cast(ulong)value); }
 
     /// Construct from `value` in base `base`.
     this(const string value, int base = 0) // TODO Use Optional/Nullable when value is nan, or inf
@@ -130,13 +134,25 @@ struct Integer
     bool opEquals(long rhs) const { return __gmpz_cmp_si(_ptr, rhs) == 0; }
     /// ditto
     bool opEquals(ulong rhs) const { return __gmpz_cmp_ui(_ptr, rhs) == 0; }
+    /// ditto
+    bool opEquals(int rhs) const { return opEquals(cast(long)rhs); }
+    /// ditto
+    bool opEquals(uint rhs) const { return opEquals(cast(ulong)rhs); }
 
     // comparison
     int opCmp(const ref Integer rhs) const { return __gmpz_cmp(_ptr, rhs._ptr); }
+    /// ditto
     int opCmp(in Integer rhs) const { return __gmpz_cmp(_ptr, rhs._ptr); }
+    /// ditto
     int opCmp(double rhs) const { return __gmpz_cmp_d(_ptr, rhs); }
+    /// ditto
     int opCmp(long rhs) const { return __gmpz_cmp_si(_ptr, rhs); }
+    /// ditto
     int opCmp(ulong rhs) const { return __gmpz_cmp_ui(_ptr, rhs); }
+    /// ditto
+    int opCmp(int rhs) const { return opCmp(cast(long)rhs); }
+    /// ditto
+    int opCmp(uint rhs) const { return opCmp(cast(ulong)rhs); }
 
     /// Add `this` with `rhs`.
     Integer opBinary(string s)(const auto ref Integer rhs) const
@@ -245,7 +261,7 @@ struct Integer
     Integer powm()(auto ref const Integer power,
                    auto ref const Integer modulo) const
     {
-        Integer rop = 0L;       // result
+        Integer rop = 0;       // result
         __gmpz_powm(rop._ptr,
                     this._ptr,
                     power._ptr,
@@ -256,7 +272,7 @@ struct Integer
     Integer powm()(ulong power,
                    auto ref const Integer modulo) const
     {
-        Integer rop = 0L;       // result
+        Integer rop = 0;       // result
         __gmpz_powm_ui(rop._ptr,
                        this._ptr,
                        power,
@@ -292,8 +308,8 @@ pure nothrow:
 @safe unittest
 {
     alias Z = Integer;          // shorthand
-    assert(Z(42L).toString == `42`);
-    assert(Z(-42L).toString == `-42`);
+    assert(Z(42).toString == `42`);
+    assert(Z(-42).toString == `-42`);
     assert(Z(`-101`).toString == `-101`);
 }
 
@@ -326,7 +342,7 @@ Integer opBinary(string s)(ulong rhs, const auto ref Integer x) @nogc
 @safe @nogc unittest
 {
     alias Z = Integer;          // shorthand
-    const Z a = 42L;
+    const Z a = 42;
     const Z b = 43UL;
     const Z c = 43.0;
 
