@@ -651,6 +651,7 @@ version(unittestPhobos) @safe @nogc unittest
         int   i  = 500_000;
         short s  = 30_000;
 
+        // TODO
         // assert(is(typeof(x % l)  == long)   && x % l  == 500L);
         // assert(is(typeof(x % ul) == BigInt) && x % ul == BigInt(500));
         // assert(is(typeof(x % i)  == int)    && x % i  == 500);
