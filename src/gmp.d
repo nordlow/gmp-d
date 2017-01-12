@@ -339,14 +339,16 @@ void swap(ref Integer x, ref Integer y) @trusted @nogc
     x.swap(y);
 }
 
-/// Returns: subtraction `rhs` - `x`.
+/// Returns: subtraction `x` - `y`.
 pragma(inline)
-Integer opBinary(string s)(ulong rhs, auto ref const Integer x) @trusted @nogc
-    if (s == "-")
+Integer opBinary(string s, Unsigned)(Unsigned x, auto ref const Integer y) @trusted @nogc
+    if (s == "-" &&
+        (is(Unsigned == ulong) ||
+         is(Unsigned == uint)))
 {
-    typeof(return) y = null;
-    __gmpz_ui_sub(y._ptr, rhs, x);
-    return y;
+    typeof(return) rop = null;
+    __gmpz_ui_sub(rop._ptr, x, y);
+    return rop;
 }
 
 ///
@@ -423,6 +425,10 @@ Integer opBinary(string s)(ulong rhs, auto ref const Integer x) @trusted @nogc
     assert(a + 0UL == a);
     assert(a + 1UL != a);
     assert(a + b == 42UL + 43UL);
+
+    // subtraction
+    assert(a - 2 == 40);
+    // assert(cast(ulong)44 - a == 2);
 
     // multiplication
     assert(a * 1UL == a);
