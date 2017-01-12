@@ -451,6 +451,7 @@ Integer opBinary(string s, Unsigned)(Unsigned x, auto ref const Integer y) @trus
     assert(six % five == 1);
     assert(six % six == 0);
 
+    // subtraction
     assert(six - one == 5);
     assert(six - 1UL == 5);
     assert(six - 1 == 5);
