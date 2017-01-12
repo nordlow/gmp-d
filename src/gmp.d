@@ -352,20 +352,20 @@ Integer opBinary(string s)(ulong rhs, const auto ref Integer x) @nogc
     const Z c = 43.0;
 
     // binary
-    assert(Z(`0b11`) == 3L);
-    assert(Z(`0B11`) == 3L);
+    assert(Z(`0b11`) == 3);
+    assert(Z(`0B11`) == 3);
 
     // octal
-    assert(Z(`07`) == 7L);
-    assert(Z(`010`) == 8L);
+    assert(Z(`07`) == 7);
+    assert(Z(`010`) == 8);
 
     // hexadecimal
-    assert(Z(`0x10`) == 16L);
-    assert(Z(`0X10`) == 16L);
+    assert(Z(`0x10`) == 16);
+    assert(Z(`0X10`) == 16);
 
     // decimal
-    assert(Z(`101`) == 101L);
-    assert(Z(`101`, 10) == 101L);
+    assert(Z(`101`) == 101);
+    assert(Z(`101`, 10) == 101);
 
     immutable Z ic = 101UL;
 
@@ -376,7 +376,7 @@ Integer opBinary(string s)(ulong rhs, const auto ref Integer x) @nogc
     assert(a == a);
     assert(a == Z(42UL));
     assert(a == 42.0);
-    assert(a == 42L);
+    assert(a == 42);
     assert(a == 42UL);
 
     // non-equality
@@ -385,14 +385,14 @@ Integer opBinary(string s)(ulong rhs, const auto ref Integer x) @nogc
     // less than
     assert(a < b);
     assert(a < Z(43UL));
-    assert(a < 43L);
+    assert(a < 43);
     assert(a < 43UL);
     assert(a < 43.0);
 
     // greater than
     assert(b > a);
     assert(b > Z(42UL));
-    assert(b > 42L);
+    assert(b > 42);
     assert(b > 42UL);
     assert(b > 42.0);
 
@@ -401,7 +401,7 @@ Integer opBinary(string s)(ulong rhs, const auto ref Integer x) @nogc
     assert(a.abs == a);         // UFCS
 
     // negated value
-    assert(-a == -42L);
+    assert(-a == -42);
     assert(-(-a) == a);
 
     // addition
@@ -413,8 +413,8 @@ Integer opBinary(string s)(ulong rhs, const auto ref Integer x) @nogc
 
     // multiplication
     assert(a * 1UL == a);
-    assert(a * 1L == a);
-    assert(a * 2L != a);
+    assert(a * 1 == a);
+    assert(a * 2 != a);
     assert(a * b == b * a);
     assert(a * b == 42UL * 43UL);
 
@@ -425,43 +425,43 @@ Integer opBinary(string s)(ulong rhs, const auto ref Integer x) @nogc
     const Z four = 4UL;
     immutable Z five = 5UL;
     const Z six = 6UL;
-    assert(six % one == 0L);
-    assert(six % two == 0L);
-    assert(six % three == 0L);
-    assert(six % four == 2L);
-    assert(six % five == 1L);
-    assert(six % six == 0L);
+    assert(six % one == 0);
+    assert(six % two == 0);
+    assert(six % three == 0);
+    assert(six % four == 2);
+    assert(six % five == 1);
+    assert(six % six == 0);
 
-    assert(six - one == 5L);
-    assert(six - 1UL == 5L);
-    assert(six - 1L == 5L);
-    // TODO assert(1UL - six == -5L);
+    assert(six - one == 5);
+    assert(six - 1UL == 5);
+    assert(six - 1 == 5);
+    // TODO assert(1UL - six == -5);
 
     // exponentiation
-    assert(Z(0L)^^0L == 1L);
-    assert(Z(3L)^^3L == 27L);
-    assert(Z(2L)^^8L == 256L);
+    assert(Z(0)^^0 == 1);
+    assert(Z(3)^^3 == 27);
+    assert(Z(2)^^8 == 256);
 
     // exponentiation plus modulus
-    assert(Z(2L).powm(Z(8L), Z(8L)) == Z(0L));
-    assert(Z(2L).powm(Z(3L), Z(16L)) == Z(8L));
-    assert(Z(3L).powm(Z(3L), Z(16L)) == Z(11L));
+    assert(Z(2).powm(Z(8), Z(8)) == Z(0));
+    assert(Z(2).powm(Z(3), Z(16)) == Z(8));
+    assert(Z(3).powm(Z(3), Z(16)) == Z(11));
 
-    assert(Z(2L).powm(8L, Z(8L)) == Z(0L));
-    assert(Z(2L).powm(3L, Z(16L)) == Z(8L));
-    assert(Z(3L).powm(3L, Z(16L)) == Z(11L));
+    assert(Z(2).powm(8, Z(8)) == Z(0));
+    assert(Z(2).powm(3, Z(16)) == Z(8));
+    assert(Z(3).powm(3, Z(16)) == Z(11));
 
     // swap
-    Z x = 42L;
-    Z y = 43L;
-    assert(x == 42L);
-    assert(y == 43L);
+    Z x = 42;
+    Z y = 43;
+    assert(x == 42);
+    assert(y == 43);
     x.swap(y);
-    assert(y == 42L);
-    assert(x == 43L);
+    assert(y == 42);
+    assert(x == 43);
     swap(x, y);
-    assert(x == 42L);
-    assert(y == 43L);
+    assert(x == 42);
+    assert(y == 43);
 }
 
 // Fermats Little Theorem
@@ -512,7 +512,7 @@ pure unittest
 
     bool found = false;
 
-    Integer r1 = 0L;
+    Integer r1 = 0;
 outermost:
     for (ulong a = 1; a <= LIMIT; a++)
     {
@@ -526,7 +526,7 @@ outermost:
                           (Integer(b) ^^ POWER) +
                           (Integer(c) ^^ POWER) +
                           (Integer(d) ^^ POWER));
-                    Integer rem = 0L;
+                    Integer rem = 0;
                     __gmpz_rootrem(r1._ptr,
                                    rem._ptr,
                                    r1._ptr,
