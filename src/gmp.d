@@ -374,7 +374,7 @@ struct MpZ
             if (rhs < 0)
             {
                 assert(rhs != rhs.min); // TODO special case because -rhs.min is not correct
-                immutable ulong pos_rhs = -rhs;
+                immutable ulong pos_rhs = -rhs; // make it positive
                 __gmpz_sub_ui(_ptr, _ptr, pos_rhs);
             }
             else
