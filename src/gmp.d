@@ -688,8 +688,8 @@ version(unittestPhobos) @safe @nogc unittest
         static assert(is(typeof(x % s)  == short));
         static assert(is(typeof(x % b)  == byte));
 
-        assert(x % ul == BigInt(500));
-        assert(x % ui == BigInt(500));
+        assert(x % ul == 500);
+        assert(x % ui == 500);
         assert(x % us  == 10500);
         assert(x % ub == 0);
 
