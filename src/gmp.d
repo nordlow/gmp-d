@@ -10,8 +10,14 @@ debug import core.stdc.stdio : printf;
 version = unittestPhobos;
 
 // local helper traits
-private enum isSigned(T) = (is(T == long) || is(T == int) || is(T == short) || is(T == byte));
-private enum isUnsigned(T) = (is(T == ulong) || is(T == uint) || is(T == ushort) || is(T == ubyte));
+private enum isSigned(T) = (is(T == int) ||
+                            is(T == long) ||
+                            is(T == short) ||
+                            is(T == byte));
+private enum isUnsigned(T) = (is(T == uint) ||
+                              is(T == ulong) ||
+                              is(T == ushort) ||
+                              is(T == ubyte));
 
 version(unittest)
 {
