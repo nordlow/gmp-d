@@ -3,6 +3,7 @@
  */
 module gmp;
 
+import std.stdio : writeln;
 debug import core.stdc.stdio : printf;
 
 // import deimos.gmp.gmp;
@@ -271,11 +272,9 @@ pure nothrow:
     assert(Z(`-101`).toString == `-101`);
 }
 
-@nogc:
-
 /// Returns: absolute value of `x`.
 pragma(inline)
-Integer abs(const ref Integer x) @trusted
+Integer abs(const ref Integer x) @trusted @nogc
 {
     typeof(return) y = null;
     __gmpz_abs(y._ptr, x._ptr);
@@ -284,13 +283,13 @@ Integer abs(const ref Integer x) @trusted
 
 /// Swap contents of `x` with contents of `y`.
 pragma(inline)
-void swap(ref Integer x, ref Integer y) @trusted
+void swap(ref Integer x, ref Integer y) @trusted @nogc
 {
     x.swap(y);
 }
 
 pragma(inline)
-Integer opBinary(string s)(ulong rhs, const auto ref Integer x)
+Integer opBinary(string s)(ulong rhs, const auto ref Integer x) @nogc
     if (s == "-")
 {
     typeof(return) y = null;
@@ -299,7 +298,7 @@ Integer opBinary(string s)(ulong rhs, const auto ref Integer x)
 }
 
 ///
-@safe unittest
+@safe @nogc unittest
 {
     alias Z = Integer;          // shorthand
     const Z a = 42L;
@@ -411,7 +410,7 @@ Integer opBinary(string s)(ulong rhs, const auto ref Integer x)
 }
 
 // Fermats Little Theorem
-unittest
+pure unittest
 {
     // calculate a mersenne prime, M(p) = 2 ^ p - 1
     Integer M(in ulong p)
@@ -429,7 +428,7 @@ unittest
      */
     foreach (const ulong i; [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127])
     {
-        for (ulong j = 2; j <= 100000; j++)
+        foreach (const ulong j; 2 .. 100000)
         {
             const p = M(i);       // power
             const a = Integer(j); // base
@@ -441,7 +440,7 @@ unittest
 }
 
 // Euler's Sum of Powers Conjecture counter example
-unittest
+pure unittest
 {
     debug printf("Running Test: Euler's Sum of Powers Conjecture counter example\n");
 
