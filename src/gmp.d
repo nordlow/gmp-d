@@ -13,7 +13,7 @@ debug import core.stdc.stdio : printf;
 enum isLvalue(alias A) = is(typeof((ref _){}(A)));
 
 // version = unittestLong;
-// version = unittestPhobos;
+version = unittestPhobos;
 
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
@@ -70,9 +70,17 @@ struct Integer
         assert(base == 0 || base >= 2 && base <= 62);
 
         // @nogc variant of `toStringz` with scoped heap allocation of null-terminated C-string `stringz`
-        char* stringz = cast(char*)qualifiedMalloc(value.length + 1);
-        stringz[0 .. value.length] = value[];
-        stringz[value.length] = '\0'; // set C null terminator
+        char* stringz = cast(char*)qualifiedMalloc(value.length + 1); // maximum this many characters
+        size_t i = 0;
+        foreach (immutable char ch; value[])
+        {
+            if (ch != '_')
+            {
+                stringz[i] = ch;
+                i += 1;
+            }
+        }
+        stringz[i] = '\0'; // set C null terminator
 
         const int status = __gmpz_init_set_str(_ptr, stringz, base);
 
@@ -249,8 +257,39 @@ struct Integer
         return y;
     }
 
+    /// Returns: TODO
+    ref Integer opOpAssign(string s)(auto ref const Integer rhs)
+        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
+    {
+        static if (s == "+")
+        {
+            __gmpz_add(_ptr, _ptr, rhs._ptr);
+        }
+        else static if (s == "-")
+        {
+            __gmpz_sub(_ptr, _ptr, rhs._ptr);
+        }
+        else static if (s == "*")
+        {
+            __gmpz_mul(_ptr, _ptr, rhs._ptr);
+        }
+        else static if (s == "/")
+        {
+            __gmpz_cdiv_q(_ptr, _ptr, rhs._ptr);
+        }
+        else static if (s == "%")
+        {
+            __gmpz_cdiv_r(_ptr, _ptr, rhs._ptr);
+        }
+        else
+        {
+            static assert(false);
+        }
+        return this;
+    }
+    /// ditto
     ref Integer opOpAssign(string s, Unsigned)(Unsigned rhs)
-        if ((s == "+" || s == "-" || s == "*" || s == "^^") &&
+        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             (is(Unsigned == ulong) ||
              is(Unsigned == uint)))
     {
@@ -266,9 +305,17 @@ struct Integer
         {
             __gmpz_mul_ui(_ptr, _ptr, rhs);
         }
+        else static if (s == "/")
+        {
+            __gmpz_cdiv_q_ui(_ptr, _ptr, rhs);
+        }
+        else static if (s == "%")
+        {
+            __gmpz_cdiv_r_ui(_ptr, _ptr, rhs);
+        }
         else static if (s == "^^")
         {
-            __gmpz_mul_ui(_ptr, _ptr, rhs);
+            __gmpz_pow_ui(_ptr, _ptr, rhs);
         }
         else
         {
@@ -540,10 +587,10 @@ version(unittestPhobos) @safe @nogc unittest
     {
         auto b = BigInt("1_000_000_000");
 
-        b += 12345;
+        b += 12345UL;
         assert(b == BigInt("1_000_012_345"));
 
-        b /= 5;
+        b /= 5UL;
         assert(b == BigInt("200_002_469"));
     }
 
@@ -563,7 +610,7 @@ version(unittestPhobos) @safe @nogc unittest
 
     {
         auto x = BigInt("123");
-        x *= 300;
+        x *= 300UL;
         assert(x == BigInt("36900"));
     }
 }
@@ -694,6 +741,9 @@ extern(C)
     void __gmpz_mul_2exp (mpz_ptr, mpz_srcptr, mp_bitcnt_t);
     void __gmpz_mul_si (mpz_ptr, mpz_srcptr, long);
     void __gmpz_mul_ui (mpz_ptr, mpz_srcptr, ulong);
+
+    void __gmpz_cdiv_q_ui (mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_cdiv_r_ui (mpz_ptr, mpz_srcptr, ulong);
 
     void __gmpz_mod (mpz_ptr, mpz_srcptr, mpz_srcptr);
 
