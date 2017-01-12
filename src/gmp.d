@@ -396,41 +396,43 @@ Integer opBinary(string s)(ulong rhs, const auto ref Integer x)
     assert(y == 43L);
 }
 
-//Fermats Little Theorem
-unittest {
-    //calculate a mersenne prime, M(p) = 2 ^ p - 1
-    Integer M(in ulong p) {
+// Fermats Little Theorem
+unittest
+{
+    // calculate a mersenne prime, M(p) = 2 ^ p - 1
+    Integer M(in ulong p)
+    {
         Integer x = 2UL;
         x ^^= p;
         return x - 1;
     }
 
-    pragma(msg, "Compiling Test: Fermats Little Theorem");
     debug printf("Running Test: Fermats Little Theorem\n");
+
     /*
       Fermats little theorem: a ^ p ≡ a (mod p) ∀ prime p
       check Fermats little theorem for a ≤ 100000 and all mersene primes M(p) : p ≤ 127
      */
     foreach (const ulong i; [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127])
     {
-        for (ulong j = 2; j <= 100000; j++){
+        for (ulong j = 2; j <= 100000; j++)
+        {
             Integer p = M(i);
             Integer a = j;
             Integer lhs = 0L;
-            mpz_powm(
-                     lhs._ptr,
-                     a._ptr,
-                     p._ptr,
-                     p._ptr);
-            //lhs = a^p (mod p)
+            __gmpz_powm(lhs._ptr,
+                        a._ptr,
+                        p._ptr,
+                        p._ptr);
+            // TODO can we use lazy evaluation on lhs = a^^p (mod p)
             assert(lhs == a % p);
         }
     }
 }
 
-//Euler's Sum of Powers Conjecture counter example
-unittest{
-    pragma(msg, "Compiling Test: Euler's Sum of Powers Conjecture counter example");
+// Euler's Sum of Powers Conjecture counter example
+unittest
+{
     debug printf("Running Test: Euler's Sum of Powers Conjecture counter example\n");
 
     /*
@@ -447,22 +449,28 @@ unittest{
     bool found = false;
 
     Integer r1 = 0L;
- outermost: for (ulong a = 1; a <= LIMIT; a++){
-        for (ulong b = a; b <= LIMIT; b++){
-            for (ulong c = b; c <= LIMIT; c++){
-                for (ulong d = c; d <= LIMIT; d++){
-                    r1 = (Integer(a) ^^ POWER) +
-                        (Integer(b) ^^ POWER) +
-                        (Integer(c) ^^ POWER) +
-                        (Integer(d) ^^ POWER);
+outermost:
+    for (ulong a = 1; a <= LIMIT; a++)
+    {
+        for (ulong b = a; b <= LIMIT; b++)
+        {
+            for (ulong c = b; c <= LIMIT; c++)
+            {
+                for (ulong d = c; d <= LIMIT; d++)
+                {
+                    r1 = ((Integer(a) ^^ POWER) +
+                          (Integer(b) ^^ POWER) +
+                          (Integer(c) ^^ POWER) +
+                          (Integer(d) ^^ POWER));
                     Integer rem = 0L;
-                    mpz_rootrem(r1._ptr,
-                                rem._ptr,
-                                r1._ptr,
-                                POWER);
-                    if (rem == 0UL){
+                    __gmpz_rootrem(r1._ptr,
+                                   rem._ptr,
+                                   r1._ptr,
+                                   POWER);
+                    if (rem == 0UL)
+                    {
                         debug printf("Counter Example Found: %lu^5 + %lu^5 + %lu^5 + %lu^5 = %lu^5\n",
-                                     a, b, c, d, mpz_get_ui(r1._ptr));
+                                     a, b, c, d, __gmpz_get_ui(r1._ptr));
                         found = true;
                         break outermost;
                     }
@@ -533,17 +541,11 @@ extern(C)
     char *__gmpz_get_str (char*, int, mpz_srcptr);
     size_t __gmpz_sizeinbase (mpz_srcptr, int); // TODO __GMP_NOTHROW __GMP_ATTRIBUTE_PURE;
 
-
-
-    //added for the extended tests
-    //when you include deimos.gmp you can take these out
-    alias mpz_powm = __gmpz_powm;
+    // TODO add high-level wrappers for these
     void __gmpz_powm (mpz_srcptr, mpz_ptr, mpz_ptr, mpz_ptr);
 
-    alias mpz_rootrem = __gmpz_rootrem;
     void __gmpz_rootrem (mpz_srcptr, mpz_ptr, mpz_ptr, ulong);
 
-    alias mpz_get_ui = __gmpz_get_ui;
     ulong __gmpz_get_ui (mpz_srcptr);
 }
 
