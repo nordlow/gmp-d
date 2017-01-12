@@ -107,7 +107,7 @@ struct Integer
         __gmpz_swap(_ptr, rhs._ptr);
     }
 
-    /// Returns: deep copy (duplicate) of `this`.
+    /// Returns: (duplicate) copy of `this`.
     Integer dup() const
     {
         typeof(return) y = void;
