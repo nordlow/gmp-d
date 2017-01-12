@@ -280,14 +280,6 @@ struct Integer
         return y;
     }
 
-    // Unsigned opBinary(string s, Unsigned)(Unsigned rhs) const
-    //     if ((s == "%") &&
-    //         isUnsigned!Unsigned)
-    // {
-    //     Integer y = null;
-    //     return cast(Unsigned)__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
-    // }
-
     Signed opBinary(string s, Signed)(Signed rhs) const
         if ((s == "%") &&
             isSigned!Signed)
@@ -302,6 +294,13 @@ struct Integer
             return cast(Signed)__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
         }
     }
+
+    // ulong opBinary(string s)(ulong rhs) const
+    //     if ((s == "%"))
+    // {
+    //     Integer y = null;
+    //     return __gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
+    // }
 
     /// Returns: TODO
     ref Integer opOpAssign(string s)(auto ref const Integer rhs)
@@ -680,7 +679,7 @@ version(unittestPhobos) @safe @nogc unittest
         static assert(is(typeof(x % s)  == short));
         static assert(is(typeof(x % b)  == byte));
 
-        // TODO static assert(is(typeof(x % ul)  == ulong));
+        // static assert(is(typeof(x % ul)  == ulong));
 
         assert(x % l  == 500L);
         assert(x % ul == BigInt(500));
