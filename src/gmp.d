@@ -230,7 +230,7 @@ struct Integer
     Integer powm(const ref Integer power, // TODO const auto ref
                  const ref Integer modulo) const // TODO const auto ref
     {
-        Integer rop = 0L;
+        Integer rop = 0L;       // result
         __gmpz_powm(rop._ptr,
                     this.dup._ptr, // TODO dup only if l-value (const ref)
                     power.dup._ptr, // TODO dup only if l-value (const ref)
