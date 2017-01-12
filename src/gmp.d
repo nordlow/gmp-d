@@ -255,7 +255,7 @@ struct Integer
     ref Integer opOpAssign(string s)(auto ref const Integer rhs)
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
-        static if (s == "+")
+        static      if (s == "+")
         {
             __gmpz_add(_ptr, _ptr, rhs._ptr);
         }
@@ -287,7 +287,7 @@ struct Integer
             (is(Unsigned == ulong) ||
              is(Unsigned == uint)))
     {
-        static if (s == "+")
+        static      if (s == "+")
         {
             __gmpz_add_ui(_ptr, _ptr, rhs);
         }
@@ -323,7 +323,7 @@ struct Integer
             (is(Unsigned == long) ||
              is(Unsigned == int)))
     {
-        static if (s == "+")
+        static      if (s == "+")
         {
             __gmpz_add_si(_ptr, _ptr, rhs);
         }
@@ -577,7 +577,6 @@ Integer opBinary(string s, Unsigned)(Unsigned x, auto ref const Integer y) @trus
 version(unittestPhobos) @safe @nogc unittest
 {
     alias BigInt = Integer;     // Phobos naming convention
-
     {
         auto b = BigInt("1_000_000_000");
 
@@ -606,6 +605,19 @@ version(unittestPhobos) @safe @nogc unittest
         auto x = BigInt("123");
         x *= 300UL;
         assert(x == BigInt("36900"));
+    }
+
+    {
+        auto  x  = BigInt("1_000_000_500");
+        long  l  = 1_000_000L;
+        ulong ul = 2_000_000UL;
+        int   i  = 500_000;
+        short s  = 30_000;
+
+        assert(is(typeof(x % l)  == long)   && x % l  == 500L);
+        assert(is(typeof(x % ul) == BigInt) && x % ul == BigInt(500));
+        assert(is(typeof(x % i)  == int)    && x % i  == 500);
+        assert(is(typeof(x % s)  == int)    && x % s  == 10500);
     }
 }
 
