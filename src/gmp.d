@@ -17,7 +17,7 @@ version(unittest)
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
 
-/** Arbitrary precision signed integer (Z).
+/** Arbitrary (multi) precision signed integer (Z).
  */
 struct MpZ
 {
