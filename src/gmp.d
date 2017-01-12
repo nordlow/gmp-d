@@ -294,6 +294,10 @@ struct Integer
         {
             return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
         }
+        else
+        {
+            static assert(false);
+        }
     }
 
     ref Integer opOpAssign(string s)(auto ref const Integer rhs)
