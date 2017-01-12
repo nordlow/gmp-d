@@ -5,5 +5,8 @@ dub.selections.json
 # DMD coverage output
 src/*.lst
 
+# DUB test artifacts
+__test__library__
+
 # library
 libgmp-d.a
