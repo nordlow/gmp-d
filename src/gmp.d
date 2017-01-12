@@ -476,9 +476,9 @@ void swap(ref Integer x, ref Integer y) @trusted @nogc
     x.swap(y);
 }
 
+/// Returns: subtraction `x` - `y`.
+/// TODO use http://dlang.org/phobos/std_bigint.html#.BigInt.opBinaryRight instead
 import std.traits : isUnsigned;
-
-/// Returns: subtraction `x` - `y`. TODO use http://dlang.org/phobos/std_bigint.html#.BigInt.opBinaryRight instead
 pragma(inline)
 Integer opBinary(string s, Unsigned)(Unsigned x, auto ref const Integer y) @trusted @nogc
     if (s == "-" &&
