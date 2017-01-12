@@ -13,6 +13,7 @@ debug import core.stdc.stdio : printf;
 enum isLvalue(alias A) = is(typeof((ref _){}(A)));
 
 // version = unittestLong;
+// version = unittestPhobos;
 
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
@@ -248,11 +249,55 @@ struct Integer
         return y;
     }
 
-    /// Operate and assign `exp`.
-    ref Integer opOpAssign(string s)(ulong exp)
-        if (s == "^^")
+    ref Integer opOpAssign(string s, Unsigned)(Unsigned rhs)
+        if ((s == "+" || s == "-" || s == "*" || s == "^^") &&
+            (is(Unsigned == ulong) ||
+             is(Unsigned == uint)))
     {
-        __gmpz_pow_ui(_ptr, _ptr, exp);
+        static if (s == "+")
+        {
+            __gmpz_add_ui(_ptr, _ptr, rhs);
+        }
+        else static if (s == "-")
+        {
+            __gmpz_sub_ui(_ptr, _ptr, rhs);
+        }
+        else static if (s == "*")
+        {
+            __gmpz_mul_ui(_ptr, _ptr, rhs);
+        }
+        else static if (s == "^^")
+        {
+            __gmpz_mul_ui(_ptr, _ptr, rhs);
+        }
+        else
+        {
+            static assert(false);
+        }
+        return this;
+    }
+
+    ref Integer opOpAssign(string s, Signed)(Signed rhs)
+        if ((s == "+" || s == "-" || s == "*") &&
+            (is(Unsigned == long) ||
+             is(Unsigned == int)))
+    {
+        static if (s == "+")
+        {
+            __gmpz_add_si(_ptr, _ptr, rhs);
+        }
+        else static if (s == "-")
+        {
+            __gmpz_sub_si(_ptr, _ptr, rhs);
+        }
+        else static if (s == "*")
+        {
+            __gmpz_mul_si(_ptr, _ptr, rhs);
+        }
+        else
+        {
+            static assert(false);
+        }
         return this;
     }
 
@@ -485,6 +530,42 @@ Integer opBinary(string s, Unsigned)(Unsigned x, auto ref const Integer y) @trus
     swap(x, y);
     assert(x == 42);
     assert(y == 43);
+}
+
+/// Phobos unittests
+version(unittestPhobos) @safe @nogc unittest
+{
+    alias BigInt = Integer;     // Phobos naming convention
+
+    {
+        auto b = BigInt("1_000_000_000");
+
+        b += 12345;
+        assert(b == BigInt("1_000_012_345"));
+
+        b /= 5;
+        assert(b == BigInt("200_002_469"));
+    }
+
+    {
+        auto x = BigInt("123");
+        auto y = BigInt("321");
+        x += y;
+        assert(x == BigInt("444"));
+    }
+
+    {
+        auto x = BigInt("123");
+        auto y = BigInt("456");
+        BigInt z = x * y;
+        assert(z == BigInt("56088"));
+    }
+
+    {
+        auto x = BigInt("123");
+        x *= 300;
+        assert(x == BigInt("36900"));
+    }
 }
 
 // Fermats Little Theorem
