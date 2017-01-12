@@ -699,14 +699,12 @@ version(unittestPhobos) @safe @nogc unittest
 pure unittest
 {
     // calculate a mersenne prime, M(p) = 2 ^ p - 1
-    Integer M(in ulong p)
+    Integer M(ulong p)
     {
         typeof(return) x = 2UL;
         x ^^= p;
         return x - 1;
     }
-
-    debug printf("Running Test: Fermats Little Theorem\n");
 
     if (unittestLong) // compile but not run unless flagged for because running is slow
     {
@@ -731,8 +729,6 @@ pure unittest
 // Euler's Sum of Powers Conjecture counter example
 pure unittest
 {
-    debug printf("Running Test: Euler's Sum of Powers Conjecture counter example\n");
-
     /*
       a^5 + b^5 + c^5 + d^5 = e^5
       Lander & Parkin, 1966 found the first counter example:
