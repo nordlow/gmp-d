@@ -80,7 +80,7 @@ struct Integer
     enum useCopy = false;       // disable copy construction for now
     static if (useCopy)
     {
-        this()(auto ref const Integer value)
+        this()(const auto ref Integer value)
         {
             mpz_init_set(_ptr, value._pt);
         }
@@ -263,8 +263,8 @@ struct Integer
     /** Returns: `this` ^^ `power` (mod `modulo`).
         TODO lazily evaluation
      */
-    Integer powm()(auto ref const Integer power,
-                   auto ref const Integer modulo) const
+    Integer powm()(const auto ref Integer power,
+                   const auto ref Integer modulo) const
     {
         Integer rop = 0;       // result
         __gmpz_powm(rop._ptr,
@@ -275,7 +275,7 @@ struct Integer
     }
     /// ditto
     Integer powm()(ulong power,
-                   auto ref const Integer modulo) const
+                   const auto ref Integer modulo) const
     {
         Integer rop = 0;       // result
         __gmpz_powm_ui(rop._ptr,
