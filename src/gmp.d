@@ -80,7 +80,7 @@ struct Integer
     enum useCopy = false;       // disable copy construction for now
     static if (useCopy)
     {
-        this()(const auto ref Integer value)
+        this()(auto ref const Integer value)
         {
             mpz_init_set(_ptr, value._pt);
         }
@@ -155,7 +155,7 @@ struct Integer
     int opCmp(uint rhs) const { return opCmp(cast(ulong)rhs); }
 
     /// Add `this` with `rhs`.
-    Integer opBinary(string s)(const auto ref Integer rhs) const
+    Integer opBinary(string s)(auto ref const Integer rhs) const
         if (s == "+")
     {
         typeof(return) y = null;
@@ -172,7 +172,7 @@ struct Integer
     }
 
     /// Subtract `rhs` from `this`.
-    Integer opBinary(string s)(const auto ref Integer rhs) const
+    Integer opBinary(string s)(auto ref const Integer rhs) const
         if (s == "-")
     {
         typeof(return) y = null;
@@ -189,7 +189,7 @@ struct Integer
     }
 
     /// Multiply with `rhs`.
-    Integer opBinary(string s)(const auto ref Integer rhs) const
+    Integer opBinary(string s)(auto ref const Integer rhs) const
         if (s == "*")
     {
         typeof(return) y = null;
@@ -218,7 +218,7 @@ struct Integer
     }
 
     /// Returns: division remainder between `this` and `rhs`.
-    Integer opBinary(string s)(const auto ref Integer rhs) const
+    Integer opBinary(string s)(auto ref const Integer rhs) const
         if (s == "%")
     {
         typeof(return) y = null;
@@ -263,8 +263,8 @@ struct Integer
     /** Returns: `this` ^^ `power` (mod `modulo`).
         TODO lazily evaluation
      */
-    Integer powm()(const auto ref Integer power,
-                   const auto ref Integer modulo) const
+    Integer powm()(auto ref const Integer power,
+                   auto ref const Integer modulo) const
     {
         Integer rop = 0;       // result
         __gmpz_powm(rop._ptr,
@@ -275,7 +275,7 @@ struct Integer
     }
     /// ditto
     Integer powm()(ulong power,
-                   const auto ref Integer modulo) const
+                   auto ref const Integer modulo) const
     {
         Integer rop = 0;       // result
         __gmpz_powm_ui(rop._ptr,
@@ -335,7 +335,7 @@ void swap(ref Integer x, ref Integer y) @trusted @nogc
 }
 
 pragma(inline)
-Integer opBinary(string s)(ulong rhs, const auto ref Integer x) @nogc
+Integer opBinary(string s)(ulong rhs, auto ref const Integer x) @nogc
     if (s == "-")
 {
     typeof(return) y = null;
