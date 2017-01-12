@@ -264,7 +264,7 @@ struct Integer
     }
 
     /** Returns: `this` ^^ `power` (mod `modulo`).
-        TODO lazily evaluation
+        TODO can we somehow capture lazy evaluation?
      */
     Integer powm()(auto ref const Integer power,
                    auto ref const Integer modulo) const
