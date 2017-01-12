@@ -347,7 +347,7 @@ Integer opBinary(string s, Unsigned)(Unsigned x, auto ref const Integer y) @trus
          is(Unsigned == uint)))
 {
     typeof(return) rop = null;
-    __gmpz_ui_sub(rop._ptr, x, y);
+    __gmpz_ui_sub(rop._ptr, x, y._ptr);
     return rop;
 }
 
@@ -428,7 +428,8 @@ Integer opBinary(string s, Unsigned)(Unsigned x, auto ref const Integer y) @trus
 
     // subtraction
     assert(a - 2 == 40);
-    // TODO assert(44 - a == 2);
+    assert(opBinary!"-"(44UL, Z(42)) == 2);
+    // TODO why does this fail?: assert(44UL - Z(42) == 2);
 
     // multiplication
     assert(a * 1UL == a);
