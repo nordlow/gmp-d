@@ -659,7 +659,7 @@ MpZ opBinary(string s, Unsigned)(Unsigned x, auto ref const MpZ y) @trusted @nog
 }
 
 /// generators
-@safe pure nothrow @nogc unittest
+@safe @nogc unittest
 {
     assert(MpZ.mersennePrime(15UL) == 2^^15 - 1);
 }
