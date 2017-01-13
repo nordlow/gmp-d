@@ -124,7 +124,7 @@ struct MpZ
     /// Swap content of `this` with `rhs`.
     void swap(ref MpZ rhs)
     {
-        __gmpz_swap(_ptr, rhs._ptr);
+        __gmpz_swap(_ptr, rhs._ptr); // TODO use D's builtin swap instead?
     }
 
     /// Returns: (duplicate) copy of `this`.
