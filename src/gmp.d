@@ -377,7 +377,6 @@ struct MpZ
         else static if (s == "-")
         {
             typeof(return) y = null;
-            // static assert(false);
             if (rhs < 0)
             {
                 immutable ulong pos_rhs = -rhs; // make it positive
