@@ -125,8 +125,7 @@ struct MpZ
     void swap(ref MpZ rhs)
     {
         import std.algorithm.mutation : swap;
-        swap(this, rhs);
-        // __gmpz_swap(_ptr, rhs._ptr); // TODO use D's builtin swap instead?
+        swap(this, rhs); // faster than __gmpz_swap(_ptr, rhs._ptr);
     }
 
     /// Returns: (duplicate) copy of `this`.
