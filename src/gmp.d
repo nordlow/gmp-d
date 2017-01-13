@@ -259,30 +259,6 @@ struct MpZ
         return y;
     }
 
-    MpZ opBinaryRight(string s, Unsigned)(Unsigned rhs) const
-        if ((s == "+" || s == "-" || s == "*") &&
-            isUnsigned!Unsigned)
-    {
-        typeof(return) y = null;
-        static      if (s == "+")
-        {
-            __gmpz_add_ui(y._ptr, _ptr, rhs); // commutative
-        }
-        else static if (s == "-")
-        {
-            __gmpz_ui_sub(y._ptr, rhs, _ptr);
-        }
-        else static if (s == "*")
-        {
-            __gmpz_mul_ui(y._ptr, _ptr, rhs); // commutative
-        }
-        else
-        {
-            static assert(false);
-        }
-        return y;
-    }
-
     MpZ opBinary(string s, Signed)(Signed rhs) const
         if ((s == "+" || s == "-" || s == "*" || s == "^^") &&
             isSigned!Signed)
@@ -290,7 +266,15 @@ struct MpZ
         typeof(return) y = null;
         static      if (s == "+")
         {
-            __gmpz_add_si(y._ptr, _ptr, rhs);
+            if (rhs < 0)
+            {
+                immutable ulong pos_rhs = -rhs; // make it positive
+                __gmpz_sub_ui(y._ptr, _ptr, pos_rhs);
+            }
+            else
+            {
+                __gmpz_add_ui(y._ptr, _ptr, rhs);
+            }
         }
         else static if (s == "-")
         {
@@ -352,6 +336,50 @@ struct MpZ
         {
             return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
         }
+        else
+        {
+            static assert(false);
+        }
+    }
+
+    MpZ opBinaryRight(string s, Unsigned)(Unsigned rhs) const
+        if ((s == "+" || s == "-" || s == "*") &&
+            isUnsigned!Unsigned)
+    {
+        typeof(return) y = null;
+        static      if (s == "+")
+        {
+            __gmpz_add_ui(y._ptr, _ptr, rhs); // commutative
+        }
+        else static if (s == "-")
+        {
+            __gmpz_ui_sub(y._ptr, rhs, _ptr);
+        }
+        else static if (s == "*")
+        {
+            __gmpz_mul_ui(y._ptr, _ptr, rhs); // commutative
+        }
+        else
+        {
+            static assert(false);
+        }
+        return y;
+    }
+
+    MpZ opBinaryRight(string s, Signed)(Signed rhs) const
+        if ((s == "+" || s == "-" || s == "*") &&
+            isSigned!Signed)
+    {
+        static if (s == "+" || s == "*")
+        {
+            return opBinary!s(rhs); // commutative
+        }
+        // else static if (s == "-")
+        // {
+        //     typeof(return) y = null;
+        //     __gmpz_ui_sub(y._ptr, rhs, _ptr);
+        //     return y;
+        // }
         else
         {
             static assert(false);
@@ -629,6 +657,8 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(a + 0UL == a);
     assert(a + 1UL != a);
     assert(a + b == 42 + 43);
+    assert(1 + a == 43);
+    assert(1UL + a == 43);
 
     // subtraction
     assert(a - 2 == 40);
