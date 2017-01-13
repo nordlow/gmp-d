@@ -124,7 +124,9 @@ struct MpZ
     /// Swap content of `this` with `rhs`.
     void swap(ref MpZ rhs)
     {
-        __gmpz_swap(_ptr, rhs._ptr); // TODO use D's builtin swap instead?
+        import std.algorithm.mutation : swap;
+        swap(this, rhs);
+        // __gmpz_swap(_ptr, rhs._ptr); // TODO use D's builtin swap instead?
     }
 
     /// Returns: (duplicate) copy of `this`.
@@ -588,13 +590,16 @@ MpZ abs(const ref MpZ x) @trusted @nogc
 pragma(inline)
 void swap(ref MpZ x, ref MpZ y) @trusted @nogc
 {
-    x.swap(y);
+    import std.algorithm.mutation : swap;
+    swap(x, y); // x.swap(y);
 }
 
 ///
 @safe @nogc unittest
 {
     alias Z = MpZ;
+
+    assert(Z.init == 0);        // should be zero initialized
 
     const Z _ = cast(uint)42;
     const Z a = 42;
