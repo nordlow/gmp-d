@@ -90,6 +90,15 @@ struct MpZ
         assert(status == 0, "Parameter `value` does not contain an integer");
     }
 
+    // Returns: the Mersenne prime, M(p) = 2 ^^ p - 1
+    static MpZ mersennePrime(Integral)(Integral p)
+        if (isIntegral!Integral)
+    {
+        typeof(return) x = 2UL;
+        x ^^= p;
+        return x - 1;
+    }
+
     enum useCopy = false;       // disable copy construction for now
     static if (useCopy)
     {
@@ -649,6 +658,12 @@ MpZ opBinary(string s, Unsigned)(Unsigned x, auto ref const MpZ y) @trusted @nog
     assert(y == 43);
 }
 
+/// generators
+@safe pure nothrow @nogc unittest
+{
+    assert(MpZ.mersennePrime(15UL) == 2^^15 - 1);
+}
+
 /// Phobos unittests
 version(unittestPhobos) @safe @nogc unittest
 {
@@ -731,14 +746,6 @@ version(unittestPhobos) @safe @nogc unittest
 // Fermats Little Theorem
 pure unittest
 {
-    // calculate a Mersenne prime, M(p) = 2 ^ p - 1
-    MpZ M(ulong p)
-    {
-        typeof(return) x = 2UL;
-        x ^^= p;
-        return x - 1;
-    }
-
     if (unittestLong) // compile but not run unless flagged for because running is slow
     {
 /*
@@ -749,7 +756,7 @@ pure unittest
         {
             foreach (immutable ulong j; 2 .. 100000)
             {
-                const p = M(i);       // power
+                const p = MpZ.mersennePrime(i); // power
                 const a = MpZ(j); // base
                 const amp = a % p;
                 const b = a.powm(p, p); // result
