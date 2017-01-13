@@ -773,9 +773,12 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     // modulo/remainder
     assert(Z(27) % Z(3) == 0);
     assert(Z(27) % Z(10) == 7);
-    // assert(Z(27) % 3 == 0);
-    // assert(Z(27) % 10 == 7);
+    assert(Z(27) % 3 == 0);
+    assert(Z(-27) % 3 == 0);
+    assert(Z(27) % 10 == 7);
+    assert(Z(27) % 10 == 7);
     assert(28 % Z(3) == 1);
+    assert(-28 % Z(3) == -1);
     assert(28UL % Z(3) == 1);
 
     // modulo/remainder
