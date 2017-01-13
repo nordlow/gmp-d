@@ -766,8 +766,9 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(six - one == 5);
     assert(six - 1UL == 5);
     assert(six - 1 == 5);
+    assert(1 - six == -5);
+    assert(1L - six == -5);
     assert(1UL - six == -5);
-    // TODO assert(1UL - six == -5);
 
     // exponentiation
     assert(Z(0)^^0 == 1);
@@ -790,12 +791,17 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     // swap
     Z x = 42;
     Z y = 43;
+
     assert(x == 42);
     assert(y == 43);
+
     x.swap(y);
+
     assert(y == 42);
     assert(x == 43);
+
     swap(x, y);
+
     assert(x == 42);
     assert(y == 43);
 }
