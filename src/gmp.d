@@ -259,6 +259,30 @@ struct MpZ
         return y;
     }
 
+    MpZ opBinaryRight(string s, Unsigned)(Unsigned rhs) const
+        if ((s == "+" || s == "-" || s == "*") &&
+            isUnsigned!Unsigned)
+    {
+        typeof(return) y = null;
+        static      if (s == "+")
+        {
+            __gmpz_add_ui(y._ptr, _ptr, rhs); // commutative
+        }
+        else static if (s == "-")
+        {
+            __gmpz_ui_sub(y._ptr, rhs, _ptr);
+        }
+        else static if (s == "*")
+        {
+            __gmpz_mul_ui(y._ptr, _ptr, rhs); // commutative
+        }
+        else
+        {
+            static assert(false);
+        }
+        return y;
+    }
+
     MpZ opBinary(string s, Signed)(Signed rhs) const
         if ((s == "+" || s == "-" || s == "*" || s == "^^") &&
             isSigned!Signed)
@@ -531,19 +555,6 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     x.swap(y);
 }
 
-/// Returns: subtraction `x` - `y`.
-/// TODO use http://dlang.org/phobos/std_bigint.html#.BigInt.opBinaryRight instead
-import std.traits : isUnsigned;
-pragma(inline)
-MpZ opBinary(string s, Unsigned)(Unsigned x, auto ref const MpZ y) @trusted @nogc
-    if (s == "-" &&
-        isUnsigned!Unsigned)
-{
-    typeof(return) rop = null;
-    __gmpz_ui_sub(rop._ptr, x, y._ptr);
-    return rop;
-}
-
 ///
 @safe @nogc unittest
 {
@@ -622,8 +633,7 @@ MpZ opBinary(string s, Unsigned)(Unsigned x, auto ref const MpZ y) @trusted @nog
     // subtraction
     assert(a - 2 == 40);
     assert(a - (-2) == 44);
-    assert(opBinary!"-"(44UL, Z(42)) == 2);
-    // assert(44UL - Z(42) == 2); // TODO why does this fail when this doesn't: opBinary!"-"(44UL, Z(42))
+    assert(44UL - Z(42) == 2);
 
     // multiplication
     assert(a * 1UL == a);
