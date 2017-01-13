@@ -346,7 +346,7 @@ struct MpZ
     }
 
     MpZ opBinaryRight(string s, Unsigned)(Unsigned lhs) const
-        if ((s == "+" || s == "-" || s == "*") &&
+        if ((s == "+" || s == "-" || s == "*" || s == "/") &&
             isUnsigned!Unsigned)
     {
         typeof(return) y = null;
@@ -375,7 +375,7 @@ struct MpZ
     }
 
     MpZ opBinaryRight(string s, Signed)(Signed lhs) const
-        if ((s == "+" || s == "-" || s == "*") &&
+        if ((s == "+" || s == "-" || s == "*" || s == "/") &&
             isSigned!Signed)
     {
         static if (s == "+" || s == "*")
@@ -399,8 +399,10 @@ struct MpZ
         }
         else static if (s == "/")
         {
+            typeof(return) y = null;
             assert(this != 0, "Divison by zero");
             __gmpz_tdiv_q(y._ptr, MpZ(lhs)._ptr, _ptr); // convert `lhs` to MpZ
+            return y;
         }
         else
         {
@@ -731,6 +733,8 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(six % four == 2);
     assert(six % five == 1);
     assert(six % six == 0);
+    assert(27 / Z(3) == 9);
+    assert(27UL / Z(3) == 9);
 
     // subtraction
     assert(six - one == 5);
