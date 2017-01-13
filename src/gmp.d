@@ -369,6 +369,7 @@ struct MpZ
         }
     }
 
+    /// Returns: an unsigned type `lhs` divided by `this`.
     MpZ opBinaryRight(string s, Unsigned)(Unsigned lhs) const
         if ((s == "+" || s == "-" || s == "*" || s == "%") &&
             isUnsigned!Unsigned)
@@ -398,6 +399,7 @@ struct MpZ
         return y;
     }
 
+    /// Returns: a signed type `lhs` divided by `this`.
     MpZ opBinaryRight(string s, Signed)(Signed lhs) const
         if ((s == "+" || s == "-" || s == "*" || s == "%") &&
             isSigned!Signed)
