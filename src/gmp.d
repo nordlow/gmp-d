@@ -193,10 +193,16 @@ struct MpZ
     int opCmp(uint rhs) const { return opCmp(cast(ulong)rhs); }
 
     /// Cast to `bool`.
-    bool opCast(T : bool)() const { return this != 0; }
+    bool opCast(T : bool)() const { return __gmpz_cmp_ui(_ptr, 0) != 0; }
 
     /// Cast to `ulong`.
     ulong opCast(T : ulong)() const { return __gmpz_get_ui(_ptr); }
+
+    /// Cast to `long`.
+    long opCast(T : long)() const { return __gmpz_get_si(_ptr); }
+
+    /// Cast to `double`.
+    double opCast(T : double)() const { return __gmpz_get_d(_ptr); }
 
     MpZ opBinary(string s)(auto ref const MpZ rhs) const
         if (s == "+" || s == "-" || s == "*" || s == "/" || s == "%")
@@ -670,6 +676,9 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(a);
     assert(cast(ulong)a == a);
     assert(cast(ulong)a == 42);
+    assert(cast(long)a == a);
+    assert(cast(long)a == 42);
+    assert(cast(double)a == 42.0);
 
     // binary
     assert(Z(`0b11`) == 3);
@@ -1160,6 +1169,8 @@ extern(C)
     void __gmpz_powm_ui (mpz_ptr, mpz_srcptr, ulong, mpz_srcptr);
 
     ulong __gmpz_get_ui (mpz_srcptr);
+    long __gmpz_get_si (mpz_srcptr);
+    double __gmpz_get_d (mpz_srcptr);
 
     // TODO wrap:
     void __gmpz_root (mpz_ptr, mpz_srcptr, ulong);
