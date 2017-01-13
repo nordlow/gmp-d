@@ -377,7 +377,7 @@ struct MpZ
         else static if (s == "-")
         {
             typeof(return) y = null;
-            if (rhs < 0)
+            if (rhs < 0)        // TODO handle rhs == rhs.min
             {
                 immutable ulong pos_rhs = -rhs; // make it positive
                 __gmpz_add_ui(y._ptr, _ptr, pos_rhs);
@@ -680,8 +680,8 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     // subtraction
     assert(a - 2 == 40);
     assert(2 - a == -40);
-    // assert(-2 - a == -40);
-    // assert(a - 2 == 2 - a);     // commutative
+    assert(-2 - a == -44);
+    assert(a - 2 == -(2 - a));     // commutative
     assert(a - (-2) == 44);
     assert(44UL - Z(42) == 2);
 
