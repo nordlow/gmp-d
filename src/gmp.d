@@ -777,9 +777,16 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(Z(-27) % 3 == 0);
     assert(Z(27) % 10 == 7);
     assert(Z(27) % 10 == 7);
-    assert(28 % Z(3) == 1);
-    assert(-28 % Z(3) == -1);
+
+    assert(28   % Z(3) == 1);
     assert(28UL % Z(3) == 1);
+
+    // assert(Z( 28)  % -3 == 1);   // TODO should be -1
+    // assert(Z(-28)  %  3 == -1);  // TODO should be 1
+    assert(Z( 28)  % Z(-3) == 1);  // TODO should be -1
+    assert(Z(-28)  % Z( 3) == -1);  // TODO should be 1
+    assert( 28  % Z(-3) == 1);      // TODO should be -1
+    assert(-28  % Z( 3) == -1);     // TODO should be 1
 
     // modulo/remainder
     immutable Z one = 1;
