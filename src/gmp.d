@@ -374,12 +374,22 @@ struct MpZ
         {
             return opBinary!s(rhs); // commutative
         }
-        // else static if (s == "-")
-        // {
-        //     typeof(return) y = null;
-        //     __gmpz_ui_sub(y._ptr, rhs, _ptr);
-        //     return y;
-        // }
+        else static if (s == "-")
+        {
+            typeof(return) y = null;
+            // static assert(false);
+            if (rhs < 0)
+            {
+                immutable ulong pos_rhs = -rhs; // make it positive
+                __gmpz_add_ui(y._ptr, _ptr, pos_rhs);
+            }
+            else
+            {
+                __gmpz_sub_ui(y._ptr, _ptr, rhs);
+            }
+            __gmpz_neg(y._ptr, y._ptr);
+            return y;
+        }
         else
         {
             static assert(false);
@@ -670,7 +680,9 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
 
     // subtraction
     assert(a - 2 == 40);
-    // TODO assert(2 - a == -40);
+    assert(2 - a == -40);
+    // assert(-2 - a == -40);
+    // assert(a - 2 == 2 - a);     // commutative
     assert(a - (-2) == 44);
     assert(44UL - Z(42) == 2);
 
