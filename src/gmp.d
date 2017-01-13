@@ -218,7 +218,7 @@ struct MpZ
         {
             // TODO use tdiv_r or mod?
             __gmpz_tdiv_r(y._ptr, _ptr, rhs._ptr);
-            // __gmpz_mod(y._ptr, _ptr, rhs._ptr);
+            // __gmpz_mod(y._ptr, _ptr, rhs._ptr); // sign of divisor is ignored
         }
         else
         {
