@@ -345,22 +345,27 @@ struct MpZ
         }
     }
 
-    MpZ opBinaryRight(string s, Unsigned)(Unsigned rhs) const
+    MpZ opBinaryRight(string s, Unsigned)(Unsigned lhs) const
         if ((s == "+" || s == "-" || s == "*") &&
             isUnsigned!Unsigned)
     {
         typeof(return) y = null;
         static      if (s == "+")
         {
-            __gmpz_add_ui(y._ptr, _ptr, rhs); // commutative
+            __gmpz_add_ui(y._ptr, _ptr, lhs); // commutative
         }
         else static if (s == "-")
         {
-            __gmpz_ui_sub(y._ptr, rhs, _ptr);
+            __gmpz_ui_sub(y._ptr, lhs, _ptr);
         }
         else static if (s == "*")
         {
-            __gmpz_mul_ui(y._ptr, _ptr, rhs); // commutative
+            __gmpz_mul_ui(y._ptr, _ptr, lhs); // commutative
+        }
+        else static if (s == "/")
+        {
+            assert(this != 0, "Divison by zero");
+            __gmpz_tdiv_q(y._ptr, MpZ(lhs)._ptr, _ptr); // convert `lhs` to MpZ
         }
         else
         {
@@ -369,28 +374,33 @@ struct MpZ
         return y;
     }
 
-    MpZ opBinaryRight(string s, Signed)(Signed rhs) const
+    MpZ opBinaryRight(string s, Signed)(Signed lhs) const
         if ((s == "+" || s == "-" || s == "*") &&
             isSigned!Signed)
     {
         static if (s == "+" || s == "*")
         {
-            return opBinary!s(rhs); // commutative
+            return opBinary!s(lhs); // commutative reuse
         }
         else static if (s == "-")
         {
             typeof(return) y = null;
-            if (rhs < 0)        // TODO handle `rhs == rhs.min`
+            if (lhs < 0)        // TODO handle `lhs == lhs.min`
             {
-                immutable ulong pos_rhs = -rhs; // make it positive
+                immutable ulong pos_rhs = -lhs; // make it positive
                 __gmpz_add_ui(y._ptr, _ptr, pos_rhs);
             }
             else
             {
-                __gmpz_sub_ui(y._ptr, _ptr, rhs);
+                __gmpz_sub_ui(y._ptr, _ptr, lhs);
             }
             __gmpz_neg(y._ptr, y._ptr);
             return y;
+        }
+        else static if (s == "/")
+        {
+            assert(this != 0, "Divison by zero");
+            __gmpz_tdiv_q(y._ptr, MpZ(lhs)._ptr, _ptr); // convert `lhs` to MpZ
         }
         else
         {
@@ -559,7 +569,10 @@ struct MpZ
 private:
 
     /// Returns: pointer to internal GMP C struct.
-    inout(__mpz_struct)* _ptr() inout { return &_z; }
+    inout(__mpz_struct)* _ptr() inout return // TODO scope
+    {
+        return &_z;
+    }
 
     __mpz_struct _z;            // internal libgmp C struct
 
