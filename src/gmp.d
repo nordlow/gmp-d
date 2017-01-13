@@ -216,7 +216,9 @@ struct MpZ
         }
         else static if (s == "%")
         {
-            __gmpz_mod(y._ptr, _ptr, rhs._ptr);
+            // TODO use tdiv_r or mod?
+            __gmpz_tdiv_r(y._ptr, _ptr, rhs._ptr);
+            // __gmpz_mod(y._ptr, _ptr, rhs._ptr);
         }
         else
         {
