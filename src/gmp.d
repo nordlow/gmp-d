@@ -737,10 +737,16 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(Z(27) / Z(10) == 2);
     // assert(Z(27) / 3 == 9);
     // assert(Z(27) / 10 == 2);
-    assert(27 / Z(3) == 9);
-    assert(27UL / Z(3) == 9);
+    assert(28 / Z(3) == 9);
+    assert(28UL / Z(3) == 9);
 
     // modulo/remainder
+    assert(Z(27) % Z(3) == 0);
+    assert(Z(27) % Z(10) == 7);
+    // assert(Z(27) % 3 == 0);
+    // assert(Z(27) % 10 == 7);
+    assert(28 % Z(3) == 1);
+    assert(28UL % Z(3) == 1);
 
     // modulo/remainder
     immutable Z one = 1;
