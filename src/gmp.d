@@ -588,7 +588,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
 
     // equality
     assert(a == a);
-    assert(a == Z(42UL));
+    assert(a == Z(42));
     assert(a == 42.0);
     assert(a == 42);
     assert(a == cast(uint)42);
@@ -601,7 +601,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
 
     // less than
     assert(a < b);
-    assert(a < Z(43UL));
+    assert(a < Z(43));
     assert(a < 43);
     assert(a < cast(uint)43);
     assert(a < 43UL);
@@ -609,7 +609,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
 
     // greater than
     assert(b > a);
-    assert(b > Z(42UL));
+    assert(b > Z(42));
     assert(b > 42);
     assert(b > cast(uint)42);
     assert(b > 42UL);
@@ -625,10 +625,10 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
 
     // addition
     assert(a + b == b + a);
-    assert(a + Z(43UL) == b + a);
+    assert(a + Z(43) == b + a);
     assert(a + 0UL == a);
     assert(a + 1UL != a);
-    assert(a + b == 42UL + 43UL);
+    assert(a + b == 42 + 43);
 
     // subtraction
     assert(a - 2 == 40);
@@ -643,12 +643,12 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(a * b == 42UL * 43UL);
 
     // modulo/remainder
-    immutable Z one = 1UL;
-    const Z two = 2UL;
-    immutable Z three = 3UL;
-    const Z four = 4UL;
-    immutable Z five = 5UL;
-    const Z six = 6UL;
+    immutable Z one = 1;
+    const Z two = 2;
+    immutable Z three = 3;
+    const Z four = 4;
+    immutable Z five = 5;
+    const Z six = 6;
     assert(six % one == 0);
     assert(six % two == 0);
     assert(six % three == 0);
@@ -660,6 +660,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(six - one == 5);
     assert(six - 1UL == 5);
     assert(six - 1 == 5);
+    assert(1UL - six == -5);
     // TODO assert(1UL - six == -5);
 
     // exponentiation
