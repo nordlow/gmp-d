@@ -213,6 +213,7 @@ struct MpZ
         }
         else static if (s == "/")
         {
+            assert(rhs != 0, "Divison by zero");
             __gmpz_tdiv_q(y._ptr, _ptr, rhs._ptr);
         }
         else static if (s == "%")
@@ -247,6 +248,7 @@ struct MpZ
         }
         else static if (s == "/")
         {
+            assert(rhs != 0, "Divison by zero");
             __gmpz_tdiv_q_ui(y._ptr, _ptr, rhs);
         }
         else static if (s == "^^")
@@ -321,6 +323,7 @@ struct MpZ
             isIntegral!Integral)
     {
         MpZ y = null;
+        assert(rhs != 0, "Divison by zero");
         static if (isSigned!Integral)
         {
             if (rhs < 0)        // TODO handle `rhs == rhs.min`
@@ -412,10 +415,12 @@ struct MpZ
         }
         else static if (s == "/")
         {
+            assert(rhs != 0, "Divison by zero");
             __gmpz_tdiv_q(_ptr, _ptr, rhs._ptr);
         }
         else static if (s == "%")
         {
+            assert(rhs != 0, "Divison by zero");
             __gmpz_tdiv_r(_ptr, _ptr, rhs._ptr);
         }
         else
@@ -443,10 +448,12 @@ struct MpZ
         }
         else static if (s == "/")
         {
+            assert(rhs != 0, "Divison by zero");
             __gmpz_tdiv_q_ui(_ptr, _ptr, rhs);
         }
         else static if (s == "%")
         {
+            assert(rhs != 0, "Divison by zero");
             __gmpz_tdiv_r_ui(_ptr, _ptr, rhs);
         }
         else static if (s == "^^")
