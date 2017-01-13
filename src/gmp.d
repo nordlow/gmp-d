@@ -263,7 +263,7 @@ struct MpZ
     }
 
     MpZ opBinary(string s, Signed)(Signed rhs) const
-        if ((s == "+" || s == "-" || s == "*" || s == "^^") &&
+        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
             isSigned!Signed)
     {
         typeof(return) y = null;
@@ -294,6 +294,20 @@ struct MpZ
         {
             __gmpz_mul_si(y._ptr, _ptr, rhs);
         }
+        else static if (s == "/")
+        {
+            assert(rhs != 0, "Divison by zero");
+            if (rhs < 0)        // TODO handle `rhs == rhs.min`
+            {
+                immutable ulong pos_rhs = -rhs; // make it positive
+                __gmpz_tdiv_q_ui(y._ptr, _ptr, pos_rhs);
+                y.negate();                 // negate result
+            }
+            else
+            {
+                __gmpz_tdiv_q_ui(y._ptr, _ptr, rhs);
+            }
+        }
         else static if (s == "^^")
         {
             if (rhs < 0)        // TODO handle `rhs == rhs.min`
@@ -302,7 +316,7 @@ struct MpZ
                 __gmpz_pow_ui(y._ptr, _ptr, pos_rhs); // use positive power
                 if (pos_rhs & 1)                      // if odd power
                 {
-                    __gmpz_neg(y._ptr, y._ptr); // negate result
+                    y.negate();                 // negate result
                 }
             }
             else
@@ -399,7 +413,7 @@ struct MpZ
             {
                 __gmpz_sub_ui(y._ptr, _ptr, lhs);
             }
-            __gmpz_neg(y._ptr, y._ptr);
+            y.negate();
             return y;
         }
         else static if (s == "/")
@@ -533,6 +547,7 @@ struct MpZ
     }
 
     /// Returns: negation of `this`.
+    pragma(inline, true)
     MpZ opUnary(string s)() const
         if (s == "-")
     {
@@ -540,6 +555,14 @@ struct MpZ
         __gmpz_neg(y._ptr, _ptr);
         return y;
     }
+
+    /// Negate `this`.
+    pragma(inline, true)
+    void negate()
+    {
+        __gmpz_neg(_ptr, _ptr);
+    }
+    alias neg = negate;
 
     /// Returns: `base` raised to the power of `exp`.
     static MpZ pow(ulong base, ulong exp)
@@ -729,16 +752,23 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(1UL * a == a);
     assert((-1) * a == -a);
     assert(a * 2 != a);
+    assert(a * -2 == -(2*a));
     assert(a * b == b * a);
     assert(a * b == 42UL * 43UL);
 
     // division
     assert(Z(27) / Z(3) == 9);
     assert(Z(27) / Z(10) == 2);
-    // assert(Z(27) / 3 == 9);
-    // assert(Z(27) / 10 == 2);
+    assert(Z(27) / 3 == 9);
+    assert(Z(27) / -3 == -9);
+    assert(Z(27) / 3UL == 9);
+    assert(Z(27) / 10 == 2);
+    assert(Z(27) / -10 == -2);
+    assert(Z(27) / 10UL == 2);
     assert(28 / Z(3) == 9);
+    assert(28 / Z(-3) == -9);
     assert(28UL / Z(3) == 9);
+    assert(28UL / Z(-3) == -9);
 
     // modulo/remainder
     assert(Z(27) % Z(3) == 0);
