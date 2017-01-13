@@ -685,6 +685,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(ic == ic.dup);
 
     // equality
+
     assert(a == a);
     assert(a == Z(42));
     assert(a == 42.0);
@@ -695,9 +696,11 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(c == 43.0);
 
     // non-equality
+
     assert(a != b);
 
     // less than
+
     assert(a < b);
     assert(a < Z(43));
     assert(a < 43);
@@ -706,6 +709,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(a < 43.0);
 
     // greater than
+
     assert(b > a);
     assert(b > Z(42));
     assert(b > 42);
@@ -714,14 +718,17 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(b > 42.0);
 
     // absolute value
+
     assert(abs(a) == a);
     assert(a.abs == a);         // UFCS
 
     // negated value
+
     assert(-a == -42);
     assert(-(-a) == a);
 
     // addition
+
     assert(a + b == b + a);     // commutative
     assert(a + Z(43) == b + a);
     assert(a + 0 == a);
@@ -739,6 +746,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(1UL + a == a + 1UL);   // commutative
 
     // subtraction
+
     assert(a - 2 == 40);
     assert(2 - a == -40);
     assert(-2 - a == -44);
@@ -747,6 +755,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(44UL - Z(42) == 2);
 
     // multiplication
+
     assert(a * 1UL == a);
     assert(a * 1 == a);
     assert(1 * a == a);
@@ -758,6 +767,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(a * b == 42UL * 43UL);
 
     // division
+
     assert(Z(27) / Z(3) == 9);
     assert(Z(27) / Z(10) == 2);
     assert(Z(27) / 3 == 9);
@@ -772,18 +782,23 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(28UL / Z(-3) == -9);
 
     // modulo/remainder
+
     assert(Z(27) % Z(3) == 0);
     assert(Z(27) % Z(10) == 7);
+
     assert(Z(27) % 3 == 0);
     assert(Z(-27) % 3 == 0);
+
     assert(Z(27) % 10 == 7);
     assert(Z(27) % 10 == 7);
 
     assert(28   % Z(3) == 1);
     assert(28UL % Z(3) == 1);
 
-    assert(Z( 28)  % -3 == -1);
-    assert(Z(-28)  %  3 == 1);
+    assert(Z( 28)  % -3 == -1); // negative divisor gives negative remainder according to https://en.wikipedia.org/wiki/Remainder
+    assert(Z(-28)  %  3 == 1);  // dividend sign doesn't affect remainder
+
+    //
     assert(Z( 28)  % Z(-3) == 1);  // TODO should be -1
     assert(Z(-28)  % Z( 3) == -1);  // TODO should be 1
     assert( 28  % Z(-3) == 1);      // TODO should be -1
