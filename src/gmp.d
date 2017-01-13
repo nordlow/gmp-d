@@ -192,6 +192,9 @@ struct MpZ
     /// ditto
     int opCmp(uint rhs) const { return opCmp(cast(ulong)rhs); }
 
+    /// Cast to `bool`.
+    bool opCast(T : bool)() const { return this != 0; }
+
     /// Cast to `ulong`.
     ulong opCast(T : ulong)() const { return __gmpz_get_ui(_ptr); }
 
@@ -662,6 +665,11 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     const Z a = 42;
     const Z b = 43UL;
     const Z c = 43.0;
+
+    // bool cast
+    assert(a);
+    assert(cast(ulong)a == a);
+    assert(cast(ulong)a == 42);
 
     // binary
     assert(Z(`0b11`) == 3);
