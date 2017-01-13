@@ -35,3 +35,7 @@
   - `mpq_inits` (va_list wrapper)
   - `mpq_clears` (va_list wrapper)
   - `mpq_swap` (no better than rust's swap)
+
+- Optimize lazy expression
+  - `x = -x` => `x.negate()`
+  - `x = x + y * z` => `mpz_addmul(x, y, z)`
