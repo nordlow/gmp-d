@@ -135,6 +135,29 @@ struct MpZ
         return y;
     }
 
+    /// Assign from `rhs`.
+    void opAssign()(auto ref const MpZ rhs)
+    {
+        __gmpz_set(_ptr, rhs._ptr);
+    }
+    /// ditto
+    void opAssign(Unsigned)(Unsigned rhs)
+        if (isUnsigned!Unsigned)
+    {
+        __gmpz_set_ui(_ptr, rhs);
+    }
+    /// ditto
+    void opAssign(Signed)(Signed rhs)
+        if (isSigned!Signed)
+    {
+        __gmpz_set_si(_ptr, rhs);
+    }
+    /// ditto
+    void opAssign(double rhs)
+    {
+        __gmpz_set_d(_ptr, rhs);
+    }
+
     /// Destruct `this`.
     ~this() { if (_ptr) { __gmpz_clear(_ptr); } }
 
@@ -668,6 +691,35 @@ MpZ opBinary(string s, Unsigned)(Unsigned x, auto ref const MpZ y) @trusted @nog
 version(unittestPhobos) @safe @nogc unittest
 {
     alias BigInt = MpZ;     // Phobos naming convention
+
+    {
+        BigInt a = "9588669891916142";
+        BigInt b = "7452469135154800";
+        auto c = a * b;
+        assert(c == BigInt("71459266416693160362545788781600"));
+        auto d = b * a;
+        assert(d == BigInt("71459266416693160362545788781600"));
+        assert(d == c);
+        d = c * BigInt("794628672112");
+        assert(d == BigInt("56783581982794522489042432639320434378739200"));
+        auto e = c + d;
+        assert(e == BigInt("56783581982865981755459125799682980167520800"));
+        auto f = d + c;
+        assert(f == e);
+        auto g = f - c;
+        assert(g == d);
+        g = f - d;
+        assert(g == c);
+        e = 12345678;
+        g = c + e;
+        auto h = g / b;
+        auto i = g % b;
+        assert(h == a);
+        assert(i == e);
+        BigInt j = "-0x9A56_57f4_7B83_AB78";
+        j ^^= 11UL;
+    }
+
     {
         auto b = BigInt("1_000_000_000");
 
@@ -844,6 +896,11 @@ extern(C)
     void __gmpz_init_set_ui (mpz_ptr, ulong);
     int __gmpz_init_set_str (mpz_ptr, const char*, int);
 
+    void __gmpz_set (mpz_ptr rop, mpz_srcptr op);
+    void __gmpz_set_ui (mpz_ptr rop, ulong op);
+    void __gmpz_set_si (mpz_ptr rop, long op);
+    void __gmpz_set_d (mpz_ptr rop, double op);
+
     void __gmpz_clear (mpz_ptr);
 
     void __gmpz_abs (mpz_ptr, mpz_srcptr);
@@ -873,6 +930,8 @@ extern(C)
     void __gmpz_fdiv_qr_ui (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
     void __gmpz_fdiv_ui (mpz_srcptr, ulong);
 
+    void __gmpz_tdiv_q (mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_tdiv_r (mpz_ptr, mpz_srcptr, mpz_srcptr);
     void __gmpz_tdiv_q_ui (mpz_ptr, mpz_srcptr, ulong);
     ulong __gmpz_tdiv_r_ui (mpz_ptr, mpz_srcptr, ulong);
     void __gmpz_tdiv_qr_ui (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
