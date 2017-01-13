@@ -196,13 +196,13 @@ struct MpZ
     bool opCast(T : bool)() const { return __gmpz_cmp_ui(_ptr, 0) != 0; }
 
     /// Cast to `ulong`.
-    ulong opCast(T : ulong)() const { return __gmpz_get_ui(_ptr); }
+    T opCast(T)() const if (isUnsigned!T) { return cast(T)__gmpz_get_ui(_ptr); }
 
     /// Cast to `long`.
-    long opCast(T : long)() const { return __gmpz_get_si(_ptr); }
+    T opCast(T)() const if (isSigned!T) { return cast(T)__gmpz_get_si(_ptr); }
 
     /// Cast to `double`.
-    double opCast(T : double)() const { return __gmpz_get_d(_ptr); }
+    // TODO double opCast(T : double)() const { return __gmpz_get_d(_ptr); }
 
     MpZ opBinary(string s)(auto ref const MpZ rhs) const
         if (s == "+" || s == "-" || s == "*" || s == "/" || s == "%")
@@ -370,7 +370,7 @@ struct MpZ
     }
 
     MpZ opBinaryRight(string s, Unsigned)(Unsigned lhs) const
-        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%") &&
+        if ((s == "+" || s == "-" || s == "*" || s == "%") &&
             isUnsigned!Unsigned)
     {
         typeof(return) y = null;
@@ -386,11 +386,6 @@ struct MpZ
         {
             __gmpz_mul_ui(y._ptr, _ptr, lhs); // commutative
         }
-        else static if (s == "/")
-        {
-            assert(this != 0, "Divison by zero");
-            __gmpz_tdiv_q(y._ptr, MpZ(lhs)._ptr, _ptr); // convert `lhs` to MpZ
-        }
         else static if (s == "%")
         {
             assert(this != 0, "Divison by zero");
@@ -404,7 +399,7 @@ struct MpZ
     }
 
     MpZ opBinaryRight(string s, Signed)(Signed lhs) const
-        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%") &&
+        if ((s == "+" || s == "-" || s == "*" || s == "%") &&
             isSigned!Signed)
     {
         static if (s == "+" || s == "*")
@@ -426,13 +421,6 @@ struct MpZ
             y.negate();
             return y;
         }
-        else static if (s == "/")
-        {
-            typeof(return) y = null;
-            assert(this != 0, "Divison by zero");
-            __gmpz_tdiv_q(y._ptr, MpZ(lhs)._ptr, _ptr); // convert `lhs` to MpZ
-            return y;
-        }
         else static if (s == "%")
         {
             typeof(return) y = null;
@@ -444,6 +432,17 @@ struct MpZ
         {
             static assert(false);
         }
+    }
+
+    /// Dividend propagates quotient type to signed.
+    Unqual!Integral opBinaryRight(string s, Integral)(Integral lhs) const
+        if ((s == "/") &&
+            isIntegral!Integral)
+    {
+        MpZ y = null;
+        assert(this != 0, "Divison by zero");
+        __gmpz_tdiv_q(y._ptr, MpZ(lhs)._ptr, _ptr);
+        return cast(typeof(return))y;
     }
 
     ref MpZ opOpAssign(string s)(auto ref const MpZ rhs)
@@ -786,17 +785,21 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     // division
 
     assert(Z(27) / Z(3) == 9);
-    assert(Z(27) / Z(10) == 2);
-    assert(Z(27) / 3 == 9);
-    assert(Z(27) / -3 == -9);
-    assert(Z(27) / 3UL == 9);
-    assert(Z(27) / 10 == 2);
-    assert(Z(27) / -10 == -2);
-    assert(Z(27) / 10UL == 2);
-    assert(28 / Z(3) == 9);
-    assert(28 / Z(-3) == -9);
-    assert(28UL / Z(3) == 9);
-    assert(28UL / Z(-3) == -9);
+    assert(Z(27) /   3  == 9);
+
+    assert(Z(27) / Z(10)  == 2);
+    assert(Z(27) /   10   == 2);
+    assert(Z(27) /   10UL == 2);
+
+    assert(Z(27) / -3   == -9);
+    assert(Z(27) /  3UL ==  9);
+
+    assert(Z(27) / -10   == -2);
+
+    assert(28   / Z( 3) ==  9);
+    assert(28   / Z(-3) == -9);
+    assert(28UL / Z( 3) ==  9);
+    // assert(28UL / Z(-3) == -9);
 
     // modulo/remainder
 
