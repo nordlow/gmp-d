@@ -652,18 +652,25 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(-(-a) == a);
 
     // addition
-    assert(a + b == b + a);
+    assert(a + b == b + a);     // commutative
     assert(a + Z(43) == b + a);
+    assert(a + 0 == a);
+    assert(a + 1 != a);
+    assert(0 + a == a);
+    assert(1 + a != a);
     assert(a + 0UL == a);
     assert(a + 1UL != a);
     assert(a + b == 42 + 43);
     assert(1 + a == 43);
-    assert(a + 1 == 43);
     assert(a + (-1) == 41);
     assert(1UL + a == 43);
+    assert(a + 1 == 1 + a);       // commutative
+    assert(a + (-1) == (-1) + a); // commutative
+    assert(1UL + a == a + 1UL);   // commutative
 
     // subtraction
     assert(a - 2 == 40);
+    // TODO assert(2 - a == -40);
     assert(a - (-2) == 44);
     assert(44UL - Z(42) == 2);
 
