@@ -944,15 +944,15 @@ version(unittestPhobos) @safe @nogc unittest
     {
         auto  x  = BigInt("1_000_000_500");
 
-        ulong ul  = 2_000_000UL;
-        uint ui   = 500_000;
-        ushort us = 30_000;
-        ubyte ub  = 50;
+        immutable ulong ul  = 2_000_000UL;
+        immutable uint ui   = 500_000;
+        immutable ushort us = 30_000;
+        immutable ubyte ub  = 50;
 
-        long  l = 1_000_000L;
-        int   i = 500_000;
-        short s = 30_000;
-        byte b  = 50;
+        immutable long  l = 1_000_000L;
+        immutable int   i = 500_000;
+        immutable short s = 30_000;
+        immutable byte b  = 50;
 
         static assert(is(typeof(x % ul)  == ulong));
         static assert(is(typeof(x % ui)  == uint));
@@ -966,13 +966,28 @@ version(unittestPhobos) @safe @nogc unittest
 
         assert(x % ul == 500);
         assert(x % ui == 500);
-        assert(x % us  == 10500);
+        assert(x % us  == 10_500);
         assert(x % ub == 0);
 
         assert(x % l  == 500L);
         assert(x % i  == 500);
-        assert(x % s  == 10500);
+        assert(x % s  == 10_500);
         assert(x % b == 0);
+    }
+
+    {
+        auto x = BigInt("100");
+        BigInt y = 123 + x;
+        assert(y == BigInt("223"));
+
+        BigInt z = 123 - x;
+        assert(z == BigInt("23"));
+
+        // Dividing a built-in integer type by BigInt always results in
+        // something that fits in a built-in type, so the built-in type is
+        // returned, not BigInt.
+        // assert(is(typeof(1000 / x) == int));
+        assert(1000 / x == 10);
     }
 }
 
