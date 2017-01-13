@@ -342,7 +342,8 @@ struct MpZ
         {
             if (rhs < 0)        // TODO handle `rhs == rhs.min`
             {
-                return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
+                immutable ulong pos_rhs = -rhs; // make it positive
+                return -cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, pos_rhs);
             }
             else
             {
@@ -781,8 +782,8 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(28   % Z(3) == 1);
     assert(28UL % Z(3) == 1);
 
-    // assert(Z( 28)  % -3 == 1);   // TODO should be -1
-    // assert(Z(-28)  %  3 == -1);  // TODO should be 1
+    assert(Z( 28)  % -3 == -1);
+    assert(Z(-28)  %  3 == 1);
     assert(Z( 28)  % Z(-3) == 1);  // TODO should be -1
     assert(Z(-28)  % Z( 3) == -1);  // TODO should be 1
     assert( 28  % Z(-3) == 1);      // TODO should be -1
