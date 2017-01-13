@@ -266,7 +266,7 @@ struct MpZ
         typeof(return) y = null;
         static      if (s == "+")
         {
-            if (rhs < 0)
+            if (rhs < 0)        // TODO handle `rhs == rhs.min`
             {
                 immutable ulong pos_rhs = -rhs; // make it positive
                 __gmpz_sub_ui(y._ptr, _ptr, pos_rhs);
@@ -278,8 +278,7 @@ struct MpZ
         }
         else static if (s == "-")
         {
-            // TODO handle case `rhs.min`, as `-rhs.min` cannot be represented as a `Signed`
-            if (rhs < 0)
+            if (rhs < 0)        // TODO handle `rhs == rhs.min`
             {
                 __gmpz_add_ui(y._ptr, _ptr, -rhs); // x - (-y) == x + y
             }
@@ -294,7 +293,7 @@ struct MpZ
         }
         else static if (s == "^^")
         {
-            if (rhs < 0)
+            if (rhs < 0)        // TODO handle `rhs == rhs.min`
             {
                 immutable ulong pos_rhs = -rhs; // make it positive
                 __gmpz_pow_ui(y._ptr, _ptr, pos_rhs); // use positive power
@@ -323,7 +322,7 @@ struct MpZ
         MpZ y = null;
         static if (isSigned!Integral)
         {
-            if (rhs < 0)
+            if (rhs < 0)        // TODO handle `rhs == rhs.min`
             {
                 return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
             }
@@ -377,7 +376,7 @@ struct MpZ
         else static if (s == "-")
         {
             typeof(return) y = null;
-            if (rhs < 0)        // TODO handle rhs == rhs.min
+            if (rhs < 0)        // TODO handle `rhs == rhs.min`
             {
                 immutable ulong pos_rhs = -rhs; // make it positive
                 __gmpz_add_ui(y._ptr, _ptr, pos_rhs);
@@ -466,9 +465,9 @@ struct MpZ
     {
         static      if (s == "+")
         {
-            if (rhs < 0)
+            if (rhs < 0)        // TODO handle `rhs == rhs.min`
             {
-                assert(rhs != rhs.min); // TODO special case because -rhs.min is not correct
+                assert(rhs != rhs.min);
                 immutable ulong pos_rhs = -rhs; // make it positive
                 __gmpz_sub_ui(_ptr, _ptr, pos_rhs);
             }
@@ -479,9 +478,9 @@ struct MpZ
         }
         else static if (s == "-")
         {
-            if (rhs < 0)
+            if (rhs < 0)        // TODO handle `rhs == rhs.min`
             {
-                assert(rhs != rhs.min); // TODO special case because -rhs.min is not correct
+                assert(rhs != rhs.min);
                 immutable ulong pos_rhs = -rhs; // make it positive
                 __gmpz_add_ui(_ptr, _ptr, pos_rhs);
             }
