@@ -90,7 +90,7 @@ struct MpZ
         assert(status == 0, "Parameter `value` does not contain an integer");
     }
 
-    // Returns: the Mersenne prime, M(p) = 2 ^^ p - 1
+    /// Returns: the Mersenne prime, M(p) = 2 ^^ p - 1
     static MpZ mersennePrime(Integral)(Integral p)
         if (isIntegral!Integral)
     {
