@@ -36,6 +36,8 @@
   - `mpq_clears` (va_list wrapper)
   - `mpq_swap` (no better than rust's swap)
 
-- Optimize lazy expression
+- Lazy Evaluation
   - `x = -x` => `x.negate()`
   - `x = x + y * z` => `mpz_addmul(x, y, z)`
+  - lots more...
+  - `toString`, `opCast` should probably evaluate and cache result
