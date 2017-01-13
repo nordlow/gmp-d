@@ -658,6 +658,8 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(a + 1UL != a);
     assert(a + b == 42 + 43);
     assert(1 + a == 43);
+    assert(a + 1 == 43);
+    assert(a + (-1) == 41);
     assert(1UL + a == 43);
 
     // subtraction
