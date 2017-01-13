@@ -711,6 +711,9 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     // multiplication
     assert(a * 1UL == a);
     assert(a * 1 == a);
+    assert(1 * a == a);
+    assert(1UL * a == a);
+    assert((-1) * a == -a);
     assert(a * 2 != a);
     assert(a * b == b * a);
     assert(a * b == 42UL * 43UL);
