@@ -986,7 +986,7 @@ version(unittestPhobos) @safe @nogc unittest
         // Dividing a built-in integer type by BigInt always results in
         // something that fits in a built-in type, so the built-in type is
         // returned, not BigInt.
-        // assert(is(typeof(1000 / x) == int));
+        // static assert(is(typeof(1000 / x) == int));
         assert(1000 / x == 10);
     }
 }
