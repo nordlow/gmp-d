@@ -208,23 +208,11 @@ struct MpZ
         if (s == "+" || s == "-" || s == "*" || s == "/" || s == "%")
     {
         typeof(return) y = null;
-        static      if (s == "+")
-        {
-            __gmpz_add(y._ptr, _ptr, rhs._ptr);
-        }
-        else static if (s == "-")
-        {
-            __gmpz_sub(y._ptr, _ptr, rhs._ptr);
-        }
-        else static if (s == "*")
-        {
-            __gmpz_mul(y._ptr, _ptr, rhs._ptr);
-        }
-        else static if (s == "/")
-        {
-            assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_q(y._ptr, _ptr, rhs._ptr);
-        }
+        static      if (s == "+") { __gmpz_add(y._ptr, _ptr, rhs._ptr); }
+        else static if (s == "-") { __gmpz_sub(y._ptr, _ptr, rhs._ptr); }
+        else static if (s == "*") { __gmpz_mul(y._ptr, _ptr, rhs._ptr); }
+        else static if (s == "/") { assert(rhs != 0, "Divison by zero");
+                                    __gmpz_tdiv_q(y._ptr, _ptr, rhs._ptr); }
         else static if (s == "%")
         {
             // TODO use tdiv_r or mod?
@@ -243,31 +231,13 @@ struct MpZ
             isUnsigned!Unsigned)
     {
         typeof(return) y = null;
-        static      if (s == "+")
-        {
-            __gmpz_add_ui(y._ptr, _ptr, rhs);
-        }
-        else static if (s == "-")
-        {
-            __gmpz_sub_ui(y._ptr, _ptr, rhs);
-        }
-        else static if (s == "*")
-        {
-            __gmpz_mul_ui(y._ptr, _ptr, rhs);
-        }
-        else static if (s == "/")
-        {
-            assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_q_ui(y._ptr, _ptr, rhs);
-        }
-        else static if (s == "^^")
-        {
-            __gmpz_pow_ui(y._ptr, _ptr, rhs);
-        }
-        else
-        {
-            static assert(false);
-        }
+        static      if (s == "+") { __gmpz_add_ui(y._ptr, _ptr, rhs); }
+        else static if (s == "-") { __gmpz_sub_ui(y._ptr, _ptr, rhs); }
+        else static if (s == "*") { __gmpz_mul_ui(y._ptr, _ptr, rhs); }
+        else static if (s == "/") { assert(rhs != 0, "Divison by zero");
+                                    __gmpz_tdiv_q_ui(y._ptr, _ptr, rhs); }
+        else static if (s == "^^") { __gmpz_pow_ui(y._ptr, _ptr, rhs); }
+        else { static assert(false); }
         return y;
     }
 
@@ -375,20 +345,10 @@ struct MpZ
             isUnsigned!Unsigned)
     {
         typeof(return) y = null;
-        static      if (s == "+")
-        {
-            __gmpz_add_ui(y._ptr, _ptr, lhs); // commutative
-        }
-        else static if (s == "-")
-        {
-            __gmpz_ui_sub(y._ptr, lhs, _ptr);
-        }
-        else static if (s == "*")
-        {
-            __gmpz_mul_ui(y._ptr, _ptr, lhs); // commutative
-        }
-        else static if (s == "%")
-        {
+        static      if (s == "+") { __gmpz_add_ui(y._ptr, _ptr, lhs); }// commutative
+        else static if (s == "-") { __gmpz_ui_sub(y._ptr, lhs, _ptr); }
+        else static if (s == "*") { __gmpz_mul_ui(y._ptr, _ptr, lhs); } // commutative
+        else static if (s == "%") {
             assert(this != 0, "Divison by zero");
             __gmpz_tdiv_r(y._ptr, MpZ(lhs)._ptr, _ptr); // convert `lhs` to MpZ
         }
@@ -450,28 +410,11 @@ struct MpZ
     ref MpZ opOpAssign(string s)(auto ref const MpZ rhs)
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
-        static      if (s == "+")
-        {
-            __gmpz_add(_ptr, _ptr, rhs._ptr);
-        }
-        else static if (s == "-")
-        {
-            __gmpz_sub(_ptr, _ptr, rhs._ptr);
-        }
-        else static if (s == "*")
-        {
-            __gmpz_mul(_ptr, _ptr, rhs._ptr);
-        }
-        else static if (s == "/")
-        {
-            assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_q(_ptr, _ptr, rhs._ptr);
-        }
-        else static if (s == "%")
-        {
-            assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_r(_ptr, _ptr, rhs._ptr);
-        }
+        static      if (s == "+") { __gmpz_add(_ptr, _ptr, rhs._ptr); }
+        else static if (s == "-") { __gmpz_sub(_ptr, _ptr, rhs._ptr); }
+        else static if (s == "*") { __gmpz_mul(_ptr, _ptr, rhs._ptr); }
+        else static if (s == "/") { assert(rhs != 0, "Divison by zero"); __gmpz_tdiv_q(_ptr, _ptr, rhs._ptr); }
+        else static if (s == "%") { assert(rhs != 0, "Divison by zero"); __gmpz_tdiv_r(_ptr, _ptr, rhs._ptr); }
         else
         {
             static assert(false);
@@ -483,32 +426,12 @@ struct MpZ
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isUnsigned!Unsigned)
     {
-        static      if (s == "+")
-        {
-            __gmpz_add_ui(_ptr, _ptr, rhs);
-        }
-        else static if (s == "-")
-        {
-            __gmpz_sub_ui(_ptr, _ptr, rhs);
-        }
-        else static if (s == "*")
-        {
-            __gmpz_mul_ui(_ptr, _ptr, rhs);
-        }
-        else static if (s == "/")
-        {
-            assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_q_ui(_ptr, _ptr, rhs);
-        }
-        else static if (s == "%")
-        {
-            assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs);
-        }
-        else static if (s == "^^")
-        {
-            __gmpz_pow_ui(_ptr, _ptr, rhs);
-        }
+        static      if (s == "+") { __gmpz_add_ui(_ptr, _ptr, rhs); }
+        else static if (s == "-") { __gmpz_sub_ui(_ptr, _ptr, rhs); }
+        else static if (s == "*") { __gmpz_mul_ui(_ptr, _ptr, rhs); }
+        else static if (s == "/") { assert(rhs != 0, "Divison by zero"); __gmpz_tdiv_q_ui(_ptr, _ptr, rhs); }
+        else static if (s == "%") { assert(rhs != 0, "Divison by zero"); __gmpz_tdiv_r_ui(_ptr, _ptr, rhs); }
+        else static if (s == "^^") { __gmpz_pow_ui(_ptr, _ptr, rhs); }
         else
         {
             static assert(false);
