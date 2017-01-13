@@ -404,7 +404,19 @@ struct MpZ
         MpZ y = null;
         assert(this != 0, "Divison by zero");
         __gmpz_tdiv_q(y._ptr, MpZ(lhs)._ptr, _ptr);
-        return cast(typeof(return))y;
+        static      if (isSigned!Integral)
+        {
+            return cast(typeof(return))y;
+        }
+        else static if (isUnsigned!Integral)
+        {
+            import std.typecons : Signed;
+            return cast(Signed!(typeof(return)))y;
+        }
+        else
+        {
+            static assert(false);
+        }
     }
 
     ref MpZ opOpAssign(string s)(auto ref const MpZ rhs)
@@ -725,7 +737,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(28UL / Z( 3) ==  9);
 
     assert(28   / Z(-3) == -9);
-    // assert(28UL / Z(-3) == -9);
+    assert(28UL / Z(-3) == -9);
 
     // modulo/remainder
 
