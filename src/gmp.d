@@ -969,6 +969,7 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
 /// Phobos unittests
 version(unittestPhobos) @safe @nogc unittest
 {
+    alias bigInt = mpz;
     alias BigInt = Z;     // Phobos naming convention
 
     {
