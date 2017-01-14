@@ -651,7 +651,11 @@ struct MpZ(Eval eval = Eval.direct)
         return !negative;
     }
 
-    /// Get sign, being either -1, 0, or +1.
+    /** Returns: sign as either
+        - -1 (`this` < 0),
+        -  0 (`this` == 0), or
+        - +1 (`this` > 0).
+     */
     @property int sgn() const
     {
         return _z._mp_size < 0 ? -1 : _z._mp_size > 0; // C macro `mpz_sgn` in gmp.h
