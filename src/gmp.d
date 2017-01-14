@@ -665,14 +665,20 @@ struct MpZ(Eval eval = Eval.direct)
 
 private:
 
-    /// Limb of internal representation.
+    /// Type of limb in internal representation.
     alias Limb = __mp_limb_t;   // GNU MP alias
 
     /** Returns: limbs. */
     inout(Limb)[] limbs() inout return @system // TODO scope
     {
-        import std.numeric : abs;
-        return _z._mp_d[0 .. abs(_z._mp_size)];
+        // import std.math : abs;
+        return _z._mp_d[0 .. limbCount];
+    }
+
+    /// Get number of limbs in internal representation.
+    @property uint limbCount() const
+    {
+        return integralAbs(_z._mp_size);
     }
 
     /// @nogc-variant of `toStringz` with heap allocation of null-terminated C-string `stringz`.
@@ -707,6 +713,12 @@ private:
         pragma(mangle, "free") void qualifiedFree(void* ptr);
     }
 
+    // utility
+    static T integralAbs(T)(T x)
+        if (isIntegral!T)
+    {
+        return x>=0 ? x : -x;
+    }
 }
 
 pure nothrow pragma(inline, true):
