@@ -647,6 +647,10 @@ struct MpZ(Eval eval = Eval.direct)
         return rop;
     }
 
+    // size_t toHash() const
+    // {
+    // }
+
     /// Returns: number of digits in base `base`.
     size_t sizeInBase(int base) const
     {
@@ -654,27 +658,27 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
     /// Check if `this` is odd.
-    @property bool odd() const  // TODO isOdd instead?
+    @property bool isOdd() const
     {
         return (_z._mp_size != 0) & cast(int)(_z._mp_d[0]); // C macro `mpz_odd_p` in gmp.h
     }
 
     /// Check if `this` is odd.
-    @property bool even() const // TODO isEven instead?
+    @property bool isEven() const
     {
-        return !odd;            // C macro `mpz_even_p` in gmp.h
+        return !isOdd;            // C macro `mpz_even_p` in gmp.h
     }
 
     /// Check if `this` is negative.
-    @property bool negative() const // TODO isNegative instead?
+    @property bool isNegative() const
     {
         return _z._mp_size < 0;
     }
 
     /// Check if `this` is positive.
-    @property bool positive() const // TODO isPositive instead?
+    @property bool isPositive() const
     {
-        return !negative;
+        return !isNegative;
     }
 
     /** Returns: sign as either
@@ -1066,30 +1070,30 @@ MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
 
     // odd and even
 
-    assert(mpz(0).even);
-    assert(mpz(1).odd);
-    assert(mpz(2).even);
-    assert(mpz(3).odd);
+    assert(mpz(0).isEven);
+    assert(mpz(1).isOdd);
+    assert(mpz(2).isEven);
+    assert(mpz(3).isOdd);
 
-    assert(mpz(-1).odd);
-    assert(mpz(-2).even);
-    assert(mpz(-3).odd);
+    assert(mpz(-1).isOdd);
+    assert(mpz(-2).isEven);
+    assert(mpz(-3).isOdd);
 
-    assert(mpz("300000000000000000000000000000000000000").even);
-    assert(mpz("300000000000000000000000000000000000001").odd);
-    assert(mpz("300000000000000000000000000000000000002").even);
-    assert(mpz("300000000000000000000000000000000000003").odd);
+    assert(mpz("300000000000000000000000000000000000000").isEven);
+    assert(mpz("300000000000000000000000000000000000001").isOdd);
+    assert(mpz("300000000000000000000000000000000000002").isEven);
+    assert(mpz("300000000000000000000000000000000000003").isOdd);
 
     // negative and positive
 
-    assert(mpz(0).positive);
-    assert(mpz(1).positive);
-    assert(mpz(2).positive);
-    assert(mpz(3).positive);
+    assert(mpz(0).isPositive);
+    assert(mpz(1).isPositive);
+    assert(mpz(2).isPositive);
+    assert(mpz(3).isPositive);
 
-    assert(mpz(-1).negative);
-    assert(mpz(-2).negative);
-    assert(mpz(-3).negative);
+    assert(mpz(-1).isNegative);
+    assert(mpz(-2).isNegative);
+    assert(mpz(-3).isNegative);
 
     // sign function (sgn)
 
