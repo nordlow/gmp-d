@@ -750,6 +750,19 @@ MpZ!eval mpz(Eval eval = Eval.direct, Args...)(Args args) @safe @nogc
     return typeof(return)(args);
 }
 
+/// Swap contents of `x` with contents of `y`.
+void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
+                                  ref MpZ!evalY y) @trusted @nogc
+{
+    import std.algorithm.mutation : swap;
+    swap(x, y); // x.swap(y);
+}
+
+string toDecimalString(Eval eval)(auto ref const MpZ!eval rhs) // for `std.bigint.BigInt` compatibility
+{
+    return rhs.toString(10);
+}
+
 version(unittest)
 {
     alias Z = MpZ!(Eval.direct);
@@ -761,6 +774,7 @@ version(unittest)
     assert(mpz(42).toString == `42`);
     assert(mpz(-42).toString == `-42`);
     assert(mpz(`-101`).toString == `-101`);
+    assert(mpz(42).toDecimalString == `42`);
 }
 
 /// Returns: absolute value of `x`.
@@ -769,14 +783,6 @@ MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
     typeof(return) y = null;
     __gmpz_abs(y._ptr, x._ptr);
     return y;
-}
-
-/// Swap contents of `x` with contents of `y`.
-void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
-                                  ref MpZ!evalY y) @trusted @nogc
-{
-    import std.algorithm.mutation : swap;
-    swap(x, y); // x.swap(y);
 }
 
 ///
