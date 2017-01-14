@@ -25,6 +25,7 @@ enum Eval
 // import deimos.gmp.integer;
 
 /** Arbitrary (multi) precision signed integer (Z).
+    Wrapper for GNU MP (GMP)'s type `mpz_t` and functions `mpz_.*`.
  */
 struct MpZ(Eval eval = Eval.direct)
 {
