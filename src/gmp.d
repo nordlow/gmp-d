@@ -623,6 +623,18 @@ struct MpZ(Eval eval = Eval.direct)
         return __gmpz_sizeinbase(_ptr, base);
     }
 
+    /// Check if `this` is odd.
+    @property bool odd() const
+    {
+        assert(false, "TODO check source def of mpz_odd_p");
+    }
+
+    /// Check if `this` is odd.
+    @property bool even() const
+    {
+        assert(false, "TODO check source def of mpz_even_p");
+    }
+
     /// Number of significant `uint`s used for storing `this`.
     @property size_t uintLength() const
     {
