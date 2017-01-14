@@ -75,7 +75,7 @@ struct MpZ(Eval eval = Eval.direct)
 
     /// Construct from `value` in base `base`.
     pragma(inline, false)
-    this(const string value, int base = 0) // TODO Use Optional/Nullable when value is nan, or inf
+    this(const string value, int base = defaultBase) // TODO Use Optional/Nullable when value is nan, or inf
     {
         assert(base == 0 || base >= 2 && base <= 62);
         char* stringz = allocStringzCopyOf(value);
@@ -156,7 +156,7 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
     /// Assign `this` from `string` `rhs` interpreted in base `base`.
-    ref MpZ fromString(string rhs, int base = 10)
+    ref MpZ fromString(string rhs, int base = defaultBase)
     {
         assert(base == 0 || base >= 2 && base <= 62);
         char* stringz = allocStringzCopyOf(rhs);
