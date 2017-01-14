@@ -51,7 +51,7 @@ struct MpZ
     /// Construct empty (undefined) from explicit `null`.
     this(typeof(null))
     {
-        initialize();           // TODO remove if this is same as zero bitblit
+        initialize();             // TODO remove if this is same as zero bitblit
         assert(this == MpZ.init); // if this is same as default
     }
 
@@ -113,10 +113,8 @@ struct MpZ
         @disable this(this);
     }
 
-    /** Initialize internal struct.
-        Cannot be called `init` as that will override builtin type property.
-     */
-    private void initialize()
+    /** Initialize internal struct. */
+    private void initialize() // cannot be called `init` as that will override builtin type property
     {
         __gmpz_init(_ptr);
     }
@@ -526,9 +524,7 @@ struct MpZ
         return y;
     }
 
-    /** Returns: `this` ^^ `power` (mod `modulo`).
-        TODO can we somehow capture lazy evaluation?
-     */
+    /// Returns: `this` ^^ `power` (mod `modulo`).
     MpZ powm()(auto ref const MpZ power,
                auto ref const MpZ modulo) const
     {
