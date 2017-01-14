@@ -36,7 +36,7 @@
   - `mpq_clears` (va_list wrapper)
   - `mpq_swap` (no better than rust's swap)
 
-- Lazy Evaluation
+- Lazy Evaluation via expression templates (`gmp.Evaluation`)
   - `x = -x` => `x.negate()`
   - `x = x + y * z` => `mpz_addmul(x, y, z)`
   - lots more...
