@@ -1015,7 +1015,7 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     assert(mpz(-2).negative);
     assert(mpz(-3).negative);
 
-    // limb count
+    // internal limb count
 
     assert(mpz(0).limbCount == 0);
     assert(mpz(1).limbCount == 1);
