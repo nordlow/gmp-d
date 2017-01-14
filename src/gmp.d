@@ -38,13 +38,28 @@ struct MpZ(Eval eval = Eval.direct)
     @trusted pure nothrow pragma(inline, true):
 
     /// Convert to string in base `base`.
-    string toString(int base = defaultBase) const
+    string toString(int base = defaultBase, bool upperCaseDigits = false) const
     {
         assert(base >= -2 && base <= -36 ||
                base >= 2 && base <= 62);
+
         immutable size = sizeInBase(base);
+
         string str = new string(size + 1); // one extra for minus sign
-        __gmpz_get_str(cast(char*)str.ptr, base, _ptr);
+        __gmpz_get_str(cast(char*)str.ptr, base, _ptr); // fill it
+
+        if (upperCaseDigits)
+        {
+            foreach (ref e; cast(char[])str)
+            {
+                import std.ascii : isLower, toUpper;
+                if (e.isLower)
+                {
+                    e = e.toUpper;
+                }
+            }
+        }
+
         return str[0] == '-' ? str : str.ptr[0 .. size];
     }
 
@@ -763,6 +778,11 @@ string toDecimalString(Eval eval)(auto ref const MpZ!eval rhs) // for `std.bigin
     return rhs.toString(10);
 }
 
+string toHex(Eval eval)(auto ref const MpZ!eval rhs) // for `std.bigint.BigInt` compatibility
+{
+    return rhs.toString(16, true);
+}
+
 version(unittest)
 {
     alias Z = MpZ!(Eval.direct);
@@ -771,10 +791,20 @@ version(unittest)
 /// convert to string
 @safe unittest
 {
-    assert(mpz(42).toString == `42`);
-    assert(mpz(-42).toString == `-42`);
+    assert(mpz(42).toString     ==   `42`);
+    assert(mpz(-42).toString    ==  `-42`);
     assert(mpz(`-101`).toString == `-101`);
-    assert(mpz(42).toDecimalString == `42`);
+
+    assert(mpz(-42).toDecimalString == `-42`);
+    assert(mpz( 42).toDecimalString ==  `42`);
+
+    assert(mpz( 0).toHex == `0`);
+    assert(mpz( 1).toHex == `1`);
+    assert(mpz( 9).toHex == `9`);
+    assert(mpz(10).toHex == `A`);
+    assert(mpz(14).toHex == `E`);
+    assert(mpz(15).toHex == `F`);
+    assert(mpz(16).toHex == `10`);
 }
 
 /// Returns: absolute value of `x`.
