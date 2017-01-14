@@ -155,7 +155,7 @@ struct MpZ(Eval eval = Eval.direct)
         return this;
     }
 
-    /// Assign from string `rhs`.
+    /// Assign `this` from `string` `rhs` interpreted in base `base`.
     ref MpZ fromString(string rhs, int base = 10)
     {
         assert(base == 0 || base >= 2 && base <= 62);
@@ -942,6 +942,11 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     assert(y == 43);
 
     assert(mpz(null).fromString("42") == 42);
+    assert(mpz(null).fromString("11", 2) == 3);
+    assert(mpz(null).fromString("7", 8) == 7);
+    assert(mpz(null).fromString("e", 16) == 14);
+    assert(mpz(null).fromString("f", 16) == 15);
+    assert(mpz(null).fromString("10", 16) == 16);
 
     // odd and even
 
