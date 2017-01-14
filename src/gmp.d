@@ -638,13 +638,13 @@ struct MpZ(Eval eval = Eval.direct)
     /// Number of significant `uint`s used for storing `this`.
     @property size_t uintLength() const
     {
-        assert(false, "TODO implement");
+        assert(false, "TODO use mpz_size");
     }
 
     /// Number of significant `ulong`s used for storing `this`.
     @property size_t uintLong() const
     {
-        assert(false, "TODO implement");
+        assert(false, "TODO use mpz_size");
     }
 
 private:
