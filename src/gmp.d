@@ -1017,7 +1017,29 @@ version(unittestPhobos) @safe @nogc unittest
     }
 
     {
+        assert(cast(int)BigInt("0") == 0);
+        assert(cast(ubyte)BigInt("0") == 0);
 
+        assert(cast(ubyte)BigInt(255) == 255);
+        assert(cast(ushort)BigInt(65535) == 65535);
+        assert(cast(uint)BigInt(uint.max) == uint.max);
+        assert(cast(ulong)BigInt(ulong.max) == ulong.max);
+
+        assert(cast(byte)BigInt(-128) == -128);
+        assert(cast(short)BigInt(-32768) == -32768);
+        assert(cast(int)BigInt(int.min) == int.min);
+        assert(cast(long)BigInt(long.min) == long.min);
+
+        assert(cast(byte)BigInt(127) == 127);
+        assert(cast(short)BigInt(32767) == 32767);
+        assert(cast(int)BigInt(int.max) == int.max);
+        assert(cast(long)BigInt(long.max) == long.max);
+
+        // TODO:
+        // import std.conv : to, ConvOverflowException;
+        // import std.exception : assertThrown;
+        // assertThrown!ConvOverflowException(BigInt("256").to!ubyte);
+        // assertThrown!ConvOverflowException(BigInt("-1").to!ubyte);
     }
 }
 
