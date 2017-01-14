@@ -657,6 +657,12 @@ struct MpZ(Eval eval = Eval.direct)
         return __gmpz_sizeinbase(_ptr, base);
     }
 
+    /// Check if `this` is zero.
+    @property bool isZero() const
+    {
+        return _z._mp_size == 0;
+    }
+
     /// Check if `this` is odd.
     @property bool isOdd() const
     {
@@ -1106,6 +1112,16 @@ MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
     assert(mpz( 2).sgn ==  1);
     assert(mpz(int.max).sgn  == 1);
     assert(mpz(long.max).sgn == 1);
+
+    assert(!mpz(long.min).isZero);
+    assert(!mpz(int.min).isZero);
+    assert(!mpz(-2).isZero);
+    assert(!mpz(-1).isZero);
+    assert( mpz( 0).isZero);
+    assert(!mpz( 1).isZero);
+    assert(!mpz( 2).isZero);
+    assert(!mpz(int.max).isZero);
+    assert(!mpz(long.max).isZero);
 
     // internal limb count
 
