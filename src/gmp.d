@@ -505,9 +505,26 @@ struct MpZ(Eval eval = Eval.direct)
     {
         static      if (s == "+") { __gmpz_add(_ptr, _ptr, rhs._ptr); }
         else static if (s == "-") { __gmpz_sub(_ptr, _ptr, rhs._ptr); }
-        else static if (s == "*") { __gmpz_mul(_ptr, _ptr, rhs._ptr); }
-        else static if (s == "/") { assert(rhs != 0, "Divison by zero"); __gmpz_tdiv_q(_ptr, _ptr, rhs._ptr); }
-        else static if (s == "%") { assert(rhs != 0, "Divison by zero"); __gmpz_tdiv_r(_ptr, _ptr, rhs._ptr); }
+        else static if (s == "*")
+        {
+            if (rhs == -1)
+                negate();
+            else
+                __gmpz_mul(_ptr, _ptr, rhs._ptr);
+        }
+        else static if (s == "/")
+        {
+            assert(rhs != 0, "Divison by zero");
+            if (rhs == -1)
+                negate();
+            else
+                __gmpz_tdiv_q(_ptr, _ptr, rhs._ptr);
+        }
+        else static if (s == "%")
+        {
+            assert(rhs != 0, "Divison by zero");
+            __gmpz_tdiv_r(_ptr, _ptr, rhs._ptr);
+        }
         else
         {
             static assert(false);
@@ -564,7 +581,10 @@ struct MpZ(Eval eval = Eval.direct)
         }
         else static if (s == "*")
         {
-            __gmpz_mul_si(_ptr, _ptr, rhs);
+            if (rhs == -1)
+                negate();
+            else
+                __gmpz_mul_si(_ptr, _ptr, rhs);
         }
         else static if (s == "^^")
         {
@@ -1234,6 +1254,12 @@ version(unittestPhobos) @safe @nogc unittest
         auto x = BigInt("123");
         x *= 300;
         assert(x == 36_900);
+    }
+
+    {
+        auto x = BigInt("123");
+        x *= -1;
+        assert(x == -123);
     }
 
     {
