@@ -840,9 +840,9 @@ version(unittestPhobos) @safe @nogc unittest
     alias BigInt = MpZ;     // Phobos naming convention
 
     {
-        BigInt a = "9588669891916142";
-        BigInt b = "7452469135154800";
-        auto c = a * b;
+        const BigInt a = "9588669891916142";
+        const BigInt b = "7452469135154800";
+        const c = a * b;
         assert(c == BigInt("71459266416693160362545788781600"));
         auto d = b * a;
         assert(d == BigInt("71459266416693160362545788781600"));
@@ -870,17 +870,17 @@ version(unittestPhobos) @safe @nogc unittest
     {
         auto b = BigInt("1_000_000_000");
 
-        b += 12345;
+        b += 12_345;
         assert(b == 1_000_012_345);
-        b += -12345;
+        b += -12_345;
         assert(b == 1_000_000_000);
 
-        b -= -12345;
+        b -= -12_345;
         assert(b == 1_000_012_345);
-        b -= +12345;
+        b -= +12_345;
         assert(b == 1_000_000_000);
 
-        b += 12345;
+        b += 12_345;
         assert(b == 1_000_012_345);
 
         b /= 5UL;
@@ -889,26 +889,26 @@ version(unittestPhobos) @safe @nogc unittest
 
     {
         auto x = BigInt("123");
-        auto y = BigInt("321");
+        const y = BigInt("321");
         x += y;
         assert(x == 444);
     }
 
     {
-        auto x = BigInt("123");
-        auto y = BigInt("456");
-        BigInt z = x * y;
-        assert(z == 56088);
+        const x = BigInt("123");
+        const y = BigInt("456");
+        const BigInt z = x * y;
+        assert(z == 56_088);
     }
 
     {
         auto x = BigInt("123");
         x *= 300;
-        assert(x == 36900);
+        assert(x == 36_900);
     }
 
     {
-        auto  x  = BigInt("1_000_000_500");
+        const x  = BigInt("1_000_000_500");
 
         immutable ulong ul  = 2_000_000UL;
         immutable uint ui   = 500_000;
@@ -942,11 +942,11 @@ version(unittestPhobos) @safe @nogc unittest
     }
 
     {
-        auto x = BigInt("100");
-        BigInt y = 123 + x;
+        const x = BigInt("100");
+        const BigInt y = 123 + x;
         assert(y == BigInt("223"));
 
-        BigInt z = 123 - x;
+        const BigInt z = 123 - x;
         assert(z == BigInt("23"));
 
         // Dividing a built-in integer type by BigInt always results in
@@ -962,6 +962,8 @@ version(unittestPhobos) @safe @nogc unittest
         assert(-x == BigInt("-1234"));
         // ++x;
         // assert(x == BigInt("1235"));
+        // --x;
+        // assert(x == BigInt("1234"));
     }
 }
 
