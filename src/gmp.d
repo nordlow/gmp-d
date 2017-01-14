@@ -508,17 +508,25 @@ struct MpZ(Eval eval = Eval.direct)
         else static if (s == "*")
         {
             if (rhs == -1)
+            {
                 negate();
+            }
             else
+            {
                 __gmpz_mul(_ptr, _ptr, rhs._ptr);
+            }
         }
         else static if (s == "/")
         {
             assert(rhs != 0, "Divison by zero");
             if (rhs == -1)
+            {
                 negate();
+            }
             else
+            {
                 __gmpz_tdiv_q(_ptr, _ptr, rhs._ptr);
+            }
         }
         else static if (s == "%")
         {
@@ -582,9 +590,13 @@ struct MpZ(Eval eval = Eval.direct)
         else static if (s == "*")
         {
             if (rhs == -1)
+            {
                 negate();
+            }
             else
+            {
                 __gmpz_mul_si(_ptr, _ptr, rhs);
+            }
         }
         else static if (s == "^^")
         {
