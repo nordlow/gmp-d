@@ -653,8 +653,6 @@ struct MpZ(Eval eval = Eval.direct)
         if (isIntegral!IntegralBase &&
             isIntegral!IntegralExp)
     {
-        typeof(return) y = null;
-
         static if (isSigned!IntegralBase)
         {
             assert(base >= 0, "Negative power base");
@@ -675,6 +673,7 @@ struct MpZ(Eval eval = Eval.direct)
             immutable uexp = exp;
         }
 
+        typeof(return) y = null;
         __gmpz_ui_pow_ui(y._ptr, ubase, uexp);
         return y;
     }
