@@ -11,12 +11,6 @@ import std.typecons : Unsigned;
 enum unittestLong = false;
 version = unittestPhobos;
 
-version(unittest)
-{
-    import dbgio;
-    alias Z = MpZ!(Eval.direct);
-}
-
 /** Evaluation Policy. */
 enum Eval
 {
@@ -1454,6 +1448,12 @@ private T _integralAbs(T)(T x)
     if (isIntegral!T)
 {
     return x>=0 ? x : -x;
+}
+
+version(unittest)
+{
+    import dbgio;
+    alias Z = MpZ!(Eval.direct);
 }
 
 // C API
