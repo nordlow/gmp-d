@@ -14,11 +14,11 @@ version(unittest)
     import dbgio;
 }
 
-/** Evaluation Policy. */
-enum Evaluation
+/** Eval Policy. */
+enum Eval
 {
-    delayed,                    // lazy evaluation via expression templates
-    direct,                     // direct evaluation
+    delayed,                    // lazy eval via expression templates
+    direct,                     // direct eval
 }
 
 // import deimos.gmp.gmp;
@@ -26,7 +26,7 @@ enum Evaluation
 
 /** Arbitrary (multi) precision signed integer (Z).
  */
-struct MpZ(Evaluation evaluation = Evaluation = direct)
+struct MpZ(Eval eval = Eval.direct)
 {
     import std.typecons : Unqual;
     import std.traits : isSigned, isUnsigned, isIntegral;
@@ -537,7 +537,9 @@ struct MpZ(Evaluation evaluation = Evaluation = direct)
     }
 
     /// Returns: `base` raised to the power of `exp`.
-    static MpZ pow(ulong base, ulong exp)
+    static MpZ pow(BaseUnsigned, ExpUnsigned)(BaseUnsigned base, ExpUnsigned exp)
+        if (isUnsigned!BaseUnsigned &&
+            isUnsigned!ExpUnsigned)
     {
         typeof(return) y = null;
         __gmpz_ui_pow_ui(y._ptr, base, exp);
@@ -594,18 +596,28 @@ private:
 
 pure nothrow:
 
+/** Instantiator for `MpZ`. */
+MpZ!eval mpz(Eval eval = Eval.direct, Args...)(Args args) @safe @nogc
+{
+    return typeof(return)(args);
+}
+
+version(unittest)
+{
+    alias Z = MpZ!(Eval.direct);
+}
+
 /// convert to string
 @safe unittest
 {
-    alias Z = MpZ;
-    assert(Z(42).toString == `42`);
-    assert(Z(-42).toString == `-42`);
-    assert(Z(`-101`).toString == `-101`);
+    assert(mpz(42).toString == `42`);
+    assert(mpz(-42).toString == `-42`);
+    assert(mpz(`-101`).toString == `-101`);
 }
 
 /// Returns: absolute value of `x`.
 pragma(inline)
-MpZ abs(const ref MpZ x) @trusted @nogc
+MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
 {
     typeof(return) y = null;
     __gmpz_abs(y._ptr, x._ptr);
@@ -614,7 +626,8 @@ MpZ abs(const ref MpZ x) @trusted @nogc
 
 /// Swap contents of `x` with contents of `y`.
 pragma(inline)
-void swap(ref MpZ x, ref MpZ y) @trusted @nogc
+void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
+                                  ref MpZ!evalY y) @trusted @nogc
 {
     import std.algorithm.mutation : swap;
     swap(x, y); // x.swap(y);
@@ -623,16 +636,12 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
 ///
 @safe @nogc unittest
 {
-    alias Z = MpZ;
+    const _ = mpz(cast(uint)42);
+    const a = mpz(42);
+    const b = mpz(43UL);
+    const c = mpz(43.0);
 
-    assert(Z.init == 0);        // should be zero initialized
-
-    const Z _ = cast(uint)42;
-    const Z a = 42;
-    const Z b = 43UL;
-    const Z c = 43.0;
-
-    // bool cast
+    // Eval cast
     assert(a);
     assert(cast(ulong)a == a);
     assert(cast(ulong)a == 42);
@@ -641,22 +650,22 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(cast(double)a == 42.0);
 
     // binary
-    assert(Z(`0b11`) == 3);
-    assert(Z(`0B11`) == 3);
+    assert(mpz(`0b11`) == 3);
+    assert(mpz(`0B11`) == 3);
 
     // octal
-    assert(Z(`07`) == 7);
-    assert(Z(`010`) == 8);
+    assert(mpz(`07`) == 7);
+    assert(mpz(`010`) == 8);
 
     // hexadecimal
-    assert(Z(`0x10`) == 16);
-    assert(Z(`0X10`) == 16);
+    assert(mpz(`0x10`) == 16);
+    assert(mpz(`0X10`) == 16);
 
     // decimal
-    assert(Z(`101`) == 101);
-    assert(Z(`101`, 10) == 101);
+    assert(mpz(`101`) == 101);
+    assert(mpz(`101`, 10) == 101);
 
-    immutable Z ic = 101UL;
+    immutable ic = mpz(101UL);
 
     assert(a == a.dup);
     assert(ic == ic.dup);
@@ -664,7 +673,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     // equality
 
     assert(a == a);
-    assert(a == Z(42));
+    assert(a == mpz(42));
     assert(a == 42.0);
     assert(a == 42);
     assert(a == cast(uint)42);
@@ -679,7 +688,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     // less than
 
     assert(a < b);
-    assert(a < Z(43));
+    assert(a < mpz(43));
     assert(a < 43);
     assert(a < cast(uint)43);
     assert(a < 43UL);
@@ -688,7 +697,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     // greater than
 
     assert(b > a);
-    assert(b > Z(42));
+    assert(b > mpz(42));
     assert(b > 42);
     assert(b > cast(uint)42);
     assert(b > 42UL);
@@ -707,7 +716,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     // addition
 
     assert(a + b == b + a);     // commutative
-    assert(a + Z(43) == b + a);
+    assert(a + mpz(43) == b + a);
     assert(a + 0 == a);
     assert(a + 1 != a);
     assert(0 + a == a);
@@ -729,7 +738,7 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(-2 - a == -44);
     assert(a - 2 == -(2 - a));     // commutative
     assert(a - (-2) == 44);
-    assert(44UL - Z(42) == 2);
+    assert(44UL - mpz(42) == 2);
 
     // multiplication
 
@@ -745,54 +754,54 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
 
     // division
 
-    assert(Z(27) / Z(3) == 9);
-    assert(Z(27) /   3  == 9);
+    assert(mpz(27) / mpz(3) == 9);
+    assert(mpz(27) /   3  == 9);
 
-    assert(Z(27) / Z(10)  == 2);
-    assert(Z(27) /   10   == 2);
-    assert(Z(27) /   10UL == 2);
+    assert(mpz(27) / mpz(10)  == 2);
+    assert(mpz(27) /   10   == 2);
+    assert(mpz(27) /   10UL == 2);
 
-    assert(Z(27) / -3   == -9);
-    assert(Z(27) /  3UL ==  9);
+    assert(mpz(27) / -3   == -9);
+    assert(mpz(27) /  3UL ==  9);
 
-    assert(Z(27) / -10   == -2);
+    assert(mpz(27) / -10   == -2);
 
-    assert(28   / Z( 3) ==  9);
-    assert(28UL / Z( 3) ==  9);
+    assert(28   / mpz( 3) ==  9);
+    assert(28UL / mpz( 3) ==  9);
 
-    assert(28   / Z(-3) == -9);
-    assert(28UL / Z(-3) == -9);
+    assert(28   / mpz(-3) == -9);
+    assert(28UL / mpz(-3) == -9);
 
     // modulo/remainder
 
-    assert(Z(27) % Z(3) == 0);
-    assert(Z(27) % Z(10) == 7);
+    assert(mpz(27) % mpz(3) == 0);
+    assert(mpz(27) % mpz(10) == 7);
 
-    assert(Z(27) % 3 == 0);
-    assert(Z(-27) % 3 == 0);
+    assert(mpz(27) % 3 == 0);
+    assert(mpz(-27) % 3 == 0);
 
-    assert(Z(27) % 10 == 7);
-    assert(Z(27) % 10 == 7);
+    assert(mpz(27) % 10 == 7);
+    assert(mpz(27) % 10 == 7);
 
-    assert(28   % Z(3) == 1);
-    assert(28UL % Z(3) == 1);
+    assert(28   % mpz(3) == 1);
+    assert(28UL % mpz(3) == 1);
 
-    assert(Z( 28)  % -3 == -1); // negative divisor gives negative remainder according to https://en.wikipedia.org/wiki/Remainder
-    assert(Z(-28)  %  3 == 1);  // dividend sign doesn't affect remainder
+    assert(mpz( 28)  % -3 == -1); // negative divisor gives negative remainder according to https://en.wikipedia.org/wiki/Remainder
+    assert(mpz(-28)  %  3 == 1);  // dividend sign doesn't affect remainder
 
     //
-    assert(Z( 28)  % Z(-3) == 1);  // TODO should be -1
-    assert(Z(-28)  % Z( 3) == -1);  // TODO should be 1
-    assert( 28  % Z(-3) == 1);      // TODO should be -1
-    assert(-28  % Z( 3) == -1);     // TODO should be 1
+    assert(mpz( 28)  % mpz(-3) == 1);  // TODO should be -1
+    assert(mpz(-28)  % mpz( 3) == -1);  // TODO should be 1
+    assert( 28  % mpz(-3) == 1);      // TODO should be -1
+    assert(-28  % mpz( 3) == -1);     // TODO should be 1
 
     // modulo/remainder
-    immutable Z one = 1;
-    const Z two = 2;
-    immutable Z three = 3;
-    const Z four = 4;
-    immutable Z five = 5;
-    const Z six = 6;
+    immutable one = mpz(1);
+    const two = mpz(2);
+    immutable three = mpz(3);
+    const four = mpz(4);
+    immutable five = mpz(5);
+    const six = mpz(6);
     assert(six % one == 0);
     assert(six % two == 0);
     assert(six % three == 0);
@@ -809,26 +818,26 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
     assert(1UL - six == -5);
 
     // exponentiation
-    assert(Z(0)^^0 == 1);
-    assert(Z(3)^^3 == 27);
-    assert(Z(3)^^(-3) == -27);
-    assert(Z(2)^^8 == 256);
-    assert(Z(2)^^(-9) == -512);
+    assert(mpz(0)^^0 == 1);
+    assert(mpz(3)^^3 == 27);
+    assert(mpz(3)^^(-3) == -27);
+    assert(mpz(2)^^8 == 256);
+    assert(mpz(2)^^(-9) == -512);
 
-    assert(Z.pow(2, 8) == 256);
+    assert(Z.pow(2UL, 8UL) == 256);
 
     // exponentiation plus modulus
-    assert(Z(2).powm(Z(8), Z(8)) == Z(0));
-    assert(Z(2).powm(Z(3), Z(16)) == Z(8));
-    assert(Z(3).powm(Z(3), Z(16)) == Z(11));
+    assert(mpz(2).powm(mpz(8), mpz(8)) == mpz(0));
+    assert(mpz(2).powm(mpz(3), mpz(16)) == mpz(8));
+    assert(mpz(3).powm(mpz(3), mpz(16)) == mpz(11));
 
-    assert(Z(2).powm(8, Z(8)) == Z(0));
-    assert(Z(2).powm(3, Z(16)) == Z(8));
-    assert(Z(3).powm(3, Z(16)) == Z(11));
+    assert(mpz(2).powm(8, mpz(8)) == mpz(0));
+    assert(mpz(2).powm(3, mpz(16)) == mpz(8));
+    assert(mpz(3).powm(3, mpz(16)) == mpz(11));
 
     // swap
-    Z x = 42;
-    Z y = 43;
+    auto x = mpz(42);
+    auto y = mpz(43);
 
     assert(x == 42);
     assert(y == 43);
@@ -847,13 +856,13 @@ void swap(ref MpZ x, ref MpZ y) @trusted @nogc
 /// generators
 @safe @nogc unittest
 {
-    assert(MpZ.mersennePrime(15UL) == 2^^15 - 1);
+    assert(Z.mersennePrime(15UL) == 2^^15 - 1);
 }
 
 /// Phobos unittests
 version(unittestPhobos) @safe @nogc unittest
 {
-    alias BigInt = MpZ;     // Phobos naming convention
+    alias BigInt = Z;     // Phobos naming convention
 
     {
         const BigInt a = "9588669891916142";
@@ -996,8 +1005,8 @@ pure unittest
         {
             foreach (immutable ulong j; 2 .. 100000)
             {
-                const p = MpZ.mersennePrime(i); // power
-                const a = MpZ(j); // base
+                const p = Z.mersennePrime(i); // power
+                const a = Z(j); // base
                 const amp = a % p;
                 const b = a.powm(p, p); // result
                 assert(b == amp);
@@ -1023,7 +1032,7 @@ pure unittest
     if (unittestLong) // compile but not run unless flagged for because running is slow
     {
         bool found = false;
-        MpZ r1 = 0;
+        Z r1 = 0;
     outermost:
         foreach (immutable ulong a; 1 .. LIMIT)
         {
@@ -1033,11 +1042,11 @@ pure unittest
                 {
                     foreach (immutable ulong d; c .. LIMIT)
                     {
-                        r1 = ((MpZ(a) ^^ POWER) +
-                              (MpZ(b) ^^ POWER) +
-                              (MpZ(c) ^^ POWER) +
-                              (MpZ(d) ^^ POWER));
-                        MpZ rem = 0;
+                        r1 = ((Z(a) ^^ POWER) +
+                              (Z(b) ^^ POWER) +
+                              (Z(c) ^^ POWER) +
+                              (Z(d) ^^ POWER));
+                        Z rem = 0;
                         __gmpz_rootrem(r1._ptr,
                                        rem._ptr,
                                        r1._ptr,
