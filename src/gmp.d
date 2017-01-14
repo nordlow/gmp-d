@@ -492,6 +492,14 @@ struct MpZ
         return this;
     }
 
+    /// Returns: `this`.
+    pragma(inline, true)
+    ref inout(MpZ) opUnary(string s)() inout
+        if (s == "+")
+    {
+        return this;
+    }
+
     /// Returns: negation of `this`.
     pragma(inline, true)
     MpZ opUnary(string s)() const
@@ -944,8 +952,16 @@ version(unittestPhobos) @safe @nogc unittest
         // Dividing a built-in integer type by BigInt always results in
         // something that fits in a built-in type, so the built-in type is
         // returned, not BigInt.
-        // static assert(is(typeof(1000 / x) == int));
+        static assert(is(typeof(1000 / x) == int));
         assert(1000 / x == 10);
+    }
+
+    {
+        auto x = BigInt("1234");
+        assert(+x == BigInt("1234"));
+        assert(-x == BigInt("-1234"));
+        // ++x;
+        // assert(x == BigInt("1235"));
     }
 }
 
