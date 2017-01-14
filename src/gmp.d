@@ -174,6 +174,8 @@ struct MpZ(Eval eval = Eval.direct)
         return (_ptr == rhs._ptr || // fast equality
                 __gmpz_cmp(_ptr, rhs._ptr) == 0);
     }
+
+    // TODO use one common definition for all `Integral`
     /// ditto
     bool opEquals(long rhs) const { return __gmpz_cmp_si(_ptr, rhs) == 0; }
     /// ditto
@@ -182,11 +184,14 @@ struct MpZ(Eval eval = Eval.direct)
     bool opEquals(int rhs) const { return opEquals(cast(long)rhs); }
     /// ditto
     bool opEquals(uint rhs) const { return opEquals(cast(ulong)rhs); }
+
     /// ditto
     bool opEquals(double rhs) const { return __gmpz_cmp_d(_ptr, rhs) == 0; }
 
     /// Compare `this` to `rhs`.
     int opCmp()(auto ref const MpZ rhs) const { return __gmpz_cmp(_ptr, rhs._ptr); }
+
+    // TODO use one common definition for all `Integral`
     /// ditto
     int opCmp(long rhs) const { return __gmpz_cmp_si(_ptr, rhs); }
     /// ditto
@@ -195,6 +200,7 @@ struct MpZ(Eval eval = Eval.direct)
     int opCmp(int rhs) const { return opCmp(cast(long)rhs); }
     /// ditto
     int opCmp(uint rhs) const { return opCmp(cast(ulong)rhs); }
+
     /// ditto
     int opCmp(double rhs) const { return __gmpz_cmp_d(_ptr, rhs); }
 
@@ -1040,6 +1046,14 @@ version(unittestPhobos) @safe @nogc unittest
         // import std.exception : assertThrown;
         // assertThrown!ConvOverflowException(BigInt("256").to!ubyte);
         // assertThrown!ConvOverflowException(BigInt("-1").to!ubyte);
+    }
+
+    {
+        // TODO
+        // segfaults because with double free
+        // const(BigInt) x = BigInt("123");
+        // BigInt y = cast()x;    // cast away const
+        // assert(y == x);
     }
 }
 
