@@ -163,7 +163,7 @@ struct MpZ
     /// Returns: `true` iff `this` equals `rhs`.
     bool opEquals()(auto ref const MpZ rhs) const
     {
-        return (_ptr == rhs._ptr || // fast compare
+        return (_ptr == rhs._ptr || // fast equality
                 __gmpz_cmp(_ptr, rhs._ptr) == 0);
     }
     /// ditto
