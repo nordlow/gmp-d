@@ -156,7 +156,7 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
     /// Assign from string `rhs`.
-    ref MpZ setFromString(string rhs, int base = 10)
+    ref MpZ fromString(string rhs, int base = 10)
     {
         assert(base == 0 || base >= 2 && base <= 62);
         char* stringz = allocStringzCopyOf(rhs);
@@ -941,7 +941,7 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     assert(x == 42);
     assert(y == 43);
 
-    assert(mpz(null).setFromString("42") == 42);
+    assert(mpz(null).fromString("42") == 42);
 
     // odd and even
 
