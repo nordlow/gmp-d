@@ -626,7 +626,7 @@ struct MpZ(Eval eval = Eval.direct)
     /// Check if `this` is odd.
     @property bool odd() const
     {
-        return (_z._mp_size != 0) & (cast(int)(_z._mp_d[0])); // see mpz_odd_p() in gmp.h
+        return (_z._mp_size != 0) & cast(int)(_z._mp_d[0]); // see mpz_odd_p() in gmp.h
     }
 
     /// Check if `this` is odd.
