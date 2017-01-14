@@ -225,7 +225,7 @@ struct MpZ(Eval eval = Eval.direct)
     int opCmp(double rhs) const { return __gmpz_cmp_d(_ptr, rhs); }
 
     /// Cast to `bool`.
-    bool opCast(T : bool)() const { return __gmpz_cmp_ui(_ptr, 0) != 0; }
+    bool opCast(T : bool)() const { return !isZero; }
 
     /// Cast to unsigned type `T`.
     T opCast(T)() const if (isUnsigned!T) { return cast(T)__gmpz_get_ui(_ptr); }
