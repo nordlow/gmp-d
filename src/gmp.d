@@ -337,7 +337,7 @@ struct MpZ(Eval eval = Eval.direct)
             {
                 immutable ulong pos_rhs = -rhs; // make it positive
                 __gmpz_tdiv_q_ui(y._ptr, _ptr, pos_rhs);
-                y.negate();                 // negate result
+                y.negate();     // negate result
             }
             else
             {
@@ -352,7 +352,7 @@ struct MpZ(Eval eval = Eval.direct)
                 __gmpz_pow_ui(y._ptr, _ptr, pos_rhs); // use positive power
                 if (pos_rhs & 1)                      // if odd power
                 {
-                    y.negate();                 // negate result
+                    y.negate(); // negate result
                 }
             }
             else
@@ -565,10 +565,10 @@ struct MpZ(Eval eval = Eval.direct)
         return y;
     }
 
-    /// Negate `this`.
+    /// Negate `this` in-place.
     void negate()
     {
-        __gmpz_neg(_ptr, _ptr);
+        _z._mp_size = - _z._mp_size; // C macro `mpz_neg` in gmp.h
     }
     alias neg = negate;
 
