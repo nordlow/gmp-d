@@ -647,12 +647,22 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
     /// Returns: `base` raised to the power of `exp`.
-    static MpZ pow(BaseUnsigned, ExpUnsigned)(BaseUnsigned base, ExpUnsigned exp)
+    static MpZ pow(BaseUnsigned,
+                   ExpIntegral)(BaseUnsigned base,
+                                ExpIntegral exp)
         if (isUnsigned!BaseUnsigned &&
-            isUnsigned!ExpUnsigned)
+            isIntegral!ExpIntegral)
     {
         typeof(return) y = null;
-        __gmpz_ui_pow_ui(y._ptr, base, exp);
+        static if (isSigned!ExpIntegral)
+        {
+            assert(exp >= 0, "Negative power exponent");
+            __gmpz_ui_pow_ui(y._ptr, base, cast(ulong)exp);
+        }
+        else
+        {
+            __gmpz_ui_pow_ui(y._ptr, base, exp);
+        }
         return y;
     }
 
@@ -1071,6 +1081,7 @@ MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
     assert(mpz(2)^^8UL == 256);
 
     assert(Z.pow(2UL, 8UL) == 256);
+    assert(Z.pow(2UL, 8) == 256);
 
     // disallow power exponent to be an `MpZ`
     assert(!__traits(compiles, 2^^mpz(8) == 256));
@@ -1186,6 +1197,7 @@ MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
 /// generators
 @safe @nogc unittest
 {
+    assert(Z.mersennePrime(15) == 2^^15 - 1);
     assert(Z.mersennePrime(15UL) == 2^^15 - 1);
 }
 
