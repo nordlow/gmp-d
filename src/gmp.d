@@ -1096,6 +1096,7 @@ MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
     assert(Z.pow(2UL, 8UL) == 256);
     assert(Z.pow(2UL, 8) == 256);
     assert(Z.pow(2UL, 8) == 256);
+    assert(Z.pow(2, 8) == 256);
 
     // disallow power exponent to be an `MpZ`
     assert(!__traits(compiles, 2^^mpz(8) == 256));
