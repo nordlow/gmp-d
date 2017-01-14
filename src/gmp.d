@@ -14,12 +14,19 @@ version(unittest)
     import dbgio;
 }
 
+/** Evaluation Policy. */
+enum Evaluation
+{
+    delayed,                    // lazy evaluation via expression templates
+    direct,                     // direct evaluation
+}
+
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
 
 /** Arbitrary (multi) precision signed integer (Z).
  */
-struct MpZ
+struct MpZ(Evaluation evaluation = Evaluation = direct)
 {
     import std.typecons : Unqual;
     import std.traits : isSigned, isUnsigned, isIntegral;
@@ -50,7 +57,7 @@ struct MpZ
     /// Construct empty (undefined) from explicit `null`.
     this(typeof(null))
     {
-        initialize();             // TODO remove if this is same as zero bitblit
+        initialize();             // TODO is there a faster way?
         assert(this == MpZ.init); // if this is same as default
     }
 
