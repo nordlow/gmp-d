@@ -646,7 +646,7 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
     /// Check if `this` is positive.
-    @property bool positive() const // TODO is Positive instead?
+    @property bool positive() const // TODO isPositive instead?
     {
         return !negative;
     }
