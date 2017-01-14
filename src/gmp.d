@@ -218,7 +218,7 @@ struct MpZ(Eval eval = Eval.direct)
     */
     long toLong() const
     {
-        // TODO can probably be optimized
+        // TODO can probably be optimized or reuse `clamp`
         if (this <= long.min)
         {
             return long.min;
@@ -238,7 +238,7 @@ struct MpZ(Eval eval = Eval.direct)
     */
     int toInt() const
     {
-        // TODO can probably be optimized
+        // TODO can probably be optimized or reuse `clamp`
         if (this <= int.min)
         {
             return int.min;
