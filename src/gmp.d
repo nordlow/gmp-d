@@ -27,7 +27,7 @@ struct MpZ
     /// Default conversion base.
     private enum defaultBase = 10;
 
-    pragma(inline)
+    pragma(inline, true)
     @trusted pure nothrow:
 
     /// Convert to string in base `base`.
@@ -67,6 +67,7 @@ struct MpZ
     this(uint value) { this(cast(ulong)value); }
 
     /// Construct from `value` in base `base`.
+    pragma(inline, false)
     this(const string value, int base = 0) // TODO Use Optional/Nullable when value is nan, or inf
     {
         assert(base == 0 || base >= 2 && base <= 62);
@@ -491,7 +492,6 @@ struct MpZ
     }
 
     /// Returns: `this`.
-    pragma(inline, true)
     ref inout(MpZ) opUnary(string s)() inout
         if (s == "+")
     {
@@ -499,7 +499,6 @@ struct MpZ
     }
 
     /// Returns: negation of `this`.
-    pragma(inline, true)
     MpZ opUnary(string s)() const
         if (s == "-")
     {
@@ -509,7 +508,6 @@ struct MpZ
     }
 
     /// Negate `this`.
-    pragma(inline, true)
     void negate()
     {
         __gmpz_neg(_ptr, _ptr);
@@ -954,8 +952,8 @@ version(unittestPhobos) @safe @nogc unittest
 
     {
         auto x = BigInt("1234");
-        assert(+x == BigInt("1234"));
-        assert(-x == BigInt("-1234"));
+        assert(+x  == BigInt(" 1234"));
+        assert(-x  == BigInt("-1234"));
         // ++x;
         // assert(x == BigInt("1235"));
         // --x;
