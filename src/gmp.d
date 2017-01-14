@@ -628,25 +628,25 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
     /// Check if `this` is odd.
-    @property bool odd() const
+    @property bool odd() const  // TODO isOdd instead?
     {
         return (_z._mp_size != 0) & cast(int)(_z._mp_d[0]); // C macro `mpz_odd_p` in gmp.h
     }
 
     /// Check if `this` is odd.
-    @property bool even() const
+    @property bool even() const // TODO isEven instead?
     {
         return !odd;            // C macro `mpz_even_p` in gmp.h
     }
 
     /// Check if `this` is negative.
-    @property bool negative() const
+    @property bool negative() const // TODO isNegative instead?
     {
         return _z._mp_size < 0;
     }
 
     /// Check if `this` is positive.
-    @property bool positive() const
+    @property bool positive() const // TODO is Positive instead?
     {
         return !negative;
     }
