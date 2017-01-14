@@ -1267,6 +1267,7 @@ extern(C)
                                    this is a negative number.  */
         __mp_limb_t* _mp_d;       /* Pointer to the limbs. */
     }
+    static assert(__mpz_struct.sizeof == 16); // fits in two 64-bit words
 
     alias mpz_srcptr = const(__mpz_struct)*;
     alias mpz_ptr = __mpz_struct*;
