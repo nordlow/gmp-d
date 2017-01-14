@@ -650,6 +650,14 @@ struct MpZ(Eval eval = Eval.direct)
         return rop;
     }
 
+    /// Returns: absolute value of `this`.
+    MpZ!eval abs() const
+    {
+        typeof(return) y = null;
+        __gmpz_abs(y._ptr, _ptr);
+        return y;
+    }
+
     /// Returns: number of digits in base `base`.
     size_t sizeInBase(int base) const
     {
@@ -910,8 +918,8 @@ MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
 
     // absolute value
 
-    assert(abs(a) == a);
-    assert(a.abs == a);         // UFCS
+    assert(abs(a) == a);        // free function
+    assert(a.abs == a);         // member
 
     // negated value
 
