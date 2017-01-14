@@ -991,6 +991,34 @@ version(unittestPhobos) @safe @nogc unittest
         --x;
         assert(x == BigInt("1234"));
     }
+
+    {
+        const x = BigInt("12345");
+        const y = BigInt("12340");
+        immutable int z = 12345;
+        immutable int w = 54321;
+        assert(x == x);
+        assert(x != y);
+        assert(x == y + 5);
+        assert(x == z);
+        assert(x != w);
+    }
+
+    {
+        // non-zero values are regarded as `true`
+        const x = BigInt("1");
+        const y = BigInt("10");
+        assert(x);
+        assert(y);
+
+        // zero value is regarded as `false`
+        const z = BigInt("0");
+        assert(!z);
+    }
+
+    {
+
+    }
 }
 
 // Fermats Little Theorem
