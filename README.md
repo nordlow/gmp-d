@@ -1,9 +1,7 @@
 # gmp-d
-D-language high-level wrapper for GNU MP (GMP) library that aims to
-
-- be `std.bigint.BigInt` compatible
-
-- be `@safe pure nothrow @nogc` when possible
+D-language high-level wrapper for GNU MP (GMP) library that aims to be
+compatible with `std.bigint.BigInt` and be`@safe pure nothrow @nogc`when
+possible.
 
 Implementation is highly optimized through
 
