@@ -114,9 +114,7 @@ struct MpZ(Eval eval = Eval.direct)
     static MpZ mersennePrime(Integral)(Integral p)
         if (isIntegral!Integral)
     {
-        typeof(return) x = 2UL;
-        x ^^= p;
-        return x - 1;
+        return MpZ.pow(2UL, p) - 1;
     }
 
     enum useCopy = false;       // disable copy construction for now
