@@ -647,9 +647,9 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
     /// Returns: `base` raised to the power of `exp`.
-    static MpZ pow(BaseUnsigned,
-                   ExpIntegral)(BaseUnsigned base,
-                                ExpIntegral exp)
+    static typeof(this) pow(BaseUnsigned,
+                            ExpIntegral)(BaseUnsigned base,
+                                         ExpIntegral exp)
         if (isUnsigned!BaseUnsigned &&
             isIntegral!ExpIntegral)
     {
@@ -1081,6 +1081,7 @@ MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
     assert(mpz(2)^^8UL == 256);
 
     assert(Z.pow(2UL, 8UL) == 256);
+    assert(Z.pow(2UL, 8) == 256);
     assert(Z.pow(2UL, 8) == 256);
 
     // disallow power exponent to be an `MpZ`
