@@ -36,8 +36,11 @@
   - `mpq_clears` (va_list wrapper)
   - `mpq_swap` (no better than rust's swap)
 
-- Lazy Evaluation via expression templates (`gmp.Evaluation`)
-  - `x = -x` => `x.negate()`
+- Lazy evaluation
+  via [expression templates](https://en.wikipedia.org/wiki/Expression_templates)
+  (when `gmp.Evaluation` is `direct`)
+  - `x = -x` => Assign(x, Neg(x)) => `x.negate()` (if compiler doesn't already rewrite this)
+  - `x *= -1` => x.negeate()
   - `x = x + y * z` => `mpz_addmul(x, y, z)`
   - lots more...
   - `toString`, `opCast` should probably evaluate and cache result
