@@ -768,13 +768,6 @@ private:
         pragma(mangle, "malloc") void* qualifiedMalloc(size_t size);
         pragma(mangle, "free") void qualifiedFree(void* ptr);
     }
-
-    // utility
-    static T _integralAbs(T)(T x)
-        if (isIntegral!T)
-    {
-        return x>=0 ? x : -x;
-    }
 }
 
 pure nothrow pragma(inline, true):
@@ -793,19 +786,21 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     swap(x, y); // x.swap(y);
 }
 
-string toDecimalString(Eval eval)(auto ref const MpZ!eval rhs) // for `std.bigint.BigInt` compatibility
+string toDecimalString(Eval eval)(auto ref const MpZ!eval x) // for `std.bigint.BigInt` compatibility
 {
-    return rhs.toString(10);
+    return x.toString(10);
 }
 
-string toHex(Eval eval)(auto ref const MpZ!eval rhs) // for `std.bigint.BigInt` compatibility
+string toHex(Eval eval)(auto ref const MpZ!eval x) // for `std.bigint.BigInt` compatibility
 {
-    return rhs.toString(16, true);
+    return x.toString(16, true);
 }
 
-Unsigned!T absUnsign(T, Eval eval)(auto ref const MpZ!eval rhs) // for `std.bigint.BigInt` compatibility
+/// Returns: the absolute value of `x` converted to the corresponding unsigned type.
+Unsigned!T absUnsign(T, Eval eval)(auto ref const MpZ!eval x) // for `std.bigint.BigInt` compatibility
     if (isIntegral!T)
 {
+    return _integralAbs(cast(T)x);
 }
 
 version(unittest)
@@ -830,6 +825,9 @@ version(unittest)
     assert(mpz(14).toHex == `E`);
     assert(mpz(15).toHex == `F`);
     assert(mpz(16).toHex == `10`);
+
+    assert(mpz(-42).absUnsign!ulong == 42);
+    assert(mpz( 42).absUnsign!ulong == 42);
 }
 
 /// as hash table key
@@ -1460,6 +1458,13 @@ pure unittest
         }
         assert(found);
     }
+}
+
+// utility
+private T _integralAbs(T)(T x)
+    if (isIntegral!T)
+{
+    return x>=0 ? x : -x;
 }
 
 // C API
