@@ -952,6 +952,7 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     assert(mpz(null).fromString("0xe") == 14);
     assert(mpz(null).fromString("0xf") == 15);
     assert(mpz(null).fromString("10", 16) == 16);
+    assert(mpz(null).fromString("10", 32) == 32);
 
     // odd and even
 
