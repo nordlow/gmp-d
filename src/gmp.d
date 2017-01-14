@@ -375,19 +375,8 @@ struct MpZ(Eval eval = Eval.direct)
         }
         else static if (s == "^^")
         {
-            if (rhs < 0)        // TODO handle `rhs == rhs.min`
-            {
-                immutable ulong pos_rhs = -rhs; // make it positive
-                __gmpz_pow_ui(y._ptr, _ptr, pos_rhs); // use positive power
-                if (pos_rhs & 1)                      // if odd power
-                {
-                    y.negate(); // negate result
-                }
-            }
-            else
-            {
-                __gmpz_pow_ui(y._ptr, _ptr, rhs);
-            }
+            assert(rhs >= 0, "TODO Negative power exponent needs MpQ return");
+            __gmpz_pow_ui(y._ptr, _ptr, rhs);
         }
         else
         {
@@ -549,7 +538,7 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
     ref MpZ opOpAssign(string s, Signed)(Signed rhs)
-        if ((s == "+" || s == "-" || s == "*") &&
+        if ((s == "+" || s == "-" || s == "*" || s == "^^") &&
             isSigned!Signed)
     {
         static      if (s == "+")
@@ -581,6 +570,11 @@ struct MpZ(Eval eval = Eval.direct)
         else static if (s == "*")
         {
             __gmpz_mul_si(_ptr, _ptr, rhs);
+        }
+        else static if (s == "^^")
+        {
+            assert(rhs >= 0, "Negative power exponent");
+            __gmpz_pow_ui(_ptr, _ptr, rhs);
         }
         else
         {
@@ -1045,12 +1039,9 @@ MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
     assert(mpz(0)^^0 == 1);
     assert(mpz(3)^^3 == 27);
     assert(mpz(3)^^3L == 27);
-    assert(mpz(3)^^(-3) == -27);
-    assert(mpz(3)^^(-3L) == -27);
     assert(mpz(2)^^8 == 256);
     assert(mpz(2)^^8L == 256);
     assert(mpz(2)^^8UL == 256);
-    assert(mpz(2)^^(-9) == -512);
 
     assert(Z.pow(2UL, 8UL) == 256);
 
