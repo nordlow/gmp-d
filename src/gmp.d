@@ -167,8 +167,6 @@ struct MpZ
                 __gmpz_cmp(_ptr, rhs._ptr) == 0);
     }
     /// ditto
-    bool opEquals(double rhs) const { return __gmpz_cmp_d(_ptr, rhs) == 0; }
-    /// ditto
     bool opEquals(long rhs) const { return __gmpz_cmp_si(_ptr, rhs) == 0; }
     /// ditto
     bool opEquals(ulong rhs) const { return __gmpz_cmp_ui(_ptr, rhs) == 0; }
@@ -176,11 +174,11 @@ struct MpZ
     bool opEquals(int rhs) const { return opEquals(cast(long)rhs); }
     /// ditto
     bool opEquals(uint rhs) const { return opEquals(cast(ulong)rhs); }
-
-    // comparison
-    int opCmp()(auto ref const MpZ rhs) const { return __gmpz_cmp(_ptr, rhs._ptr); }
     /// ditto
-    int opCmp(double rhs) const { return __gmpz_cmp_d(_ptr, rhs); }
+    bool opEquals(double rhs) const { return __gmpz_cmp_d(_ptr, rhs) == 0; }
+
+    /// Compare `this` to `rhs`.
+    int opCmp()(auto ref const MpZ rhs) const { return __gmpz_cmp(_ptr, rhs._ptr); }
     /// ditto
     int opCmp(long rhs) const { return __gmpz_cmp_si(_ptr, rhs); }
     /// ditto
@@ -189,6 +187,8 @@ struct MpZ
     int opCmp(int rhs) const { return opCmp(cast(long)rhs); }
     /// ditto
     int opCmp(uint rhs) const { return opCmp(cast(ulong)rhs); }
+    /// ditto
+    int opCmp(double rhs) const { return __gmpz_cmp_d(_ptr, rhs); }
 
     /// Cast to `bool`.
     bool opCast(T : bool)() const { return __gmpz_cmp_ui(_ptr, 0) != 0; }
