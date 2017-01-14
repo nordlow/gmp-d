@@ -647,14 +647,14 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
     /// Returns: `base` raised to the power of `exp`.
-    static typeof(this) pow(BaseUnsigned,
-                            ExpIntegral)(BaseUnsigned base,
-                                         ExpIntegral exp)
-        if (isUnsigned!BaseUnsigned &&
-            isIntegral!ExpIntegral)
+    static typeof(this) pow(IntegralBase,
+                            IntegralExp)(IntegralBase base,
+                                         IntegralExp exp)
+        if (isIntegral!IntegralBase &&
+            isIntegral!IntegralExp)
     {
         typeof(return) y = null;
-        static if (isSigned!ExpIntegral)
+        static if (isSigned!IntegralExp)
         {
             assert(exp >= 0, "Negative power exponent");
             __gmpz_ui_pow_ui(y._ptr, base, cast(ulong)exp);
