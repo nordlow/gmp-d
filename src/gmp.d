@@ -626,13 +626,13 @@ struct MpZ(Eval eval = Eval.direct)
     /// Check if `this` is odd.
     @property bool odd() const
     {
-        assert(false, "TODO check source def of mpz_odd_p");
+        return (_z._mp_size != 0) & (cast(int)(_z._mp_d[0])); // see mpz_odd_p() in gmp.h
     }
 
     /// Check if `this` is odd.
     @property bool even() const
     {
-        assert(false, "TODO check source def of mpz_even_p");
+        return !odd;
     }
 
     /// Number of significant `uint`s used for storing `this`.
@@ -942,6 +942,22 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     assert(y == 43);
 
     assert(mpz(null).setFromString("42") == 42);
+
+    // odd and even
+
+    assert(mpz(0).even);
+    assert(mpz(1).odd);
+    assert(mpz(2).even);
+    assert(mpz(3).odd);
+
+    assert(mpz(-1).odd);
+    assert(mpz(-2).even);
+    assert(mpz(-3).odd);
+
+    assert(mpz("300000000000000000000000000000000000000").even);
+    assert(mpz("300000000000000000000000000000000000001").odd);
+    assert(mpz("300000000000000000000000000000000000002").even);
+    assert(mpz("300000000000000000000000000000000000003").odd);
 }
 
 /// generators
@@ -1241,6 +1257,7 @@ pure unittest
 // C API
 extern(C)
 {
+    alias __mp_limb_t = ulong;    // see mp_limb_t gmp.h
     struct __mpz_struct
     {
         int _mp_alloc;		/* Number of *limbs* allocated and pointed to by
@@ -1248,7 +1265,7 @@ extern(C)
         int _mp_size;           /* abs(_mp_size) is the number of limbs the last
                                    field points to.  If _mp_size is negative
                                    this is a negative number.  */
-        void* _mp_d;            /* Pointer to the limbs.  */
+        __mp_limb_t* _mp_d;       /* Pointer to the limbs. */
     }
 
     alias mpz_srcptr = const(__mpz_struct)*;
