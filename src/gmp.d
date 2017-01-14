@@ -1257,7 +1257,7 @@ pure unittest
 // C API
 extern(C)
 {
-    alias __mp_limb_t = ulong;    // see mp_limb_t gmp.h
+    alias __mp_limb_t = ulong;    // see `mp_limb_t` gmp.h. TODO detect when it is `uint` instead
     struct __mpz_struct
     {
         int _mp_alloc;		/* Number of *limbs* allocated and pointed to by
