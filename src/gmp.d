@@ -654,15 +654,28 @@ struct MpZ(Eval eval = Eval.direct)
             isIntegral!IntegralExp)
     {
         typeof(return) y = null;
-        static if (isSigned!IntegralExp)
+
+        static if (isSigned!IntegralBase)
         {
-            assert(exp >= 0, "Negative power exponent");
-            __gmpz_ui_pow_ui(y._ptr, base, cast(ulong)exp);
+            assert(base >= 0, "Negative power base");
+            immutable ubase = cast(ulong)base;
         }
         else
         {
-            __gmpz_ui_pow_ui(y._ptr, base, exp);
+            immutable ubase = base;
         }
+
+        static if (isSigned!IntegralExp)
+        {
+            assert(exp >= 0, "Negative power exponent");
+            immutable uexp = cast(ulong)exp;
+        }
+        else
+        {
+            immutable uexp = exp;
+        }
+
+        __gmpz_ui_pow_ui(y._ptr, ubase, uexp);
         return y;
     }
 
