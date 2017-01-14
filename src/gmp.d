@@ -621,8 +621,8 @@ struct MpZ(Eval eval = Eval.direct)
     MpZ opUnary(string s)() const
         if (s == "-")
     {
-        typeof(return) y = null;
-        __gmpz_neg(y._ptr, _ptr);
+        typeof(return) y = this.dup;
+        y.negate();
         return y;
     }
 
