@@ -5,6 +5,6 @@ possible.
 
 Implementation is highly optimized through
 
-- reimplementation of C macro logic in D inline functions
+- mapping of GMP's C macros into D inline functions
 
 - passing of struct arguments as `auto ref const`
