@@ -825,6 +825,17 @@ version(unittest)
     assert(mpz(16).toHex == `10`);
 }
 
+/// as hash table key
+@safe unittest
+{
+    // TODO disabled until non-copyable types work in AA's
+    // string[Z] aa;
+    // aa[mpz(123)] = "abc";
+    // aa[mpz(456)] = "def";
+    // assert(aa[mpz(123)] == "abc");
+    // assert(aa[mpz(456)] == "def");
+}
+
 /// Returns: absolute value of `x`.
 MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
 {
