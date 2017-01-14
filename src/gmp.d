@@ -27,8 +27,7 @@ struct MpZ
     /// Default conversion base.
     private enum defaultBase = 10;
 
-    pragma(inline, true)
-    @trusted pure nothrow:
+    pragma(inline, true) @trusted pure nothrow:
 
     /// Convert to string in base `base`.
     string toString(int base = defaultBase) const
