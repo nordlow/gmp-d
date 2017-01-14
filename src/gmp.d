@@ -476,6 +476,17 @@ struct MpZ(Eval eval = Eval.direct)
         }
     }
 
+    /// Exponentation.
+    MpZ opBinaryRight(string s, Integral)(Integral base) const
+        if ((s == "^^") &&
+            isIntegral!Integral)
+    {
+        static assert(false, "Convert `this MpZ` exponent to `ulong` and calculate power via static method `pow()`");
+        // MpZ exp = null;
+        // __gmpz_pow();
+        // return exp;
+    }
+
     ref MpZ opOpAssign(string s)(auto ref const MpZ rhs)
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
@@ -776,7 +787,8 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     const b = mpz(43UL);
     const c = mpz(43.0);
 
-    // Eval cast
+    // eval cast
+
     assert(a);
     assert(cast(ulong)a == a);
     assert(cast(ulong)a == 42);
@@ -785,18 +797,22 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     assert(cast(double)a == 42.0);
 
     // binary
+
     assert(mpz(`0b11`) == 3);
     assert(mpz(`0B11`) == 3);
 
     // octal
+
     assert(mpz(`07`) == 7);
     assert(mpz(`010`) == 8);
 
     // hexadecimal
+
     assert(mpz(`0x10`) == 16);
     assert(mpz(`0X10`) == 16);
 
     // decimal
+
     assert(mpz(`101`) == 101);
     assert(mpz(`101`, 10) == 101);
 
@@ -931,6 +947,7 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     assert(-28  % mpz( 3) == -1);     // TODO should be 1
 
     // modulo/remainder
+
     immutable one = mpz(1);
     const two = mpz(2);
     immutable three = mpz(3);
@@ -945,6 +962,7 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     assert(six % six == 0);
 
     // subtraction
+
     assert(six - one == 5);
     assert(six - 1UL == 5);
     assert(six - 1 == 5);
@@ -953,6 +971,7 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     assert(1UL - six == -5);
 
     // exponentiation
+
     assert(mpz(0)^^0 == 1);
     assert(mpz(3)^^3 == 27);
     assert(mpz(3)^^3L == 27);
@@ -965,7 +984,13 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
 
     assert(Z.pow(2UL, 8UL) == 256);
 
+    // disallow power exponent to be an `MpZ`
+    assert(!__traits(compiles, 2^^mpz(8) == 256));
+    assert(!__traits(compiles, 2L^^mpz(8) == 256));
+    assert(!__traits(compiles, 2UL^^mpz(8) == 256));
+
     // exponentiation plus modulus
+
     assert(mpz(2).powm(mpz(8), mpz(8)) == mpz(0));
     assert(mpz(2).powm(mpz(3), mpz(16)) == mpz(8));
     assert(mpz(3).powm(mpz(3), mpz(16)) == mpz(11));
@@ -975,6 +1000,7 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     assert(mpz(3).powm(3, mpz(16)) == mpz(11));
 
     // swap
+
     auto x = mpz(42);
     auto y = mpz(43);
 
