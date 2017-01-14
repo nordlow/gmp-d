@@ -207,11 +207,51 @@ struct MpZ(Eval eval = Eval.direct)
     /// Cast to `bool`.
     bool opCast(T : bool)() const { return __gmpz_cmp_ui(_ptr, 0) != 0; }
 
-    /// Cast to `ulong`.
+    /// Cast to unsigned type `T`.
     T opCast(T)() const if (isUnsigned!T) { return cast(T)__gmpz_get_ui(_ptr); }
 
-    /// Cast to `long`.
+    /// Cast to signed type `T`.
     T opCast(T)() const if (isSigned!T) { return cast(T)__gmpz_get_si(_ptr); }
+
+    /** Returns: The value of this as a `long`, or +/- `long.max` if outside
+        the representable range.
+    */
+    long toLong() const
+    {
+        // TODO can probably be optimized
+        if (this <= long.min)
+        {
+            return long.min;
+        }
+        else if (this >= long.max)
+        {
+            return long.max;
+        }
+        else
+        {
+            return cast(long)__gmpz_get_si(_ptr);
+        }
+    }
+
+    /** Returns: The value of this as a `int`, or +/- `int.max` if outside
+        the representable range.
+    */
+    int toInt() const
+    {
+        // TODO can probably be optimized
+        if (this <= int.min)
+        {
+            return int.min;
+        }
+        else if (this >= int.max)
+        {
+            return int.max;
+        }
+        else
+        {
+            return cast(int)__gmpz_get_si(_ptr);
+        }
+    }
 
     /// Cast to `double`.
     // TODO double opCast(T : double)() const { return __gmpz_get_d(_ptr); }
@@ -1054,6 +1094,29 @@ version(unittestPhobos) @safe @nogc unittest
         // const(BigInt) x = BigInt("123");
         // BigInt y = cast()x;    // cast away const
         // assert(y == x);
+    }
+
+    {
+        auto x = BigInt("100");
+        auto y = BigInt("10");
+        int z = 50;
+        const int w = 200;
+        assert(y < x);
+        assert(x > z);
+        assert(z > y);
+        assert(x < w);
+    }
+
+    {
+        assert(BigInt("12345").toLong() == 12_345);
+        assert(BigInt("-123450000000000000000000000000").toLong() == long.min);
+        assert(BigInt("12345000000000000000000000000000").toLong() == long.max);
+    }
+
+    {
+        assert(BigInt("12345").toInt() == 12_345);
+        assert(BigInt("-123450000000000000000000000000").toInt() == int.min);
+        assert(BigInt("12345000000000000000000000000000").toInt() == int.max);
     }
 }
 
