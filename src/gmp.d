@@ -639,6 +639,18 @@ struct MpZ(Eval eval = Eval.direct)
         return !odd;            // C macro `mpz_even_p` in gmp.h
     }
 
+    /// Check if `this` is negative.
+    @property bool negative() const
+    {
+        return _z._mp_size < 0;
+    }
+
+    /// Check if `this` is positive.
+    @property bool positive() const
+    {
+        return !negative;
+    }
+
     /// Number of significant `uint`s used for storing `this`.
     @property size_t uintLength() const
     {
@@ -652,6 +664,16 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
 private:
+
+    /// Limb of internal representation.
+    alias Limb = __mp_limb_t;   // GNU MP alias
+
+    /** Returns: limbs. */
+    inout(Limb)[] limbs() inout return @system // TODO scope
+    {
+        import std.numeric : abs;
+        return _z._mp_d[0 .. abs(_z._mp_size)];
+    }
 
     /// @nogc-variant of `toStringz` with heap allocation of null-terminated C-string `stringz`.
     char* allocStringzCopyOf(const string value) @nogc
@@ -969,6 +991,17 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     assert(mpz("300000000000000000000000000000000000001").odd);
     assert(mpz("300000000000000000000000000000000000002").even);
     assert(mpz("300000000000000000000000000000000000003").odd);
+
+    // negative and positive
+
+    assert(mpz(0).positive);
+    assert(mpz(1).positive);
+    assert(mpz(2).positive);
+    assert(mpz(3).positive);
+
+    assert(mpz(-1).negative);
+    assert(mpz(-2).negative);
+    assert(mpz(-3).negative);
 }
 
 /// generators
