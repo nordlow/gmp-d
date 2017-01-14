@@ -14,7 +14,7 @@ version(unittest)
     import dbgio;
 }
 
-/** Eval Policy. */
+/** Evaluation Policy. */
 enum Eval
 {
     direct,                     // direct eval
