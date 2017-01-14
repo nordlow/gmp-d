@@ -632,7 +632,7 @@ struct MpZ(Eval eval = Eval.direct)
     /// Check if `this` is odd.
     @property bool even() const
     {
-        return !odd;
+        return !odd;            // mpz_even_p in gmp.h
     }
 
     /// Number of significant `uint`s used for storing `this`.
