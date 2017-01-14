@@ -955,8 +955,12 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     // exponentiation
     assert(mpz(0)^^0 == 1);
     assert(mpz(3)^^3 == 27);
+    assert(mpz(3)^^3L == 27);
     assert(mpz(3)^^(-3) == -27);
+    assert(mpz(3)^^(-3L) == -27);
     assert(mpz(2)^^8 == 256);
+    assert(mpz(2)^^8L == 256);
+    assert(mpz(2)^^8UL == 256);
     assert(mpz(2)^^(-9) == -512);
 
     assert(Z.pow(2UL, 8UL) == 256);
