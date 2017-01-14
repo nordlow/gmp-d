@@ -65,6 +65,18 @@ struct MpZ(Eval eval = Eval.direct)
 
     // TODO toRCString wrapped in UniqueRange
 
+    // Returns: A unique hash of the `MpZ` value suitable for use in a hash table.
+    size_t toHash() const
+    {
+        import core.internal.hash : hashOf;
+        typeof(return) hash = _limbCount;
+        foreach (immutable i; 0 .. _limbCount)
+        {
+            hash ^= _limbs[i].hashOf;
+        }
+        return hash;
+    }
+
     @nogc:
 
     /// No default construction.
@@ -95,7 +107,7 @@ struct MpZ(Eval eval = Eval.direct)
     this(const string value, int base = 0) // TODO Use Optional/Nullable when value is nan, or inf
     {
         assert(base == 0 || base >= 2 && base <= 62);
-        char* stringz = allocStringzCopyOf(value);
+        char* stringz = _allocStringzCopyOf(value);
         immutable int status = __gmpz_init_set_str(_ptr, stringz, base);
         qualifiedFree(stringz);
         assert(status == 0, "Parameter `value` does not contain an integer");
@@ -178,7 +190,7 @@ struct MpZ(Eval eval = Eval.direct)
     ref MpZ fromString(string rhs, int base = 0)
     {
         assert(base == 0 || base >= 2 && base <= 62);
-        char* stringz = allocStringzCopyOf(rhs);
+        char* stringz = _allocStringzCopyOf(rhs);
         immutable int status = __gmpz_set_str(_ptr, stringz, base);
         qualifiedFree(stringz);
         assert(status == 0, "Parameter `rhs` does not contain an integer");
@@ -647,10 +659,6 @@ struct MpZ(Eval eval = Eval.direct)
         return rop;
     }
 
-    // size_t toHash() const
-    // {
-    // }
-
     /// Returns: number of digits in base `base`.
     size_t sizeInBase(int base) const
     {
@@ -715,20 +723,20 @@ private:
     alias Limb = __mp_limb_t;   // GNU MP alias
 
     /** Returns: limbs. */
-    inout(Limb)[] limbs() inout return @system // TODO scope
+    inout(Limb)[] _limbs() inout return @system // TODO scope
     {
         // import std.math : abs;
-        return _z._mp_d[0 .. limbCount];
+        return _z._mp_d[0 .. _limbCount];
     }
 
     /// Get number of limbs in internal representation.
-    @property uint limbCount() const
+    @property uint _limbCount() const
     {
-        return integralAbs(_z._mp_size);
+        return _integralAbs(_z._mp_size);
     }
 
     /// @nogc-variant of `toStringz` with heap allocation of null-terminated C-string `stringz`.
-    char* allocStringzCopyOf(const string value) @nogc
+    char* _allocStringzCopyOf(const string value) @nogc
     {
         char* stringz = cast(char*)qualifiedMalloc(value.length + 1); // maximum this many characters
         size_t i = 0;
@@ -760,7 +768,7 @@ private:
     }
 
     // utility
-    static T integralAbs(T)(T x)
+    static T _integralAbs(T)(T x)
         if (isIntegral!T)
     {
         return x>=0 ? x : -x;
@@ -1125,20 +1133,20 @@ MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
 
     // internal limb count
 
-    assert(mpz(0).limbCount == 0);
-    assert(mpz(1).limbCount == 1);
-    assert(mpz(2).limbCount == 1);
+    assert(mpz(0)._limbCount == 0);
+    assert(mpz(1)._limbCount == 1);
+    assert(mpz(2)._limbCount == 1);
 
-    assert(Z.pow(2UL, 32UL).limbCount == 1);
+    assert(Z.pow(2UL, 32UL)._limbCount == 1);
 
-    assert(Z.pow(2UL, 63UL).limbCount == 1);
-    assert(Z.pow(2UL, 63UL + 1).limbCount == 2);
+    assert(Z.pow(2UL, 63UL)._limbCount == 1);
+    assert(Z.pow(2UL, 63UL + 1)._limbCount == 2);
 
-    assert(Z.pow(2UL, 127UL).limbCount == 2);
-    assert(Z.pow(2UL, 127UL + 1).limbCount == 3);
+    assert(Z.pow(2UL, 127UL)._limbCount == 2);
+    assert(Z.pow(2UL, 127UL + 1)._limbCount == 3);
 
-    assert(Z.pow(2UL, 255UL).limbCount == 4);
-    assert(Z.pow(2UL, 255UL + 1).limbCount == 5);
+    assert(Z.pow(2UL, 255UL)._limbCount == 4);
+    assert(Z.pow(2UL, 255UL + 1)._limbCount == 5);
 }
 
 /// generators
