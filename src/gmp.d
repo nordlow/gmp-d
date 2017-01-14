@@ -594,7 +594,7 @@ struct MpZ(Eval eval = Eval.direct)
     /// Negate `this` in-place.
     void negate()
     {
-        _z._mp_size = -_z._mp_size; // C macro `mpz_neg` in gmp.h
+        _z._mp_size = -_z._mp_size; // fast C macro `mpz_neg` in gmp.h
     }
     alias neg = negate;
 
@@ -660,31 +660,31 @@ struct MpZ(Eval eval = Eval.direct)
     /// Check if `this` is zero.
     @property bool isZero() const
     {
-        return _z._mp_size == 0;
+        return _z._mp_size == 0; // fast
     }
 
     /// Check if `this` is odd.
     @property bool isOdd() const
     {
-        return (_z._mp_size != 0) & cast(int)(_z._mp_d[0]); // C macro `mpz_odd_p` in gmp.h
+        return (_z._mp_size != 0) & cast(int)(_z._mp_d[0]); // fast C macro `mpz_odd_p` in gmp.h
     }
 
     /// Check if `this` is odd.
     @property bool isEven() const
     {
-        return !isOdd;            // C macro `mpz_even_p` in gmp.h
+        return !isOdd;            // fast C macro `mpz_even_p` in gmp.h
     }
 
     /// Check if `this` is negative.
     @property bool isNegative() const
     {
-        return _z._mp_size < 0;
+        return _z._mp_size < 0; // fast
     }
 
     /// Check if `this` is positive.
     @property bool isPositive() const
     {
-        return !isNegative;
+        return !isNegative;     // fast
     }
 
     /** Returns: sign as either
@@ -694,7 +694,7 @@ struct MpZ(Eval eval = Eval.direct)
      */
     @property int sgn() const
     {
-        return _z._mp_size < 0 ? -1 : _z._mp_size > 0; // C macro `mpz_sgn` in gmp.h
+        return _z._mp_size < 0 ? -1 : _z._mp_size > 0; // fast C macro `mpz_sgn` in gmp.h
     }
 
     /// Number of significant `uint`s used for storing `this`.
