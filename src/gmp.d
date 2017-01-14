@@ -1014,6 +1014,23 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     assert(mpz(-1).negative);
     assert(mpz(-2).negative);
     assert(mpz(-3).negative);
+
+    // limb count
+
+    assert(mpz(0).limbCount == 0);
+    assert(mpz(1).limbCount == 1);
+    assert(mpz(2).limbCount == 1);
+
+    assert(Z.pow(2UL, 32UL).limbCount == 1);
+
+    assert(Z.pow(2UL, 63UL).limbCount == 1);
+    assert(Z.pow(2UL, 63UL + 1).limbCount == 2);
+
+    assert(Z.pow(2UL, 127UL).limbCount == 2);
+    assert(Z.pow(2UL, 127UL + 1).limbCount == 3);
+
+    assert(Z.pow(2UL, 255UL).limbCount == 4);
+    assert(Z.pow(2UL, 255UL + 1).limbCount == 5);
 }
 
 /// generators
