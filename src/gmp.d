@@ -1194,6 +1194,8 @@ version(unittestPhobos) @safe @nogc unittest
         assert(i == e);
         BigInt j = "-0x9A56_57f4_7B83_AB78";
         j ^^= 11UL;
+        j ^^= 2L;
+        j ^^= 2;
     }
 
     {
