@@ -791,8 +791,8 @@ version(unittest)
 /// convert to string
 @safe unittest
 {
-    assert(mpz(42).toString     ==   `42`);
-    assert(mpz(-42).toString    ==  `-42`);
+    assert(mpz(    42).toString ==   `42`);
+    assert(mpz(   -42).toString ==  `-42`);
     assert(mpz(`-101`).toString == `-101`);
 
     assert(mpz(-42).toDecimalString == `-42`);
