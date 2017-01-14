@@ -651,6 +651,12 @@ struct MpZ(Eval eval = Eval.direct)
         return !negative;
     }
 
+    /// Get sign, being either -1, 0, or +1.
+    @property int sgn() const
+    {
+        return _z._mp_size < 0 ? -1 : _z._mp_size > 0; // C macro `mpz_sgn` in gmp.h
+    }
+
     /// Number of significant `uint`s used for storing `this`.
     @property size_t uintLength() const
     {
@@ -1014,6 +1020,18 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
     assert(mpz(-1).negative);
     assert(mpz(-2).negative);
     assert(mpz(-3).negative);
+
+    // sign function (sgn)
+
+    assert(mpz(long.min).sgn == -1);
+    assert(mpz(int.min).sgn  == -1);
+    assert(mpz(-2).sgn == -1);
+    assert(mpz(-1).sgn == -1);
+    assert(mpz( 0).sgn ==  0);
+    assert(mpz( 1).sgn ==  1);
+    assert(mpz( 2).sgn ==  1);
+    assert(mpz(int.max).sgn  == 1);
+    assert(mpz(long.max).sgn == 1);
 
     // internal limb count
 
