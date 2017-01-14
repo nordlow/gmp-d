@@ -3,8 +3,10 @@
  */
 module gmp;
 
-import std.stdio : writeln;
 debug import core.stdc.stdio : printf;
+import std.stdio : writeln;
+import std.traits : isIntegral;
+import std.typecons : Unsigned;
 
 enum unittestLong = false;
 version = unittestPhobos;
@@ -30,7 +32,7 @@ enum Eval
 struct MpZ(Eval eval = Eval.direct)
 {
     import std.typecons : Unqual;
-    import std.traits : isSigned, isUnsigned, isIntegral;
+    import std.traits : isSigned, isUnsigned;
 
     /// Default conversion base.
     private enum defaultBase = 10;
@@ -799,6 +801,11 @@ string toDecimalString(Eval eval)(auto ref const MpZ!eval rhs) // for `std.bigin
 string toHex(Eval eval)(auto ref const MpZ!eval rhs) // for `std.bigint.BigInt` compatibility
 {
     return rhs.toString(16, true);
+}
+
+Unsigned!T absUnsign(T, Eval eval)(auto ref const MpZ!eval rhs) // for `std.bigint.BigInt` compatibility
+    if (isIntegral!T)
+{
 }
 
 version(unittest)
