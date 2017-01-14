@@ -35,7 +35,7 @@ struct MpZ(Eval eval = Eval.direct)
     /// Default conversion base.
     private enum defaultBase = 10;
 
-    pragma(inline, true) @trusted pure nothrow:
+    @trusted pure nothrow pragma(inline, true):
 
     /// Convert to string in base `base`.
     string toString(int base = defaultBase) const
@@ -683,7 +683,7 @@ private:
 
 }
 
-pure nothrow:
+pure nothrow pragma(inline, true):
 
 /** Instantiator for `MpZ`. */
 MpZ!eval mpz(Eval eval = Eval.direct, Args...)(Args args) @safe @nogc
@@ -705,7 +705,6 @@ version(unittest)
 }
 
 /// Returns: absolute value of `x`.
-pragma(inline)
 MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
 {
     typeof(return) y = null;
@@ -714,7 +713,6 @@ MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
 }
 
 /// Swap contents of `x` with contents of `y`.
-pragma(inline)
 void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
                                   ref MpZ!evalY y) @trusted @nogc
 {
