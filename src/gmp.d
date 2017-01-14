@@ -17,8 +17,8 @@ version(unittest)
 /** Eval Policy. */
 enum Eval
 {
-    delayed,                    // lazy eval via expression templates
     direct,                     // direct eval
+    delayed,                    // lazy eval via expression templates
 }
 
 // import deimos.gmp.gmp;
@@ -568,7 +568,7 @@ struct MpZ(Eval eval = Eval.direct)
     /// Negate `this` in-place.
     void negate()
     {
-        _z._mp_size = - _z._mp_size; // C macro `mpz_neg` in gmp.h
+        _z._mp_size = -_z._mp_size; // C macro `mpz_neg` in gmp.h
     }
     alias neg = negate;
 
