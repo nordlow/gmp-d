@@ -513,6 +513,22 @@ struct MpZ
     }
     alias neg = negate;
 
+    /// Increase `this` by one.
+    ref MpZ opUnary(string s)()
+        if (s == "++")
+    {
+        __gmpz_add_ui(_ptr, _ptr, 1);
+        return this;
+    }
+
+    /// Decrease `this` by one.
+    ref MpZ opUnary(string s)()
+        if (s == "--")
+    {
+        __gmpz_sub_ui(_ptr, _ptr, 1);
+        return this;
+    }
+
     /// Returns: `base` raised to the power of `exp`.
     static MpZ pow(ulong base, ulong exp)
     {
@@ -953,10 +969,10 @@ version(unittestPhobos) @safe @nogc unittest
         auto x = BigInt("1234");
         assert(+x  == BigInt(" 1234"));
         assert(-x  == BigInt("-1234"));
-        // ++x;
-        // assert(x == BigInt("1235"));
-        // --x;
-        // assert(x == BigInt("1234"));
+        ++x;
+        assert(x == BigInt("1235"));
+        --x;
+        assert(x == BigInt("1234"));
     }
 }
 
