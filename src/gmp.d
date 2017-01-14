@@ -78,22 +78,8 @@ struct MpZ(Eval eval = Eval.direct)
     this(const string value, int base = 0) // TODO Use Optional/Nullable when value is nan, or inf
     {
         assert(base == 0 || base >= 2 && base <= 62);
-
-        // @nogc variant of `toStringz` with scoped heap allocation of null-terminated C-string `stringz`
-        char* stringz = cast(char*)qualifiedMalloc(value.length + 1); // maximum this many characters
-        size_t i = 0;
-        foreach (immutable char ch; value[])
-        {
-            if (ch != '_')
-            {
-                stringz[i] = ch;
-                i += 1;
-            }
-        }
-        stringz[i] = '\0'; // set C null terminator
-
-        const int status = __gmpz_init_set_str(_ptr, stringz, base);
-
+        char* stringz = allocStringzCopyOf(value);
+        immutable int status = __gmpz_init_set_str(_ptr, stringz, base);
         qualifiedFree(stringz);
         assert(status == 0, "Parameter `value` does not contain an integer");
     }
@@ -143,26 +129,41 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
     /// Assign from `rhs`.
-    void opAssign()(auto ref const MpZ rhs)
+    ref MpZ opAssign()(auto ref const MpZ rhs)
     {
         __gmpz_set(_ptr, rhs._ptr);
+        return this;
     }
     /// ditto
-    void opAssign(Unsigned)(Unsigned rhs)
+    ref MpZ opAssign(Unsigned)(Unsigned rhs)
         if (isUnsigned!Unsigned)
     {
         __gmpz_set_ui(_ptr, rhs);
+        return this;
     }
     /// ditto
-    void opAssign(Signed)(Signed rhs)
+    ref MpZ opAssign(Signed)(Signed rhs)
         if (isSigned!Signed)
     {
         __gmpz_set_si(_ptr, rhs);
+        return this;
     }
     /// ditto
-    void opAssign(double rhs)
+    ref MpZ opAssign(double rhs)
     {
         __gmpz_set_d(_ptr, rhs);
+        return this;
+    }
+
+    /// Assign from string `rhs`.
+    ref MpZ setFromString(string rhs, int base = 10)
+    {
+        assert(base == 0 || base >= 2 && base <= 62);
+        char* stringz = allocStringzCopyOf(rhs);
+        immutable int status = __gmpz_set_str(_ptr, stringz, base);
+        qualifiedFree(stringz);
+        assert(status == 0, "Parameter `rhs` does not contain an integer");
+        return this;
     }
 
     /// Destruct `this`.
@@ -622,7 +623,36 @@ struct MpZ(Eval eval = Eval.direct)
         return __gmpz_sizeinbase(_ptr, base);
     }
 
+    /// Number of significant `uint`s used for storing `this`.
+    @property size_t uintLength() const
+    {
+        assert(false, "TODO implement");
+    }
+
+    /// Number of significant `ulong`s used for storing `this`.
+    @property size_t uintLong() const
+    {
+        assert(false, "TODO implement");
+    }
+
 private:
+
+    /// @nogc-variant of `toStringz` with heap allocation of null-terminated C-string `stringz`.
+    char* allocStringzCopyOf(const string value) @nogc
+    {
+        char* stringz = cast(char*)qualifiedMalloc(value.length + 1); // maximum this many characters
+        size_t i = 0;
+        foreach (immutable char ch; value[])
+        {
+            if (ch != '_')
+            {
+                stringz[i] = ch;
+                i += 1;
+            }
+        }
+        stringz[i] = '\0'; // set C null terminator
+        return stringz;
+    }
 
     /// Returns: pointer to internal GMP C struct.
     inout(__mpz_struct)* _ptr() inout return // TODO scope
@@ -898,6 +928,8 @@ void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
 
     assert(x == 42);
     assert(y == 43);
+
+    assert(mpz(null).setFromString("42") == 42);
 }
 
 /// generators
@@ -1225,6 +1257,7 @@ extern(C)
     void __gmpz_set_ui (mpz_ptr rop, ulong op);
     void __gmpz_set_si (mpz_ptr rop, long op);
     void __gmpz_set_d (mpz_ptr rop, double op);
+    int __gmpz_set_str (mpz_ptr, const char*, int);
 
     void __gmpz_clear (mpz_ptr);
 
