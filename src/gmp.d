@@ -631,7 +631,6 @@ struct MpZ(Eval eval = Eval.direct)
     {
         _z._mp_size = -_z._mp_size; // fast C macro `mpz_neg` in gmp.h
     }
-    alias neg = negate;
 
     /// Increase `this` by one.
     ref MpZ opUnary(string s)()
