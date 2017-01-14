@@ -14,6 +14,7 @@ version = unittestPhobos;
 version(unittest)
 {
     import dbgio;
+    alias Z = MpZ!(Eval.direct);
 }
 
 /** Evaluation Policy. */
@@ -803,11 +804,6 @@ MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
     typeof(return) y = null;
     __gmpz_abs(y._ptr, x._ptr);
     return y;
-}
-
-version(unittest)
-{
-    alias Z = MpZ!(Eval.direct);
 }
 
 /// convert to string
