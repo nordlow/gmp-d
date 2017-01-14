@@ -797,6 +797,14 @@ Unsigned!T absUnsign(T, Eval eval)(auto ref const MpZ!eval x) // for `std.bigint
     return _integralAbs(cast(T)x);
 }
 
+/// Returns: absolute value of `x`.
+MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
+{
+    typeof(return) y = null;
+    __gmpz_abs(y._ptr, x._ptr);
+    return y;
+}
+
 version(unittest)
 {
     alias Z = MpZ!(Eval.direct);
@@ -833,14 +841,6 @@ version(unittest)
     // aa[mpz(456)] = "def";
     // assert(aa[mpz(123)] == "abc");
     // assert(aa[mpz(456)] == "def");
-}
-
-/// Returns: absolute value of `x`.
-MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
-{
-    typeof(return) y = null;
-    __gmpz_abs(y._ptr, x._ptr);
-    return y;
 }
 
 ///
