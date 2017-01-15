@@ -1568,17 +1568,24 @@ struct MpzAdd2(T1, T2)
 version(unittest) static assert(isMpZExpr!(MpzAdd2!(MpZ, MpZ)));
 
 /// Instantiate an add expression `MpzAdd2`.
-MpzAdd2!(T1, T2) add2(T1, T2)(auto ref T1 t1,
-                            auto ref T2 t2)
+MpzAdd2!(T1, T2) add(T1, T2)(T1 t1, T2 t2)
     if (isMpZExpr!T1 &&
         isMpZExpr!T2)
 {
     return typeof(return)(move(t1), move(t2)); // TODO remove `move` when compiler does it for us
 }
 
-unittest
+@nogc unittest
 {
-    assert(add2(Z(3), Z(4)).eval() == 7);
+    assert(add(Z(3),
+               Z(4)).eval() == 7);
+    assert(add(add(Z(3),
+                   Z(4)),
+               Z(5)).eval() == 12);
+    assert(add(add(Z(3),
+                   Z(4)),
+               add(Z(5),
+                   Z(6))).eval() == 18);
 }
 
 /// `MpZ`-`MpZ` subtraction expression.
