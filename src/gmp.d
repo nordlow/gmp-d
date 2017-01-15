@@ -207,41 +207,24 @@ struct MpZ(Eval eval = Eval.direct)
         return (_ptr == rhs._ptr || // fast equality
                 __gmpz_cmp(_ptr, rhs._ptr) == 0);
     }
-
-    // TODO use one common definition for all `Integral`
     /// ditto
-    bool opEquals(long rhs) const
+    bool opEquals(Signed)(Signed rhs) const
+        if (isSigned!Signed)
     {
         if (rhs == 0)
             return isZero;
         else
-            return __gmpz_cmp_si(_ptr, rhs) == 0;
+            return __gmpz_cmp_si(_ptr, cast(long)rhs) == 0;
     }
     /// ditto
-    bool opEquals(ulong rhs) const
+    bool opEquals(Unsigned)(Unsigned rhs) const
+        if (isUnsigned!Unsigned)
     {
         if (rhs == 0)
             return isZero;
         else
-            return __gmpz_cmp_ui(_ptr, rhs) == 0;
+            return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
     }
-    /// ditto
-    bool opEquals(int rhs) const
-    {
-        if (rhs == 0)
-            return isZero;
-        else
-            return opEquals(cast(long)rhs);
-    }
-    /// ditto
-    bool opEquals(uint rhs) const
-    {
-        if (rhs == 0)
-            return isZero;
-        else
-            return opEquals(cast(ulong)rhs);
-    }
-
     /// ditto
     bool opEquals(double rhs) const
     {
