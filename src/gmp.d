@@ -1556,16 +1556,30 @@ pure unittest
 /// expression template types
 
 /// `MpZ`-`MpZ` adding expression.
-struct MpzAdd(T1, T2)
+struct MpzAdd2(T1, T2)
     if (isMpZExpr!T1 &&
         isMpZExpr!T2)
 {
     T1 t1;                      // first term
-    T2 t2;                     // second term
+    T2 t2;                      // second term
     /// Returns: evaluation of `this` expression.
     pragma(inline, true) MpZ eval() const { return t1.eval() + t2.eval(); }
 }
-version(unittest) static assert(isMpZExpr!(MpzAdd!(MpZ, MpZ)));
+version(unittest) static assert(isMpZExpr!(MpzAdd2!(MpZ, MpZ)));
+
+/// Instantiate an add expression `MpzAdd2`.
+MpzAdd2!(T1, T2) add2(T1, T2)(auto ref T1 t1,
+                            auto ref T2 t2)
+    if (isMpZExpr!T1 &&
+        isMpZExpr!T2)
+{
+    return typeof(return)(move(t1), move(t2)); // TODO remove `move` when compiler does it for us
+}
+
+unittest
+{
+    assert(add2(Z(3), Z(4)).eval() == 7);
+}
 
 /// `MpZ`-`MpZ` subtraction expression.
 struct MpzSub(T1, T2)
@@ -1650,7 +1664,7 @@ struct MpzNeg(A)
     pragma(inline, true) MpZ eval()
     {
         arg.negate();
-        return move(arg);       // TODO remove `move` when compiler does it for us
+        return move(arg);     // TODO remove `move` when compiler does it for us
     }
 }
 version(unittest) static assert(isMpZExpr!(MpzNeg!(MpZ)));
