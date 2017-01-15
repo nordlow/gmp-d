@@ -17,8 +17,10 @@ version = unittestPhobos;
 enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
 
 /// Is `true` if type `T` can be evaluated to a `MpZ` value.
-enum isMpZExpr(T) = (__traits(hasMember, T, "eval") && // has member `eval()`
+enum isMpZExpr(T) = (// TODO needed?: __traits(hasMember, T, "eval") && // has member `eval()`
                      is(Unqual!(typeof(T.eval())) == MpZ)); // which returns an `MpZ`
+
+version(unittest) static assert(!isMpZExpr!int);
 
 // TODO use these imports instead of the ones below
 // import deimos.gmp.gmp;
