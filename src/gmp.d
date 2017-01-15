@@ -679,17 +679,18 @@ struct MpZ(Eval eval = Eval.direct)
     {
         static if (isSigned!IntegralBase)
         {
-            assert(base >= 0, "Negative power base");
-            immutable ubase = cast(ulong)base;
+            immutable bool negate = base < 0;
+            immutable ubase = cast(ulong)(negate ? -base : base);
         }
         else
         {
+            immutable bool negate = false;
             immutable ubase = base;
         }
 
         static if (isSigned!IntegralExp)
         {
-            assert(exp >= 0, "Negative power exponent");
+            assert(exp >= 0, "Negative power exponent"); // TODO return mpq?
             immutable uexp = cast(ulong)exp;
         }
         else
@@ -699,6 +700,12 @@ struct MpZ(Eval eval = Eval.direct)
 
         typeof(return) y = null;
         __gmpz_ui_pow_ui(y._ptr, ubase, uexp);
+        if (negate &&
+            exp & 1)            // and odd exponent
+        {
+            y.negate();
+        }
+
         return y;
     }
 
@@ -1128,6 +1135,8 @@ MpZ!eval abs(Eval eval)(auto ref const MpZ!eval x) @trusted @nogc
     assert(Z.pow(2UL, 8) == 256);
     assert(Z.pow(2UL, 8) == 256);
     assert(Z.pow(2, 8) == 256);
+    assert(Z.pow(-2, 8) == 256);
+    assert(Z.pow(-2, 7) == -128);
 
     // disallow power exponent to be an `MpZ`
     assert(!__traits(compiles, 2^^mpz(8) == 256));
