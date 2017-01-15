@@ -4,7 +4,6 @@
 module gmp;
 
 debug import core.stdc.stdio : printf;
-import std.traits : isIntegral;
 import std.typecons : Unsigned;
 
 enum unittestLong = false;
@@ -26,7 +25,6 @@ enum Eval
 struct MpZ(Eval eval = Eval.direct)
 {
     import std.typecons : Unqual;
-    import std.traits : isSigned, isUnsigned;
 
     /// Default conversion base.
     private enum defaultBase = 10;
@@ -1512,11 +1510,21 @@ pure unittest
 }
 
 // utility
-private T _integralAbs(T)(T x)
+T _integralAbs(T)(T x)
     if (isIntegral!T)
 {
     return x>=0 ? x : -x;
 }
+
+/** Is `true` iff `T` is a GNU MP arithmetic type (`long`, `ulong` or `double`). */
+enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
+
+// faster traits. TODO move to std.traits
+enum isArithmetic(T) = __traits(isArithmetic, T);
+enum isScalar(T) = __traits(isScalar, T);
+enum isIntegral(T) = __traits(isIntegral, T);
+enum isUnsigned(T) = __traits(isUnsigned, T);
+enum isSigned(T) = __traits(isArithmetic, T) && !__traits(isUnsigned, T);
 
 version(unittest)
 {
