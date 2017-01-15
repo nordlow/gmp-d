@@ -709,7 +709,9 @@ struct MpZ(Eval eval = Eval.direct)
         return y;
     }
 
-    /// Returns: `this` ^^ `power` (mod `modulo`).
+    /** Returns: `this` ^^ `power` (mod `modulo`).
+        Parameter `power` must be positive.
+    */
     MpZ powm()(auto ref const MpZ power,
                auto ref const MpZ modulo) const
     {
