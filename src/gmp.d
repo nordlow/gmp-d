@@ -16,6 +16,9 @@ enum Eval
     delayed,                    // lazy eval via expression templates
 }
 
+/** Is `true` iff `T` is a GNU MP arithmetic type (`long`, `ulong` or `double`). */
+enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
+
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
 
@@ -1516,15 +1519,30 @@ T _integralAbs(T)(T x)
     return x>=0 ? x : -x;
 }
 
-/** Is `true` iff `T` is a GNU MP arithmetic type (`long`, `ulong` or `double`). */
-enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
-
 // faster traits. TODO move to std.traits
 enum isArithmetic(T) = __traits(isArithmetic, T);
+enum isFloating(T) = __traits(isFloating, T);
+enum isFloatingPoint(T) = __traits(isFloating, T);
 enum isScalar(T) = __traits(isScalar, T);
+enum isScalarType(T) = __traits(isScalar, T);
 enum isIntegral(T) = __traits(isIntegral, T);
 enum isUnsigned(T) = __traits(isUnsigned, T);
 enum isSigned(T) = __traits(isArithmetic, T) && !__traits(isUnsigned, T);
+enum isStaticArray(T) = __traits(isStaticArray, T);
+enum isAssociativeArray(T) = __traits(isAssociativeArray, T);
+enum isAbstractClass(T) = __traits(isAbstractClass, T);
+enum isFinalClass(T) = __traits(isFinalClass, T);
+enum isPOD(T) = __traits(isPOD, T);
+enum isNested(T) = __traits(isNested, T);
+enum isVirtualFunction(T) = __traits(isVirtualFunction, T);
+enum isVirtualMethod(T) = __traits(isVirtualMethod, T);
+enum isAbstractFunction(T) = __traits(isAbstractFunction, T);
+enum isFinalFunction(T) = __traits(isFinalFunction, T);
+enum isOverrideFunction(T) = __traits(isOverrideFunction, T);
+enum isStaticFunction(T) = __traits(isStaticFunction, T);
+enum isTemplate(T) = __traits(isTemplate, T);
+enum hasMember(T, string member) = __traits(hasMember, T, member);
+enum Identifier(alias symbol) = __traits(symbol);
 
 version(unittest)
 {
