@@ -789,6 +789,7 @@ struct MpZ
         assert(false, "TODO use mpz_size");
     }
 
+    /// Returns: evaluation of `this` expression which in this is a no-op.
     ref inout(MpZ) eval() inout return { return this; }
 
 private:
