@@ -4,7 +4,6 @@
 module gmp;
 
 debug import core.stdc.stdio : printf;
-import std.stdio : writeln;
 import std.traits : isIntegral;
 import std.typecons : Unsigned;
 
