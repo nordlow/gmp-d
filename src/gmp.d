@@ -104,7 +104,7 @@ struct MpZ(Eval eval = Eval.direct)
     pragma(inline, false)
     this(in string value, int base = 0) // TODO Use Optional/Nullable when value is nan, or inf
     {
-        assert(base == 0 || base >= 2 && base <= 62);
+        assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(value);
         immutable int status = __gmpz_init_set_str(_ptr, stringz, base);
         qualifiedFree(stringz);
