@@ -938,6 +938,14 @@ MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
     const a = mpz(42);
     const b = mpz(43UL);
     const c = mpz(43.0);
+    const z = mpz(0);
+
+    // equality
+    assert(z == 0);
+    assert(z == cast(uint)0);
+    assert(z == 0L);
+    assert(z == 0UL);
+    assert(z == 0.0);
 
     // eval cast
 
