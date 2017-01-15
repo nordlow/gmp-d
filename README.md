@@ -82,7 +82,7 @@ compileGMP!"Integer res = a ^^ 5 + b ^^ 5 + c ^^ 5 + d ^^ 5"();
 might generate the code
 
 
-```
+```D
 Integer res, r2; // r2 used as a register of sorts (minimise allocation of Integers)
 mpz_init(res); mpz_init(r2);
 
