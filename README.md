@@ -39,7 +39,10 @@ Delayed evaluation via expression templates (`Eval.delayed`) is planned.
   `int` and `uint` on non-Posix systems. This sounds like a very unportable
   solution.
 
-- Compare implementation with https://github.com/thestinger/rust-gmp
+- Compare implementation with official C++ wrapper
+  ([gmpxx](/usr/include/gmpxx.h))
+  and [Rust wrappers such as rust-gmp](https://github.com/thestinger/rust-gmp)
+  to see that no optimization has been overseen
 
 - Forbid usage of
   - `gmp_randinit` (not thread-safe, obsolete)
