@@ -708,22 +708,22 @@ struct MpZ
         return y;
     }
 
-    /** Returns: `this` ^^ `power` (mod `modulo`).
+    /** Returns: `this` ^^ `power` (modulo `mod`).
         Parameter `power` must be positive.
     */
     MpZ powm()(auto ref const MpZ power,
-               auto ref const MpZ modulo) const
+               auto ref const MpZ mod) const
     {
         typeof(return) y = 0; // result
-        __gmpz_powm(y._ptr, _ptr,  power._ptr, modulo._ptr);
+        __gmpz_powm(y._ptr, _ptr,  power._ptr, mod._ptr);
         return y;
     }
     /// ditto
     MpZ powm()(ulong power,
-               auto ref const MpZ modulo) const
+               auto ref const MpZ mod) const
     {
         typeof(return) y = 0;       // result
-        __gmpz_powm_ui(y._ptr, _ptr, power, modulo._ptr);
+        __gmpz_powm_ui(y._ptr, _ptr, power, mod._ptr);
         return y;
     }
 
@@ -858,9 +858,8 @@ struct MpzAdd(T1, T2)
 {
     T1 t1;                      // first term
     T2 t2;                     // second term
-    pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ eval() const { return t1.eval() + t2.eval(); }
+    pragma(inline, true) MpZ eval() const { return t1.eval() + t2.eval(); }
 }
 version(unittest) static assert(isMpZExpr!(MpzAdd!(MpZ, MpZ)));
 
@@ -871,9 +870,8 @@ struct MpzSub(T1, T2)
 {
     T1 t1;                      // first term
     T2 t2;                      // second term
-    pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ eval() const { return t1.eval() - t2.eval(); }
+    pragma(inline, true) MpZ eval() const { return t1.eval() - t2.eval(); }
 }
 version(unittest) static assert(isMpZExpr!(MpzSub!(MpZ, MpZ)));
 
@@ -884,9 +882,8 @@ struct MpzMul(F1, F2)
 {
     F1 f1;                      // first factor
     F2 f2;                      // second factor
-    pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ eval() const { return f1.eval() * f2.eval(); }
+    pragma(inline, true) MpZ eval() const { return f1.eval() * f2.eval(); }
 }
 version(unittest) static assert(isMpZExpr!(MpzMul!(MpZ, MpZ)));
 
@@ -897,9 +894,8 @@ struct MpzDiv(P, Q)
 {
     P dsor;                     // divisor
     Q dend;                     // dividend
-    pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ eval() const { return dsor.eval() / dend.eval(); }
+    pragma(inline, true) MpZ eval() const { return dsor.eval() / dend.eval(); }
 }
 version(unittest) static assert(isMpZExpr!(MpzDiv!(MpZ, MpZ)));
 
@@ -910,9 +906,8 @@ struct MpzMod(P, Q)
 {
     P dsor;                     // divisor
     Q dend;                     // dividend
-    pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ eval() const { return dsor.eval() % dend.eval(); }
+    pragma(inline, true) MpZ eval() const { return dsor.eval() % dend.eval(); }
 }
 version(unittest) static assert(isMpZExpr!(MpzMod!(MpZ, MpZ)));
 
@@ -923,11 +918,24 @@ struct MpzPowU(P, Q)
 {
     P base;                     // base
     Q exp;                      // exponent
-    pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ eval() const { return base.eval() ^^ exp; }
+    pragma(inline, true) MpZ eval() const { return base.eval() ^^ exp; }
 }
 version(unittest) static assert(isMpZExpr!(MpzPowU!(MpZ, ulong)));
+
+/// `MpZ`-`ulong`-`MpZ` power-modulo expression.
+struct MpzPowM(P, Q, M)
+    if (isMpZExpr!P &&
+        isUnsigned!Q &&
+        isMpZExpr!M)
+{
+    P base;                     // base
+    Q exp;                      // exponent
+    M mod;                      // modulo
+    /// Returns: evaluation of `this` expression.
+    pragma(inline, true) MpZ eval() const { return base.powm(exp, mod); }
+}
+version(unittest) static assert(isMpZExpr!(MpzPowM!(MpZ, ulong, MpZ)));
 
 /// `MpZ` negation expression.
 struct MpzNeg(A)
