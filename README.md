@@ -8,10 +8,10 @@ that aims to be compatible with `std.bigint.BigInt` and be`@safe pure nothrow
 
 Implementation is optimized through
 
-- mapping of GMP's C macros into D inline functions
+- mapping of GMP's C macros into D inline functions that operate directly on the
+  internal C-representation `__mpz_struct`,
 
 - passing of `MpZ`-typed parameters as `auto ref const`
-
 
 ## TODO list (in order of priority)
 
