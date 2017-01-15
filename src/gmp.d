@@ -15,6 +15,10 @@ version = unittestPhobos;
 /** Is `true` iff `T` is a GNU MP arithmetic type (`long`, `ulong` or `double`). */
 enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
 
+/// Is `true` if type `T` can be evaluated to a `MpZ` value.
+enum isMpZExpr(T) = (__traits(hasMember, T, "eval") &&
+                     is(Unqual!(typeof(T.eval())) == MpZ));
+
 // TODO use these imports instead of the ones below
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
@@ -843,14 +847,7 @@ private:
     }
 }
 
-/// Is `true` if type `T` can be evaluated to a `MpZ` value.
-enum isMpZExpr(T) = (__traits(hasMember, T, "eval") &&
-                     is(Unqual!(typeof(T.eval())) == MpZ));
-
-@safe pure nothrow @nogc unittest
-{
-    static assert(isMpZExpr!MpZ);
-}
+version(unittest) static assert(isMpZExpr!MpZ);
 
 /// expression template types
 
@@ -865,6 +862,7 @@ struct MpzAdd(T1, T2)
     /// Returns: evaluation of `this` expression.
     MpZ eval() const { return t1.eval() + t2.eval(); }
 }
+version(unittest) static assert(isMpZExpr!(MpzAdd!(MpZ, MpZ)));
 
 /// `MpZ`-`MpZ` subtraction expression.
 struct MpzSub(T1, T2)
@@ -877,6 +875,7 @@ struct MpzSub(T1, T2)
     /// Returns: evaluation of `this` expression.
     MpZ eval() const { return t1.eval() - t2.eval(); }
 }
+version(unittest) static assert(isMpZExpr!(MpzSub!(MpZ, MpZ)));
 
 /// `MpZ`-`MpZ` multiplication expression.
 struct MpzMul(F1, F2)
@@ -889,6 +888,7 @@ struct MpzMul(F1, F2)
     /// Returns: evaluation of `this` expression.
     MpZ eval() const { return f1.eval() * f2.eval(); }
 }
+version(unittest) static assert(isMpZExpr!(MpzMul!(MpZ, MpZ)));
 
 /// `MpZ`-`MpZ` division expression.
 struct MpzDiv(P, Q)
@@ -901,6 +901,7 @@ struct MpzDiv(P, Q)
     /// Returns: evaluation of `this` expression.
     MpZ eval() const { return dsor.eval() / dend.eval(); }
 }
+version(unittest) static assert(isMpZExpr!(MpzDiv!(MpZ, MpZ)));
 
 /// `MpZ`-`MpZ` modulus expression.
 struct MpzMod(P, Q)
@@ -913,6 +914,7 @@ struct MpzMod(P, Q)
     /// Returns: evaluation of `this` expression.
     MpZ eval() const { return dsor.eval() % dend.eval(); }
 }
+version(unittest) static assert(isMpZExpr!(MpzMod!(MpZ, MpZ)));
 
 /// `MpZ` negation expression.
 struct MpzNeg(A)
@@ -927,6 +929,7 @@ struct MpzNeg(A)
         return move(arg);       // TODO remove `move` when compiler does it for us
     }
 }
+version(unittest) static assert(isMpZExpr!(MpzNeg!(MpZ)));
 
 pure nothrow pragma(inline, true):
 
