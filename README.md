@@ -18,9 +18,10 @@ Implementation is highly optimized through
 - Compare my solution with `std.bigint`
 
   - Delayed evaluation via expression templates (`Eval.delayed`) is
-    planned. Evaluation can kick in automatically for r-value parameters (using
-    `__traits(isRef!Param)`). See
-    [this thread](http://forum.dlang.org/post/boorcxnmtatrncrclimp@forum.dlang.org).
+  planned. Evaluation can kick in automatically for r-value parameters (when
+  `!__traits(isRef, param)` when param is passed as `(T)(auto ref const T
+  param)`). See
+  [this thread](http://forum.dlang.org/post/boorcxnmtatrncrclimp@forum.dlang.org).
 
   - Copy-on-write (COW) `RefCounted` data store. Optionally with specialized
     heap-allocator for `MpZ` type (16-bytes).
