@@ -19,6 +19,7 @@ enum Eval
 /** Is `true` iff `T` is a GNU MP arithmetic type (`long`, `ulong` or `double`). */
 enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
 
+// TODO use these imports instead of the ones below
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
 
