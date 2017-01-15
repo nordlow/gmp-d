@@ -700,8 +700,7 @@ struct MpZ(Eval eval = Eval.direct)
 
         typeof(return) y = null;
         __gmpz_ui_pow_ui(y._ptr, ubase, uexp);
-        if (negate &&
-            exp & 1)            // and odd exponent
+        if (negate && exp & 1)  // if negative odd exponent
         {
             y.negate();
         }
@@ -716,10 +715,7 @@ struct MpZ(Eval eval = Eval.direct)
                auto ref const MpZ modulo) const
     {
         typeof(return) y = 0; // result
-        __gmpz_powm(y._ptr,
-                    _ptr,
-                    power._ptr,
-                    modulo._ptr);
+        __gmpz_powm(y._ptr, _ptr,  power._ptr, modulo._ptr);
         return y;
     }
     /// ditto
@@ -727,10 +723,7 @@ struct MpZ(Eval eval = Eval.direct)
                auto ref const MpZ modulo) const
     {
         typeof(return) y = 0;       // result
-        __gmpz_powm_ui(y._ptr,
-                       _ptr,
-                       power,
-                       modulo._ptr);
+        __gmpz_powm_ui(y._ptr, _ptr, power, modulo._ptr);
         return y;
     }
 
