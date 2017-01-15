@@ -5,6 +5,7 @@ module gmp;
 
 debug import core.stdc.stdio : printf;
 import std.typecons : Unsigned, Unqual;
+import std.traits : isInstanceOf;
 import std.algorithm.mutation : move;
 
 /// Call unittests taking long to execute.
@@ -85,6 +86,27 @@ struct MpZ
         assert(this == MpZ.init); // if this is same as default
     }
 
+    /// Construct from expression `expr`.
+    this(Expr)(Expr expr)
+        if (isMpZExpr!Expr &&
+            !is(Expr == MpZ))   // except standard copy constructor
+    {
+        static if (isInstanceOf!(MpzAddExpr, Expr))
+        {
+            __gmpz_add(this._ptr,
+                       expr.t1.eval()._ptr,
+                       expr.t2.eval()._ptr);
+        }
+        else  static if (isInstanceOf!(MpzSubExpr, Expr))
+        {
+            __gmpz_sub(this._ptr,
+                       expr.t1.eval()._ptr,
+                       expr.t2.eval()._ptr);
+        }
+        else
+            this = expr.eval();     // evaluate and move
+    }
+
     /// Construct from `value`.
     this(long value) { __gmpz_init_set_si(_ptr, value); }
     /// ditto
@@ -124,7 +146,7 @@ struct MpZ
         /// Construct copy of `value`.
         this()(auto ref const MpZ value)
         {
-            mpz_init_set(_ptr, value._pt);
+            mpz_init_set(_ptr, value._ptr);
         }
     }
     else
@@ -1556,7 +1578,7 @@ pure unittest
 /// expression template types
 
 /// `MpZ`-`MpZ` adding expression.
-struct MpzAdd(T1, T2)
+struct MpzAddExpr(T1, T2)
     if (isMpZExpr!T1 &&
         isMpZExpr!T2)
 {
@@ -1565,10 +1587,10 @@ struct MpzAdd(T1, T2)
     /// Returns: evaluation of `this` expression.
     pragma(inline, true) MpZ eval() const { return t1.eval() + t2.eval(); }
 }
-version(unittest) static assert(isMpZExpr!(MpzAdd!(MpZ, MpZ)));
+version(unittest) static assert(isMpZExpr!(MpzAddExpr!(MpZ, MpZ)));
 
-/// Instantiate an add expression `MpzAdd`.
-MpzAdd!(T1, T2) add(T1, T2)(T1 t1, T2 t2)
+/// Instantiate an add expression `MpzAddExpr`.
+MpzAddExpr!(T1, T2) add(T1, T2)(T1 t1, T2 t2)
     if (isMpZExpr!T1 &&
         isMpZExpr!T2)
 {
@@ -1586,10 +1608,13 @@ MpzAdd!(T1, T2) add(T1, T2)(T1 t1, T2 t2)
                    Z(4)),
                add(Z(5),
                    Z(6))).eval() == 18);
+
+    const Z x = add(Z(3), Z(4));    // lowers to `mpz_add`
+    assert(x == 7);
 }
 
 /// `MpZ`-`MpZ` subtraction expression.
-struct MpzSub(T1, T2)
+struct MpzSubExpr(T1, T2)
     if (isMpZExpr!T1 &&
         isMpZExpr!T2)
 {
@@ -1598,10 +1623,27 @@ struct MpzSub(T1, T2)
     /// Returns: evaluation of `this` expression.
     pragma(inline, true) MpZ eval() const { return t1.eval() - t2.eval(); }
 }
-version(unittest) static assert(isMpZExpr!(MpzSub!(MpZ, MpZ)));
+version(unittest) static assert(isMpZExpr!(MpzSubExpr!(MpZ, MpZ)));
+
+@nogc unittest
+{
+    assert(sub(Z(3),
+               Z(4)).eval() == -1);
+
+    const Z x = sub(Z(3), Z(4));    // lowers to `mpz_sub`
+    assert(x == -1);
+}
+
+/// Instantiate an sub expression `MpzSubExpr`.
+MpzSubExpr!(T1, T2) sub(T1, T2)(T1 t1, T2 t2)
+    if (isMpZExpr!T1 &&
+        isMpZExpr!T2)
+{
+    return typeof(return)(move(t1), move(t2)); // TODO remove `move` when compiler does it for us
+}
 
 /// `MpZ`-`MpZ` multiplication expression.
-struct MpzMul(F1, F2)
+struct MpzMulExpr(F1, F2)
     if (isMpZExpr!F1 &&
         isMpZExpr!F2)
 {
@@ -1610,10 +1652,10 @@ struct MpzMul(F1, F2)
     /// Returns: evaluation of `this` expression.
     pragma(inline, true) MpZ eval() const { return f1.eval() * f2.eval(); }
 }
-version(unittest) static assert(isMpZExpr!(MpzMul!(MpZ, MpZ)));
+version(unittest) static assert(isMpZExpr!(MpzMulExpr!(MpZ, MpZ)));
 
 /// `MpZ`-`MpZ` division expression.
-struct MpzDiv(P, Q)
+struct MpzDivExpr(P, Q)
     if (isMpZExpr!P &&
         isMpZExpr!Q)
 {
@@ -1622,10 +1664,10 @@ struct MpzDiv(P, Q)
     /// Returns: evaluation of `this` expression.
     pragma(inline, true) MpZ eval() const { return dsor.eval() / dend.eval(); }
 }
-version(unittest) static assert(isMpZExpr!(MpzDiv!(MpZ, MpZ)));
+version(unittest) static assert(isMpZExpr!(MpzDivExpr!(MpZ, MpZ)));
 
 /// `MpZ`-`MpZ` modulus expression.
-struct MpzMod(P, Q)
+struct MpzModExpr(P, Q)
     if (isMpZExpr!P &&
         isMpZExpr!Q)
 {
@@ -1634,10 +1676,10 @@ struct MpzMod(P, Q)
     /// Returns: evaluation of `this` expression.
     pragma(inline, true) MpZ eval() const { return dsor.eval() % dend.eval(); }
 }
-version(unittest) static assert(isMpZExpr!(MpzMod!(MpZ, MpZ)));
+version(unittest) static assert(isMpZExpr!(MpzModExpr!(MpZ, MpZ)));
 
 /// `MpZ`-`ulong` power expression.
-struct MpzPowU(P, Q)
+struct MpzPowUExpr(P, Q)
     if (isMpZExpr!P &&
         isUnsigned!Q)
 {
@@ -1646,10 +1688,10 @@ struct MpzPowU(P, Q)
     /// Returns: evaluation of `this` expression.
     pragma(inline, true) MpZ eval() const { return base.eval() ^^ exp; }
 }
-version(unittest) static assert(isMpZExpr!(MpzPowU!(MpZ, ulong)));
+version(unittest) static assert(isMpZExpr!(MpzPowUExpr!(MpZ, ulong)));
 
 /// `MpZ`-`ulong`-`MpZ` power-modulo expression.
-struct MpzPowM(P, Q, M)
+struct MpzPowMExpr(P, Q, M)
     if (isMpZExpr!P &&
         isUnsigned!Q &&
         isMpZExpr!M)
@@ -1660,21 +1702,20 @@ struct MpzPowM(P, Q, M)
     /// Returns: evaluation of `this` expression.
     pragma(inline, true) MpZ eval() const { return base.powm(exp, mod); }
 }
-version(unittest) static assert(isMpZExpr!(MpzPowM!(MpZ, ulong, MpZ)));
+version(unittest) static assert(isMpZExpr!(MpzPowMExpr!(MpZ, ulong, MpZ)));
 
 /// `MpZ` negation expression.
-struct MpzNeg(A)
+struct MpzNegExpr(A)
     if (isMpZExpr!A)
 {
     A arg;
     /// Returns: evaluation of `this` expression.
     pragma(inline, true) MpZ eval()
     {
-        arg.negate();
-        return move(arg);     // TODO remove `move` when compiler does it for us
+        return -arg.eval();
     }
 }
-version(unittest) static assert(isMpZExpr!(MpzNeg!(MpZ)));
+version(unittest) static assert(isMpZExpr!(MpzNegExpr!(MpZ)));
 
 @safe pure nothrow @nogc unittest
 {
