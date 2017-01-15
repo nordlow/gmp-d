@@ -12,7 +12,7 @@ enum unittestLong = false;
 version = unittestPhobos;
 
 /** Evaluation Policy. */
-enum Eval
+enum Eval : ubyte
 {
     direct,                     // direct eval
     delayed,                    // lazy eval via expression templates
@@ -28,7 +28,7 @@ enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
 /** Arbitrary (multi) precision signed integer (Z).
     Wrapper for GNU MP (GMP)'s type `mpz_t` and functions `mpz_.*`.
  */
-struct MpZ(Eval eval = Eval.direct)
+struct MpZ
 {
     import std.typecons : Unqual;
 
@@ -159,13 +159,13 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
     /// Assign from `rhs`.
-    ref MpZ opAssign()(auto ref const MpZ rhs)
+    ref MpZ opAssign()(auto ref const MpZ rhs) return // TODO DIP-1000 scope
     {
         __gmpz_set(_ptr, rhs._ptr);
         return this;
     }
     /// ditto
-    ref MpZ opAssign(Integral)(Integral rhs)
+    ref MpZ opAssign(Integral)(Integral rhs) return // TODO DIP-1000 scope
         if (isIntegral!Integral)
     {
         static if (isUnsigned!Integral)
@@ -183,7 +183,7 @@ struct MpZ(Eval eval = Eval.direct)
         return this;
     }
     /// ditto
-    ref MpZ opAssign(double rhs)
+    ref MpZ opAssign(double rhs) return // TODO DIP-1000 scope
     {
         __gmpz_set_d(_ptr, rhs);
         return this;
@@ -526,7 +526,7 @@ struct MpZ(Eval eval = Eval.direct)
         // return exp;
     }
 
-    ref MpZ opOpAssign(string s)(auto ref const MpZ rhs)
+    ref MpZ opOpAssign(string s)(auto ref const MpZ rhs) return // TODO DIP-1000 scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
         static      if (s == "+") { __gmpz_add(_ptr, _ptr, rhs._ptr); }
@@ -583,7 +583,7 @@ struct MpZ(Eval eval = Eval.direct)
         return this;
     }
 
-    ref MpZ opOpAssign(string s, Signed)(Signed rhs)
+    ref MpZ opOpAssign(string s, Signed)(Signed rhs) return // TODO DIP-1000 scope
         if ((s == "+" || s == "-" || s == "*" || s == "^^") &&
             isSigned!Signed)
     {
@@ -659,7 +659,7 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
     /// Increase `this` by one.
-    ref MpZ opUnary(string s)()
+    ref MpZ opUnary(string s)() return // TODO DIP-1000 scope
         if (s == "++")
     {
         __gmpz_add_ui(_ptr, _ptr, 1);
@@ -667,7 +667,7 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
     /// Decrease `this` by one.
-    ref MpZ opUnary(string s)()
+    ref MpZ opUnary(string s)() return // TODO DIP-1000 scope
         if (s == "--")
     {
         __gmpz_sub_ui(_ptr, _ptr, 1);
@@ -732,7 +732,7 @@ struct MpZ(Eval eval = Eval.direct)
     }
 
     /// Returns: absolute value of `this`.
-    MpZ!eval abs() const
+    MpZ abs() const
     {
         typeof(return) y = null;
         __gmpz_abs(y._ptr, _ptr);
@@ -848,41 +848,86 @@ private:
     }
 }
 
+/// `MpZ`-`MpZ` adding expression.
+struct MpzAdd
+{
+    MpZ t1;                     // first term
+    MpZ t2;                     // second
+    MpZ eval()
+    {
+        return t1/t2;
+    }
+}
+
+/// `MpZ`-`MpZ` multiplication expression.
+struct MpzMul
+{
+    MpZ f1;                     // first factor
+    MpZ f2;                     // second factor
+}
+
+/// `MpZ`-`MpZ` division expression.
+struct MpzDiv
+{
+    MpZ dsor;                   // divisor
+    MpZ dend;                   // dividend
+}
+
+/// `MpZ`-`MpZ` modulus expression.
+struct MpzMod
+{
+    MpZ dsor;                   // divisor
+    MpZ dend;                   // dividend
+}
+
+/// `MpZ`-`MpZ` power expression.
+struct MpzPow
+{
+    MpZ base;                   // base
+    MpZ exp;                    // exponent
+}
+
+/// `MpZ`-`MpZ` negation expression.
+struct MpzNeg
+{
+    MpZ arg;
+}
+
 pure nothrow pragma(inline, true):
 
 /** Instantiator for `MpZ`. */
-MpZ!eval mpz(Eval eval = Eval.direct, Args...)(Args args) @safe @nogc
+MpZ mpz(Args...)(Args args) @safe @nogc
 {
     return typeof(return)(args);
 }
 
 /// Swap contents of `x` with contents of `y`.
-void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
-                                  ref MpZ!evalY y) @nogc
+void swap()(ref MpZ x,
+            ref MpZ y) @nogc
 {
     import std.algorithm.mutation : swap;
     swap(x, y); // x.swap(y);
 }
 
-string toDecimalString(Eval eval)(auto ref const MpZ!eval x) // for `std.bigint.BigInt` compatibility
+string toDecimalString()(auto ref const MpZ x) // for `std.bigint.BigInt` compatibility
 {
     return x.toString(10);
 }
 
-string toHex(Eval eval)(auto ref const MpZ!eval x) // for `std.bigint.BigInt` compatibility
+string toHex()(auto ref const MpZ x) // for `std.bigint.BigInt` compatibility
 {
     return x.toString(16, true);
 }
 
 /// Returns: the absolute value of `x` converted to the corresponding unsigned type.
-Unsigned!T absUnsign(T, Eval eval)(auto ref const MpZ!eval x) // for `std.bigint.BigInt` compatibility
+Unsigned!T absUnsign(T)(auto ref const MpZ x) // for `std.bigint.BigInt` compatibility
     if (isIntegral!T)
 {
     return _integralAbs(cast(T)x);
 }
 
 /// Returns: absolute value of `x`.
-MpZ!eval abs(Eval eval)(auto ref const MpZ!eval x) @trusted @nogc
+MpZ abs()(auto ref const MpZ x) @trusted @nogc
 {
     typeof(return) y = null;
     __gmpz_abs(y._ptr, x._ptr);
@@ -1603,7 +1648,7 @@ version(none) @safe pure nothrow @nogc unittest
 version(unittest)
 {
     // import dbgio;
-    alias Z = MpZ!(Eval.direct);
+    alias Z = MpZ;
 }
 
 // C API
