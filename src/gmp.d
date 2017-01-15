@@ -789,7 +789,7 @@ struct MpZ
         assert(false, "TODO use mpz_size");
     }
 
-    ref inout(MpZ) toValue() inout return { return this; }
+    ref inout(MpZ) eval() inout return { return this; }
 
 private:
 
@@ -843,8 +843,8 @@ private:
 }
 
 /// Is `true` if type `T` can be evaluated to a `MpZ` value.
-enum isMpZExpr(T) = (__traits(hasMember, T, "toValue") &&
-                     is(Unqual!(typeof(T.toValue())) == MpZ));
+enum isMpZExpr(T) = (__traits(hasMember, T, "eval") &&
+                     is(Unqual!(typeof(T.eval())) == MpZ));
 
 @safe pure nothrow @nogc unittest
 {
@@ -862,7 +862,7 @@ struct MpzAdd(T1, T2)
     T2 t2;                     // second term
     pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ toValue() const { return t1.toValue() + t2.toValue(); }
+    MpZ eval() const { return t1.eval() + t2.eval(); }
 }
 
 /// `MpZ`-`MpZ` subtraction expression.
@@ -874,7 +874,7 @@ struct MpzSub(T1, T2)
     T2 t2;                      // second term
     pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ toValue() const { return t1.toValue() - t2.toValue(); }
+    MpZ eval() const { return t1.eval() - t2.eval(); }
 }
 
 /// `MpZ`-`MpZ` multiplication expression.
@@ -886,7 +886,7 @@ struct MpzMul(F1, F2)
     F2 f2;                      // second factor
     pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ toValue() const { return f1.toValue() * f2.toValue(); }
+    MpZ eval() const { return f1.eval() * f2.eval(); }
 }
 
 /// `MpZ`-`MpZ` division expression.
@@ -898,7 +898,7 @@ struct MpzDiv(P, Q)
     Q dend;                     // dividend
     pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ toValue() const { return dsor.toValue() / dend.toValue(); }
+    MpZ eval() const { return dsor.eval() / dend.eval(); }
 }
 
 /// `MpZ`-`MpZ` modulus expression.
@@ -910,7 +910,7 @@ struct MpzMod(P, Q)
     Q dend;                     // dividend
     pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ toValue() const { return dsor.toValue() % dend.toValue(); }
+    MpZ eval() const { return dsor.eval() % dend.eval(); }
 }
 
 /// `MpZ` negation expression.
@@ -920,7 +920,7 @@ struct MpzNeg(A)
     A arg;
     pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ toValue()
+    MpZ eval()
     {
         arg.negate();
         return move(arg);       // TODO remove `move` when compiler does it for us
