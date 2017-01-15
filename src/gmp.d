@@ -1580,13 +1580,12 @@ enum hasMember(T, string member) = __traits(hasMember, T, member);
 enum IdentifierStringOfSymbol(alias sym) = __traits(identifier, sym);
 
 /// http://forum.dlang.org/post/llwrbirvlqxawifyytqq@forum.dlang.org
-@safe pure nothrow @nogc unittest
+version(none) @safe pure nothrow @nogc unittest
 {
     struct S { int x, y; }
     static void f()(auto ref const S s)
     {
-        pragma(msg, "isRef:", isRef!s,
-               " typeof(s)", typeof(s));
+        pragma(msg, "type:", typeof(s), " isRef:", isRef!s);
     }
     f(S.init);
     S s;
