@@ -5,18 +5,12 @@ module gmp;
 
 debug import core.stdc.stdio : printf;
 import std.typecons : Unsigned, Unqual;
+import std.algorithm.mutation : move;
 
 /// Call unittests taking long to execute.
 enum unittestLong = false;
 
 version = unittestPhobos;
-
-/** Evaluation Policy. */
-enum Eval : ubyte
-{
-    direct,                     // direct eval
-    delayed,                    // lazy eval via expression templates
-}
 
 /** Is `true` iff `T` is a GNU MP arithmetic type (`long`, `ulong` or `double`). */
 enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
@@ -795,7 +789,7 @@ struct MpZ
         assert(false, "TODO use mpz_size");
     }
 
-    ref inout(MpZ) eval() inout return { return this; }
+    ref inout(MpZ) toValue() inout return { return this; }
 
 private:
 
@@ -849,8 +843,8 @@ private:
 }
 
 /// Is `true` if type `T` can be evaluated to a `MpZ` value.
-enum isMpZExpr(T) = (__traits(hasMember, T, "eval") &&
-                     is(Unqual!(typeof(T.eval())) == MpZ));
+enum isMpZExpr(T) = (__traits(hasMember, T, "toValue") &&
+                     is(Unqual!(typeof(T.toValue())) == MpZ));
 
 @safe pure nothrow @nogc unittest
 {
@@ -861,61 +855,76 @@ enum isMpZExpr(T) = (__traits(hasMember, T, "eval") &&
 
 /// `MpZ`-`MpZ` adding expression.
 struct MpzAdd(T1, T2)
+    if (isMpZExpr!T1 &&
+        isMpZExpr!T2)
 {
     T1 t1;                      // first term
     T2 t2;                     // second term
     pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ eval() const { return t1 + t2; }
+    MpZ toValue() const { return t1.toValue() + t2.toValue(); }
 }
 
 /// `MpZ`-`MpZ` subtraction expression.
 struct MpzSub(T1, T2)
+    if (isMpZExpr!T1 &&
+        isMpZExpr!T2)
 {
     T1 t1;                      // first term
     T2 t2;                      // second term
     pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ eval() const { return t1 - t2; }
+    MpZ toValue() const { return t1.toValue() - t2.toValue(); }
 }
 
 /// `MpZ`-`MpZ` multiplication expression.
-struct MpzMul
+struct MpzMul(F1, F2)
+    if (isMpZExpr!F1 &&
+        isMpZExpr!F2)
 {
-    MpZ f1;                     // first factor
-    MpZ f2;                     // second factor
+    F1 f1;                      // first factor
+    F2 f2;                      // second factor
     pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ eval() const { return f1*f2; }
+    MpZ toValue() const { return f1.toValue() * f2.toValue(); }
 }
 
 /// `MpZ`-`MpZ` division expression.
-struct MpzDiv
+struct MpzDiv(P, Q)
+    if (isMpZExpr!P &&
+        isMpZExpr!Q)
 {
-    MpZ dsor;                   // divisor
-    MpZ dend;                   // dividend
+    P dsor;                     // divisor
+    Q dend;                     // dividend
     pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ eval() const { return dsor/dend; }
+    MpZ toValue() const { return dsor.toValue() / dend.toValue(); }
 }
 
 /// `MpZ`-`MpZ` modulus expression.
-struct MpzMod
+struct MpzMod(P, Q)
+    if (isMpZExpr!P &&
+        isMpZExpr!Q)
 {
-    MpZ dsor;                   // divisor
-    MpZ dend;                   // dividend
+    P dsor;                     // divisor
+    Q dend;                     // dividend
     pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ eval() const { return dsor%dend; }
+    MpZ toValue() const { return dsor.toValue() % dend.toValue(); }
 }
 
-/// `MpZ`-`MpZ` negation expression.
-struct MpzNeg
+/// `MpZ` negation expression.
+struct MpzNeg(A)
+    if (isMpZExpr!A)
 {
-    MpZ arg;
+    A arg;
     pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ eval() const { return -arg; }
+    MpZ toValue()
+    {
+        arg.negate();
+        return move(arg);       // TODO remove `move` when compiler does it for us
+    }
 }
 
 pure nothrow pragma(inline, true):
