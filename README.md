@@ -17,7 +17,7 @@ Implementation is optimized through
 
 - Compare my solution with `std.bigint`
 
-  - Delayed evaluation via expression templates (`Eval.delayed`) is
+  - Delayed evaluation via expression templates is
   planned. Evaluation can kick in automatically for r-value parameters (when
   `!__traits(isRef, param)` when param is passed as `(T)(auto ref const T
   param)`). See
@@ -72,7 +72,6 @@ Implementation is optimized through
 
 - Lazy evaluation
   via [expression templates](https://en.wikipedia.org/wiki/Expression_templates)
-  (when `gmp.Evaluation` is `direct`)
   - `x = -x`        => Assign(x, Neg(x)) => `x.negate()` (if compiler doesn't already rewrite this)
   - `x *= -1`       => `mpz_neg(x, x)` => `x.negate()`
   - `x -= 2*x`      => `mpz_neg(x, x)` => `x.negate()`
