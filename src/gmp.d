@@ -849,112 +849,6 @@ private:
 
 version(unittest) static assert(isMpZExpr!MpZ);
 
-/// expression template types
-
-/// `MpZ`-`MpZ` adding expression.
-struct MpzAdd(T1, T2)
-    if (isMpZExpr!T1 &&
-        isMpZExpr!T2)
-{
-    T1 t1;                      // first term
-    T2 t2;                     // second term
-    /// Returns: evaluation of `this` expression.
-    pragma(inline, true) MpZ eval() const { return t1.eval() + t2.eval(); }
-}
-version(unittest) static assert(isMpZExpr!(MpzAdd!(MpZ, MpZ)));
-
-/// `MpZ`-`MpZ` subtraction expression.
-struct MpzSub(T1, T2)
-    if (isMpZExpr!T1 &&
-        isMpZExpr!T2)
-{
-    T1 t1;                      // first term
-    T2 t2;                      // second term
-    /// Returns: evaluation of `this` expression.
-    pragma(inline, true) MpZ eval() const { return t1.eval() - t2.eval(); }
-}
-version(unittest) static assert(isMpZExpr!(MpzSub!(MpZ, MpZ)));
-
-/// `MpZ`-`MpZ` multiplication expression.
-struct MpzMul(F1, F2)
-    if (isMpZExpr!F1 &&
-        isMpZExpr!F2)
-{
-    F1 f1;                      // first factor
-    F2 f2;                      // second factor
-    /// Returns: evaluation of `this` expression.
-    pragma(inline, true) MpZ eval() const { return f1.eval() * f2.eval(); }
-}
-version(unittest) static assert(isMpZExpr!(MpzMul!(MpZ, MpZ)));
-
-/// `MpZ`-`MpZ` division expression.
-struct MpzDiv(P, Q)
-    if (isMpZExpr!P &&
-        isMpZExpr!Q)
-{
-    P dsor;                     // divisor
-    Q dend;                     // dividend
-    /// Returns: evaluation of `this` expression.
-    pragma(inline, true) MpZ eval() const { return dsor.eval() / dend.eval(); }
-}
-version(unittest) static assert(isMpZExpr!(MpzDiv!(MpZ, MpZ)));
-
-/// `MpZ`-`MpZ` modulus expression.
-struct MpzMod(P, Q)
-    if (isMpZExpr!P &&
-        isMpZExpr!Q)
-{
-    P dsor;                     // divisor
-    Q dend;                     // dividend
-    /// Returns: evaluation of `this` expression.
-    pragma(inline, true) MpZ eval() const { return dsor.eval() % dend.eval(); }
-}
-version(unittest) static assert(isMpZExpr!(MpzMod!(MpZ, MpZ)));
-
-/// `MpZ`-`ulong` power expression.
-struct MpzPowU(P, Q)
-    if (isMpZExpr!P &&
-        isUnsigned!Q)
-{
-    P base;                     // base
-    Q exp;                      // exponent
-    /// Returns: evaluation of `this` expression.
-    pragma(inline, true) MpZ eval() const { return base.eval() ^^ exp; }
-}
-version(unittest) static assert(isMpZExpr!(MpzPowU!(MpZ, ulong)));
-
-/// `MpZ`-`ulong`-`MpZ` power-modulo expression.
-struct MpzPowM(P, Q, M)
-    if (isMpZExpr!P &&
-        isUnsigned!Q &&
-        isMpZExpr!M)
-{
-    P base;                     // base
-    Q exp;                      // exponent
-    M mod;                      // modulo
-    /// Returns: evaluation of `this` expression.
-    pragma(inline, true) MpZ eval() const { return base.powm(exp, mod); }
-}
-version(unittest) static assert(isMpZExpr!(MpzPowM!(MpZ, ulong, MpZ)));
-
-/// `MpZ` negation expression.
-struct MpzNeg(A)
-    if (isMpZExpr!A)
-{
-    A arg;
-    /// Returns: evaluation of `this` expression.
-    pragma(inline, true) MpZ eval()
-    {
-        arg.negate();
-        return move(arg);       // TODO remove `move` when compiler does it for us
-    }
-}
-version(unittest) static assert(isMpZExpr!(MpzNeg!(MpZ)));
-
-@safe pure nothrow @nogc unittest
-{
-}
-
 pure nothrow pragma(inline, true):
 
 /** Instantiator for `MpZ`. */
@@ -1657,6 +1551,112 @@ pure unittest
         }
         assert(found);
     }
+}
+
+/// expression template types
+
+/// `MpZ`-`MpZ` adding expression.
+struct MpzAdd(T1, T2)
+    if (isMpZExpr!T1 &&
+        isMpZExpr!T2)
+{
+    T1 t1;                      // first term
+    T2 t2;                     // second term
+    /// Returns: evaluation of `this` expression.
+    pragma(inline, true) MpZ eval() const { return t1.eval() + t2.eval(); }
+}
+version(unittest) static assert(isMpZExpr!(MpzAdd!(MpZ, MpZ)));
+
+/// `MpZ`-`MpZ` subtraction expression.
+struct MpzSub(T1, T2)
+    if (isMpZExpr!T1 &&
+        isMpZExpr!T2)
+{
+    T1 t1;                      // first term
+    T2 t2;                      // second term
+    /// Returns: evaluation of `this` expression.
+    pragma(inline, true) MpZ eval() const { return t1.eval() - t2.eval(); }
+}
+version(unittest) static assert(isMpZExpr!(MpzSub!(MpZ, MpZ)));
+
+/// `MpZ`-`MpZ` multiplication expression.
+struct MpzMul(F1, F2)
+    if (isMpZExpr!F1 &&
+        isMpZExpr!F2)
+{
+    F1 f1;                      // first factor
+    F2 f2;                      // second factor
+    /// Returns: evaluation of `this` expression.
+    pragma(inline, true) MpZ eval() const { return f1.eval() * f2.eval(); }
+}
+version(unittest) static assert(isMpZExpr!(MpzMul!(MpZ, MpZ)));
+
+/// `MpZ`-`MpZ` division expression.
+struct MpzDiv(P, Q)
+    if (isMpZExpr!P &&
+        isMpZExpr!Q)
+{
+    P dsor;                     // divisor
+    Q dend;                     // dividend
+    /// Returns: evaluation of `this` expression.
+    pragma(inline, true) MpZ eval() const { return dsor.eval() / dend.eval(); }
+}
+version(unittest) static assert(isMpZExpr!(MpzDiv!(MpZ, MpZ)));
+
+/// `MpZ`-`MpZ` modulus expression.
+struct MpzMod(P, Q)
+    if (isMpZExpr!P &&
+        isMpZExpr!Q)
+{
+    P dsor;                     // divisor
+    Q dend;                     // dividend
+    /// Returns: evaluation of `this` expression.
+    pragma(inline, true) MpZ eval() const { return dsor.eval() % dend.eval(); }
+}
+version(unittest) static assert(isMpZExpr!(MpzMod!(MpZ, MpZ)));
+
+/// `MpZ`-`ulong` power expression.
+struct MpzPowU(P, Q)
+    if (isMpZExpr!P &&
+        isUnsigned!Q)
+{
+    P base;                     // base
+    Q exp;                      // exponent
+    /// Returns: evaluation of `this` expression.
+    pragma(inline, true) MpZ eval() const { return base.eval() ^^ exp; }
+}
+version(unittest) static assert(isMpZExpr!(MpzPowU!(MpZ, ulong)));
+
+/// `MpZ`-`ulong`-`MpZ` power-modulo expression.
+struct MpzPowM(P, Q, M)
+    if (isMpZExpr!P &&
+        isUnsigned!Q &&
+        isMpZExpr!M)
+{
+    P base;                     // base
+    Q exp;                      // exponent
+    M mod;                      // modulo
+    /// Returns: evaluation of `this` expression.
+    pragma(inline, true) MpZ eval() const { return base.powm(exp, mod); }
+}
+version(unittest) static assert(isMpZExpr!(MpzPowM!(MpZ, ulong, MpZ)));
+
+/// `MpZ` negation expression.
+struct MpzNeg(A)
+    if (isMpZExpr!A)
+{
+    A arg;
+    /// Returns: evaluation of `this` expression.
+    pragma(inline, true) MpZ eval()
+    {
+        arg.negate();
+        return move(arg);       // TODO remove `move` when compiler does it for us
+    }
+}
+version(unittest) static assert(isMpZExpr!(MpzNeg!(MpZ)));
+
+@safe pure nothrow @nogc unittest
+{
 }
 
 /// Copied from `std.numeric` to prevent unnecessary Phobos deps.
