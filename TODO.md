@@ -44,3 +44,33 @@
   - `x = x + y * z` => `mpz_addmul(x, y, z)`
   - lots more...
   - `toString`, `opCast` should probably evaluate and cache result
+
+- Define a tagged union on top of `__mpz_struct` together with a `ucent` minus
+  on bit. Similar to the small {array|vector} optimization used in C++
+  libraries. If value is <= `2^^(64-1)-1` it fits in the non-heap allocated
+  small value.
+
+- [Code generation](http://forum.dlang.org/post/wyduglxwbxmfcgwtczra@forum.dlang.org) via something like
+
+```D
+ulong a = 27, b = 84, c = 110, d = 133;
+compileGMP!"Integer res = a ^^ 5 + b ^^ 5 + c ^^ 5 + d ^^ 5"();
+```
+
+might generate the code
+
+
+```
+Integer res, r2; // r2 used as a register of sorts (minimise allocation of Integers)
+mpz_init(res); mpz_init(r2);
+
+mpz_ui_pow_ui(res, a, 5);
+mpz_ui_pow_ui(r2, b, 5);
+mpz_add(res, res, r2);
+
+mpz_ui_pow_ui(res, c 5);
+mpz_add(res, res, r2);
+
+mpz_ui_pow_ui(r2, d, 5);
+mpz_add(res, res, r2);
+```
