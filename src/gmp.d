@@ -35,7 +35,7 @@ struct MpZ(Eval eval = Eval.direct)
 
     @trusted pure nothrow pragma(inline, true):
 
-    /// Convert to string in base `base`.
+    /// Convert to `string` in base `base`.
     string toString(int base = defaultBase, bool upperCaseDigits = false) const
     {
         assert(base >= -2 && base <= -36 ||
