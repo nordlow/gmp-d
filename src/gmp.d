@@ -1585,7 +1585,7 @@ enum IdentifierStringOfSymbol(alias sym) = __traits(identifier, sym);
     struct S { int x, y; }
     static void f()(auto ref const S s)
     {
-        pragma(msg, "isRef:", __traits(isRef, s),
+        pragma(msg, "isRef:", isRef!s,
                " typeof(s)", typeof(s));
     }
     f(S.init);
