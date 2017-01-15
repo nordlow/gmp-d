@@ -755,7 +755,7 @@ struct MpZ(Eval eval = Eval.direct)
         return _z._mp_size == 0; // fast
     }
 
-    /// Check if `this` is odd.
+    /// Check if `this` is odd. TODO use as specialcase in: this & 1
     @property bool isOdd() const
     {
         return (_z._mp_size != 0) & cast(int)(_z._mp_d[0]); // fast C macro `mpz_odd_p` in gmp.h
@@ -767,7 +767,7 @@ struct MpZ(Eval eval = Eval.direct)
         return !isOdd;            // fast C macro `mpz_even_p` in gmp.h
     }
 
-    /// Check if `this` is negative.
+    /// Check if `this` is negative. TODO use as specialcase in opCmp
     @property bool isNegative() const
     {
         return _z._mp_size < 0; // fast
