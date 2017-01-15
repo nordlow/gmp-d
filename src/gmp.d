@@ -205,23 +205,56 @@ struct MpZ(Eval eval = Eval.direct)
 
     // TODO use one common definition for all `Integral`
     /// ditto
-    bool opEquals(long rhs) const { return __gmpz_cmp_si(_ptr, rhs) == 0; }
+    bool opEquals(long rhs) const
+    {
+        if (rhs == 0)
+            return isZero;
+        else
+            return __gmpz_cmp_si(_ptr, rhs) == 0;
+    }
     /// ditto
-    bool opEquals(ulong rhs) const { return __gmpz_cmp_ui(_ptr, rhs) == 0; }
+    bool opEquals(ulong rhs) const
+    {
+        if (rhs == 0)
+            return isZero;
+        else
+            return __gmpz_cmp_ui(_ptr, rhs) == 0;
+    }
     /// ditto
-    bool opEquals(int rhs) const { return opEquals(cast(long)rhs); }
+    bool opEquals(int rhs) const
+    {
+        if (rhs == 0)
+            return isZero;
+        else
+            return opEquals(cast(long)rhs);
+    }
     /// ditto
-    bool opEquals(uint rhs) const { return opEquals(cast(ulong)rhs); }
+    bool opEquals(uint rhs) const
+    {
+        if (rhs == 0)
+            return isZero;
+        else
+            return opEquals(cast(ulong)rhs);
+    }
 
     /// ditto
-    bool opEquals(double rhs) const { return __gmpz_cmp_d(_ptr, rhs) == 0; }
+    bool opEquals(double rhs) const
+    {
+        if (rhs == 0)
+            return isZero;
+        else
+            return __gmpz_cmp_d(_ptr, rhs) == 0;
+    }
 
     /// Compare `this` to `rhs`.
     int opCmp()(auto ref const MpZ rhs) const { return __gmpz_cmp(_ptr, rhs._ptr); }
 
     // TODO use one common definition for all `Integral`
     /// ditto
-    int opCmp(long rhs) const { return __gmpz_cmp_si(_ptr, rhs); }
+    int opCmp(long rhs) const
+    {
+        return __gmpz_cmp_si(_ptr, rhs);
+    }
     /// ditto
     int opCmp(ulong rhs) const { return __gmpz_cmp_ui(_ptr, rhs); }
     /// ditto
