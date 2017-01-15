@@ -829,7 +829,7 @@ MpZ!eval mpz(Eval eval = Eval.direct, Args...)(Args args) @safe @nogc
 
 /// Swap contents of `x` with contents of `y`.
 void swap(Eval evalX, Eval evalY)(ref MpZ!evalX x,
-                                  ref MpZ!evalY y) @trusted @nogc
+                                  ref MpZ!evalY y) @nogc
 {
     import std.algorithm.mutation : swap;
     swap(x, y); // x.swap(y);
