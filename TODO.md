@@ -6,7 +6,13 @@
 
 - Merge my `Integer` struct with https://github.com/andrew-m-h/libgmp/blob/master/source/deimos/gmp/operators.d
 
-- Is Natural/Integer/Rational (N,Z,Q) or Big{Nat,Int,Rat} preferred?
+- Define mp{z,q,f}-function wrappers for Mp{Z,Q,F} class.
+
+- Is for
+  - `MpZ`, `MpQ`, `MpF`,
+  - `Natural`/`Integer`/`Rational`,
+  - (`N`,`Z`,``Q`,`F``) or
+  - Big{Nat,Int,Rat,Flt,Float} preferred?
 
 - Find out if `__gmpz_init` function is same zeroing shallow zeroing of struct
 `Integer`. If so only default constructor can be activated.
