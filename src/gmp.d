@@ -1556,7 +1556,7 @@ pure unittest
 /// expression template types
 
 /// `MpZ`-`MpZ` adding expression.
-struct MpzAdd2(T1, T2)
+struct MpzAdd(T1, T2)
     if (isMpZExpr!T1 &&
         isMpZExpr!T2)
 {
@@ -1565,10 +1565,10 @@ struct MpzAdd2(T1, T2)
     /// Returns: evaluation of `this` expression.
     pragma(inline, true) MpZ eval() const { return t1.eval() + t2.eval(); }
 }
-version(unittest) static assert(isMpZExpr!(MpzAdd2!(MpZ, MpZ)));
+version(unittest) static assert(isMpZExpr!(MpzAdd!(MpZ, MpZ)));
 
-/// Instantiate an add expression `MpzAdd2`.
-MpzAdd2!(T1, T2) add(T1, T2)(T1 t1, T2 t2)
+/// Instantiate an add expression `MpzAdd`.
+MpzAdd!(T1, T2) add(T1, T2)(T1 t1, T2 t2)
     if (isMpZExpr!T1 &&
         isMpZExpr!T2)
 {
