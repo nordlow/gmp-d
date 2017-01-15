@@ -38,8 +38,8 @@ struct MpZ(Eval eval = Eval.direct)
     /// Convert to `string` in base `base`.
     string toString(int base = defaultBase, bool upperCaseDigits = false) const
     {
-        assert(base >= -2 && base <= -36 ||
-               base >= 2 && base <= 62);
+        assert((base >= -2 && base <= -36) ||
+               (base >= 2 && base <= 62));
 
         immutable size = sizeInBase(base);
 
