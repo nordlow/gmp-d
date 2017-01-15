@@ -22,7 +22,7 @@ Delayed evaluation via expression templates (`Eval.delayed`) is planned.
 
 - Merge my `Integer` struct with https://github.com/andrew-m-h/libgmp/blob/master/source/deimos/gmp/operators.d
 
-- Define mp{z,q,f} C-function wrappers callable with refs to D-wrapper structs
+- Define `mp{z,q,f}` C-function wrappers callable with refs to D-wrapper structs
   (`MpZ`, `MpQ`, `MpF`).
 
 - Is for
