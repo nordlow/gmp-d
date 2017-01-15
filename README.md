@@ -84,9 +84,9 @@ Implementation is optimized through
   - `toString`, `opCast` should probably evaluate and cache result
 
 - Define a tagged union on top of `__mpz_struct` together with a `ucent` minus
-  on bit. Similar to the small {array|vector} optimization used in C++
-  libraries. If value is <= `2^^(64-1)-1` it fits in the non-heap allocated
-  small value.
+  one discriminator bit. Similar to the small {array|vector} optimization used
+  in C++ libraries. If value is <= `2^^(64-1)-1` it fits in the non-heap
+  allocated small value.
 
 - [Code generation](http://forum.dlang.org/post/wyduglxwbxmfcgwtczra@forum.dlang.org) via something like
 
