@@ -1,6 +1,6 @@
 # gmp-d
 
-## Abstract
+## Overview
 
 D-language high-level wrapper for GNU MP (GMP) library that aims to be
 compatible with `std.bigint.BigInt` and be`@safe pure nothrow @nogc`when
