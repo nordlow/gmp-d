@@ -1535,15 +1535,15 @@ enum isAbstractClass(T) = __traits(isAbstractClass, T);
 enum isFinalClass(T) = __traits(isFinalClass, T);
 enum isPOD(T) = __traits(isPOD, T);
 enum isNested(T) = __traits(isNested, T);
-enum isVirtualFunction(T) = __traits(isVirtualFunction, T);
-enum isVirtualMethod(T) = __traits(isVirtualMethod, T);
-enum isAbstractFunction(T) = __traits(isAbstractFunction, T);
-enum isFinalFunction(T) = __traits(isFinalFunction, T);
-enum isOverrideFunction(T) = __traits(isOverrideFunction, T);
-enum isStaticFunction(T) = __traits(isStaticFunction, T);
-enum isTemplate(T) = __traits(isTemplate, T);
+enum isVirtualFunction(alias fn) = __traits(isVirtualFunction, fn);
+enum isVirtualMethod(alias m) = __traits(isVirtualMethod, m);
+enum isAbstractFunction(alias fn) = __traits(isAbstractFunction, fn);
+enum isFinalFunction(alias fn) = __traits(isFinalFunction, fn);
+enum isOverrideFunction(alias fn) = __traits(isOverrideFunction, fn);
+enum isStaticFunction(alias fn) = __traits(isStaticFunction, fn);
+enum isTemplate(alias sym) = __traits(isTemplate, sym);
 enum hasMember(T, string member) = __traits(hasMember, T, member);
-enum Identifier(alias symbol) = __traits(symbol);
+enum IdentifierStringOfSymbol(alias sym) = __traits(identifier, sym);
 
 version(unittest)
 {
