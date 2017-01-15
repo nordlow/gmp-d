@@ -1553,11 +1553,11 @@ pure unittest
     }
 }
 
-// utility
+/// Copied from `std.numeric` to prevent unnecessary Phobos deps.
 T _integralAbs(T)(T x)
     if (isIntegral!T)
 {
-    return x>=0 ? x : -x;
+    return x >= 0 ? x : -x;
 }
 
 // Faster than `std.traits`, TODO into `std.traits`
