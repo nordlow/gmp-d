@@ -852,11 +852,20 @@ private:
 struct MpzAdd
 {
     MpZ t1;                     // first term
-    MpZ t2;                     // second
-    MpZ eval()
-    {
-        return t1/t2;
-    }
+    MpZ t2;                     // second term
+    pure nothrow pragma(inline, true) @nogc:
+    /// Returns: evaluation of `this` expression.
+    MpZ eval() const { return t1 + t2; }
+}
+
+/// `MpZ`-`MpZ` subtraction expression.
+struct MpzSub
+{
+    MpZ t1;                     // first term
+    MpZ t2;                     // second term
+    pure nothrow pragma(inline, true) @nogc:
+    /// Returns: evaluation of `this` expression.
+    MpZ eval() const { return t1 - t2; }
 }
 
 /// `MpZ`-`MpZ` multiplication expression.
@@ -864,6 +873,9 @@ struct MpzMul
 {
     MpZ f1;                     // first factor
     MpZ f2;                     // second factor
+    pure nothrow pragma(inline, true) @nogc:
+    /// Returns: evaluation of `this` expression.
+    MpZ eval() const { return f1*f2; }
 }
 
 /// `MpZ`-`MpZ` division expression.
@@ -871,6 +883,9 @@ struct MpzDiv
 {
     MpZ dsor;                   // divisor
     MpZ dend;                   // dividend
+    pure nothrow pragma(inline, true) @nogc:
+    /// Returns: evaluation of `this` expression.
+    MpZ eval() const { return dsor/dend; }
 }
 
 /// `MpZ`-`MpZ` modulus expression.
@@ -878,19 +893,18 @@ struct MpzMod
 {
     MpZ dsor;                   // divisor
     MpZ dend;                   // dividend
-}
-
-/// `MpZ`-`MpZ` power expression.
-struct MpzPow
-{
-    MpZ base;                   // base
-    MpZ exp;                    // exponent
+    pure nothrow pragma(inline, true) @nogc:
+    /// Returns: evaluation of `this` expression.
+    MpZ eval() const { return dsor%dend; }
 }
 
 /// `MpZ`-`MpZ` negation expression.
 struct MpzNeg
 {
     MpZ arg;
+    pure nothrow pragma(inline, true) @nogc:
+    /// Returns: evaluation of `this` expression.
+    MpZ eval() const { return -arg; }
 }
 
 pure nothrow pragma(inline, true):
