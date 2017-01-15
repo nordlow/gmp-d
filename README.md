@@ -10,7 +10,7 @@ Implementation is highly optimized through
 
 - mapping of GMP's C macros into D inline functions
 
-- passing of struct arguments as `auto ref const`
+- passing of `MpZ`-typed parameters as `auto ref const`
 
 Delayed evaluation via expression templates (`Eval.delayed`) is planned.
 
