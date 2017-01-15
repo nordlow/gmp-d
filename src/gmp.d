@@ -188,7 +188,7 @@ struct MpZ(Eval eval = Eval.direct)
     */
     ref MpZ fromString(in string rhs, int base = 0) return // TODO DIP-1000 scope
     {
-        assert(base == 0 || base >= 2 && base <= 62);
+        assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(rhs);
         immutable int status = __gmpz_set_str(_ptr, stringz, base);
         qualifiedFree(stringz);
