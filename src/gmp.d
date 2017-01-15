@@ -4,7 +4,7 @@
 module gmp;
 
 debug import core.stdc.stdio : printf;
-import std.typecons : Unsigned;
+import std.typecons : Unsigned, Unqual;
 
 /// Call unittests taking long to execute.
 enum unittestLong = false;
@@ -30,8 +30,6 @@ enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
  */
 struct MpZ
 {
-    import std.typecons : Unqual;
-
     /// Default conversion base.
     private enum defaultBase = 10;
 
@@ -797,6 +795,8 @@ struct MpZ
         assert(false, "TODO use mpz_size");
     }
 
+    ref inout(MpZ) eval() inout return { return this; }
+
 private:
 
     /// Type of limb in internal representation.
@@ -849,8 +849,13 @@ private:
 }
 
 /// Is `true` if type `T` can be evaluated to a `MpZ` value.
-bool isMpZExpr(T) = (__traits(hasMember, T, "eval") &&
-                     is(typeof(T.eval()) == MpeZ));
+enum isMpZExpr(T) = (__traits(hasMember, T, "eval") &&
+                     is(Unqual!(typeof(T.eval())) == MpZ));
+
+@safe pure nothrow @nogc unittest
+{
+    static assert(isMpZExpr!MpZ);
+}
 
 /// expression template types
 
