@@ -876,7 +876,7 @@ Unsigned!T absUnsign(T, Eval eval)(auto ref const MpZ!eval x) // for `std.bigint
 }
 
 /// Returns: absolute value of `x`.
-MpZ!eval abs(Eval eval)(const ref MpZ!eval x) @trusted @nogc
+MpZ!eval abs(Eval eval)(auto ref const MpZ!eval x) @trusted @nogc
 {
     typeof(return) y = null;
     __gmpz_abs(y._ptr, x._ptr);
@@ -1578,6 +1578,20 @@ enum isLazy(alias fn) = __traits(isLazy, fn);
 enum isTemplate(alias sym) = __traits(isTemplate, sym);
 enum hasMember(T, string member) = __traits(hasMember, T, member);
 enum IdentifierStringOfSymbol(alias sym) = __traits(identifier, sym);
+
+// @safe pure nothrow @nogc unittest
+// {
+//     struct S { int x, y; }
+//     static f(in S s)
+//     {
+//     }
+//     static f(const ref S s)
+//     {
+//     }
+//     f(S.init);
+//     S s;
+//     f(s);
+// }
 
 version(unittest)
 {
