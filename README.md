@@ -12,11 +12,16 @@ Implementation is highly optimized through
 
 - passing of `MpZ`-typed parameters as `auto ref const`
 
-Delayed evaluation via expression templates (`Eval.delayed`) is planned.
 
 ## TODO list (in order of priority)
 
 - Compare my solution with `std.bigint`
+
+  - Delayed evaluation via expression templates (`Eval.delayed`) is
+    planned. Evaluation can kick in automatically for r-value parameters (using
+    `__traits(isRef!Param)`). See [this thread](http://forum.dlang.org/post/boorcxnmtatrncrclimp@forum.dlang.org).
+  - Copy-on-write (COW) `RefCounted` data store. Optionally with specialized
+  heap-allocator for `MpZ` type (16-bytes).
 
 - Use https://github.com/andrew-m-h/libgmp/tree/master/source/deimos/gmp instead of my own extern(C) definitions
 
