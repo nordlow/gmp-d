@@ -165,17 +165,21 @@ struct MpZ(Eval eval = Eval.direct)
         return this;
     }
     /// ditto
-    ref MpZ opAssign(Unsigned)(Unsigned rhs)
-        if (isUnsigned!Unsigned)
+    ref MpZ opAssign(Integral)(Integral rhs)
+        if (isIntegral!Integral)
     {
-        __gmpz_set_ui(_ptr, rhs);
-        return this;
-    }
-    /// ditto
-    ref MpZ opAssign(Signed)(Signed rhs)
-        if (isSigned!Signed)
-    {
-        __gmpz_set_si(_ptr, rhs);
+        static if (isUnsigned!Integral)
+        {
+            __gmpz_set_ui(_ptr, rhs);
+        }
+        else static if (isSigned!Integral)
+        {
+            __gmpz_set_si(_ptr, rhs);
+        }
+        else
+        {
+            static assert(false);
+        }
         return this;
     }
     /// ditto
