@@ -6,7 +6,7 @@ D-language high-level wrapper for [GNU MP (GMP) library](https://gmplib.org/)
 that aims to be compatible with `std.bigint.BigInt` and be`@safe pure nothrow
 @nogc`when possible.
 
-Implementation is highly optimized through
+Implementation is optimized through
 
 - mapping of GMP's C macros into D inline functions
 
