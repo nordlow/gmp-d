@@ -848,21 +848,27 @@ private:
     }
 }
 
+/// Is `true` if type `T` can be evaluated to a `MpZ` value.
+bool isMpZExpr(T) = (__traits(hasMember, T, "eval") &&
+                     is(typeof(T.eval()) == MpeZ));
+
+/// expression template types
+
 /// `MpZ`-`MpZ` adding expression.
-struct MpzAdd
+struct MpzAdd(T1, T2)
 {
-    MpZ t1;                     // first term
-    MpZ t2;                     // second term
+    T1 t1;                      // first term
+    T2 t2;                     // second term
     pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
     MpZ eval() const { return t1 + t2; }
 }
 
 /// `MpZ`-`MpZ` subtraction expression.
-struct MpzSub
+struct MpzSub(T1, T2)
 {
-    MpZ t1;                     // first term
-    MpZ t2;                     // second term
+    T1 t1;                      // first term
+    T2 t2;                      // second term
     pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
     MpZ eval() const { return t1 - t2; }
