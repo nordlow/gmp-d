@@ -1,4 +1,4 @@
-# gmp-d
+snegea# gmp-d
 
 ## Overview
 
@@ -73,9 +73,13 @@ Implementation is highly optimized through
 - Lazy evaluation
   via [expression templates](https://en.wikipedia.org/wiki/Expression_templates)
   (when `gmp.Evaluation` is `direct`)
-  - `x = -x` => Assign(x, Neg(x)) => `x.negate()` (if compiler doesn't already rewrite this)
-  - `x *= -1` => x.negeate()
+  - `x = -x`        => Assign(x, Neg(x)) => `x.negate()` (if compiler doesn't already rewrite this)
+  - `x *= -1`       => `mpz_neg(x, x)` => `x.negate()`
+  - `x -= 2*x`      => `mpz_neg(x, x)` => `x.negate()`
+  - `x = y + z`     => `mpz_add(x, y, z)`
+  - `z = a*x + b*y` => `mpz_add(x, y, z)`
   - `x = x + y * z` => `mpz_addmul(x, y, z)`
+  - `x = x ^ y % z` => `mpz_powm(x, x, y, z)`
   - lots more...
   - `toString`, `opCast` should probably evaluate and cache result
 
