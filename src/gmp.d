@@ -6,7 +6,9 @@ module gmp;
 debug import core.stdc.stdio : printf;
 import std.typecons : Unsigned;
 
+/// Call unittests taking long to execute.
 enum unittestLong = false;
+
 version = unittestPhobos;
 
 /** Evaluation Policy. */
