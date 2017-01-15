@@ -16,8 +16,8 @@ version = unittestPhobos;
 enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
 
 /// Is `true` if type `T` can be evaluated to a `MpZ` value.
-enum isMpZExpr(T) = (__traits(hasMember, T, "eval") &&
-                     is(Unqual!(typeof(T.eval())) == MpZ));
+enum isMpZExpr(T) = (__traits(hasMember, T, "eval") && // has member `eval()`
+                     is(Unqual!(typeof(T.eval())) == MpZ)); // which returns an `MpZ`
 
 // TODO use these imports instead of the ones below
 // import deimos.gmp.gmp;
@@ -942,15 +942,18 @@ struct MpzNeg(A)
     if (isMpZExpr!A)
 {
     A arg;
-    pure nothrow pragma(inline, true) @nogc:
     /// Returns: evaluation of `this` expression.
-    MpZ eval()
+    pragma(inline, true) MpZ eval()
     {
         arg.negate();
         return move(arg);       // TODO remove `move` when compiler does it for us
     }
 }
 version(unittest) static assert(isMpZExpr!(MpzNeg!(MpZ)));
+
+@safe pure nothrow @nogc unittest
+{
+}
 
 pure nothrow pragma(inline, true):
 
