@@ -1,4 +1,4 @@
-snegea# gmp-d
+# gmp-d
 
 ## Overview
 
