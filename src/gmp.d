@@ -1551,7 +1551,7 @@ T _integralAbs(T)(T x)
     return x>=0 ? x : -x;
 }
 
-// faster traits. TODO move to std.traits
+// Faster than `std.traits`, TODO into `std.traits`
 enum isArithmetic(T) = __traits(isArithmetic, T);
 enum isFloating(T) = __traits(isFloating, T);
 enum isFloatingPoint(T) = __traits(isFloating, T);
@@ -1579,19 +1579,19 @@ enum isTemplate(alias sym) = __traits(isTemplate, sym);
 enum hasMember(T, string member) = __traits(hasMember, T, member);
 enum IdentifierStringOfSymbol(alias sym) = __traits(identifier, sym);
 
-// @safe pure nothrow @nogc unittest
-// {
-//     struct S { int x, y; }
-//     static f(in S s)
-//     {
-//     }
-//     static f(const ref S s)
-//     {
-//     }
-//     f(S.init);
-//     S s;
-//     f(s);
-// }
+/// http://forum.dlang.org/post/llwrbirvlqxawifyytqq@forum.dlang.org
+@safe pure nothrow @nogc unittest
+{
+    struct S { int x, y; }
+    static void f()(auto ref const S s)
+    {
+        pragma(msg, "isRef:", __traits(isRef, s),
+               " typeof(s)", typeof(s));
+    }
+    f(S.init);
+    S s;
+    f(s);
+}
 
 version(unittest)
 {
