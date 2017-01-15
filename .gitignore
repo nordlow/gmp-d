@@ -10,3 +10,7 @@ __test__library__
 
 # library
 libgmp-d.a
+
+# core dumps
+core
+src/core
