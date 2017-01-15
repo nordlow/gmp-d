@@ -916,6 +916,19 @@ struct MpzMod(P, Q)
 }
 version(unittest) static assert(isMpZExpr!(MpzMod!(MpZ, MpZ)));
 
+/// `MpZ`-`ulong` power expression.
+struct MpzPow(P, Q)
+    if (isMpZExpr!P &&
+        isUnsigned!Q)
+{
+    P base;                     // base
+    Q exp;                      // exponent
+    pure nothrow pragma(inline, true) @nogc:
+    /// Returns: evaluation of `this` expression.
+    MpZ eval() const { return base.eval() ^^ exp; }
+}
+version(unittest) static assert(isMpZExpr!(MpzPow!(MpZ, ulong)));
+
 /// `MpZ` negation expression.
 struct MpzNeg(A)
     if (isMpZExpr!A)
