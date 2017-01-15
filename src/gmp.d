@@ -118,9 +118,12 @@ struct MpZ(Eval eval = Eval.direct)
         return typeof(this).pow(2UL, p) - 1;
     }
 
+    /// Use copy construction.
     enum useCopy = false;       // disable copy construction for now
+
     static if (useCopy)
     {
+        /// Construct copy of `value`.
         this()(auto ref const MpZ value)
         {
             mpz_init_set(_ptr, value._pt);
