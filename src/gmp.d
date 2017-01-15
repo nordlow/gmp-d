@@ -713,23 +713,23 @@ struct MpZ(Eval eval = Eval.direct)
     MpZ powm()(auto ref const MpZ power,
                auto ref const MpZ modulo) const
     {
-        typeof(return) rop = 0; // result
-        __gmpz_powm(rop._ptr,
+        typeof(return) y = 0; // result
+        __gmpz_powm(y._ptr,
                     _ptr,
                     power._ptr,
                     modulo._ptr);
-        return rop;
+        return y;
     }
     /// ditto
     MpZ powm()(ulong power,
                auto ref const MpZ modulo) const
     {
-        typeof(return) rop = 0;       // result
-        __gmpz_powm_ui(rop._ptr,
+        typeof(return) y = 0;       // result
+        __gmpz_powm_ui(y._ptr,
                        _ptr,
                        power,
                        modulo._ptr);
-        return rop;
+        return y;
     }
 
     /// Returns: absolute value of `this`.
