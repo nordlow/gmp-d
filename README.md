@@ -61,14 +61,14 @@ Implementation is highly optimized through
   - `mpf_init` (not thread-safe)
   - `mpf_inits` (not thread-safe, va_list wrapper)
   - `mpf_clears` (va_list wrapper)
-  - `mpf_swap` (no better than rust's swap)
+  - `mpf_swap` (no better than D's own `std.algorithm.swap`)
   - `mpf_set_prec_raw` (could be exposed with an unsafe function if needed)
   - `mpz_inits` (va_list wrapper)
   - `mpz_clears` (va_list wrapper)
-  - `mpz_swap` (no better than rust's swap)
+  - `mpz_swap` (no better than D's own `std.algorithm.swap`)
   - `mpq_inits` (va_list wrapper)
   - `mpq_clears` (va_list wrapper)
-  - `mpq_swap` (no better than rust's swap)
+  - `mpq_swap` (no better than D's own `std.algorithm.swap`)
 
 - Lazy evaluation
   via [expression templates](https://en.wikipedia.org/wiki/Expression_templates)
