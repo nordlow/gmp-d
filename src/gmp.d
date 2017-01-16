@@ -1723,7 +1723,10 @@ struct MpzAddExpr(T1, T2)
 {
     T1 e1;                      // first term
     T2 e2;                      // second term
-    pragma(inline, true) MpZ eval() const { return e1.eval() + e2.eval(); }
+    pragma(inline, true) MpZ eval() const
+    {
+        return e1.eval() + e2.eval();
+    }
 }
 version(unittest) static assert(isMpZExpr!(MpzAddExpr!(MpZ, MpZ)));
 
@@ -1741,7 +1744,10 @@ struct MpzSubExpr(T1, T2)
 {
     T1 e1;                      // first term
     T2 e2;                      // second term
-    pragma(inline, true) MpZ eval() const { return e1.eval() - e2.eval(); }
+    pragma(inline, true) MpZ eval() const
+    {
+        return e1.eval() - e2.eval();
+    }
 }
 version(unittest) static assert(isMpZExpr!(MpzSubExpr!(MpZ, MpZ)));
 
@@ -1759,7 +1765,10 @@ struct MpzMulExpr(F1, F2)
 {
     F1 e1;                      // first factor
     F2 e2;                      // second factor
-    pragma(inline, true) MpZ eval() const { return e1.eval() * e2.eval(); }
+    pragma(inline, true) MpZ eval() const
+    {
+        return e1.eval() * e2.eval();
+    }
 }
 version(unittest) static assert(isMpZExpr!(MpzMulExpr!(MpZ, MpZ)));
 
@@ -1777,7 +1786,10 @@ struct MpzDivExpr(P, Q)
 {
     P e1;                       // divisor
     Q e2;                       // dividend
-    pragma(inline, true) MpZ eval() const { return e1.eval() / e2.eval(); }
+    pragma(inline, true) MpZ eval() const
+    {
+        return e1.eval() / e2.eval();
+    }
 }
 version(unittest) static assert(isMpZExpr!(MpzDivExpr!(MpZ, MpZ)));
 
@@ -1796,7 +1808,10 @@ struct MpzModExpr(P, Q)
 {
     P e1;                       // divisor
     Q e2;                       // dividend
-    pragma(inline, true) MpZ eval() const { return e1.eval() % e2.eval(); }
+    pragma(inline, true) MpZ eval() const
+    {
+        return e1.eval() % e2.eval();
+    }
 }
 version(unittest) static assert(isMpZExpr!(MpzModExpr!(MpZ, MpZ)));
 
@@ -1814,7 +1829,10 @@ struct MpzPowUExpr(P, Q)
 {
     P e1;                       // base
     Q e2;                       // exponent
-    pragma(inline, true) MpZ eval() const { return e1.eval() ^^ e2; }
+    pragma(inline, true) MpZ eval() const
+    {
+        return e1.eval() ^^ e2;
+    }
 }
 version(unittest) static assert(isMpZExpr!(MpzPowUExpr!(MpZ, ulong)));
 
@@ -1827,7 +1845,10 @@ struct MpzPowMExpr(P, Q, M)
     P base;                     // base
     Q exp;                      // exponent
     M mod;                      // modulo
-    pragma(inline, true) MpZ eval() const { return base.powm(exp, mod); }
+    pragma(inline, true) MpZ eval() const
+    {
+        return base.powm(exp, mod);
+    }
 }
 version(unittest) static assert(isMpZExpr!(MpzPowMExpr!(MpZ, ulong, MpZ)));
 
