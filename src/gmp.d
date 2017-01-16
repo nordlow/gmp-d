@@ -1845,15 +1845,17 @@ struct MpzPowUExpr(P, Q)
     P e1;                       // base
     Q e2;                       // exponent
     pragma(inline, true)
-    MpZ eval() const
+    MpZ eval() const @trusted
     {
-        return e1.eval() ^^ e2;
+        typeof(return) y = null;
+        __gmpz_pow_ui(y._ptr, e1.eval()._ptr, e2);
+        return y;
     }
 }
 version(unittest) static assert(isMpZExpr!(MpzPowUExpr!(MpZ, ulong)));
 
 /// `MpZ`-`ulong`-`MpZ` power-modulo expression.
-struct MpzPowMExpr(P, Q, M)
+struct MpzPowMUExpr(P, Q, M)
     if (isMpZExpr!P &&
         isUnsigned!Q &&
         isMpZExpr!M)
@@ -1862,9 +1864,11 @@ struct MpzPowMExpr(P, Q, M)
     Q exp;                      // exponent
     M mod;                      // modulo
     pragma(inline, true)
-    MpZ eval() const
+    MpZ eval() const @trusted
     {
-        return base.powm(exp, mod);
+        typeof(return) y = null;
+        __gmpz_powm_ui(y._ptr, base.eval()._ptr, exp, mod._ptr);
+        return y;
     }
 }
 version(unittest) static assert(isMpZExpr!(MpzPowMExpr!(MpZ, ulong, MpZ)));
