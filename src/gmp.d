@@ -1760,7 +1760,7 @@ version(unittest) static assert(isMpZExpr!(MpzSubExpr!(MpZ, MpZ)));
 @safe @nogc unittest
 {
     assert(MpzSubExpr!(Z, Z)(3.Z, 4.Z).eval() == -1);
-    const Z x = MpzSubExpr!(Z, Z)(3.Z, 4.Z);    // lowers to `mpz_add`
+    const Z x = MpzSubExpr!(Z, Z)(3.Z, 4.Z);    // lowers to `mpz_sub`
     assert(x == -1);
 }
 
@@ -1809,7 +1809,7 @@ version(unittest) static assert(isMpZExpr!(MpzDivExpr!(MpZ, MpZ)));
 {
     assert(MpzDivExpr!(Z, Z)(27.Z, 3.Z).eval() == 9);
     assert(MpzDivExpr!(Z, Z)(28.Z, 3.Z).eval() == 9);
-    const Z x = MpzDivExpr!(Z, Z)(28.Z, 3.Z);    // lowers to `mpz_mul`
+    const Z x = MpzDivExpr!(Z, Z)(28.Z, 3.Z);    // lowers to `mpz_tdiv_q`
     assert(x == 9);
 }
 
@@ -1833,7 +1833,7 @@ version(unittest) static assert(isMpZExpr!(MpzModExpr!(MpZ, MpZ)));
 @safe @nogc unittest
 {
     assert(MpzModExpr!(Z, Z)(29.Z, 3.Z).eval() == 2);
-    const Z x = MpzModExpr!(Z, Z)(29.Z, 3.Z); // lowers to `mpz_mul`
+    const Z x = MpzModExpr!(Z, Z)(29.Z, 3.Z); // lowers to `mpz_tdiv_r`
     assert(x == 2);
 }
 
@@ -1891,7 +1891,7 @@ version(unittest) static assert(isMpZExpr!(MpzNegExpr!(MpZ)));
 @safe @nogc unittest
 {
     assert(MpzNegExpr!(Z)(27.Z).eval() == -27);
-    const Z x = MpzNegExpr!(Z)(27.Z);    // lowers to `mpz_mul`
+    const Z x = MpzNegExpr!(Z)(27.Z);    // lowers to `mpz_neg`
     assert(x == -27);
 }
 
