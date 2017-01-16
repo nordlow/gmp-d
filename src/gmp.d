@@ -1738,6 +1738,7 @@ MpzAddExpr!(T1, T2) add(T1, T2)(T1 e1, T2 e2)
 
 @safe @nogc unittest
 {
+    assert(MpzAddExpr!(Z, Z)(3.Z, 4.Z).eval() == 7);
     assert(add(3.Z, 4.Z).eval() == 7);
     assert(add(add(3.Z, 4.Z), 5.Z).eval() == 12);
     assert(add(add(3.Z, 4.Z), add(5.Z, 6.Z)).eval() == 18);
@@ -1766,6 +1767,7 @@ MpzSubExpr!(T1, T2) sub(T1, T2)(T1 e1, T2 e2)
 
 @safe @nogc unittest
 {
+    assert(MpzSubExpr!(Z, Z)(3.Z, 4.Z).eval() == -1);
     assert(sub(3.Z, 4.Z).eval() == -1);
     const Z x = sub(3.Z, 4.Z);    // lowers to `mpz_sub`
     assert(x == -1);
@@ -1792,6 +1794,7 @@ MpzMulExpr!(T1, T2) mul(T1, T2)(T1 e1, T2 e2)
 
 @safe @nogc unittest
 {
+    assert(MpzMulExpr!(Z, Z)(3.Z, 4.Z).eval() == 12);
     assert(mul(3.Z, 4.Z).eval() == 12);
     const Z x = mul(3.Z, 4.Z);    // lowers to `mpz_mul`
     assert(x == 12);
@@ -1818,7 +1821,9 @@ MpzDivExpr!(T1, T2) div(T1, T2)(T1 e1, T2 e2)
 
 @safe @nogc unittest
 {
+    assert(MpzDivExpr!(Z, Z)(28.Z, 3.Z).eval() == 9);
     assert(div(27.Z, 3.Z).eval() == 9);
+    assert(div(28.Z, 3.Z).eval() == 9);
     const Z x = div(27.Z, 3.Z);    // lowers to `mpz_mul`
     assert(x == 9);
 }
@@ -1844,6 +1849,7 @@ MpzModExpr!(T1, T2) mod(T1, T2)(T1 e1, T2 e2)
 
 @safe @nogc unittest
 {
+    assert(MpzModExpr!(Z, Z)(29.Z, 3.Z).eval() == 2);
     assert(mod(29.Z, 3.Z).eval() == 2);
     const Z x = mod(29.Z, 3.Z);    // lowers to `mpz_mul`
     assert(x == 2);
