@@ -496,6 +496,20 @@ struct MpZ
                 __gmpz_tdiv_q_ui(y._ptr, _ptr, rhs);
             }
         }
+        else static if (s == "%")
+        {
+            assert(rhs != 0, "Divison by zero");
+            if (rhs < 0)        // TODO handle `rhs == rhs.min`
+            {
+                immutable ulong pos_rhs = -rhs; // make it positive
+                __gmpz_tdiv_r_ui(y._ptr, _ptr, pos_rhs);
+                y.negate();     // negate result
+            }
+            else
+            {
+                __gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
+            }
+        }
         else static if (s == "^^")
         {
             assert(rhs >= 0, "TODO Negative power exponent needs MpQ return");
@@ -722,7 +736,7 @@ struct MpZ
     }
 
     ref MpZ opOpAssign(string s, Signed)(Signed rhs) return // TODO DIP-1000 scope
-        if ((s == "+" || s == "-" || s == "*" || s == "^^") &&
+        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isSigned!Signed)
     {
         static      if (s == "+")
@@ -761,6 +775,25 @@ struct MpZ
             {
                 __gmpz_mul_si(_ptr, _ptr, rhs);
             }
+        }
+        else static if (s == "/")
+        {
+            assert(rhs != 0, "Divison by zero");
+            if (rhs < 0)        // TODO handle `rhs == rhs.min`
+            {
+                immutable ulong pos_rhs = -rhs; // make it positive
+                __gmpz_tdiv_q_ui(_ptr, _ptr, pos_rhs);
+                negate();
+            }
+            else
+            {
+                __gmpz_tdiv_q_ui(_ptr, _ptr, rhs);
+            }
+        }
+        else static if (s == "%")
+        {
+            assert(rhs != 0, "Divison by zero");
+            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs);
         }
         else static if (s == "^^")
         {
@@ -1121,13 +1154,14 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     w *= 100;
     assert(w == 4200);
 
-    // TODO:
-    // w /= 100;
-    // assert(w == 42);
+    w /= 100;
+    assert(w == 42);
 
-    // TODO:
-    // w %= 10;
-    // assert(w == 2);
+    // w /= -100;
+    // assert(w == -42);
+
+    w %= 10;
+    assert(w == 2);
 
     w = 2;
     w ^^= 6;
