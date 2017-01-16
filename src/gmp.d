@@ -134,6 +134,7 @@ struct MpZ
         }
     }
 
+    /** Construct from `value`.
     // TODO make this work instead.
     // this(Integral)(Integral value)
     //     if (isIntegral!Integral)
@@ -145,8 +146,7 @@ struct MpZ
     //     else
     //         static assert(false);
     // }
-
-    /// Construct from `value`.
+     */
     this(long value) { __gmpz_init_set_si(_ptr, value); }
     /// ditto
     this(ulong value) { __gmpz_init_set_ui(_ptr, value); }
