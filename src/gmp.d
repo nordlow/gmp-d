@@ -861,6 +861,18 @@ struct MpZ
         return __gmpz_sizeinbase(_ptr, base);
     }
 
+    /// Returns: `true` iff `this` fits in a `T`.
+    bool fitsIn(Integral)() const
+        if (isIntegral!Integral)
+    {
+        static      if (is(T == ulong))  { return __gmpz_fits_ulong_p(_ptr); }
+        else static if (is(T ==  long))  { return __gmpz_fits_slong_p(_ptr); }
+        else static if (is(T ==  uint))  { return __gmpz_fits_uint_p(_ptr); }
+        else static if (is(T ==   int))  { return __gmpz_fits_sint_p(_ptr); }
+        else static if (is(T == ushort)) { return __gmpz_fits_ushort_p(_ptr); }
+        else static if (is(T ==  short)) { return __gmpz_fits_sshort_p(_ptr); }
+    }
+
     /// Check if `this` is zero.
     @property bool isZero() const
     {
@@ -2056,6 +2068,13 @@ extern(C)
     ulong __gmpz_get_ui (mpz_srcptr);
     long __gmpz_get_si (mpz_srcptr);
     double __gmpz_get_d (mpz_srcptr);
+
+    int __gmpz_fits_ulong_p(mpz_srcptr);
+    int __gmpz_fits_slong_p(mpz_srcptr);
+    int __gmpz_fits_uint_p(mpz_srcptr);
+    int __gmpz_fits_sint_p(mpz_srcptr);
+    int __gmpz_fits_ushort_p(mpz_srcptr);
+    int __gmpz_fits_sshort_p(mpz_srcptr);
 
     // TODO wrap:
     void __gmpz_root (mpz_ptr, mpz_srcptr, ulong);
