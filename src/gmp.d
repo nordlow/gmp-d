@@ -1048,19 +1048,47 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     const c = mpz(43.0);
     const z = mpz(0);
 
-    // opOpAssign
+    // `opOpAssign` with `Unsigned`
     auto w = mpz(42);
     assert(w == 42);
+
     w += 100UL;
     assert(w == 142);
+
     w -= 100UL;
     assert(w == 42);
+
     w *= 100UL;
     assert(w == 4200);
+
     w /= 100UL;
     assert(w == 42);
+
     w %= 10UL;
     assert(w == 2);
+
+    w ^^= 6UL;
+    assert(w == 64);
+
+    w = 42;
+    assert(w == 42);
+
+    w += 100;
+    assert(w == 142);
+
+    w -= 100;
+    assert(w == 42);
+
+    w *= 100;
+    assert(w == 4200);
+
+    // w /= 100;
+    // assert(w == 42);
+
+    // w %= 10;
+    // assert(w == 2);
+
+    w = 2;
     w ^^= 6UL;
     assert(w == 64);
 
