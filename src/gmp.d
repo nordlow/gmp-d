@@ -865,12 +865,16 @@ struct MpZ
     bool fitsIn(Integral)() const
         if (isIntegral!Integral)
     {
-        static      if (is(T == ulong))  { return __gmpz_fits_ulong_p(_ptr); }
-        else static if (is(T ==  long))  { return __gmpz_fits_slong_p(_ptr); }
-        else static if (is(T ==  uint))  { return __gmpz_fits_uint_p(_ptr); }
-        else static if (is(T ==   int))  { return __gmpz_fits_sint_p(_ptr); }
-        else static if (is(T == ushort)) { return __gmpz_fits_ushort_p(_ptr); }
-        else static if (is(T ==  short)) { return __gmpz_fits_sshort_p(_ptr); }
+        static      if (is(Integral == ulong))  { return __gmpz_fits_ulong_p(_ptr) != 0; }
+        else static if (is(Integral ==  long))  { return __gmpz_fits_slong_p(_ptr) != 0; }
+        else static if (is(Integral ==  uint))  { return __gmpz_fits_uint_p(_ptr) != 0; }
+        else static if (is(Integral ==   int))  { return __gmpz_fits_sint_p(_ptr) != 0; }
+        else static if (is(Integral == ushort)) { return __gmpz_fits_ushort_p(_ptr) != 0; }
+        else static if (is(Integral ==  short)) { return __gmpz_fits_sshort_p(_ptr) != 0; }
+        else
+        {
+            static assert(false, "Unsupported type " ~ Integral.stringof);
+        }
     }
 
     /// Check if `this` is zero.
@@ -1408,6 +1412,24 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(!mpz( 2).isZero);
     assert(!mpz(int.max).isZero);
     assert(!mpz(long.max).isZero);
+
+    // fits in type
+
+    assert(mpz(long.min).fitsIn!long);
+    assert(mpz(long.max).fitsIn!long);
+    assert(mpz(ulong.min).fitsIn!ulong);
+    assert(mpz(ulong.max).fitsIn!ulong);
+
+    assert(mpz(int.min).fitsIn!int);
+    assert(mpz(int.max).fitsIn!int);
+    assert(mpz(uint.min).fitsIn!uint);
+    assert(mpz(uint.max).fitsIn!uint);
+
+    // TODO
+    // assert(mpz(short.min).fitsIn!short);
+    // assert(mpz(short.max).fitsIn!short);
+    // assert(mpz(ushort.min).fitsIn!ushort);
+    // assert(mpz(ushort.max).fitsIn!ushort);
 
     // internal limb count
 
