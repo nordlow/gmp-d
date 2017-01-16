@@ -1048,6 +1048,20 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     const c = mpz(43.0);
     const z = mpz(0);
 
+    // opOpAssign
+    auto w = mpz(42);
+    assert(w == 42);
+    w += 100UL;
+    assert(w == 142);
+    w -= 100UL;
+    assert(w == 42);
+    w *= 100UL;
+    assert(w == 4200);
+    w /= 100UL;
+    assert(w == 42);
+    w %= 10UL;
+    assert(w == 2);
+
     // equality
     assert(z == 0);
     assert(z == cast(uint)0);
