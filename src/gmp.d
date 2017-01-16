@@ -1082,14 +1082,16 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     w *= 100;
     assert(w == 4200);
 
+    // TODO:
     // w /= 100;
     // assert(w == 42);
 
+    // TODO:
     // w %= 10;
     // assert(w == 2);
 
     w = 2;
-    w ^^= 6UL;
+    w ^^= 6;
     assert(w == 64);
 
     // equality
