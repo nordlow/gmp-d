@@ -1738,16 +1738,16 @@ MpzAddExpr!(T1, T2) add(T1, T2)(T1 e1, T2 e2)
 
 @safe @nogc unittest
 {
-    assert(add(Z(3),
-               Z(4)).eval() == 7);
-    assert(add(add(Z(3),
-                   Z(4)),
-               Z(5)).eval() == 12);
-    assert(add(add(Z(3),
-                   Z(4)),
-               add(Z(5),
-                   Z(6))).eval() == 18);
-    const Z x = add(Z(3), Z(4));    // lowers to `mpz_add`
+    assert(add(3.Z,
+               4.Z).eval() == 7);
+    assert(add(add(3.Z,
+                   4.Z),
+               5.Z).eval() == 12);
+    assert(add(add(3.Z,
+                   4.Z),
+               add(5.Z,
+                   6.Z)).eval() == 18);
+    const Z x = add(3.Z, 4.Z);    // lowers to `mpz_add`
     assert(x == 7);
 }
 
@@ -1772,9 +1772,9 @@ MpzSubExpr!(T1, T2) sub(T1, T2)(T1 e1, T2 e2)
 
 @safe @nogc unittest
 {
-    assert(sub(Z(3),
-               Z(4)).eval() == -1);
-    const Z x = sub(Z(3), Z(4));    // lowers to `mpz_sub`
+    assert(sub(3.Z,
+               4.Z).eval() == -1);
+    const Z x = sub(3.Z, 4.Z);    // lowers to `mpz_sub`
     assert(x == -1);
 }
 
@@ -1799,8 +1799,8 @@ MpzMulExpr!(T1, T2) mul(T1, T2)(T1 e1, T2 e2)
 
 @safe @nogc unittest
 {
-    assert(mul(Z(3), Z(4)).eval() == 12);
-    const Z x = mul(Z(3), Z(4));    // lowers to `mpz_mul`
+    assert(mul(3.Z, 4.Z).eval() == 12);
+    const Z x = mul(3.Z, 4.Z);    // lowers to `mpz_mul`
     assert(x == 12);
 }
 
@@ -1814,6 +1814,21 @@ struct MpzDivExpr(P, Q)
     pragma(inline, true) MpZ eval() const { return e1.eval() / e2.eval(); }
 }
 version(unittest) static assert(isMpZExpr!(MpzDivExpr!(MpZ, MpZ)));
+
+/// Instantiate an div expression `MpzDivExpr`.
+MpzDivExpr!(T1, T2) div(T1, T2)(T1 e1, T2 e2)
+    if (isMpZExpr!T1 &&
+        isMpZExpr!T2)
+{
+    return typeof(return)(move(e1), move(e2)); // TODO remove `move` when compiler does it for us
+}
+
+@safe @nogc unittest
+{
+    assert(div(27.Z, 3.Z).eval() == 9);
+    const Z x = div(27.Z, 3.Z);    // lowers to `mpz_mul`
+    assert(x == 9);
+}
 
 /// `MpZ`-`MpZ` modulus expression.
 struct MpzModExpr(P, Q)
