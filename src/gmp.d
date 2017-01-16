@@ -496,20 +496,6 @@ struct MpZ
                 __gmpz_tdiv_q_ui(y._ptr, _ptr, rhs);
             }
         }
-        else static if (s == "%")
-        {
-            assert(rhs != 0, "Divison by zero");
-            if (rhs < 0)        // TODO handle `rhs == rhs.min`
-            {
-                immutable ulong pos_rhs = -rhs; // make it positive
-                __gmpz_tdiv_r_ui(y._ptr, _ptr, pos_rhs);
-                y.negate();     // negate result
-            }
-            else
-            {
-                __gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
-            }
-        }
         else static if (s == "^^")
         {
             assert(rhs >= 0, "TODO Negative power exponent needs MpQ return");
