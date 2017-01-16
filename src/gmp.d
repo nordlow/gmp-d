@@ -1738,15 +1738,9 @@ MpzAddExpr!(T1, T2) add(T1, T2)(T1 e1, T2 e2)
 
 @safe @nogc unittest
 {
-    assert(add(3.Z,
-               4.Z).eval() == 7);
-    assert(add(add(3.Z,
-                   4.Z),
-               5.Z).eval() == 12);
-    assert(add(add(3.Z,
-                   4.Z),
-               add(5.Z,
-                   6.Z)).eval() == 18);
+    assert(add(3.Z, 4.Z).eval() == 7);
+    assert(add(add(3.Z, 4.Z), 5.Z).eval() == 12);
+    assert(add(add(3.Z, 4.Z), add(5.Z, 6.Z)).eval() == 18);
     const Z x = add(3.Z, 4.Z);    // lowers to `mpz_add`
     assert(x == 7);
 }
@@ -1772,8 +1766,7 @@ MpzSubExpr!(T1, T2) sub(T1, T2)(T1 e1, T2 e2)
 
 @safe @nogc unittest
 {
-    assert(sub(3.Z,
-               4.Z).eval() == -1);
+    assert(sub(3.Z, 4.Z).eval() == -1);
     const Z x = sub(3.Z, 4.Z);    // lowers to `mpz_sub`
     assert(x == -1);
 }
@@ -1840,6 +1833,21 @@ struct MpzModExpr(P, Q)
     pragma(inline, true) MpZ eval() const { return e1.eval() % e2.eval(); }
 }
 version(unittest) static assert(isMpZExpr!(MpzModExpr!(MpZ, MpZ)));
+
+/// Instantiate an mod expression `MpzModExpr`.
+MpzModExpr!(T1, T2) mod(T1, T2)(T1 e1, T2 e2)
+    if (isMpZExpr!T1 &&
+        isMpZExpr!T2)
+{
+    return typeof(return)(move(e1), move(e2)); // TODO remove `move` when compiler does it for us
+}
+
+@safe @nogc unittest
+{
+    assert(mod(29.Z, 3.Z).eval() == 2);
+    const Z x = mod(29.Z, 3.Z);    // lowers to `mpz_mul`
+    assert(x == 2);
+}
 
 /// `MpZ`-`ulong` power expression.
 struct MpzPowUExpr(P, Q)
