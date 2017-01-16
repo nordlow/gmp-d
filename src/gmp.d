@@ -122,6 +122,11 @@ struct MpZ
                           expr.e1.eval()._ptr,
                           expr.e2.eval()._ptr);
         }
+        else static if (isInstanceOf!(MpzNegExpr, Expr))
+        {
+            __gmpz_neg(this._ptr,
+                       expr.e1.eval()._ptr);
+        }
         else
         {
             this = expr.eval();     // evaluate and move
