@@ -755,7 +755,7 @@ struct MpZ
         {
             if (rhs == -1)
             {
-                negate();
+                negate();       // optimization
             }
             else
             {
@@ -1143,8 +1143,14 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     w /= 100;
     assert(w == 42);
 
-    // w /= -100;
-    // assert(w == -42);
+    w *= 100;
+    assert(w == 4200);
+
+    w /= -100;
+    assert(w == -42);
+
+    w *= -1;
+    assert(w == 42);
 
     w %= 10;
     assert(w == 2);
