@@ -1871,7 +1871,7 @@ struct MpzPowMUExpr(P, Q, M)
         return y;
     }
 }
-version(unittest) static assert(isMpZExpr!(MpzPowMExpr!(MpZ, ulong, MpZ)));
+version(unittest) static assert(isMpZExpr!(MpzPowMUExpr!(MpZ, ulong, MpZ)));
 
 /// `MpZ` negation expression.
 struct MpzNegExpr(A)
@@ -1879,15 +1879,20 @@ struct MpzNegExpr(A)
 {
     A e1;
     pragma(inline, true)
-    MpZ eval()
+    MpZ eval() const @trusted
     {
-        return -e1.eval();
+        typeof(return) y = null;
+        __gmpz_neg(y._ptr, e1.eval()._ptr);
+        return y;
     }
 }
 version(unittest) static assert(isMpZExpr!(MpzNegExpr!(MpZ)));
 
-@safe pure nothrow @nogc unittest
+@safe @nogc unittest
 {
+    assert(MpzNegExpr!(Z)(27.Z).eval() == -27);
+    const Z x = MpzNegExpr!(Z)(27.Z);    // lowers to `mpz_mul`
+    assert(x == -27);
 }
 
 /// Copied from `std.numeric` to prevent unnecessary Phobos deps.
