@@ -5,6 +5,7 @@ module gmp;
 
 debug import core.stdc.stdio : printf;
 import std.typecons : Unsigned, Unqual;
+import std.meta : AliasSeq;
 import std.traits : isInstanceOf;
 
 /// Call unittests taking long to execute.
@@ -133,16 +134,37 @@ struct MpZ
         }
     }
 
+    // TODO make this work instead.
+    // this(Integral)(Integral value)
+    //     if (isIntegral!Integral)
+    // {
+    //     static      if (isUnsigned!Integral)
+    //         __gmpz_init_set_ui(_ptr, cast(ulong)value);
+    //     else static if (isSigned!Integral)
+    //         __gmpz_init_set_si(_ptr, cast(long)value);
+    //     else
+    //         static assert(false);
+    // }
+
     /// Construct from `value`.
     this(long value) { __gmpz_init_set_si(_ptr, value); }
     /// ditto
     this(ulong value) { __gmpz_init_set_ui(_ptr, value); }
     /// ditto
-    this(double value) { __gmpz_init_set_d(_ptr, value); } // TODO Use Optional/Nullable when value is nan, or inf
-    /// ditto
     this(int value) { this(cast(long)value); }
     /// ditto
     this(uint value) { this(cast(ulong)value); }
+    /// ditto
+    this(short value) { this(cast(long)value); }
+    /// ditto
+    this(ushort value) { this(cast(ulong)value); }
+    /// ditto
+    this(byte value) { this(cast(long)value); }
+    /// ditto
+    this(ubyte value) { this(cast(ulong)value); }
+
+    /// ditto
+    this(double value) { __gmpz_init_set_d(_ptr, value); } // TODO Use Optional/Nullable when value is nan, or inf
 
     /** Construct from `value` in base `base`.
         If `base` is 0 it's guessed from contents of `value`.
@@ -871,10 +893,7 @@ struct MpZ
         else static if (is(Integral ==   int))  { return __gmpz_fits_sint_p(_ptr) != 0; }
         else static if (is(Integral == ushort)) { return __gmpz_fits_ushort_p(_ptr) != 0; }
         else static if (is(Integral ==  short)) { return __gmpz_fits_sshort_p(_ptr) != 0; }
-        else
-        {
-            static assert(false, "Unsupported type " ~ Integral.stringof);
-        }
+        else { static assert(false, "Unsupported type " ~ Integral.stringof); }
     }
 
     /// Check if `this` is zero.
@@ -1415,15 +1434,12 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
 
     // fits in type
 
-    assert(mpz(long.min).fitsIn!long);
-    assert(mpz(long.max).fitsIn!long);
-    assert(mpz(ulong.min).fitsIn!ulong);
-    assert(mpz(ulong.max).fitsIn!ulong);
-
-    assert(mpz(int.min).fitsIn!int);
-    assert(mpz(int.max).fitsIn!int);
-    assert(mpz(uint.min).fitsIn!uint);
-    assert(mpz(uint.max).fitsIn!uint);
+    foreach (Integral; AliasSeq!(short, int, long,
+                                 ushort, uint, ulong))
+    {
+        assert(mpz(Integral.min).fitsIn!Integral);
+        assert(mpz(Integral.max).fitsIn!Integral);
+    }
 
     // TODO
     // assert(mpz(short.min).fitsIn!short);
