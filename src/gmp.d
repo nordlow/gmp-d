@@ -6,7 +6,6 @@ module gmp;
 debug import core.stdc.stdio : printf;
 import std.typecons : Unsigned, Unqual;
 import std.traits : isInstanceOf;
-import std.algorithm.mutation : move;
 
 /// Call unittests taking long to execute.
 enum unittestLong = false;
@@ -1728,21 +1727,10 @@ struct MpzAddExpr(T1, T2)
 }
 version(unittest) static assert(isMpZExpr!(MpzAddExpr!(MpZ, MpZ)));
 
-/// Instantiate an add expression `MpzAddExpr`.
-MpzAddExpr!(T1, T2) add(T1, T2)(T1 e1, T2 e2)
-    if (isMpZExpr!T1 &&
-        isMpZExpr!T2)
-{
-    return typeof(return)(move(e1), move(e2)); // TODO remove `move` when compiler does it for us
-}
-
 @safe @nogc unittest
 {
     assert(MpzAddExpr!(Z, Z)(3.Z, 4.Z).eval() == 7);
-    assert(add(3.Z, 4.Z).eval() == 7);
-    assert(add(add(3.Z, 4.Z), 5.Z).eval() == 12);
-    assert(add(add(3.Z, 4.Z), add(5.Z, 6.Z)).eval() == 18);
-    const Z x = add(3.Z, 4.Z);    // lowers to `mpz_add`
+    const Z x = MpzAddExpr!(Z, Z)(3.Z, 4.Z);    // lowers to `mpz_add`
     assert(x == 7);
 }
 
@@ -1757,19 +1745,10 @@ struct MpzSubExpr(T1, T2)
 }
 version(unittest) static assert(isMpZExpr!(MpzSubExpr!(MpZ, MpZ)));
 
-/// Instantiate an sub expression `MpzSubExpr`.
-MpzSubExpr!(T1, T2) sub(T1, T2)(T1 e1, T2 e2)
-    if (isMpZExpr!T1 &&
-        isMpZExpr!T2)
-{
-    return typeof(return)(move(e1), move(e2)); // TODO remove `move` when compiler does it for us
-}
-
 @safe @nogc unittest
 {
     assert(MpzSubExpr!(Z, Z)(3.Z, 4.Z).eval() == -1);
-    assert(sub(3.Z, 4.Z).eval() == -1);
-    const Z x = sub(3.Z, 4.Z);    // lowers to `mpz_sub`
+    const Z x = MpzSubExpr!(Z, Z)(3.Z, 4.Z);    // lowers to `mpz_add`
     assert(x == -1);
 }
 
@@ -1784,19 +1763,10 @@ struct MpzMulExpr(F1, F2)
 }
 version(unittest) static assert(isMpZExpr!(MpzMulExpr!(MpZ, MpZ)));
 
-/// Instantiate an mul expression `MpzMulExpr`.
-MpzMulExpr!(T1, T2) mul(T1, T2)(T1 e1, T2 e2)
-    if (isMpZExpr!T1 &&
-        isMpZExpr!T2)
-{
-    return typeof(return)(move(e1), move(e2)); // TODO remove `move` when compiler does it for us
-}
-
 @safe @nogc unittest
 {
     assert(MpzMulExpr!(Z, Z)(3.Z, 4.Z).eval() == 12);
-    assert(mul(3.Z, 4.Z).eval() == 12);
-    const Z x = mul(3.Z, 4.Z);    // lowers to `mpz_mul`
+    const Z x = MpzMulExpr!(Z, Z)(3.Z, 4.Z); // lowers to `mpz_mul`
     assert(x == 12);
 }
 
@@ -1811,20 +1781,11 @@ struct MpzDivExpr(P, Q)
 }
 version(unittest) static assert(isMpZExpr!(MpzDivExpr!(MpZ, MpZ)));
 
-/// Instantiate an div expression `MpzDivExpr`.
-MpzDivExpr!(T1, T2) div(T1, T2)(T1 e1, T2 e2)
-    if (isMpZExpr!T1 &&
-        isMpZExpr!T2)
-{
-    return typeof(return)(move(e1), move(e2)); // TODO remove `move` when compiler does it for us
-}
-
 @safe @nogc unittest
 {
+    assert(MpzDivExpr!(Z, Z)(27.Z, 3.Z).eval() == 9);
     assert(MpzDivExpr!(Z, Z)(28.Z, 3.Z).eval() == 9);
-    assert(div(27.Z, 3.Z).eval() == 9);
-    assert(div(28.Z, 3.Z).eval() == 9);
-    const Z x = div(27.Z, 3.Z);    // lowers to `mpz_mul`
+    const Z x = MpzDivExpr!(Z, Z)(28.Z, 3.Z);    // lowers to `mpz_mul`
     assert(x == 9);
 }
 
@@ -1839,19 +1800,10 @@ struct MpzModExpr(P, Q)
 }
 version(unittest) static assert(isMpZExpr!(MpzModExpr!(MpZ, MpZ)));
 
-/// Instantiate an mod expression `MpzModExpr`.
-MpzModExpr!(T1, T2) mod(T1, T2)(T1 e1, T2 e2)
-    if (isMpZExpr!T1 &&
-        isMpZExpr!T2)
-{
-    return typeof(return)(move(e1), move(e2)); // TODO remove `move` when compiler does it for us
-}
-
 @safe @nogc unittest
 {
     assert(MpzModExpr!(Z, Z)(29.Z, 3.Z).eval() == 2);
-    assert(mod(29.Z, 3.Z).eval() == 2);
-    const Z x = mod(29.Z, 3.Z);    // lowers to `mpz_mul`
+    const Z x = MpzModExpr!(Z, Z)(29.Z, 3.Z); // lowers to `mpz_mul`
     assert(x == 2);
 }
 
