@@ -1859,6 +1859,11 @@ struct MpzPowUExpr(P, Q)
 }
 version(unittest) static assert(isMpZExpr!(MpzPowUExpr!(MpZ, ulong)));
 
+@safe @nogc unittest
+{
+    assert(MpzPowUExpr!(Z, ulong)(3.Z, 3).eval() == 27);
+}
+
 /// `MpZ`-`ulong`-`MpZ` power-modulo expression.
 struct MpzPowMUExpr(P, Q, M)
     if (isMpZExpr!P &&
@@ -1877,6 +1882,11 @@ struct MpzPowMUExpr(P, Q, M)
     }
 }
 version(unittest) static assert(isMpZExpr!(MpzPowMUExpr!(MpZ, ulong, MpZ)));
+
+@safe @nogc unittest
+{
+    assert(MpzPowMUExpr!(Z, ulong, Z)(3.Z, 3, 20.Z).eval() == 7);
+}
 
 /// `MpZ` negation expression.
 struct MpzNegExpr(A)
