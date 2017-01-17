@@ -1821,7 +1821,7 @@ MpzAddExpr!(T1, T2) mpzAddExpr(T1, T2)(T1 t1, T2 t2)
 @safe @nogc unittest
 {
     assert(MpzAddExpr!(Z, Z)(3.Z, 4.Z).eval() == 7);
-    const Z x = MpzAddExpr!(Z, Z)(3.Z, 4.Z);    // lowers to `mpz_add`
+    const Z x = MpzAddExpr!(Z, Z)(3.Z, 4.Z); // lowers to `mpz_add`
     assert(x == 7);
 }
 
@@ -1845,7 +1845,7 @@ version(unittest) static assert(isMpZExpr!(MpzSubExpr!(MpZ, MpZ)));
 @safe @nogc unittest
 {
     assert(MpzSubExpr!(Z, Z)(3.Z, 4.Z).eval() == -1);
-    const Z x = MpzSubExpr!(Z, Z)(3.Z, 4.Z);    // lowers to `mpz_sub`
+    const Z x = MpzSubExpr!(Z, Z)(3.Z, 4.Z); // lowers to `mpz_sub`
     assert(x == -1);
 }
 
@@ -1894,7 +1894,7 @@ version(unittest) static assert(isMpZExpr!(MpzDivExpr!(MpZ, MpZ)));
 {
     assert(MpzDivExpr!(Z, Z)(27.Z, 3.Z).eval() == 9);
     assert(MpzDivExpr!(Z, Z)(28.Z, 3.Z).eval() == 9);
-    const Z x = MpzDivExpr!(Z, Z)(28.Z, 3.Z);    // lowers to `mpz_tdiv_q`
+    const Z x = MpzDivExpr!(Z, Z)(28.Z, 3.Z); // lowers to `mpz_tdiv_q`
     assert(x == 9);
 }
 
