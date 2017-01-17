@@ -1647,8 +1647,8 @@ version(unittestPhobos) @safe @nogc unittest
     {
         const x = BigInt("12345");
         const y = BigInt("12340");
-        immutable int z = 12345;
-        immutable int w = 54321;
+        immutable int z = 12_345;
+        immutable int w = 54_321;
         assert(x == x);
         assert(x != y);
         assert(x == y + 5);
@@ -1673,17 +1673,17 @@ version(unittestPhobos) @safe @nogc unittest
         assert(cast(ubyte)BigInt("0") == 0);
 
         assert(cast(ubyte)BigInt(255) == 255);
-        assert(cast(ushort)BigInt(65535) == 65535);
+        assert(cast(ushort)BigInt(65_535) == 65_535);
         assert(cast(uint)BigInt(uint.max) == uint.max);
         assert(cast(ulong)BigInt(ulong.max) == ulong.max);
 
         assert(cast(byte)BigInt(-128) == -128);
-        assert(cast(short)BigInt(-32768) == -32768);
+        assert(cast(short)BigInt(-32_768) == -32_768);
         assert(cast(int)BigInt(int.min) == int.min);
         assert(cast(long)BigInt(long.min) == long.min);
 
         assert(cast(byte)BigInt(127) == 127);
-        assert(cast(short)BigInt(32767) == 32767);
+        assert(cast(short)BigInt(32_767) == 32_767);
         assert(cast(int)BigInt(int.max) == int.max);
         assert(cast(long)BigInt(long.max) == long.max);
 
@@ -1737,7 +1737,7 @@ version(unittestPhobos) @safe @nogc unittest
 */
         foreach (immutable ulong i; [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127])
         {
-            foreach (immutable ulong j; 2 .. 100000)
+            foreach (immutable ulong j; 2 .. 100_000)
             {
                 const p = Z.mersennePrime(i); // power
                 const a = Z(j); // base
