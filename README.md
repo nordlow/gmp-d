@@ -4,7 +4,7 @@
 
 D-language high-level wrapper for [GNU MP (GMP) library](https://gmplib.org/)
 that aims to be compatible with `std.bigint.BigInt` and `@safe pure nothrow
-@nogc` in all usage except conversions to `string`.
+@nogc` except when converting to `string`.
 
 Implementation is optimized through
 
