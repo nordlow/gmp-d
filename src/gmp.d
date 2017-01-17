@@ -289,7 +289,7 @@ struct MpZ
     {
         if (rhs == 0)
         {
-            return isZero;
+            return isZero;      // optimization
         }
         else
         {
@@ -302,7 +302,7 @@ struct MpZ
     {
         if (rhs == 0)
         {
-            return isZero;
+            return isZero;      // optimization
         }
         else
         {
@@ -316,7 +316,7 @@ struct MpZ
     {
         if (rhs == 0)
         {
-            return isZero;
+            return isZero;      // optimization
         }
         else
         {
