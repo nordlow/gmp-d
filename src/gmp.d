@@ -316,27 +316,42 @@ struct MpZ
     }
 
     /// Compare `this` to `rhs`.
-    int opCmp()(auto ref const MpZ rhs) const { return __gmpz_cmp(_ptr, rhs._ptr); }
-
-    // TODO use one common definition for all `Integral`
-    // TODO optimize with isZero and isNegative if rhs == 0
-    /// ditto
-    int opCmp(long rhs) const
+    int opCmp()(auto ref const MpZ rhs) const
     {
-        return __gmpz_cmp_si(_ptr, rhs);
+        if (rhs == 0)
+        {
+            return sgn();       // optimization
+        }
+        return __gmpz_cmp(_ptr, rhs._ptr);
     }
-    /// ditto
-    int opCmp(ulong rhs) const { return __gmpz_cmp_ui(_ptr, rhs); }
-    /// ditto
-    int opCmp(int rhs) const { return opCmp(cast(long)rhs); }
-    /// ditto
-    int opCmp(uint rhs) const { return opCmp(cast(ulong)rhs); }
 
     /// ditto
-    int opCmp(double rhs) const { return __gmpz_cmp_d(_ptr, rhs); }
+    int opCmp(T)(T rhs) const
+        if (isArithmetic!T)
+    {
+        if (rhs == 0)
+        {
+            return sgn();       // optimization
+        }
+        static      if (isUnsigned!T)
+        {
+            return __gmpz_cmp_ui(_ptr, rhs);
+        }
+        else static if (isFloating!T)
+        {
+            return __gmpz_cmp_d(_ptr, rhs);
+        }
+        else
+        {
+            return __gmpz_cmp_si(_ptr, rhs);
+        }
+    }
 
     /// Cast to `bool`.
-    bool opCast(T : bool)() const { return !isZero; }
+    bool opCast(T : bool)() const
+    {
+        return !isZero;
+    }
 
     T opCast(T)() const
         if (isArithmetic!T)
@@ -1258,6 +1273,11 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(a < 43UL);
     assert(a < 43.0);
 
+    assert(-1.Z < 0.Z);
+    assert(-1.Z < 0L);
+    assert(-1.Z < 0UL);
+    assert(-1.Z < 0.0);
+
     // greater than
 
     assert(b > a);
@@ -1266,6 +1286,11 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(b > cast(uint)42);
     assert(b > 42UL);
     assert(b > 42.0);
+
+    assert(+1.Z > 0.Z);
+    assert(+1.Z > 0L);
+    assert(+1.Z > 0UL);
+    assert(+1.Z > 0.0);
 
     // absolute value
 
