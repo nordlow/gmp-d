@@ -1043,8 +1043,11 @@ private:
     }
 
     /** Number of calls made to `__gmpz`--functions that construct or changes
-        this value.  Used to verify correct lowering and evaluation of template
+        this value. Used to verify correct lowering and evaluation of template
         expressions.
+
+        For instance the `x` in `x = y + z` should be assigned only once inside
+        a call to `mpz_add`.
      */
     @property size_t mutatingCallCount() const { return _ccc; }
 
