@@ -3,9 +3,6 @@
 
     TODO replace parameter types of type MpZ with (Rhs + isMpZExpr) and allow
     template expressions
-
-    TODO Use `_ccc` for each call to a __gmpz function and assert that
-    expression templates works as expected
  */
 module gmp;
 
