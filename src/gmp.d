@@ -310,6 +310,7 @@ struct MpZ
     int opCmp()(auto ref const MpZ rhs) const { return __gmpz_cmp(_ptr, rhs._ptr); }
 
     // TODO use one common definition for all `Integral`
+    // TODO optimize with isZero and isNegative if rhs == 0
     /// ditto
     int opCmp(long rhs) const
     {
