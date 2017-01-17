@@ -1176,6 +1176,7 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(z == cast(uint)0);
     assert(z == 0L);
     assert(z == 0UL);
+    assert(z == 0.0f);
     assert(z == 0.0);
 
     // eval cast
