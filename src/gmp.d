@@ -1036,7 +1036,7 @@ private:
     __mpz_struct _z;            // internal libgmp C struct
 
     // qualified C memory managment
-    static @safe pure nothrow @nogc
+    static @safe
     {
         pragma(mangle, "malloc") void* qualifiedMalloc(size_t size);
         pragma(mangle, "free") void qualifiedFree(void* ptr);
@@ -1046,10 +1046,7 @@ private:
         this value.  Used to verify correct lowering and evaluation of template
         expressions.
      */
-    @property size_t gmpzArithmeticMutatingCallCount() const
-    {
-        return _ccc;
-    }
+    @property size_t gmpzArithmeticMutatingCallCount() const { return _ccc; }
 
     debug size_t _ccc;  // C mutation call count. number of calls to C GMP function calls that mutate this object
 }
