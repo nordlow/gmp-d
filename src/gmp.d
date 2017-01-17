@@ -7,6 +7,7 @@ debug import core.stdc.stdio : printf;
 import std.typecons : Unsigned, Unqual;
 import std.meta : AliasSeq;
 import std.traits : isInstanceOf;
+import std.algorithm.mutation : move;
 
 /// Call unittests taking long to execute.
 enum unittestLong = false;
@@ -1798,7 +1799,12 @@ struct MpzAddExpr(T1, T2)
 {
     T1 e1;                      // first term
     T2 e2;                      // second term
-    pragma(inline, true)
+    pragma(inline, true):
+    this(T1 e1, T2 e2)
+    {
+        this.e1 = move(e1);     // TODO remove move when compiles does it for us
+        this.e2 = move(e2);
+    }
     MpZ eval() const @trusted
     {
         typeof(return) y = null;
