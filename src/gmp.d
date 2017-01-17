@@ -1955,6 +1955,8 @@ version(unittest) static assert(isMpZExpr!(MpzDivExpr!(MpZ, MpZ)));
 {
     assert(MpzDivExpr!(Z, Z)(27.Z, 3.Z).eval() == 9);
     assert(MpzDivExpr!(Z, Z)(28.Z, 3.Z).eval() == 9);
+    assert(MpzDivExpr!(Z, Z)(29.Z, 3.Z).eval() == 9);
+    assert(MpzDivExpr!(Z, Z)(30.Z, 3.Z).eval() == 10);
     const Z x = MpzDivExpr!(Z, Z)(28.Z, 3.Z);
     assert(x.mutatingCallCount == 1); // lowers to single `mpz_tdiv_q`
     assert(x == 9);
@@ -1979,7 +1981,10 @@ version(unittest) static assert(isMpZExpr!(MpzModExpr!(MpZ, MpZ)));
 
 @safe @nogc unittest
 {
+    assert(MpzModExpr!(Z, Z)(27.Z, 3.Z).eval() == 0);
+    assert(MpzModExpr!(Z, Z)(28.Z, 3.Z).eval() == 1);
     assert(MpzModExpr!(Z, Z)(29.Z, 3.Z).eval() == 2);
+    assert(MpzModExpr!(Z, Z)(30.Z, 3.Z).eval() == 0);
     const Z x = MpzModExpr!(Z, Z)(29.Z, 3.Z);
     assert(x.mutatingCallCount == 1); // lowers to single `mpz_tdiv_r`
     assert(x == 2);
