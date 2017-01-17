@@ -1803,7 +1803,7 @@ struct MpzAddExpr(T1, T2)
     this(T1 e1, T2 e2)
     {
         this.e1 = move(e1);     // TODO remove move when compiles does it for us
-        this.e2 = move(e2);
+        this.e2 = move(e2);     // TODO remove move when compiles does it for us
     }
     MpZ eval() const @trusted
     {
