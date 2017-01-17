@@ -1929,9 +1929,10 @@ version(unittest) static assert(isMpZExpr!(MpzMulExpr!(MpZ, MpZ)));
 @safe @nogc unittest
 {
     assert(MpzMulExpr!(Z, Z)(3.Z, 4.Z).eval() == 3 * 4);
+
     const Z x = MpzMulExpr!(Z, Z)(3.Z, 4.Z);
-    assert(x.mutatingCallCount == 1); // lowers to single `mpz_mul`
     assert(x == 12);
+    assert(x.mutatingCallCount == 1); // lowers to single `mpz_mul`
 }
 
 /// `MpZ`-`MpZ` division expression.
@@ -1957,9 +1958,10 @@ version(unittest) static assert(isMpZExpr!(MpzDivExpr!(MpZ, MpZ)));
     assert(MpzDivExpr!(Z, Z)(28.Z, 3.Z).eval() == 28 / 3);
     assert(MpzDivExpr!(Z, Z)(29.Z, 3.Z).eval() == 29 / 3);
     assert(MpzDivExpr!(Z, Z)(30.Z, 3.Z).eval() == 30 / 3);
+
     const Z x = MpzDivExpr!(Z, Z)(28.Z, 3.Z);
-    assert(x.mutatingCallCount == 1); // lowers to single `mpz_tdiv_q`
     assert(x == 9);
+    assert(x.mutatingCallCount == 1); // lowers to single `mpz_tdiv_q`
 }
 
 /// `MpZ`-`MpZ` modulus expression.
@@ -1985,9 +1987,10 @@ version(unittest) static assert(isMpZExpr!(MpzModExpr!(MpZ, MpZ)));
     assert(MpzModExpr!(Z, Z)(28.Z, 3.Z).eval() == 28 % 3);
     assert(MpzModExpr!(Z, Z)(29.Z, 3.Z).eval() == 29 % 3);
     assert(MpzModExpr!(Z, Z)(30.Z, 3.Z).eval() == 30 % 3);
+
     const Z x = MpzModExpr!(Z, Z)(29.Z, 3.Z);
-    assert(x.mutatingCallCount == 1); // lowers to single `mpz_tdiv_r`
     assert(x == 2);
+    assert(x.mutatingCallCount == 1); // lowers to single `mpz_tdiv_r`
 }
 
 /// `MpZ`-`ulong` power expression.
@@ -2054,6 +2057,7 @@ version(unittest) static assert(isMpZExpr!(MpzNegExpr!(MpZ)));
 @safe @nogc unittest
 {
     assert(MpzNegExpr!(Z)(27.Z).eval() == -27);
+
     const Z x = MpzNegExpr!(Z)(27.Z);
     assert(x.mutatingCallCount == 1); // lowers to single `mpz_neg`
     assert(x == -27);
