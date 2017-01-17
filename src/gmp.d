@@ -3,6 +3,9 @@
 
     TODO replace parameter types of type MpZ with (Rhs + isMpZExpr) and allow
     template expressions
+
+    TODO Use `_ccc` for each call to a __gmpz function and assert that
+    expression templates works as expected
  */
 module gmp;
 
@@ -1027,6 +1030,8 @@ private:
         pragma(mangle, "malloc") void* qualifiedMalloc(size_t size);
         pragma(mangle, "free") void qualifiedFree(void* ptr);
     }
+
+    debug size_t _ccc;            // C call count. number of calls to C GMP function calls
 }
 
 version(unittest) static assert(isMpZExpr!MpZ);
