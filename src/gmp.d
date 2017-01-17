@@ -285,18 +285,18 @@ struct MpZ
                 __gmpz_cmp(_ptr, rhs._ptr) == 0);
     }
     /// ditto
-    bool opEquals(Arithmetic)(Arithmetic rhs) const
-        if (isArithmetic!Arithmetic)
+    bool opEquals(T)(T rhs) const
+        if (isArithmetic!T)
     {
         if (rhs == 0)
         {
             return isZero;      // optimization
         }
-        static      if (isUnsigned!Arithmetic)
+        static      if (isUnsigned!T)
         {
             return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
         }
-        else static if (isFloating!Arithmetic)
+        else static if (isFloating!T)
         {
             return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO correct to do this cast here?
         }
@@ -328,11 +328,25 @@ struct MpZ
     /// Cast to `bool`.
     bool opCast(T : bool)() const { return !isZero; }
 
-    /// Cast to unsigned type `T`.
-    T opCast(T)() const if (isUnsigned!T) { return cast(T)__gmpz_get_ui(_ptr); }
+    T opCast(T)() const
+        if (isArithmetic!T)
+    {
+        static      if (isUnsigned!T)
+        {
+            return cast(T)__gmpz_get_ui(_ptr);
+        }
+        else static if (isFloating!T)
+        {
+            return cast(T)__gmpz_get_d(_ptr);
+        }
+        else
+        {
+            return cast(T)__gmpz_get_si(_ptr);
+        }
+    }
 
-    /// Cast to signed type `T`.
-    T opCast(T)() const if (isSigned!T) { return cast(T)__gmpz_get_si(_ptr); }
+    /// Cast to `double`.
+    // TODO double opCast(T : double)() const { return __gmpz_get_d(_ptr); }
 
     /** Returns: The value of this as a `long`, or +/- `long.max` if outside
         the representable range.
@@ -374,11 +388,9 @@ struct MpZ
         }
     }
 
-    /// Cast to `double`.
-    // TODO double opCast(T : double)() const { return __gmpz_get_d(_ptr); }
-
-    MpZ opBinary(string s)(auto ref const MpZ rhs) const
-        if (s == "+" || s == "-" || s == "*" || s == "/" || s == "%")
+    MpZ opBinary(string s, Rhs)(auto ref const Rhs rhs) const
+        if (isMpZExpr!Rhs &&
+            (s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
         typeof(return) y = null;
         static      if (s == "+")
