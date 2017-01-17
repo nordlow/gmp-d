@@ -1854,7 +1854,8 @@ MpzAddExpr!(T1, T2) mpzAddExpr(T1, T2)(T1 t1, T2 t2)
 @safe @nogc unittest
 {
     assert(MpzAddExpr!(Z, Z)(3.Z, 4.Z).eval() == 7);
-    const Z x = MpzAddExpr!(Z, Z)(3.Z, 4.Z); // lowers to `mpz_add`
+    const Z x = MpzAddExpr!(Z, Z)(3.Z, 4.Z);
+    assert(x.gmpzArithmeticMutatingCallCount == 1); // lowers to single `mpz_add`
     assert(x == 7);
 }
 
@@ -1878,7 +1879,8 @@ version(unittest) static assert(isMpZExpr!(MpzSubExpr!(MpZ, MpZ)));
 @safe @nogc unittest
 {
     assert(MpzSubExpr!(Z, Z)(3.Z, 4.Z).eval() == -1);
-    const Z x = MpzSubExpr!(Z, Z)(3.Z, 4.Z); // lowers to `mpz_sub`
+    const Z x = MpzSubExpr!(Z, Z)(3.Z, 4.Z);
+    assert(x.gmpzArithmeticMutatingCallCount == 1); // lowers to single `mpz_sub`
     assert(x == -1);
 }
 
@@ -1902,7 +1904,8 @@ version(unittest) static assert(isMpZExpr!(MpzMulExpr!(MpZ, MpZ)));
 @safe @nogc unittest
 {
     assert(MpzMulExpr!(Z, Z)(3.Z, 4.Z).eval() == 12);
-    const Z x = MpzMulExpr!(Z, Z)(3.Z, 4.Z); // lowers to `mpz_mul`
+    const Z x = MpzMulExpr!(Z, Z)(3.Z, 4.Z);
+    assert(x.gmpzArithmeticMutatingCallCount == 1); // lowers to single `mpz_mul`
     assert(x == 12);
 }
 
@@ -1927,7 +1930,8 @@ version(unittest) static assert(isMpZExpr!(MpzDivExpr!(MpZ, MpZ)));
 {
     assert(MpzDivExpr!(Z, Z)(27.Z, 3.Z).eval() == 9);
     assert(MpzDivExpr!(Z, Z)(28.Z, 3.Z).eval() == 9);
-    const Z x = MpzDivExpr!(Z, Z)(28.Z, 3.Z); // lowers to `mpz_tdiv_q`
+    const Z x = MpzDivExpr!(Z, Z)(28.Z, 3.Z);
+    assert(x.gmpzArithmeticMutatingCallCount == 1); // lowers to single `mpz_tdiv_q`
     assert(x == 9);
 }
 
@@ -1951,7 +1955,8 @@ version(unittest) static assert(isMpZExpr!(MpzModExpr!(MpZ, MpZ)));
 @safe @nogc unittest
 {
     assert(MpzModExpr!(Z, Z)(29.Z, 3.Z).eval() == 2);
-    const Z x = MpzModExpr!(Z, Z)(29.Z, 3.Z); // lowers to `mpz_tdiv_r`
+    const Z x = MpzModExpr!(Z, Z)(29.Z, 3.Z);
+    assert(x.gmpzArithmeticMutatingCallCount == 1); // lowers to single `mpz_tdiv_r`
     assert(x == 2);
 }
 
@@ -2019,7 +2024,8 @@ version(unittest) static assert(isMpZExpr!(MpzNegExpr!(MpZ)));
 @safe @nogc unittest
 {
     assert(MpzNegExpr!(Z)(27.Z).eval() == -27);
-    const Z x = MpzNegExpr!(Z)(27.Z);    // lowers to `mpz_neg`
+    const Z x = MpzNegExpr!(Z)(27.Z);
+    assert(x.gmpzArithmeticMutatingCallCount == 1); // lowers to single `mpz_neg`
     assert(x == -27);
 }
 
