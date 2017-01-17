@@ -1808,6 +1808,7 @@ struct MpzAddExpr(T1, T2)
 }
 version(unittest) static assert(isMpZExpr!(MpzAddExpr!(MpZ, MpZ)));
 
+/// Instantiator for `MpzAddExpr`.
 MpzAddExpr!(T1, T2) mpzAddExpr(T1, T2)(T1 t1, T2 t2)
     if (isMpZExpr!T1 &&
         isMpZExpr!T2)
