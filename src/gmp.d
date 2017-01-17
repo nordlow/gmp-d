@@ -284,43 +284,24 @@ struct MpZ
                 __gmpz_cmp(_ptr, rhs._ptr) == 0);
     }
     /// ditto
-    bool opEquals(Signed)(Signed rhs) const
-        if (isSigned!Signed)
+    bool opEquals(Arithmetic)(Arithmetic rhs) const
+        if (isArithmetic!Arithmetic)
     {
         if (rhs == 0)
         {
             return isZero;      // optimization
+        }
+        static      if (isUnsigned!Arithmetic)
+        {
+            return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
+        }
+        else static if (isFloating!Arithmetic)
+        {
+            return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO correct to do this cast here?
         }
         else
         {
             return __gmpz_cmp_si(_ptr, cast(long)rhs) == 0;
-        }
-    }
-    /// ditto
-    bool opEquals(Unsigned)(Unsigned rhs) const
-        if (isUnsigned!Unsigned)
-    {
-        if (rhs == 0)
-        {
-            return isZero;      // optimization
-        }
-        else
-        {
-            return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
-        }
-    }
-    /// ditto
-    bool opEquals(Floating)(Floating rhs) const
-        if (is(Floating == float) &&
-            is(Floating == double))
-    {
-        if (rhs == 0)
-        {
-            return isZero;      // optimization
-        }
-        else
-        {
-            return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO correct to do this cast here?
         }
     }
 
