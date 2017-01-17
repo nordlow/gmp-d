@@ -1808,6 +1808,14 @@ struct MpzAddExpr(T1, T2)
 }
 version(unittest) static assert(isMpZExpr!(MpzAddExpr!(MpZ, MpZ)));
 
+MpzAddExpr!(T1, T2) mpzAddExpr(T1, T2)(T1 t1, T2 t2)
+    if (isMpZExpr!T1 &&
+        isMpZExpr!T2)
+{
+    // TODO don't eval certain type combinations of t1 and t2
+    return MpzAddExpr!(T1, T2)(t1.eval(), t2.eval());
+}
+
 @safe @nogc unittest
 {
     assert(MpzAddExpr!(Z, Z)(3.Z, 4.Z).eval() == 7);
