@@ -285,18 +285,18 @@ struct MpZ
                 __gmpz_cmp(_ptr, rhs._ptr) == 0);
     }
     /// ditto
-    bool opEquals(T)(T rhs) const
-        if (isArithmetic!T)
+    bool opEquals(Rhs)(Rhs rhs) const
+        if (isArithmetic!Rhs)
     {
         if (rhs == 0)
         {
             return isZero;      // optimization
         }
-        static      if (isUnsigned!T)
+        static      if (isUnsigned!Rhs)
         {
             return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
         }
-        else static if (isFloating!T)
+        else static if (isFloating!Rhs)
         {
             return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO correct to do this cast here?
         }
@@ -423,9 +423,9 @@ struct MpZ
         return y;
     }
 
-    MpZ opBinary(string s, Unsigned)(Unsigned rhs) const
+    MpZ opBinary(string s, Rhs)(Rhs rhs) const
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
-            isUnsigned!Unsigned)
+            isUnsigned!Rhs)
     {
         typeof(return) y = null;
         static      if (s == "+")
@@ -456,9 +456,9 @@ struct MpZ
         return y;
     }
 
-    MpZ opBinary(string s, Signed)(Signed rhs) const
+    MpZ opBinary(string s, Rhs)(Rhs rhs) const
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
-            isSigned!Signed)
+            isSigned!Rhs)
     {
         typeof(return) y = null;
         static      if (s == "+")
@@ -515,13 +515,13 @@ struct MpZ
     }
 
     /// Remainer propagates modulus type.
-    Unqual!Integral opBinary(string s, Integral)(Integral rhs) const
+    Unqual!Rhs opBinary(string s, Rhs)(Rhs rhs) const
         if ((s == "%") &&
-            isIntegral!Integral)
+            isIntegral!Rhs)
     {
         MpZ y = null;
         assert(rhs != 0, "Divison by zero");
-        static if (isSigned!Integral)
+        static if (isSigned!Rhs)
         {
             if (rhs < 0)        // TODO handle `rhs == rhs.min`
             {
@@ -533,7 +533,7 @@ struct MpZ
                 return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
             }
         }
-        else static if (isUnsigned!Integral)
+        else static if (isUnsigned!Rhs)
         {
             return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
         }
@@ -544,9 +544,9 @@ struct MpZ
     }
 
     /// Returns: an unsigned type `lhs` divided by `this`.
-    MpZ opBinaryRight(string s, Unsigned)(Unsigned lhs) const
+    MpZ opBinaryRight(string s, Lhs)(Lhs lhs) const
         if ((s == "+" || s == "-" || s == "*" || s == "%") &&
-            isUnsigned!Unsigned)
+            isUnsigned!Lhs)
     {
         typeof(return) y = null;
         static      if (s == "+")
@@ -574,9 +574,9 @@ struct MpZ
     }
 
     /// Returns: a signed type `lhs` divided by `this`.
-    MpZ opBinaryRight(string s, Signed)(Signed lhs) const
+    MpZ opBinaryRight(string s, Lhs)(Lhs lhs) const
         if ((s == "+" || s == "-" || s == "*" || s == "%") &&
-            isSigned!Signed)
+            isSigned!Lhs)
     {
         static if (s == "+" || s == "*")
         {
@@ -611,18 +611,18 @@ struct MpZ
     }
 
     /// Dividend propagates quotient type to signed.
-    Unqual!Integral opBinaryRight(string s, Integral)(Integral lhs) const
+    Unqual!Lhs opBinaryRight(string s, Lhs)(Lhs lhs) const
         if ((s == "/") &&
-            isIntegral!Integral)
+            isIntegral!Lhs)
     {
         MpZ y = null;
         assert(this != 0, "Divison by zero");
         __gmpz_tdiv_q(y._ptr, MpZ(lhs)._ptr, _ptr);
-        static      if (isSigned!Integral)
+        static      if (isSigned!Lhs)
         {
             return cast(typeof(return))y;
         }
-        else static if (isUnsigned!Integral)
+        else static if (isUnsigned!Lhs)
         {
             import std.typecons : Signed;
             return cast(Signed!(typeof(return)))y;
@@ -634,9 +634,9 @@ struct MpZ
     }
 
     /// Exponentation.
-    MpZ opBinaryRight(string s, Integral)(Integral base) const
+    MpZ opBinaryRight(string s, Base)(Base base) const
         if ((s == "^^") &&
-            isIntegral!Integral)
+            isIntegral!Base)
     {
         static assert(false, "Convert `this MpZ` exponent to `ulong` and calculate power via static method `pow()`");
         // MpZ exp = null;
@@ -690,9 +690,9 @@ struct MpZ
         return this;
     }
 
-    ref MpZ opOpAssign(string s, Unsigned)(Unsigned rhs)
+    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs)
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
-            isUnsigned!Unsigned)
+            isUnsigned!Rhs)
     {
         static      if (s == "+")
         {
@@ -727,9 +727,9 @@ struct MpZ
         return this;
     }
 
-    ref MpZ opOpAssign(string s, Signed)(Signed rhs) return // TODO DIP-1000 scope
+    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) return // TODO DIP-1000 scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
-            isSigned!Signed)
+            isSigned!Rhs)
     {
         static      if (s == "+")
         {
@@ -838,13 +838,11 @@ struct MpZ
     }
 
     /// Returns: `base` raised to the power of `exp`.
-    static typeof(this) pow(IntegralBase,
-                            IntegralExp)(IntegralBase base,
-                                         IntegralExp exp)
-        if (isIntegral!IntegralBase &&
-            isIntegral!IntegralExp)
+    static typeof(this) pow(Base, Exp)(Base base, Exp exp)
+        if (isIntegral!Base &&
+            isIntegral!Exp)
     {
-        static if (isSigned!IntegralBase)
+        static if (isSigned!Base)
         {
             immutable bool negate = base < 0;
             immutable ubase = cast(ulong)(negate ? -base : base);
@@ -855,7 +853,7 @@ struct MpZ
             immutable ubase = base;
         }
 
-        static if (isSigned!IntegralExp)
+        static if (isSigned!Exp)
         {
             assert(exp >= 0, "Negative power exponent"); // TODO return mpq?
             immutable uexp = cast(ulong)exp;
@@ -875,22 +873,22 @@ struct MpZ
         return y;
     }
 
-    /** Returns: `this` ^^ `power` (modulo `mod`).
-        Parameter `power` must be positive.
+    /** Returns: `this` ^^ `exp` (modulo `mod`).
+        Parameter `exp` must be positive.
     */
-    MpZ powm()(auto ref const MpZ power,
+    MpZ powm()(auto ref const MpZ exp,
                auto ref const MpZ mod) const
     {
         typeof(return) y = 0; // result
-        __gmpz_powm(y._ptr, _ptr,  power._ptr, mod._ptr);
+        __gmpz_powm(y._ptr, _ptr,  exp._ptr, mod._ptr);
         return y;
     }
     /// ditto
-    MpZ powm()(ulong power,
+    MpZ powm()(ulong exp,
                auto ref const MpZ mod) const
     {
         typeof(return) y = 0;       // result
-        __gmpz_powm_ui(y._ptr, _ptr, power, mod._ptr);
+        __gmpz_powm_ui(y._ptr, _ptr, exp, mod._ptr);
         return y;
     }
 
@@ -909,16 +907,16 @@ struct MpZ
     }
 
     /// Returns: `true` iff `this` fits in a `T`.
-    bool fitsIn(Integral)() const
-        if (isIntegral!Integral)
+    bool fitsIn(T)() const
+        if (isIntegral!T)
     {
-        static      if (is(Integral == ulong))  { return __gmpz_fits_ulong_p(_ptr) != 0; }
-        else static if (is(Integral ==  long))  { return __gmpz_fits_slong_p(_ptr) != 0; }
-        else static if (is(Integral ==  uint))  { return __gmpz_fits_uint_p(_ptr) != 0; }
-        else static if (is(Integral ==   int))  { return __gmpz_fits_sint_p(_ptr) != 0; }
-        else static if (is(Integral == ushort)) { return __gmpz_fits_ushort_p(_ptr) != 0; }
-        else static if (is(Integral ==  short)) { return __gmpz_fits_sshort_p(_ptr) != 0; }
-        else { static assert(false, "Unsupported type " ~ Integral.stringof); }
+        static      if (is(T == ulong))  { return __gmpz_fits_ulong_p(_ptr) != 0; }
+        else static if (is(T ==  long))  { return __gmpz_fits_slong_p(_ptr) != 0; }
+        else static if (is(T ==  uint))  { return __gmpz_fits_uint_p(_ptr) != 0; }
+        else static if (is(T ==   int))  { return __gmpz_fits_sint_p(_ptr) != 0; }
+        else static if (is(T == ushort)) { return __gmpz_fits_ushort_p(_ptr) != 0; }
+        else static if (is(T ==  short)) { return __gmpz_fits_sshort_p(_ptr) != 0; }
+        else { static assert(false, "Unsupported type " ~ T.stringof); }
     }
 
     /// Check if `this` is zero.
