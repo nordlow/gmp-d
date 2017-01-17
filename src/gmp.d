@@ -1993,7 +1993,7 @@ T _integralAbs(T)(T x)
     return x >= 0 ? x : -x;
 }
 
-// Faster than `std.traits`, TODO into `std.traits`
+// Faster than `std.traits`.
 enum isArithmetic(T) = __traits(isArithmetic, T);
 enum isFloating(T) = __traits(isFloating, T);
 enum isFloatingPoint(T) = __traits(isFloating, T);
