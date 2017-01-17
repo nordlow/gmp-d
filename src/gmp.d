@@ -1993,7 +1993,7 @@ T _integralAbs(T)(T x)
     return x >= 0 ? x : -x;
 }
 
-// Faster than `std.traits`.
+// Faster than `std.traits`. See https://github.com/dlang/phobos/pull/5038
 enum isArithmetic(T) = __traits(isArithmetic, T);
 enum isFloating(T) = __traits(isFloating, T);
 enum isFloatingPoint(T) = __traits(isFloating, T);
