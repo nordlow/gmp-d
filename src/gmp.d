@@ -1042,15 +1042,16 @@ private:
         pragma(mangle, "free") void qualifiedFree(void* ptr);
     }
 
-    /** Number of calls made to __gmpz--functions to construct this value.
-        Used to verify correct lowering and evaluation of template expressions.
+    /** Number of calls made to `__gmpz`--functions that construct or changes
+        this value.  Used to verify correct lowering and evaluation of template
+        expressions.
      */
-    @property size_t gmpzArithmeticCallCount() const
+    @property size_t gmpzArithmeticMutatingCallCount() const
     {
         return _ccc;
     }
 
-    debug size_t _ccc;            // C call count. number of calls to C GMP function calls
+    debug size_t _ccc;  // C mutation call count. number of calls to C GMP function calls that mutate this object
 }
 
 version(unittest) static assert(isMpZExpr!MpZ);
