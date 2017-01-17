@@ -23,12 +23,10 @@ Implementation is optimized through
   param)`). See
   [this thread](http://forum.dlang.org/post/boorcxnmtatrncrclimp@forum.dlang.org).
 
-  - Copy-on-write (COW) `RefCounted` data store. Optionally with specialized
-    heap-allocator for `MpZ` type (16-bytes).
+ - Copy-on-write (COW) `RefCounted` data store. Optionally with specialized
+   heap-allocator for `MpZ` type (16-bytes).
 
 - Use https://github.com/andrew-m-h/libgmp/tree/master/source/deimos/gmp instead of my own extern(C) definitions
-
-- Merge my `Integer` struct with https://github.com/andrew-m-h/libgmp/blob/master/source/deimos/gmp/operators.d
 
 - Define `mp{z,q,f}` C-function wrappers callable with refs to D-wrapper structs
   (`MpZ`, `MpQ`, `MpF`).
