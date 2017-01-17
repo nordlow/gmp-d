@@ -309,7 +309,7 @@ struct MpZ
         {
             return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO correct to do this cast here?
         }
-        else
+        else                    // isSigned integral
         {
             return __gmpz_cmp_si(_ptr, cast(long)rhs) == 0;
         }
@@ -341,7 +341,7 @@ struct MpZ
         {
             return __gmpz_cmp_d(_ptr, rhs);
         }
-        else
+        else                    // isSigned integral
         {
             return __gmpz_cmp_si(_ptr, rhs);
         }
@@ -364,7 +364,7 @@ struct MpZ
         {
             return cast(T)__gmpz_get_d(_ptr);
         }
-        else
+        else                    // isSigned integral
         {
             return cast(T)__gmpz_get_si(_ptr);
         }
