@@ -288,18 +288,26 @@ struct MpZ
         if (isSigned!Signed)
     {
         if (rhs == 0)
+        {
             return isZero;
+        }
         else
+        {
             return __gmpz_cmp_si(_ptr, cast(long)rhs) == 0;
+        }
     }
     /// ditto
     bool opEquals(Unsigned)(Unsigned rhs) const
         if (isUnsigned!Unsigned)
     {
         if (rhs == 0)
+        {
             return isZero;
+        }
         else
+        {
             return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
+        }
     }
     /// ditto
     bool opEquals(Floating)(Floating rhs) const
@@ -307,9 +315,13 @@ struct MpZ
             is(Floating == double))
     {
         if (rhs == 0)
+        {
             return isZero;
+        }
         else
+        {
             return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO correct to do this cast here?
+        }
     }
 
     /// Compare `this` to `rhs`.
