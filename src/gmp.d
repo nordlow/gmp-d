@@ -2,6 +2,9 @@
 
     TODO replace parameter types of type MpZ with (Rhs + isMpZExpr) and allow
     template expressions
+
+    TODO disallow construction and assignment from floating point? Check with
+    other GMP interfaces and std.bigint.
  */
 module gmp;
 
