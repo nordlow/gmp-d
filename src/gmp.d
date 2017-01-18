@@ -212,13 +212,13 @@ struct MpZ
     }
 
     /// Assign from `rhs`.
-    ref MpZ opAssign()(auto ref const MpZ rhs) return // TODO DIP-1000 scope
+    ref MpZ opAssign()(auto ref const MpZ rhs) return // TODO scope
     {
         __gmpz_set(_ptr, rhs._ptr); version(ccc) ++_ccc;
         return this;
     }
     /// ditto
-    ref MpZ opAssign(Integral)(Integral rhs) return // TODO DIP-1000 scope
+    ref MpZ opAssign(Integral)(Integral rhs) return // TODO scope
         if (isIntegral!Integral)
     {
         static if (isUnsigned!Integral)
@@ -236,7 +236,7 @@ struct MpZ
         return this;
     }
     /// ditto
-    ref MpZ opAssign(double rhs) return // TODO DIP-1000 scope
+    ref MpZ opAssign(double rhs) return // TODO scope
     {
         __gmpz_set_d(_ptr, rhs);  version(ccc) ++_ccc;
         return this;
@@ -245,7 +245,7 @@ struct MpZ
     /** Assign `this` from `string` `rhs` interpreted in base `base`.
         If `base` is 0 it's guessed from contents of `value`.
     */
-    ref MpZ fromString(in string rhs, int base = 0) return // TODO DIP-1000 scope
+    ref MpZ fromString(in string rhs, int base = 0) return // TODO scope
     {
         assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(rhs);
@@ -265,7 +265,7 @@ struct MpZ
     }
 
     /// Returns: `true` iff `this` equals `rhs`.
-    bool opEquals()(auto ref const MpZ rhs) const // TODO DIP-1000 scope
+    bool opEquals()(auto ref const MpZ rhs) const // TODO scope
     {
         if (_ptr == rhs._ptr)   // fast equality
         {
@@ -274,7 +274,7 @@ struct MpZ
         return __gmpz_cmp(_ptr, rhs._ptr) == 0;
     }
     /// ditto
-    bool opEquals(Rhs)(Rhs rhs) const // TODO DIP-1000 scope
+    bool opEquals(Rhs)(Rhs rhs) const // TODO scope
         if (isArithmetic!Rhs)
     {
         if (rhs == 0)
@@ -296,7 +296,7 @@ struct MpZ
     }
 
     /// Compare `this` to `rhs`.
-    int opCmp()(auto ref const MpZ rhs) const // TODO DIP-1000 scope
+    int opCmp()(auto ref const MpZ rhs) const // TODO scope
     {
         if (rhs == 0)
         {
@@ -306,7 +306,7 @@ struct MpZ
     }
 
     /// ditto
-    int opCmp(T)(T rhs) const // TODO DIP-1000 scope
+    int opCmp(T)(T rhs) const // TODO scope
         if (isArithmetic!T)
     {
         if (rhs == 0)
@@ -328,12 +328,12 @@ struct MpZ
     }
 
     /// Cast to `bool`.
-    bool opCast(T : bool)() const // TODO DIP-1000 scope
+    bool opCast(T : bool)() const // TODO scope
     {
         return !isZero;
     }
 
-    T opCast(T)() const         // TODO DIP-1000 scope
+    T opCast(T)() const         // TODO scope
         if (isArithmetic!T)
     {
         static      if (isUnsigned!T)
@@ -657,7 +657,7 @@ struct MpZ
         // return exp;
     }
 
-    ref MpZ opOpAssign(string s)(auto ref const MpZ rhs) return // TODO DIP-1000 scope
+    ref MpZ opOpAssign(string s)(auto ref const MpZ rhs) return // TODO scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
         static      if (s == "+")
@@ -703,7 +703,7 @@ struct MpZ
         return this;
     }
 
-    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) return // TODO DIP-1000 scope
+    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) return // TODO scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isUnsigned!Rhs)
     {
@@ -740,7 +740,7 @@ struct MpZ
         return this;
     }
 
-    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) return // TODO DIP-1000 scope
+    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) return // TODO scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isSigned!Rhs)
     {
@@ -835,7 +835,7 @@ struct MpZ
     }
 
     /// Increase `this` by one.
-    ref MpZ opUnary(string s)() return // TODO DIP-1000 scope
+    ref MpZ opUnary(string s)() return // TODO scope
         if (s == "++")
     {
         __gmpz_add_ui(_ptr, _ptr, 1); version(ccc) ++_ccc;
@@ -843,7 +843,7 @@ struct MpZ
     }
 
     /// Decrease `this` by one.
-    ref MpZ opUnary(string s)() return // TODO DIP-1000 scope
+    ref MpZ opUnary(string s)() return // TODO scope
         if (s == "--")
     {
         __gmpz_sub_ui(_ptr, _ptr, 1); version(ccc) ++_ccc;
