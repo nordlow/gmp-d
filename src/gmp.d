@@ -103,36 +103,36 @@ struct MpZ
         {
             __gmpz_add(this._ptr,
                        expr.e1.eval()._ptr,
-                       expr.e2.eval()._ptr); version(ccc) { ++_ccc; }
+                       expr.e2.eval()._ptr); version(ccc) ++_ccc;
         }
         else static if (isInstanceOf!(MpzSubExpr, Expr))
         {
             __gmpz_sub(this._ptr,
                        expr.e1.eval()._ptr,
-                       expr.e2.eval()._ptr); version(ccc) { ++_ccc; }
+                       expr.e2.eval()._ptr); version(ccc) ++_ccc;
         }
         else static if (isInstanceOf!(MpzMulExpr, Expr))
         {
             __gmpz_mul(this._ptr,
                        expr.e1.eval()._ptr,
-                       expr.e2.eval()._ptr); version(ccc) { ++_ccc; }
+                       expr.e2.eval()._ptr); version(ccc) ++_ccc;
         }
         else static if (isInstanceOf!(MpzDivExpr, Expr))
         {
             __gmpz_tdiv_q(this._ptr,
                           expr.e1.eval()._ptr,
-                          expr.e2.eval()._ptr); version(ccc) { ++_ccc; }
+                          expr.e2.eval()._ptr); version(ccc) ++_ccc;
         }
         else static if (isInstanceOf!(MpzModExpr, Expr))
         {
             __gmpz_tdiv_r(this._ptr,
                           expr.e1.eval()._ptr,
-                          expr.e2.eval()._ptr); version(ccc) { ++_ccc; }
+                          expr.e2.eval()._ptr); version(ccc) ++_ccc;
         }
         else static if (isInstanceOf!(MpzNegExpr, Expr))
         {
             __gmpz_neg(this._ptr,
-                       expr.e1.eval()._ptr); version(ccc) { ++_ccc; }
+                       expr.e1.eval()._ptr); version(ccc) ++_ccc;
         }
         else
         {
@@ -144,7 +144,7 @@ struct MpZ
     this(T)(T value)
         if (isArithmetic!T)
     {
-        version(ccc) { ++_ccc; }
+        version(ccc) ++_ccc;
         static      if (isUnsigned!T)
             __gmpz_init_set_ui(_ptr, value);
         else static if (isFloating!T)
@@ -161,7 +161,7 @@ struct MpZ
     {
         assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(value);
-        immutable int status = __gmpz_init_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
+        immutable int status = __gmpz_init_set_str(_ptr, stringz, base); version(ccc) ++_ccc;
         qualifiedFree(stringz);
         assert(status == 0, "Parameter `value` does not contain an integer");
     }
@@ -193,14 +193,14 @@ struct MpZ
     /** Initialize internal struct. */
     private void initialize() // cannot be called `init` as that will override builtin type property
     {
-        __gmpz_init(_ptr); version(ccc) { ++_ccc; }
+        __gmpz_init(_ptr); version(ccc) ++_ccc;
     }
 
     /// Swap content of `this` with `rhs`.
     void swap(ref MpZ rhs)
     {
         import std.algorithm.mutation : swap;
-        swap(this, rhs); // faster than __gmpz_swap(_ptr, rhs._ptr); version(ccc) { ++_ccc; }
+        swap(this, rhs); // faster than __gmpz_swap(_ptr, rhs._ptr); version(ccc) ++_ccc;
     }
 
     /// Returns: (duplicate) copy of `this`.
@@ -214,7 +214,7 @@ struct MpZ
     /// Assign from `rhs`.
     ref MpZ opAssign()(auto ref const MpZ rhs) return // TODO scope
     {
-        __gmpz_set(_ptr, rhs._ptr); version(ccc) { ++_ccc; }
+        __gmpz_set(_ptr, rhs._ptr); version(ccc) ++_ccc;
         return this;
     }
     /// ditto
@@ -223,11 +223,11 @@ struct MpZ
     {
         static if (isUnsigned!Integral)
         {
-            __gmpz_set_ui(_ptr, rhs);  version(ccc) { ++_ccc; }
+            __gmpz_set_ui(_ptr, rhs);  version(ccc) ++_ccc;
         }
         else static if (isSigned!Integral)
         {
-            __gmpz_set_si(_ptr, rhs);  version(ccc) { ++_ccc; }
+            __gmpz_set_si(_ptr, rhs);  version(ccc) ++_ccc;
         }
         else
         {
@@ -238,7 +238,7 @@ struct MpZ
     /// ditto
     ref MpZ opAssign(double rhs) return // TODO scope
     {
-        __gmpz_set_d(_ptr, rhs);  version(ccc) { ++_ccc; }
+        __gmpz_set_d(_ptr, rhs);  version(ccc) ++_ccc;
         return this;
     }
 
@@ -249,7 +249,7 @@ struct MpZ
     {
         assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(rhs);
-        immutable int status = __gmpz_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
+        immutable int status = __gmpz_set_str(_ptr, stringz, base); version(ccc) ++_ccc;
         qualifiedFree(stringz);
         assert(status == 0, "Parameter `rhs` does not contain an integer");
         return this;
@@ -260,7 +260,7 @@ struct MpZ
     {
         if (_ptr)
         {
-            __gmpz_clear(_ptr); version(ccc) { ++_ccc; }
+            __gmpz_clear(_ptr); version(ccc) ++_ccc;
         }
     }
 
@@ -662,11 +662,11 @@ struct MpZ
     {
         static      if (s == "+")
         {
-            __gmpz_add(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
+            __gmpz_add(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
         }
         else static if (s == "-")
         {
-            __gmpz_sub(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
+            __gmpz_sub(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
         }
         else static if (s == "*")
         {
@@ -676,7 +676,7 @@ struct MpZ
             }
             else
             {
-                __gmpz_mul(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
+                __gmpz_mul(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
             }
         }
         else static if (s == "/")
@@ -688,13 +688,13 @@ struct MpZ
             }
             else
             {
-                __gmpz_tdiv_q(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
+                __gmpz_tdiv_q(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
             }
         }
         else static if (s == "%")
         {
             assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_r(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
+            __gmpz_tdiv_r(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
         }
         else
         {
@@ -709,29 +709,29 @@ struct MpZ
     {
         static      if (s == "+")
         {
-            __gmpz_add_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_add_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
         }
         else static if (s == "-")
         {
-            __gmpz_sub_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_sub_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
         }
         else static if (s == "*")
         {
-            __gmpz_mul_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_mul_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
         }
         else static if (s == "/")
         {
             assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_q_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_tdiv_q_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
         }
         else static if (s == "%")
         {
             assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
         }
         else static if (s == "^^")
         {
-            __gmpz_pow_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_pow_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
         }
         else
         {
@@ -750,11 +750,11 @@ struct MpZ
             {
                 assert(rhs != rhs.min);
                 immutable ulong pos_rhs = -rhs; // make it positive
-                __gmpz_sub_ui(_ptr, _ptr, pos_rhs); version(ccc) { ++_ccc; }
+                __gmpz_sub_ui(_ptr, _ptr, pos_rhs); version(ccc) ++_ccc;
             }
             else
             {
-                __gmpz_add_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+                __gmpz_add_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
             }
         }
         else static if (s == "-")
@@ -763,11 +763,11 @@ struct MpZ
             {
                 assert(rhs != rhs.min);
                 immutable ulong pos_rhs = -rhs; // make it positive
-                __gmpz_add_ui(_ptr, _ptr, pos_rhs); version(ccc) { ++_ccc; }
+                __gmpz_add_ui(_ptr, _ptr, pos_rhs); version(ccc) ++_ccc;
             }
             else
             {
-                __gmpz_sub_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+                __gmpz_sub_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
             }
         }
         else static if (s == "*")
@@ -778,7 +778,7 @@ struct MpZ
             }
             else
             {
-                __gmpz_mul_si(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+                __gmpz_mul_si(_ptr, _ptr, rhs); version(ccc) ++_ccc;
             }
         }
         else static if (s == "/")
@@ -787,23 +787,23 @@ struct MpZ
             if (rhs < 0)        // TODO handle `rhs == rhs.min`
             {
                 immutable ulong pos_rhs = -rhs; // make it positive
-                __gmpz_tdiv_q_ui(_ptr, _ptr, pos_rhs); version(ccc) { ++_ccc; }
+                __gmpz_tdiv_q_ui(_ptr, _ptr, pos_rhs); version(ccc) ++_ccc;
                 negate();
             }
             else
             {
-                __gmpz_tdiv_q_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+                __gmpz_tdiv_q_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
             }
         }
         else static if (s == "%")
         {
             assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
         }
         else static if (s == "^^")
         {
             assert(rhs >= 0, "Negative power exponent");
-            __gmpz_pow_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_pow_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
         }
         else
         {
@@ -838,7 +838,7 @@ struct MpZ
     ref MpZ opUnary(string s)() return // TODO scope
         if (s == "++")
     {
-        __gmpz_add_ui(_ptr, _ptr, 1); version(ccc) { ++_ccc; }
+        __gmpz_add_ui(_ptr, _ptr, 1); version(ccc) ++_ccc;
         return this;
     }
 
@@ -846,7 +846,7 @@ struct MpZ
     ref MpZ opUnary(string s)() return // TODO scope
         if (s == "--")
     {
-        __gmpz_sub_ui(_ptr, _ptr, 1); version(ccc) { ++_ccc; }
+        __gmpz_sub_ui(_ptr, _ptr, 1); version(ccc) ++_ccc;
         return this;
     }
 
