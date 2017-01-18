@@ -703,7 +703,7 @@ struct MpZ
         return this;
     }
 
-    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs)
+    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) return // TODO DIP-1000 scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isUnsigned!Rhs)
     {
