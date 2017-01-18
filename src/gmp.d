@@ -1271,6 +1271,14 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(-a == -42);
     assert(-(-a) == a);
 
+    auto n = 42.Z;
+    n.negate();
+    assert(n == -42);
+    n.negate();
+    assert(n == 42);
+    n.negate();
+    assert(n == -42);
+
     // addition
 
     assert(a + b == b + a);     // commutative
