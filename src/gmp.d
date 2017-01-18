@@ -1114,17 +1114,6 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(mpz( 42).absUnsign!ulong == 42);
 }
 
-/// as hash table key
-@safe unittest
-{
-    // TODO disabled until non-copyable types work in AA's
-    // string[Z] aa;
-    // aa[123.Z] = "abc";
-    // aa[456.Z] = "def";
-    // assert(aa[123.Z] == "abc");
-    // assert(aa[456.Z] == "def");
-}
-
 ///
 @safe @nogc unittest
 {
@@ -2095,6 +2084,17 @@ version(none) @safe pure nothrow @nogc unittest
     f(S.init);
     S s;
     f(s);
+}
+
+/// as hash table key
+@safe unittest
+{
+    // TODO disabled until non-copyable types work in AA's
+    // string[Z] aa;
+    // aa[123.Z] = "abc";
+    // aa[456.Z] = "def";
+    // assert(aa[123.Z] == "abc");
+    // assert(aa[456.Z] == "def");
 }
 
 version(unittest)
