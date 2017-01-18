@@ -21,8 +21,8 @@ Implementation is optimized through
   param)`). See
   [this thread](http://forum.dlang.org/post/boorcxnmtatrncrclimp@forum.dlang.org).
 
- - Copy-on-write (COW) `RefCounted` data store. Optionally with specialized
-   heap-allocator for `MpZ` type (16-bytes).
+- Copy-on-write (COW) `RefCounted` data store. Optionally with specialized
+  heap-allocator for `MpZ` type (16-bytes).
 
 - Use https://github.com/andrew-m-h/libgmp/tree/master/source/deimos/gmp instead of my own extern(C) definitions
 
@@ -34,9 +34,6 @@ Implementation is optimized through
   - `Natural`/`Integer`/`Rational`,
   - (`N`,`Z`,``Q`,`F``) or
   - Big{Nat,Int,Rat,Flt,Float} preferred?
-
-- Find out if `__gmpz_init` function is same zeroing shallow zeroing of struct
-`Integer`. If so only default constructor can be activated.
 
 - Is it preferred to `core.stdc.config : c_long, c_ulong` instead of builtin
   `long` and `ulong` like is done? The motivation should be that these alias to
