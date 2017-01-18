@@ -828,6 +828,16 @@ struct MpZ
         return y;
     }
 
+    /// Returns: negation of `this`.
+    MpZ unaryMinus() const return
+    {
+        pragma(msg, isRef!this);
+        pragma(msg, typeof(this));
+        typeof(return) y = this.dup;
+        y.negate();
+        return y;
+    }
+
     /// Negate `this` in-place.
     void negate()
     {
@@ -1092,6 +1102,14 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     return y;
 }
 
+///
+@safe @nogc unittest
+{
+    const x = 42.Z;
+    assert(x.unaryMinus() == -42);   // l-value `this`
+    assert(42.Z.unaryMinus() == -42); // r-value `this`
+}
+
 /// convert to string
 @safe unittest
 {
@@ -1112,14 +1130,6 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
 
     assert(mpz(-42).absUnsign!ulong == 42);
     assert(mpz( 42).absUnsign!ulong == 42);
-}
-
-///
-@safe @nogc unittest
-{
-    const x = 42.Z;
-    assert(-x == -42);          // `this` for MpZ.opUnary!"-" is an l-value
-    assert(-(42.Z) == -42);     // `this` for MpZ.opUnary!"-" is an r-value
 }
 
 ///
