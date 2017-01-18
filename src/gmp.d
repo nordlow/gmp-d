@@ -1119,23 +1119,23 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
 {
     // TODO disabled until non-copyable types work in AA's
     // string[Z] aa;
-    // aa[mpz(123)] = "abc";
-    // aa[mpz(456)] = "def";
-    // assert(aa[mpz(123)] == "abc");
-    // assert(aa[mpz(456)] == "def");
+    // aa[123.Z] = "abc";
+    // aa[456.Z] = "def";
+    // assert(aa[123.Z] == "abc");
+    // assert(aa[456.Z] == "def");
 }
 
 ///
 @safe @nogc unittest
 {
-    const _ = mpz(cast(uint)42);
-    const a = mpz(42);
-    const b = mpz(43UL);
-    const c = mpz(43.0);
-    const z = mpz(0);
+    const _ = (cast(uint)42).Z;
+    const a = 42.Z;
+    const b = 43UL.Z;
+    const c = 43.0.Z;
+    const z = 0.Z;
 
     // `opOpAssign` with `Unsigned`
-    auto w = mpz(42);
+    auto w = 42.Z;
     assert(w == 42);
 
     w += 100UL;
@@ -1206,25 +1206,25 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
 
     // binary
 
-    assert(mpz(`0b11`) == 3);
-    assert(mpz(`0B11`) == 3);
+    assert(`0b11`.Z == 3);
+    assert(`0B11`.Z == 3);
 
     // octal
 
-    assert(mpz(`07`) == 7);
-    assert(mpz(`010`) == 8);
+    assert(`07`.Z == 7);
+    assert(`010`.Z == 8);
 
     // hexadecimal
 
-    assert(mpz(`0x10`) == 16);
-    assert(mpz(`0X10`) == 16);
+    assert(`0x10`.Z == 16);
+    assert(`0X10`.Z == 16);
 
     // decimal
 
-    assert(mpz(`101`) == 101);
-    assert(mpz(`101`, 10) == 101);
+    assert(`101`.Z == 101);
+    assert(`101`.Z == 101);
 
-    immutable ic = mpz(101UL);
+    immutable ic = 101UL.Z;
 
     assert(a == a.dup);
     assert(ic == ic.dup);
@@ -1232,7 +1232,7 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     // equality
 
     assert(a == a);
-    assert(a == mpz(42));
+    assert(a == 42.Z);
     assert(a == 42.0);
     assert(a == 42);
     assert(a == cast(uint)42);
@@ -1247,7 +1247,7 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     // less than
 
     assert(a < b);
-    assert(a < mpz(43));
+    assert(a < 43.Z);
     assert(a < 43);
     assert(a < cast(uint)43);
     assert(a < 43UL);
@@ -1261,7 +1261,7 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     // greater than
 
     assert(b > a);
-    assert(b > mpz(42));
+    assert(b > 42.Z);
     assert(b > 42);
     assert(b > cast(uint)42);
     assert(b > 42UL);
@@ -1285,7 +1285,7 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     // addition
 
     assert(a + b == b + a);     // commutative
-    assert(a + mpz(43) == b + a);
+    assert(a + 43.Z == b + a);
     assert(a + 0 == a);
     assert(a + 1 != a);
     assert(0 + a == a);
@@ -1307,7 +1307,7 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(-2 - a == -44);
     assert(a - 2 == -(2 - a));     // commutative
     assert(a - (-2) == 44);
-    assert(44UL - mpz(42) == 2);
+    assert(44UL - 42.Z == 2);
 
     // multiplication
 
@@ -1323,55 +1323,55 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
 
     // division
 
-    assert(mpz(27) / mpz(3) == 9);
-    assert(mpz(27) /   3  == 9);
+    assert(27.Z / 3.Z == 9);
+    assert(27.Z /   3  == 9);
 
-    assert(mpz(27) / mpz(10)  == 2);
-    assert(mpz(27) /   10   == 2);
-    assert(mpz(27) /   10UL == 2);
+    assert(27.Z / 10.Z  == 2);
+    assert(27.Z /   10   == 2);
+    assert(27.Z /   10UL == 2);
 
-    assert(mpz(27) / -3   == -9);
-    assert(mpz(27) /  3UL ==  9);
+    assert(27.Z / -3   == -9);
+    assert(27.Z /  3UL ==  9);
 
-    assert(mpz(27) / -10   == -2);
+    assert(27.Z / -10   == -2);
 
-    assert(28   / mpz( 3) ==  9);
-    assert(28UL / mpz( 3) ==  9);
+    assert(28   /  3.Z ==  9);
+    assert(28UL /  3.Z ==  9);
 
-    assert(28   / mpz(-3) == -9);
-    assert(28UL / mpz(-3) == -9);
+    assert(28   / -3.Z == -9);
+    assert(28UL / -3.Z == -9);
 
     // modulo/remainder
 
-    assert(mpz(27) % mpz(3) == 0);
-    assert(mpz(27) % mpz(10) == 7);
+    assert(27.Z % 3.Z == 0);
+    assert(27.Z % 10.Z == 7);
 
-    assert(mpz(27) % 3 == 0);
-    assert(mpz(-27) % 3 == 0);
+    assert(27.Z % 3 == 0);
+    assert(-27.Z % 3 == 0);
 
-    assert(mpz(27) % 10 == 7);
-    assert(mpz(27) % 10 == 7);
+    assert(27.Z % 10 == 7);
+    assert(27.Z % 10 == 7);
 
-    assert(28   % mpz(3) == 1);
-    assert(28UL % mpz(3) == 1);
+    assert(28   % 3.Z == 1);
+    assert(28UL % 3.Z == 1);
 
-    assert(mpz( 28)  % -3 == -1); // negative divisor gives negative remainder according to https://en.wikipedia.org/wiki/Remainder
-    assert(mpz(-28)  %  3 == 1);  // dividend sign doesn't affect remainder
+    assert( 28.Z  % -3 == -1); // negative divisor gives negative remainder according to https://en.wikipedia.org/wiki/Remainder
+    assert(-28.Z  %  3 == 1);  // dividend sign doesn't affect remainder
 
     //
-    assert(mpz( 28)  % mpz(-3) == 1);  // TODO should be -1
-    assert(mpz(-28)  % mpz( 3) == -1);  // TODO should be 1
-    assert( 28  % mpz(-3) == 1);      // TODO should be -1
-    assert(-28  % mpz( 3) == -1);     // TODO should be 1
+    assert( 28.Z  % -3.Z == 1);  // TODO should be -1
+    assert(-28.Z  %  3.Z == -1);  // TODO should be 1
+    assert( 28  % -3.Z == 1);      // TODO should be -1
+    assert(-28  %  3.Z == -1);     // TODO should be 1
 
     // modulo/remainder
 
-    immutable one = mpz(1);
-    const two = mpz(2);
-    immutable three = mpz(3);
-    const four = mpz(4);
-    immutable five = mpz(5);
-    const six = mpz(6);
+    immutable one = 1.Z;
+    const two = 2.Z;
+    immutable three = 3.Z;
+    const four = 4.Z;
+    immutable five = 5.Z;
+    const six = 6.Z;
     assert(six % one == 0);
     assert(six % two == 0);
     assert(six % three == 0);
@@ -1390,12 +1390,12 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
 
     // exponentiation
 
-    assert(mpz(0)^^0 == 1);
-    assert(mpz(3)^^3 == 27);
-    assert(mpz(3)^^3L == 27);
-    assert(mpz(2)^^8 == 256);
-    assert(mpz(2)^^8L == 256);
-    assert(mpz(2)^^8UL == 256);
+    assert(0.Z^^0 == 1);
+    assert(3.Z^^3 == 27);
+    assert(3.Z^^3L == 27);
+    assert(2.Z^^8 == 256);
+    assert(2.Z^^8L == 256);
+    assert(2.Z^^8UL == 256);
 
     assert(Z.pow(2UL, 8UL) == 256);
     assert(Z.pow(2UL, 8) == 256);
@@ -1405,24 +1405,24 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(Z.pow(-2, 7) == -128);
 
     // disallow power exponent to be an `MpZ`
-    assert(!__traits(compiles, 2^^mpz(8) == 256));
-    assert(!__traits(compiles, 2L^^mpz(8) == 256));
-    assert(!__traits(compiles, 2UL^^mpz(8) == 256));
+    assert(!__traits(compiles, 2^^8.Z == 256));
+    assert(!__traits(compiles, 2L^^8.Z == 256));
+    assert(!__traits(compiles, 2UL^^8.Z == 256));
 
     // exponentiation plus modulus
 
-    assert(mpz(2).powm(mpz(8), mpz(8)) == mpz(0));
-    assert(mpz(2).powm(mpz(3), mpz(16)) == mpz(8));
-    assert(mpz(3).powm(mpz(3), mpz(16)) == mpz(11));
+    assert(2.Z.powm(8.Z, 8.Z) == 0.Z);
+    assert(2.Z.powm(3.Z, 16.Z) == 8.Z);
+    assert(3.Z.powm(3.Z, 16.Z) == 11.Z);
 
-    assert(mpz(2).powm(8, mpz(8)) == mpz(0));
-    assert(mpz(2).powm(3, mpz(16)) == mpz(8));
-    assert(mpz(3).powm(3, mpz(16)) == mpz(11));
+    assert(2.Z.powm(8, 8.Z) == 0.Z);
+    assert(2.Z.powm(3, 16.Z) == 8.Z);
+    assert(3.Z.powm(3, 16.Z) == 11.Z);
 
     // swap
 
-    auto x = mpz(42);
-    auto y = mpz(43);
+    auto x = 42.Z;
+    auto y = 43.Z;
 
     assert(x == 42);
     assert(y == 43);
@@ -1437,89 +1437,89 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(x == 42);
     assert(y == 43);
 
-    assert(mpz(null).fromString("42") == 42.Z);
-    assert(mpz(null).fromString("42") < 43.Z);
-    assert(mpz(null).fromString("42") > 41.Z);
-    assert(mpz(null).fromString("42") == 42);
-    assert(mpz(null).fromString("11", 2) == 3);
-    assert(mpz(null).fromString("7", 8) == 7);
-    assert(mpz(null).fromString("7") == 7);
-    assert(mpz(null).fromString("e", 16) == 14);
-    assert(mpz(null).fromString("f", 16) == 15);
-    assert(mpz(null).fromString("0xe") == 14);
-    assert(mpz(null).fromString("0xf") == 15);
-    assert(mpz(null).fromString("10", 16) == 16);
-    assert(mpz(null).fromString("10", 32) == 32);
+    assert(null.Z.fromString("42") == 42.Z);
+    assert(null.Z.fromString("42") < 43.Z);
+    assert(null.Z.fromString("42") > 41.Z);
+    assert(null.Z.fromString("42") == 42);
+    assert(null.Z.fromString("11", 2) == 3);
+    assert(null.Z.fromString("7", 8) == 7);
+    assert(null.Z.fromString("7") == 7);
+    assert(null.Z.fromString("e", 16) == 14);
+    assert(null.Z.fromString("f", 16) == 15);
+    assert(null.Z.fromString("0xe") == 14);
+    assert(null.Z.fromString("0xf") == 15);
+    assert(null.Z.fromString("10", 16) == 16);
+    assert(null.Z.fromString("10", 32) == 32);
 
     // odd and even
 
-    assert(mpz(0).isEven);
-    assert(mpz(1).isOdd);
-    assert(mpz(2).isEven);
-    assert(mpz(3).isOdd);
+    assert(0.Z.isEven);
+    assert(1.Z.isOdd);
+    assert(2.Z.isEven);
+    assert(3.Z.isOdd);
 
-    assert(mpz(-1).isOdd);
-    assert(mpz(-2).isEven);
-    assert(mpz(-3).isOdd);
+    assert((-1).Z.isOdd);
+    assert((-2).Z.isEven);
+    assert((-3).Z.isOdd);
 
-    assert(mpz("300000000000000000000000000000000000000").isEven);
-    assert(mpz("300000000000000000000000000000000000001").isOdd);
-    assert(mpz("300000000000000000000000000000000000002").isEven);
-    assert(mpz("300000000000000000000000000000000000003").isOdd);
+    assert("300000000000000000000000000000000000000".Z.isEven);
+    assert("300000000000000000000000000000000000001".Z.isOdd);
+    assert("300000000000000000000000000000000000002".Z.isEven);
+    assert("300000000000000000000000000000000000003".Z.isOdd);
 
     // negative and positive
 
-    assert(mpz(0).isPositive);
-    assert(mpz(1).isPositive);
-    assert(mpz(2).isPositive);
-    assert(mpz(3).isPositive);
+    assert(0.Z.isPositive);
+    assert(1.Z.isPositive);
+    assert(2.Z.isPositive);
+    assert(3.Z.isPositive);
 
-    assert(mpz(-1).isNegative);
-    assert(mpz(-2).isNegative);
-    assert(mpz(-3).isNegative);
+    assert((-1).Z.isNegative);
+    assert((-2).Z.isNegative);
+    assert((-3).Z.isNegative);
 
     // sign function (sgn)
 
-    assert(mpz(long.min).sgn == -1);
-    assert(mpz(int.min).sgn  == -1);
-    assert(mpz(-2).sgn == -1);
-    assert(mpz(-1).sgn == -1);
-    assert(mpz( 0).sgn ==  0);
-    assert(mpz( 1).sgn ==  1);
-    assert(mpz( 2).sgn ==  1);
-    assert(mpz(int.max).sgn  == 1);
-    assert(mpz(long.max).sgn == 1);
+    assert(long.min.Z.sgn == -1);
+    assert(int.min.Z.sgn  == -1);
+    assert(-2.Z.sgn == -1);
+    assert(-1.Z.sgn == -1);
+    assert( 0.Z.sgn ==  0);
+    assert( 1.Z.sgn ==  1);
+    assert( 2.Z.sgn ==  1);
+    assert(int.max.Z.sgn  == 1);
+    assert(long.max.Z.sgn == 1);
 
-    assert(!mpz(long.min).isZero);
-    assert(!mpz(int.min).isZero);
-    assert(!mpz(-2).isZero);
-    assert(!mpz(-1).isZero);
-    assert( mpz( 0).isZero);
-    assert(!mpz( 1).isZero);
-    assert(!mpz( 2).isZero);
-    assert(!mpz(int.max).isZero);
-    assert(!mpz(long.max).isZero);
+    assert(!long.min.Z.isZero);
+    assert(!int.min.Z.isZero);
+    assert(!(-2).Z.isZero);
+    assert(!(-1).Z.isZero);
+    assert( 0.Z.isZero);
+    assert(! 1.Z.isZero);
+    assert(! 2.Z.isZero);
+    assert(!int.max.Z.isZero);
+    assert(!long.max.Z.isZero);
 
     // fits in type
 
     foreach (Integral; AliasSeq!(short, int, long,
                                  ushort, uint, ulong))
     {
-        assert(mpz(Integral.min).fitsIn!Integral);
-        assert(mpz(Integral.max).fitsIn!Integral);
+        assert(Integral.min.Z.fitsIn!Integral);
+        assert(Integral.max.Z.fitsIn!Integral);
     }
 
     // TODO
-    // assert(mpz(short.min).fitsIn!short);
-    // assert(mpz(short.max).fitsIn!short);
-    // assert(mpz(ushort.min).fitsIn!ushort);
-    // assert(mpz(ushort.max).fitsIn!ushort);
+    // assert(short.min.Z.fitsIn!short);
+    // assert(short.max.Z.fitsIn!short);
+    // assert(ushort.min.Z.fitsIn!ushort);
+    // assert(ushort.max.Z.fitsIn!ushort);
 
     // internal limb count
 
-    assert(mpz(0)._limbCount == 0);
-    assert(mpz(1)._limbCount == 1);
-    assert(mpz(2)._limbCount == 1);
+    assert(0.Z._limbCount == 0);
+    assert(1.Z._limbCount == 1);
+    assert(2.Z._limbCount == 1);
 
     assert(Z.pow(2UL, 32UL)._limbCount == 1);
 
@@ -1740,9 +1740,9 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     }
 
     {
-        auto x = BigInt("100");
-        auto y = BigInt("10");
-        int z = 50;
+        const x = BigInt("100");
+        const y = BigInt("10");
+        const int z = 50;
         const int w = 200;
         assert(y < x);
         assert(x > z);
