@@ -1117,6 +1117,14 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
 ///
 @safe @nogc unittest
 {
+    const x = 42.Z;
+    assert(-x == -42);          // `this` for MpZ.opUnary!"-" is an l-value
+    assert(-(42.Z) == -42);     // `this` for MpZ.opUnary!"-" is an r-value
+}
+
+///
+@safe @nogc unittest
+{
     const _ = (cast(uint)42).Z;
     const a = 42.Z;
     const b = 43UL.Z;
