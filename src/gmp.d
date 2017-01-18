@@ -1768,10 +1768,10 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
 {
     if (unittestLong) // compile but not run unless flagged for because running is slow
     {
-/*
-  Fermats little theorem: a ^ p ≡ a (mod p) ∀ prime p
-  check Fermats little theorem for a ≤ 100000 and all mersene primes M(p) : p ≤ 127
-*/
+        /*
+          Fermats little theorem: a ^ p ≡ a (mod p) ∀ prime p check Fermats
+          little theorem for a ≤ 100000 and all mersene primes M(p) : p ≤ 127
+        */
         foreach (immutable ulong i; [2, 3, 5, 7, 13, 17, 19, 31, 61, 89, 107, 127])
         {
             foreach (immutable ulong j; 2 .. 100_000)
@@ -1790,14 +1790,12 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
 pure @nogc unittest
 {
     /*
-      a^5 + b^5 + c^5 + d^5 = e^5
-      Lander & Parkin, 1966 found the first counter example:
-      27^5 + 84^5 + 110^5 + 133^5 = 144^5
-      this test is going to search for this counter example by
-      brute force for all positive a, b, c, d ≤ 200
+      a^5 + b^5 + c^5 + d^5 = e^5 Lander & Parkin, 1966 found the first counter
+      example: 27^5 + 84^5 + 110^5 + 133^5 = 144^5. This test searches for this
+      counter example by brute force for all positive a, b, c, d ≤ 144
     */
 
-    enum LIMIT = 200;
+    enum LIMIT = 144 + 1;
     enum POWER = 5;
 
     if (unittestLong) // compile but not run unless flagged for because running is slow
