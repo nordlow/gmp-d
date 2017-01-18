@@ -1451,7 +1451,6 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(mpz(null).fromString("10", 16) == 16);
     assert(mpz(null).fromString("10", 32) == 32);
 
-
     // odd and even
 
     assert(mpz(0).isEven);
