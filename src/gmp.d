@@ -1438,6 +1438,8 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(y == 43);
 
     assert(mpz(null).fromString("42") == 42.Z);
+    assert(mpz(null).fromString("42") < 43.Z);
+    assert(mpz(null).fromString("42") > 41.Z);
     assert(mpz(null).fromString("42") == 42);
     assert(mpz(null).fromString("11", 2) == 3);
     assert(mpz(null).fromString("7", 8) == 7);
@@ -1449,7 +1451,6 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(mpz(null).fromString("10", 16) == 16);
     assert(mpz(null).fromString("10", 32) == 32);
 
-    assert(mpz(null).fromString("42") < 42.Z);
 
     // odd and even
 
