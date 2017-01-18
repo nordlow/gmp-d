@@ -265,7 +265,7 @@ struct MpZ
     }
 
     /// Returns: `true` iff `this` equals `rhs`.
-    bool opEquals()(auto ref const MpZ rhs) const
+    bool opEquals()(auto ref const MpZ rhs) const // TODO DIP-1000 scope
     {
         if (_ptr == rhs._ptr)   // fast equality
         {
@@ -274,7 +274,7 @@ struct MpZ
         return __gmpz_cmp(_ptr, rhs._ptr) == 0;
     }
     /// ditto
-    bool opEquals(Rhs)(Rhs rhs) const
+    bool opEquals(Rhs)(Rhs rhs) const // TODO DIP-1000 scope
         if (isArithmetic!Rhs)
     {
         if (rhs == 0)
@@ -296,7 +296,7 @@ struct MpZ
     }
 
     /// Compare `this` to `rhs`.
-    int opCmp()(auto ref const MpZ rhs) const
+    int opCmp()(auto ref const MpZ rhs) const // TODO DIP-1000 scope
     {
         if (rhs == 0)
         {
@@ -306,7 +306,7 @@ struct MpZ
     }
 
     /// ditto
-    int opCmp(T)(T rhs) const
+    int opCmp(T)(T rhs) const // TODO DIP-1000 scope
         if (isArithmetic!T)
     {
         if (rhs == 0)
@@ -328,12 +328,12 @@ struct MpZ
     }
 
     /// Cast to `bool`.
-    bool opCast(T : bool)() const
+    bool opCast(T : bool)() const // TODO DIP-1000 scope
     {
         return !isZero;
     }
 
-    T opCast(T)() const
+    T opCast(T)() const         // TODO DIP-1000 scope
         if (isArithmetic!T)
     {
         static      if (isUnsigned!T)
@@ -1437,6 +1437,7 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(x == 42);
     assert(y == 43);
 
+    assert(mpz(null).fromString("42") == 42.Z);
     assert(mpz(null).fromString("42") == 42);
     assert(mpz(null).fromString("11", 2) == 3);
     assert(mpz(null).fromString("7", 8) == 7);
