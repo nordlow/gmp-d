@@ -2097,6 +2097,7 @@ enum isTemplate(alias sym) = __traits(isTemplate, sym);
 enum hasMember(T, string member) = __traits(hasMember, T, member);
 enum IdentifierStringOfSymbol(alias sym) = __traits(identifier, sym);
 
+// TODO WARNING disabled because this cannot be wrapped in a template
 enum isRef(alias fn) = __traits(isRef, fn);
 
 /// http://forum.dlang.org/post/llwrbirvlqxawifyytqq@forum.dlang.org
