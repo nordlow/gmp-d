@@ -2091,24 +2091,35 @@ enum isAbstractFunction(alias fn) = __traits(isAbstractFunction, fn);
 enum isFinalFunction(alias fn) = __traits(isFinalFunction, fn);
 enum isOverrideFunction(alias fn) = __traits(isOverrideFunction, fn);
 enum isStaticFunction(alias fn) = __traits(isStaticFunction, fn);
-enum isRef(alias fn) = __traits(isRef, fn);
 enum isOut(alias fn) = __traits(isOut, fn);
 enum isLazy(alias fn) = __traits(isLazy, fn);
 enum isTemplate(alias sym) = __traits(isTemplate, sym);
 enum hasMember(T, string member) = __traits(hasMember, T, member);
 enum IdentifierStringOfSymbol(alias sym) = __traits(identifier, sym);
 
+enum isRef(alias fn) = __traits(isRef, fn);
+
 /// http://forum.dlang.org/post/llwrbirvlqxawifyytqq@forum.dlang.org
-version(none) @safe pure nothrow @nogc unittest
+@safe pure nothrow @nogc unittest
 {
     struct S { int x, y; }
+
     static void f()(auto ref const S s)
     {
-        pragma(msg, "type:", typeof(s), " isRef:", isRef!s);
+        static assert(__traits(isRef, s));
     }
-    f(S.init);
+
+    static void g()(auto ref const S s)
+    {
+        static assert(!__traits(isRef, s));
+    }
+
     S s;
+    static assert(!__traits(isRef, s));
+
     f(s);
+
+    g(S.init);
 }
 
 /// as hash table key
