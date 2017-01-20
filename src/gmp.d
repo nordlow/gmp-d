@@ -415,7 +415,7 @@ struct MpZ
                 // commutative
                 MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
                 __gmpz_add(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
-                return move(*mut_rhs); // TODO shouldn't have to call mut here
+                return move(*mut_rhs); // TODO shouldn't have to call move here
             }
             else
             {
@@ -431,7 +431,7 @@ struct MpZ
                 MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
                 __gmpz_sub(mut_rhs._ptr, rhs._ptr, _ptr); version(ccc) ++mut_rhs._ccc;
                 mut_rhs.negate(); // fast
-                return move(*mut_rhs); // TODO shouldn't have to call mut here
+                return move(*mut_rhs); // TODO shouldn't have to call move here
             }
             else
             {
@@ -447,7 +447,7 @@ struct MpZ
                 // commutative
                 MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
                 __gmpz_mul(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
-                return move(*mut_rhs); // TODO shouldn't have to call mut here
+                return move(*mut_rhs); // TODO shouldn't have to call move here
             }
             else
             {
