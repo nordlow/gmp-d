@@ -980,12 +980,11 @@ struct MpZ
         return y;
     }
 
-    /// Returns: absolute value of `this`.
-    MpZ abs() const @trusted
+    /// Returns: Make `this` the absolute value of itself.
+    ref MpZ absolute() @trusted return
     {
-        typeof(return) y = null;
-        __gmpz_abs(y._ptr, _ptr); version(ccc) ++y._ccc;
-        return y;
+        __gmpz_abs(_ptr, _ptr); version(ccc) ++_ccc;
+        return this;
     }
 
     /// Returns: number of digits in base `base`.
@@ -1411,6 +1410,10 @@ MpZ cmpabs()(auto ref const MpZ x) @trusted @nogc
     assert(n == 42);
     n.negate();
     assert(n == -42);
+    n.absolute();
+    assert(n == 42);
+    n.absolute();
+    assert(n == 42);
 
     // addition
 
