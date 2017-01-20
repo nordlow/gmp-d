@@ -1548,9 +1548,11 @@ MpZ powm()(auto ref const MpZ base,
 
     assert(nextPrime(_24) == 29);
     assert(nextPrime(24.Z) == 29);
+    assert(24.Z.nextPrime() == 29);
 
     assert(nextPrime(_43) == 47);
     assert(nextPrime(43.Z) == 47);
+    assert(43.Z.nextPrime() == 47);
 
     // greatest common divisor
 
