@@ -1,6 +1,8 @@
 /** High-level wrapper for GNU Multiple Precision (MP) library.
 
-    TODO _ccc Make _ccc two => uint _initCCC and uint _opCCC, mutatingCallCount return their sum
+    TODO _ccc Make _ccc two => uint _initCCC and uint _opCCC, mutatingCallCount
+    return their sum. Use these counters to make more precise asserts on how
+    assignments and operators are lowered to calls to C __gmpz-calls
 
     TODO replace parameter types of type MpZ with (Rhs + isMpZExpr) and allow
     template expressions
