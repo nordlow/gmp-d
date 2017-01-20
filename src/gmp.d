@@ -907,6 +907,12 @@ struct MpZ
         _z._mp_size = -_z._mp_size; // fast C macro `mpz_neg` in gmp.h
     }
 
+    /// Make `this` the absolute value of itself in-place.
+    void absolute() @trusted
+    {
+        __gmpz_abs(_ptr, _ptr); version(ccc) ++_ccc;
+    }
+
     /// Increase `this` by one.
     ref MpZ opUnary(string s)() return @trusted // TODO scope
         if (s == "++")
@@ -976,13 +982,6 @@ struct MpZ
         typeof(return) y = 0;       // result, TODO reuse `exp` or `mod` if any is an r-value
         __gmpz_powm_ui(y._ptr, _ptr, exp, mod._ptr); version(ccc) ++y._ccc;
         return y;
-    }
-
-    /// Make `this` the absolute value of itself.
-    ref MpZ absolute() @trusted return
-    {
-        __gmpz_abs(_ptr, _ptr); version(ccc) ++_ccc;
-        return this;
     }
 
     /// Returns: number of digits in base `base`.
