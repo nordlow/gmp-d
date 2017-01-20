@@ -413,7 +413,9 @@ struct MpZ
     {
         static if (!__traits(isRef, rhs)) // r-value `rhs`
         {
-            MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
+            // safe to cast away constness of r-value MpZ because it doesn't
+            // contain any indirections
+            MpZ* mut_rhs = (cast(MpZ*)(&rhs));
             static      if (s == "+")
             {
                 __gmpz_add(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
