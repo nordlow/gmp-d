@@ -1139,11 +1139,13 @@ void swap()(ref MpZ x,
     swap(x, y); // x.swap(y);
 }
 
+/// Returns: string representation of `x` in decimal base.
 string toDecimalString()(auto ref const MpZ x) // for `std.bigint.BigInt` compatibility
 {
     return x.toString(10);
 }
 
+/// Returns: string representation of `x` in uppercased hexadecimal base without any base prefix (0x).
 string toHex()(auto ref const MpZ x) // for `std.bigint.BigInt` compatibility
 {
     return x.toString(16, true);
