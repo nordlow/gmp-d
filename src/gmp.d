@@ -482,7 +482,6 @@ struct MpZ
         if (isLazyMpZExpr!Rhs && // lazy value
             (s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
-        pragma(msg, typeof(this), " ", s, " ", Rhs);
         static assert(false, "TODO");
     }
 
