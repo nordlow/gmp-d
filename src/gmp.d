@@ -43,7 +43,7 @@ struct MpZ
     @trusted pure nothrow pragma(inline, true):
 
     /// Convert to `string` in base `base`.
-    string toString(int base = defaultBase, bool upperCaseDigits = false) const
+    string toString(uint base = defaultBase, bool upperCaseDigits = false) const
     {
         assert((base >= -2 && base <= -36) ||
                (base >= 2 && base <= 62));
@@ -157,7 +157,7 @@ struct MpZ
         If `base` is 0 it's guessed from contents of `value`.
         */
     pragma(inline, false)
-    this(in string value, int base = 0) // TODO Use Optional/Nullable when value is nan, or inf
+    this(in string value, uint base = 0) // TODO Use Optional/Nullable when value is nan, or inf
     {
         assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(value);
@@ -245,7 +245,7 @@ struct MpZ
     /** Assign `this` from `string` `rhs` interpreted in base `base`.
         If `base` is 0 it's guessed from contents of `value`.
     */
-    ref MpZ fromString(in string rhs, int base = 0) return // TODO scope
+    ref MpZ fromString(in string rhs, uint base = 0) return // TODO scope
     {
         assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(rhs);
@@ -923,7 +923,7 @@ struct MpZ
     }
 
     /// Returns: number of digits in base `base`.
-    size_t sizeInBase(int base) const
+    size_t sizeInBase(uint base) const
     {
         return __gmpz_sizeinbase(_ptr, base);
     }
