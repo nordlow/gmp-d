@@ -965,7 +965,7 @@ struct MpZ
     MpZ powm()(auto ref const MpZ exp,
                auto ref const MpZ mod) const @trusted
     {
-        typeof(return) y = 0; // result
+        typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
         __gmpz_powm(y._ptr, _ptr,  exp._ptr, mod._ptr); version(ccc) ++y._ccc;
         return y;
     }
@@ -973,7 +973,7 @@ struct MpZ
     MpZ powm()(ulong exp,
                auto ref const MpZ mod) const @trusted
     {
-        typeof(return) y = 0;       // result
+        typeof(return) y = 0;       // result, TODO reuse `exp` or `mod` if any is an r-value
         __gmpz_powm_ui(y._ptr, _ptr, exp, mod._ptr); version(ccc) ++y._ccc;
         return y;
     }
