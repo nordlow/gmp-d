@@ -407,69 +407,67 @@ struct MpZ
     MpZ opBinary(string s)(auto ref const MpZ rhs) const // direct value
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
-        static      if (s == "+")
+        static if (!__traits(isRef, rhs)) // r-value `rhs`
         {
-            static if (!__traits(isRef, rhs)) // r-value `rhs`
+            MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
+            static      if (s == "+")
             {
-                MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
                 __gmpz_add(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
-                return move(*mut_rhs); // TODO shouldn't have to call move here
             }
-            else
+            else static if (s == "-")
             {
-                typeof(return) y = null;
-                __gmpz_add(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
-                return y;
-            }
-        }
-        else static if (s == "-")
-        {
-            static if (!__traits(isRef, rhs)) // r-value `rhs`
-            {
-                MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
                 __gmpz_sub(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
-                return move(*mut_rhs); // TODO shouldn't have to call move here
             }
-            else
+            else static if (s == "*")
             {
-                typeof(return) y = null;
-                __gmpz_sub(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
-                return y;
-            }
-        }
-        else static if (s == "*")
-        {
-            static if (!__traits(isRef, rhs)) // r-value `rhs`
-            {
-                MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
                 __gmpz_mul(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
-                return move(*mut_rhs); // TODO shouldn't have to call move here
+            }
+            else static if (s == "/")
+            {
+                assert(rhs != 0, "Divison by zero");
+                __gmpz_tdiv_q(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+            }
+            else static if (s == "%")
+            {
+                assert(rhs != 0, "Divison by zero");
+                __gmpz_tdiv_r(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
             }
             else
             {
-                typeof(return) y = null;
-                __gmpz_mul(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
-                return y;
+                static assert(false);
             }
-        }
-        else static if (s == "/")
-        {
-            assert(rhs != 0, "Divison by zero");
-            typeof(return) y = null;
-            __gmpz_tdiv_q(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
-            return y;
-        }
-        else static if (s == "%")
-        {
-            // TODO use tdiv_r or mod?
-            typeof(return) y = null;
-            __gmpz_tdiv_r(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
-            // __gmpz_mod(y._ptr, _ptr, rhs._ptr); // sign of divisor is ignored
-            return y;
+            return move(*mut_rhs); // TODO shouldn't have to call move here
         }
         else
         {
-            static assert(false);
+            typeof(return) y = null;
+            static      if (s == "+")
+            {
+                __gmpz_add(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+            }
+            else static if (s == "-")
+            {
+                __gmpz_sub(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+            }
+            else static if (s == "*")
+            {
+                __gmpz_mul(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+            }
+            else static if (s == "/")
+            {
+                assert(rhs != 0, "Divison by zero");
+                __gmpz_tdiv_q(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+            }
+            else static if (s == "%")
+            {
+                assert(rhs != 0, "Divison by zero");
+                __gmpz_tdiv_r(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+            }
+            else
+            {
+                static assert(false);
+            }
+            return y;
         }
     }
 
