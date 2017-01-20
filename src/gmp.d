@@ -1201,19 +1201,19 @@ MpZ gcd()(auto ref const MpZ x,
     static      if (!__traits(isRef, x)) // r-value `x`
     {
         MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_gcd(mut_x._ptr, x._ptr, y._ptr); // TODO reuse x or y if they are r-values
+        __gmpz_gcd(mut_x._ptr, x._ptr, y._ptr);
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
     else static if (!__traits(isRef, y)) // r-value `y`
     {
         MpZ* mut_y = (cast(MpZ*)(&y)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_gcd(mut_y._ptr, x._ptr, y._ptr); // TODO reuse x or y if they are r-values
+        __gmpz_gcd(mut_y._ptr, x._ptr, y._ptr);
         return move(*mut_y);    // TODO shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`
     {
         MpZ z = null;
-        __gmpz_gcd(z._ptr, x._ptr, y._ptr); // TODO reuse x or y if they are r-values
+        __gmpz_gcd(z._ptr, x._ptr, y._ptr);
         return z;
     }
 }
