@@ -978,7 +978,7 @@ struct MpZ
         return y;
     }
 
-    /// Returns: Make `this` the absolute value of itself.
+    /// Make `this` the absolute value of itself.
     ref MpZ absolute() @trusted return
     {
         __gmpz_abs(_ptr, _ptr); version(ccc) ++_ccc;
@@ -1175,10 +1175,11 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     }
 }
 
-/// Returns: absolute value of `x`.
-MpZ cmpabs()(auto ref const MpZ x) @trusted @nogc
+/// Returns: comparison of the absolute values of `x` and `y`.
+int cmpabs()(auto ref const MpZ x,
+             auto ref const MpZ y) @trusted @nogc
 {
-    static assert(false, "TODO");
+    return abs(x).opCmp(abs(y)); // TODO faster than 'mpz_cmpabs'?
 }
 
 ///
