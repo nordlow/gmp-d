@@ -9,8 +9,6 @@
 
     TODO disallow construction and assignment from floating point? Check with
     other GMP interfaces and std.bigint.
-
-    TODO Support __mpz_cmpabs
  */
 module gmp;
 
