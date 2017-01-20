@@ -23,8 +23,7 @@ version = ccc;                  // do C mutation call count
 enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
 
 /// Is `true` if type `T` can be evaluated to a `MpZ` value.
-enum isMpZExpr(T) = (// TODO needed?: __traits(hasMember, T, "eval") && // has member `eval()`
-                     is(Unqual!(typeof(T.eval())) == MpZ)); // which returns an `MpZ`
+enum isMpZExpr(T) = (is(Unqual!(typeof(T.eval())) == MpZ)); // which returns an `MpZ`
 /// Is `true` if type `T` is lazy (not yet evaluated) `MpZ`-expression.
 enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct value
                          isMpZExpr!T);
@@ -410,7 +409,7 @@ struct MpZ
     {
         static      if (s == "+")
         {
-            static if (!isRef!rhs)
+            static if (!__traits(isRef, rhs)) // r-value `rhs`
             {
                 // commutative
                 MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
@@ -426,7 +425,7 @@ struct MpZ
         }
         else static if (s == "-")
         {
-            static if (!isRef!rhs)
+            static if (!__traits(isRef, rhs)) // r-value `rhs`
             {
                 MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
                 __gmpz_sub(mut_rhs._ptr, rhs._ptr, _ptr); version(ccc) ++mut_rhs._ccc;
@@ -442,7 +441,7 @@ struct MpZ
         }
         else static if (s == "*")
         {
-            static if (!isRef!rhs)
+            static if (!__traits(isRef, rhs)) // r-value `rhs`
             {
                 // commutative
                 MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
