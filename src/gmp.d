@@ -678,7 +678,7 @@ struct MpZ
         if ((s == "/") &&
             isIntegral!Lhs)
     {
-        MpZ y = null;
+        MpZ y = null; // TODO avoid if !__traits(isRef, this)
         version(ccc) ++y._ccc;
         assert(this != 0, "Divison by zero");
         __gmpz_tdiv_q(y._ptr, MpZ(lhs)._ptr, _ptr);
