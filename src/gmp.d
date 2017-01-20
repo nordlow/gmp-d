@@ -1,7 +1,5 @@
 /** High-level wrapper for GNU Multiple Precision (MP) library.
 
-    TODO remove `@trusted:` and make them explicit for all functions
-
     TODO _ccc Make _ccc two => uint _initCCC and uint _opCCC, mutatingCallCount return their sum
 
     TODO replace parameter types of type MpZ with (Rhs + isMpZExpr) and allow
@@ -16,7 +14,7 @@ debug import core.stdc.stdio : printf;
 import std.typecons : Unsigned, Unqual;
 import std.meta : AliasSeq;
 import std.traits : isInstanceOf;
-import std.algorithm.mutation : move;
+import std.algorithm.mutation : move, moveEmplace;
 
 /// Call unittests taking long to execute.
 enum unittestLong = false;
@@ -147,9 +145,14 @@ struct MpZ
     static if (useCopy)
     {
         /// Construct copy of `value`.
-        this()(auto ref const MpZ value) @trusted
+        this(ref const MpZ value) @trusted
         {
-            mpz_init_set(_ptr, value._ptr);
+            __gmpz_init_set(_ptr, value._ptr); version(ccc) ++_ccc;
+        }
+        /// Construct copy of `value`.
+        this(MpZ value) @trusted
+        {
+            moveEmplace(value, this);
         }
     }
     else
