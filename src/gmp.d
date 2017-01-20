@@ -1194,6 +1194,23 @@ int cmpabs()(auto ref const MpZ x, ulong y) @trusted @nogc
     return __gmpz_cmpabs_ui(x._ptr, y);
 }
 
+/// Returns: greatest common divisor (gcd) of `x` and `y`.
+MpZ gcd()(auto ref const MpZ x,
+          auto ref const MpZ y) @trusted @nogc
+{
+    MpZ z = null;
+    __gmpz_gcd(z._ptr, x._ptr, y._ptr); // TODO reuse x or y if they are r-values
+    return z;
+}
+/// ditto
+MpZ gcd()(auto ref const MpZ x,
+          ulong y) @trusted @nogc
+{
+    MpZ z = null;
+    __gmpz_gcd_ui(z._ptr, x._ptr, y); // TODO reuse x if they are r-values
+    return z;
+}
+
 ///
 @safe @nogc unittest
 {
@@ -1414,6 +1431,7 @@ int cmpabs()(auto ref const MpZ x, ulong y) @trusted @nogc
     assert(abs(-a) == a);
 
     // absolute value comparison
+
     assert(cmpabs(-43.Z,  44.Z) == -1);
     assert(cmpabs(-43.Z, -44.Z) == -1);
     assert(cmpabs(-44.Z, -43.Z) == +1);
@@ -1429,6 +1447,18 @@ int cmpabs()(auto ref const MpZ x, ulong y) @trusted @nogc
     assert(cmpabs(-44.Z, 43) == +1);
     assert(cmpabs( 44.Z, 43) == +1);
     assert(cmpabs(-43.Z, 43) ==  0);
+
+    // greatest common divisor
+
+    assert(gcd(43.Z,  44.Z) == 1);
+    assert(gcd(4.Z, 24.Z) == 4);
+    assert(gcd(6.Z, 24.Z) == 6);
+    assert(gcd(10.Z, 100.Z) == 10);
+
+    assert(gcd(43.Z,  44) == 1);
+    assert(gcd(4.Z, 24) == 4);
+    assert(gcd(6.Z, 24) == 6);
+    assert(gcd(10.Z, 100) == 10);
 
     // negated value
 
@@ -2385,6 +2415,9 @@ extern(C)
     int __gmpz_cmpabs (mpz_srcptr, mpz_srcptr);
     int __gmpz_cmpabs_d (mpz_srcptr, double);
     int __gmpz_cmpabs_ui (mpz_srcptr, ulong);
+
+    void __gmpz_gcd (mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_gcd_ui (mpz_ptr, mpz_srcptr, ulong);
 
     char *__gmpz_get_str (char*, int, mpz_srcptr);
     size_t __gmpz_sizeinbase (mpz_srcptr, int);
