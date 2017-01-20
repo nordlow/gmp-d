@@ -233,11 +233,11 @@ struct MpZ
         {
             static if (isUnsigned!Integral)
             {
-                __gmpz_set_ui(_ptr, rhs);  version(ccc) ++_ccc;
+                __gmpz_set_ui(_ptr, rhs); version(ccc) ++_ccc;
             }
             else static if (isSigned!Integral)
             {
-                __gmpz_set_si(_ptr, rhs);  version(ccc) ++_ccc;
+                __gmpz_set_si(_ptr, rhs); version(ccc) ++_ccc;
             }
             else
             {
@@ -248,7 +248,7 @@ struct MpZ
     /// ditto
     ref MpZ opAssign(double rhs) return // TODO scope
     {
-        __gmpz_set_d(_ptr, rhs);  version(ccc) ++_ccc;
+        __gmpz_set_d(_ptr, rhs); version(ccc) ++_ccc;
         return this;
     }
 
