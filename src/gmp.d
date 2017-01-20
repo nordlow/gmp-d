@@ -1186,22 +1186,39 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(mpz( 42).absUnsign!ulong == 42);
 }
 
-/// lazy evaluation via expression templates
+/// opBinary with r-value right-hand-side
 @safe @nogc unittest
 {
     Z a = 42;
+    {
+        Z b = a + 1.Z;              // r-value `rhs`
+        assert(b.mutatingCallCount == 2);
+        assert(b == 43);
+    }
 
-    Z b = a + 1.Z;
-    assert(b.mutatingCallCount == 2);
-    assert(b == 43);
+    {
+        Z b = a - 1.Z;              // r-value `rhs`
+        assert(b.mutatingCallCount == 2);
+        assert(b == 41);
+    }
 
-    Z c = a - 1.Z;
-    assert(c.mutatingCallCount == 2);
-    assert(c == 41);
+    {
+        Z b = a * 2.Z;              // r-value `rhs`
+        assert(b.mutatingCallCount == 2);
+        assert(b == 84);
+    }
 
-    Z d = a * 2.Z;
-    assert(d.mutatingCallCount == 2);
-    assert(d == 84);
+    {
+        Z b = a / 2.Z;              // r-value `rhs`
+        assert(b.mutatingCallCount == 2);
+        assert(b == 21);
+    }
+
+    {
+        Z b = a % 10.Z;              // r-value `rhs`
+        assert(b.mutatingCallCount == 2);
+        assert(b == 2);
+    }
 }
 
 ///
