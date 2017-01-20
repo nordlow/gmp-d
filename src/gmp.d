@@ -343,6 +343,7 @@ struct MpZ
         return !isZero;
     }
 
+    /// Cast to arithmetic type `T`.
     T opCast(T)() const         // TODO scope
         if (isArithmetic!T)
     {
@@ -1889,6 +1890,7 @@ MpzAddExpr!(T1, T2) mpzAddExpr(T1, T2)(T1 t1, T2 t2)
     assert(MpzAddExpr!(Z, Z)(3.Z, 4.Z).eval() == 3 + 4);
     const Z x = MpzAddExpr!(Z, Z)(3.Z, 4.Z);
     assert(x.mutatingCallCount == 1); // lowers to single `mpz_add`
+    dln(cast(ulong)x);
     assert(x == 7);
 }
 
@@ -2146,7 +2148,7 @@ enum isRef(alias fn) = __traits(isRef, fn);
 
 version(unittest)
 {
-    // import dbgio;
+    import dbgio;
     alias Z = MpZ;
 }
 
