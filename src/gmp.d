@@ -1198,9 +1198,24 @@ int cmpabs()(auto ref const MpZ x, ulong y) @trusted @nogc
 MpZ gcd()(auto ref const MpZ x,
           auto ref const MpZ y) @trusted @nogc
 {
-    MpZ z = null;
-    __gmpz_gcd(z._ptr, x._ptr, y._ptr); // TODO reuse x or y if they are r-values
-    return z;
+    static      if (!__traits(isRef, x)) // r-value `x`
+    {
+        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_gcd(mut_x._ptr, x._ptr, y._ptr); // TODO reuse x or y if they are r-values
+        return move(*mut_x);    // TODO shouldn't have to call `move` here
+    }
+    else static if (!__traits(isRef, y)) // r-value `y`
+    {
+        MpZ* mut_y = (cast(MpZ*)(&y)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_gcd(mut_y._ptr, x._ptr, y._ptr); // TODO reuse x or y if they are r-values
+        return move(*mut_y);    // TODO shouldn't have to call `move` here
+    }
+    else                        // l-value `x` and `y`
+    {
+        MpZ z = null;
+        __gmpz_gcd(z._ptr, x._ptr, y._ptr); // TODO reuse x or y if they are r-values
+        return z;
+    }
 }
 /// ditto
 MpZ gcd()(auto ref const MpZ x,
@@ -1215,7 +1230,7 @@ MpZ gcd()(auto ref const MpZ x,
     else
     {
         MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_gcd_ui(mut_x._ptr, mut_x._ptr, y);
+        __gmpz_gcd_ui(mut_x._ptr, x._ptr, y);
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
 }
@@ -1471,9 +1486,12 @@ MpZ gcd()(auto ref const MpZ x,
 
     Z _43 = 43;
     Z _4 = 4;
+    Z _24 = 24;
 
     assert(gcd(_43,  44) == 1);
     assert(gcd(_4, 24) == 4);
+    assert(gcd(_4, _24) == 4);
+    assert(gcd(_4, 24.Z) == 4);
 
     // negated value
 
