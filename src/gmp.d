@@ -423,9 +423,7 @@ struct MpZ
     {
         static if (!__traits(isRef, rhs)) // r-value `rhs`
         {
-            // safe to cast away constness of r-value MpZ because it doesn't
-            // contain any indirections
-            MpZ* mut_rhs = (cast(MpZ*)(&rhs));
+            MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // @trusted because MpZ has no aliased indirections
             static      if (s == "+")
             {
                 __gmpz_add(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
@@ -1169,9 +1167,9 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     }
     else                        // r-value `x`
     {
-        static assert(false, "TODO verify this");
-        y.makeAbsolute();
-        return move(y);
+        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because MpZ has no aliased indirections
+        mut_x.absolute();
+        return move(*mut_x);
     }
 }
 
@@ -1396,7 +1394,9 @@ MpZ cmpabs()(auto ref const MpZ x) @trusted @nogc
     // absolute value
 
     assert(abs(a) == a);        // free function
-    assert(a.abs == a);         // member
+    assert(a.abs == a);         // UFCS
+    assert(abs(-42.Z) == 42);
+    assert(abs(-a) == a);
 
     // negated value
 
