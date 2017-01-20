@@ -901,13 +901,17 @@ struct MpZ
         return y;
     }
 
-    /// Negate `this` in-place.
+    /** Negate `this` in-place.
+        Returns: `void` to make it obvious `this` is mutated.
+     */
     void negate() @safe
     {
         _z._mp_size = -_z._mp_size; // fast C macro `mpz_neg` in gmp.h
     }
 
-    /// Make `this` the absolute value of itself in-place.
+    /** Make `this` the absolute value of itself in-place.
+        Returns: `void` to make it obvious `this` is mutated.
+     */
     void absolute() @trusted
     {
         __gmpz_abs(_ptr, _ptr); version(ccc) ++_ccc;
