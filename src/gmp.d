@@ -1179,7 +1179,7 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
 int cmpabs()(auto ref const MpZ x,
              auto ref const MpZ y) @trusted @nogc
 {
-    return abs(x).opCmp(abs(y)); // TODO faster than 'mpz_cmpabs'?
+    return __gmpz_cmpabs(x._ptr, y._ptr);
 }
 
 ///
@@ -1400,6 +1400,12 @@ int cmpabs()(auto ref const MpZ x,
     assert(a.abs == a);         // UFCS
     assert(abs(-42.Z) == 42);
     assert(abs(-a) == a);
+
+    // absolute value comparison
+    assert(cmpabs(-43.Z,  44.Z) == -1);
+    assert(cmpabs(-43.Z, -44.Z) == -1);
+    assert(cmpabs(-44.Z, -43.Z) == +1);
+    assert(cmpabs(-43.Z, -43.Z) ==  0);
 
     // negated value
 
@@ -2346,15 +2352,19 @@ extern(C)
     void __gmpz_pow_ui (mpz_ptr, mpz_srcptr, ulong);
     void __gmpz_ui_pow_ui (mpz_ptr, ulong, ulong);
 
-    void __gmpz_swap (mpz_ptr, mpz_ptr); // TODO: __GMP_NOTHROW;
+    void __gmpz_swap (mpz_ptr, mpz_ptr);
 
-    int __gmpz_cmp (mpz_srcptr, mpz_srcptr); // TODO: __GMP_NOTHROW __GMP_ATTRIBUTE_PURE;
-    int __gmpz_cmp_d (mpz_srcptr, double); // TODO: __GMP_ATTRIBUTE_PURE
-    int __gmpz_cmp_si (mpz_srcptr, long); // TODO: __GMP_NOTHROW __GMP_ATTRIBUTE_PURE
-    int __gmpz_cmp_ui (mpz_srcptr, ulong); // TODO: __GMP_NOTHROW __GMP_ATTRIBUTE_PURE
+    int __gmpz_cmp (mpz_srcptr, mpz_srcptr);
+    int __gmpz_cmp_d (mpz_srcptr, double);
+    int __gmpz_cmp_si (mpz_srcptr, long);
+    int __gmpz_cmp_ui (mpz_srcptr, ulong);
+
+    int __gmpz_cmpabs (mpz_srcptr, mpz_srcptr);
+    int __gmpz_cmpabs_d (mpz_srcptr, double);
+    int __gmpz_cmpabs_ui (mpz_srcptr, ulong);
 
     char *__gmpz_get_str (char*, int, mpz_srcptr);
-    size_t __gmpz_sizeinbase (mpz_srcptr, int); // TODO __GMP_NOTHROW __GMP_ATTRIBUTE_PURE;
+    size_t __gmpz_sizeinbase (mpz_srcptr, int);
 
     void __gmpz_powm (mpz_ptr, mpz_srcptr, mpz_srcptr, mpz_srcptr);
     void __gmpz_powm_ui (mpz_ptr, mpz_srcptr, ulong, mpz_srcptr);
