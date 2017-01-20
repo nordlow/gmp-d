@@ -423,7 +423,7 @@ struct MpZ
     {
         static if (!__traits(isRef, rhs)) // r-value `rhs`
         {
-            MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // @trusted because MpZ has no aliased indirections
+            MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // @trusted because `MpZ` has no aliased indirections
             static      if (s == "+")
             {
                 __gmpz_add(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
@@ -450,7 +450,7 @@ struct MpZ
             {
                 static assert(false);
             }
-            return move(*mut_rhs); // TODO shouldn't have to call move here
+            return move(*mut_rhs); // TODO shouldn't have to call `move` here
         }
         else
         {
@@ -1158,7 +1158,9 @@ Unsigned!T absUnsign(T)(auto ref const MpZ x) // for `std.bigint.BigInt` compati
     return _integralAbs(cast(T)x);
 }
 
-/// Returns: absolute value of `x`.
+/** Returns: absolute value of `x`.
+    Written as a free function instead of Mpz-member because `__traits(isRef, this)` cannot be used.
+ */
 MpZ abs()(auto ref const MpZ x) @trusted @nogc
 {
     static if (__traits(isRef, x)) // l-value `x`
@@ -1169,9 +1171,9 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     }
     else                        // r-value `x`
     {
-        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because MpZ has no aliased indirections
+        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
         mut_x.absolute();
-        return move(*mut_x);    // TODO shouldn't have to call move here
+        return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
 }
 
