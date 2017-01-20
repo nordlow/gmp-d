@@ -1206,9 +1206,18 @@ MpZ gcd()(auto ref const MpZ x,
 MpZ gcd()(auto ref const MpZ x,
           ulong y) @trusted @nogc
 {
-    MpZ z = null;
-    __gmpz_gcd_ui(z._ptr, x._ptr, y); // TODO reuse x if they are r-values
-    return z;
+    static if (__traits(isRef, x)) // l-value `x`
+    {
+        MpZ z = null;
+        __gmpz_gcd_ui(z._ptr, x._ptr, y);
+        return z;
+    }
+    else
+    {
+        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_gcd_ui(mut_x._ptr, mut_x._ptr, y);
+        return move(*mut_x);    // TODO shouldn't have to call `move` here
+    }
 }
 
 ///
@@ -1459,6 +1468,12 @@ MpZ gcd()(auto ref const MpZ x,
     assert(gcd(4.Z, 24) == 4);
     assert(gcd(6.Z, 24) == 6);
     assert(gcd(10.Z, 100) == 10);
+
+    Z _43 = 43;
+    Z _4 = 4;
+
+    assert(gcd(_43,  44) == 1);
+    assert(gcd(_4, 24) == 4);
 
     // negated value
 
