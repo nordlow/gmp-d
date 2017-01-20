@@ -1227,7 +1227,8 @@ MpZ powm()(auto ref const MpZ base,
            auto ref const MpZ mod) @trusted
 {
     typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
-    __gmpz_powm(y._ptr, base._ptr,  exp._ptr, mod._ptr); version(ccc) ++y._ccc;
+    assert(exp >= 0, "Negative exponent");
+    __gmpz_powm(y._ptr, base._ptr, exp._ptr, mod._ptr); version(ccc) ++y._ccc;
     return y;
 }
 /// ditto
