@@ -411,7 +411,6 @@ struct MpZ
         {
             static if (!__traits(isRef, rhs)) // r-value `rhs`
             {
-                // commutative
                 MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
                 __gmpz_add(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
                 return move(*mut_rhs); // TODO shouldn't have to call move here
@@ -442,7 +441,6 @@ struct MpZ
         {
             static if (!__traits(isRef, rhs)) // r-value `rhs`
             {
-                // commutative
                 MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
                 __gmpz_mul(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
                 return move(*mut_rhs); // TODO shouldn't have to call move here
