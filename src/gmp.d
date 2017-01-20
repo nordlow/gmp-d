@@ -1224,13 +1224,13 @@ MpZ gcd()(auto ref const MpZ x,
     static if (__traits(isRef, x)) // l-value `x`
     {
         MpZ z = null;
-        __gmpz_gcd_ui(z._ptr, x._ptr, y);
+        const z_ui = __gmpz_gcd_ui(z._ptr, x._ptr, y);
         return z;
     }
     else
     {
         MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_gcd_ui(mut_x._ptr, x._ptr, y);
+        const z_ui = __gmpz_gcd_ui(mut_x._ptr, x._ptr, y);
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
 }
@@ -2450,7 +2450,7 @@ extern(C)
     int __gmpz_cmpabs_ui (mpz_srcptr, ulong);
 
     void __gmpz_gcd (mpz_ptr, mpz_srcptr, mpz_srcptr);
-    void __gmpz_gcd_ui (mpz_ptr, mpz_srcptr, ulong);
+    ulong __gmpz_gcd_ui (mpz_ptr, mpz_srcptr, ulong);
 
     char *__gmpz_get_str (char*, int, mpz_srcptr);
     size_t __gmpz_sizeinbase (mpz_srcptr, int);
