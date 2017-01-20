@@ -25,6 +25,9 @@ enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
 /// Is `true` if type `T` can be evaluated to a `MpZ` value.
 enum isMpZExpr(T) = (// TODO needed?: __traits(hasMember, T, "eval") && // has member `eval()`
                      is(Unqual!(typeof(T.eval())) == MpZ)); // which returns an `MpZ`
+/// Is `true` if type `T` is lazy (not yet evaluated) `MpZ`-expression.
+enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct value
+                         isMpZExpr!T);
 
 version(unittest) static assert(!isMpZExpr!int);
 
@@ -96,8 +99,7 @@ struct MpZ
 
     /// Construct from expression `expr`.
     this(Expr)(Expr expr)
-        if (isMpZExpr!Expr &&
-            !is(Expr == MpZ))   // except standard copy constructor
+        if (isLazyMpZExpr!Expr)
     {
         static      if (isInstanceOf!(MpzAddExpr, Expr))
         {
@@ -218,23 +220,31 @@ struct MpZ
         return this;
     }
     /// ditto
-    ref MpZ opAssign(Integral)(Integral rhs) return // TODO scope
-        if (isIntegral!Integral)
+    ref MpZ opAssign(Expr)(auto ref Expr rhs) return // TODO scope
+        if (isLazyMpZExpr!Expr)
     {
-        static if (isUnsigned!Integral)
-        {
-            __gmpz_set_ui(_ptr, rhs);  version(ccc) ++_ccc;
-        }
-        else static if (isSigned!Integral)
-        {
-            __gmpz_set_si(_ptr, rhs);  version(ccc) ++_ccc;
-        }
-        else
-        {
-            static assert(false);
-        }
+        pragma(msg, "TODO specialize on lazy evaluated Expr");
+        __gmpz_set(_ptr, rhs.eval()._ptr); version(ccc) ++_ccc;
         return this;
     }
+    /// ditto
+    ref MpZ opAssign(Integral)(Integral rhs) return // TODO scope
+        if (isIntegral!Integral)
+        {
+            static if (isUnsigned!Integral)
+            {
+                __gmpz_set_ui(_ptr, rhs);  version(ccc) ++_ccc;
+            }
+            else static if (isSigned!Integral)
+            {
+                __gmpz_set_si(_ptr, rhs);  version(ccc) ++_ccc;
+            }
+            else
+            {
+                static assert(false);
+            }
+            return this;
+        }
     /// ditto
     ref MpZ opAssign(double rhs) return // TODO scope
     {
