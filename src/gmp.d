@@ -1169,7 +1169,7 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     {
         MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because MpZ has no aliased indirections
         mut_x.absolute();
-        return move(*mut_x);
+        return move(*mut_x);    // TODO shouldn't have to call move here
     }
 }
 
