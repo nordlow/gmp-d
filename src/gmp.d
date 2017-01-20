@@ -1143,7 +1143,7 @@ Unsigned!T absUnsign(T)(auto ref const MpZ x) // for `std.bigint.BigInt` compati
 }
 
 /** Returns: absolute value of `x`.
-    Written as a free function instead of Mpz-member because `__traits(isRef, this)` cannot be used.
+    Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
  */
 MpZ abs()(auto ref const MpZ x) @trusted @nogc
 {
@@ -1178,6 +1178,25 @@ int cmpabs()(auto ref const MpZ x, ulong y) @trusted @nogc
     return __gmpz_cmpabs_ui(x._ptr, y);
 }
 
+/** Returns: next prime greater than `x`.
+    Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
+*/
+MpZ nextPrime()(auto ref const MpZ x) @trusted @nogc
+{
+    static if (__traits(isRef, x)) // l-value `x`
+    {
+        typeof(return) y = null; // must use temporary
+        __gmpz_nextprime(y._ptr, x._ptr); version(ccc) ++y._ccc;
+        return y;
+    }
+    else                        // r-value `x`
+    {
+        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_nextprime(mut_x._ptr, x._ptr); version(ccc) ++mut_x._ccc;
+        return move(*mut_x);    // TODO shouldn't have to call `move` here
+    }
+}
+
 /// Returns: greatest common divisor (gcd) of `x` and `y`.
 MpZ gcd()(auto ref const MpZ x,
           auto ref const MpZ y) @trusted @nogc
@@ -1185,19 +1204,19 @@ MpZ gcd()(auto ref const MpZ x,
     static      if (!__traits(isRef, x)) // r-value `x`
     {
         MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_gcd(mut_x._ptr, x._ptr, y._ptr);
+        __gmpz_gcd(mut_x._ptr, x._ptr, y._ptr); version(ccc) ++mut_x._ccc;
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
     else static if (!__traits(isRef, y)) // r-value `y`
     {
         MpZ* mut_y = (cast(MpZ*)(&y)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_gcd(mut_y._ptr, x._ptr, y._ptr);
+        __gmpz_gcd(mut_y._ptr, x._ptr, y._ptr); version(ccc) ++mut_y._ccc;
         return move(*mut_y);    // TODO shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`
     {
         MpZ z = null;
-        __gmpz_gcd(z._ptr, x._ptr, y._ptr);
+        __gmpz_gcd(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
         return z;
     }
 }
@@ -1208,13 +1227,13 @@ MpZ gcd()(auto ref const MpZ x,
     static if (__traits(isRef, x)) // l-value `x`
     {
         MpZ z = null;
-        const z_ui = __gmpz_gcd_ui(z._ptr, x._ptr, y);
+        const z_ui = __gmpz_gcd_ui(z._ptr, x._ptr, y); version(ccc) ++z._ccc;
         return z;
     }
     else
     {
         MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        const z_ui = __gmpz_gcd_ui(mut_x._ptr, x._ptr, y);
+        const z_ui = __gmpz_gcd_ui(mut_x._ptr, x._ptr, y); version(ccc) ++mut_x._ccc;
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
 }
@@ -1226,19 +1245,19 @@ MpZ lcm()(auto ref const MpZ x,
     static      if (!__traits(isRef, x)) // r-value `x`
     {
         MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_lcm(mut_x._ptr, x._ptr, y._ptr);
+        __gmpz_lcm(mut_x._ptr, x._ptr, y._ptr); version(ccc) ++mut_x._ccc;
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
     else static if (!__traits(isRef, y)) // r-value `y`
     {
         MpZ* mut_y = (cast(MpZ*)(&y)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_lcm(mut_y._ptr, x._ptr, y._ptr);
+        __gmpz_lcm(mut_y._ptr, x._ptr, y._ptr); version(ccc) ++mut_y._ccc;
         return move(*mut_y);    // TODO shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`
     {
         MpZ z = null;
-        __gmpz_lcm(z._ptr, x._ptr, y._ptr);
+        __gmpz_lcm(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
         return z;
     }
 }
@@ -1255,7 +1274,7 @@ MpZ lcm()(auto ref const MpZ x,
     else
     {
         MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_lcm_ui(mut_x._ptr, x._ptr, y);
+        __gmpz_lcm_ui(mut_x._ptr, x._ptr, y); version(ccc) ++mut_x._ccc;
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
 }
@@ -1522,6 +1541,16 @@ MpZ powm()(auto ref const MpZ base,
     Z _43 = 43;
     Z _4 = 4;
     Z _24 = 24;
+
+    // next prime
+    assert(nextPrime(_4) == 5);
+    assert(nextPrime(24.Z) == 29);
+
+    assert(nextPrime(_24) == 29);
+    assert(nextPrime(24.Z) == 29);
+
+    assert(nextPrime(_43) == 47);
+    assert(nextPrime(43.Z) == 47);
 
     // greatest common divisor
 
@@ -2512,6 +2541,8 @@ extern(C)
     int __gmpz_cmpabs (mpz_srcptr, mpz_srcptr);
     int __gmpz_cmpabs_d (mpz_srcptr, double);
     int __gmpz_cmpabs_ui (mpz_srcptr, ulong);
+
+    void __gmpz_nextprime (mpz_ptr, mpz_srcptr);
 
     void __gmpz_gcd (mpz_ptr, mpz_srcptr, mpz_srcptr);
     ulong __gmpz_gcd_ui (mpz_ptr, mpz_srcptr, ulong);
