@@ -23,7 +23,10 @@ import std.algorithm.mutation : move, moveEmplace;
 /// Call unittests taking long to execute.
 enum unittestLong = false;
 
-version = ccc;                  // do C mutation call count
+version(unittest)
+{
+    version = ccc;              // do C mutation call count
+}
 
 /** Is `true` iff `T` is a GNU MP arithmetic type (`long`, `ulong` or `double`). */
 enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
@@ -34,7 +37,10 @@ enum isMpZExpr(T) = (is(Unqual!(typeof(T.eval())) == MpZ)); // which returns an 
 enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct value
                          isMpZExpr!T);
 
-version(unittest) static assert(!isMpZExpr!int);
+version(unittest)
+{
+    static assert(!isMpZExpr!int);
+}
 
 // TODO use these imports instead of the ones below
 // import deimos.gmp.gmp;
