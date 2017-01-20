@@ -101,45 +101,8 @@ struct MpZ
     this(Expr)(Expr expr)
         if (isLazyMpZExpr!Expr)
     {
-        static      if (isInstanceOf!(MpzAddExpr, Expr))
-        {
-            __gmpz_add(this._ptr,
-                       expr.e1.eval()._ptr,
-                       expr.e2.eval()._ptr); version(ccc) ++_ccc;
-        }
-        else static if (isInstanceOf!(MpzSubExpr, Expr))
-        {
-            __gmpz_sub(this._ptr,
-                       expr.e1.eval()._ptr,
-                       expr.e2.eval()._ptr); version(ccc) ++_ccc;
-        }
-        else static if (isInstanceOf!(MpzMulExpr, Expr))
-        {
-            __gmpz_mul(this._ptr,
-                       expr.e1.eval()._ptr,
-                       expr.e2.eval()._ptr); version(ccc) ++_ccc;
-        }
-        else static if (isInstanceOf!(MpzDivExpr, Expr))
-        {
-            __gmpz_tdiv_q(this._ptr,
-                          expr.e1.eval()._ptr,
-                          expr.e2.eval()._ptr); version(ccc) ++_ccc;
-        }
-        else static if (isInstanceOf!(MpzModExpr, Expr))
-        {
-            __gmpz_tdiv_r(this._ptr,
-                          expr.e1.eval()._ptr,
-                          expr.e2.eval()._ptr); version(ccc) ++_ccc;
-        }
-        else static if (isInstanceOf!(MpzNegExpr, Expr))
-        {
-            __gmpz_neg(this._ptr,
-                       expr.e1.eval()._ptr); version(ccc) ++_ccc;
-        }
-        else
-        {
-            this = expr.eval();     // evaluate and move
-        }
+        // TODO ok to just assume zero-initialized contents at `_z` before...
+        this = expr;            // ...calling this.opAssign ?x
     }
 
     /** Construct from `value`. */
@@ -223,8 +186,45 @@ struct MpZ
     ref MpZ opAssign(Expr)(auto ref Expr rhs) return // TODO scope
         if (isLazyMpZExpr!Expr)
     {
-        pragma(msg, "TODO specialize on lazy evaluated Expr");
-        __gmpz_set(_ptr, rhs.eval()._ptr); version(ccc) ++_ccc;
+        static      if (isInstanceOf!(MpzAddExpr, Expr))
+        {
+            __gmpz_add(this._ptr,
+                       rhs.e1.eval()._ptr,
+                       rhs.e2.eval()._ptr); version(ccc) ++_ccc;
+        }
+        else static if (isInstanceOf!(MpzSubExpr, Expr))
+        {
+            __gmpz_sub(this._ptr,
+                       rhs.e1.eval()._ptr,
+                       rhs.e2.eval()._ptr); version(ccc) ++_ccc;
+        }
+        else static if (isInstanceOf!(MpzMulExpr, Expr))
+        {
+            __gmpz_mul(this._ptr,
+                       rhs.e1.eval()._ptr,
+                       rhs.e2.eval()._ptr); version(ccc) ++_ccc;
+        }
+        else static if (isInstanceOf!(MpzDivExpr, Expr))
+        {
+            __gmpz_tdiv_q(this._ptr,
+                          rhs.e1.eval()._ptr,
+                          rhs.e2.eval()._ptr); version(ccc) ++_ccc;
+        }
+        else static if (isInstanceOf!(MpzModExpr, Expr))
+        {
+            __gmpz_tdiv_r(this._ptr,
+                          rhs.e1.eval()._ptr,
+                          rhs.e2.eval()._ptr); version(ccc) ++_ccc;
+        }
+        else static if (isInstanceOf!(MpzNegExpr, Expr))
+        {
+            __gmpz_neg(this._ptr,
+                       rhs.e1.eval()._ptr); version(ccc) ++_ccc;
+        }
+        else
+        {
+            this = rhs.eval();     // evaluate and move
+        }
         return this;
     }
     /// ditto
@@ -1890,7 +1890,6 @@ MpzAddExpr!(T1, T2) mpzAddExpr(T1, T2)(T1 t1, T2 t2)
     assert(MpzAddExpr!(Z, Z)(3.Z, 4.Z).eval() == 3 + 4);
     const Z x = MpzAddExpr!(Z, Z)(3.Z, 4.Z);
     assert(x.mutatingCallCount == 1); // lowers to single `mpz_add`
-    dln(cast(ulong)x);
     assert(x == 7);
 }
 
