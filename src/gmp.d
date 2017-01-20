@@ -969,25 +969,6 @@ struct MpZ
         return y;
     }
 
-    /** Returns: `this` ^^ `exp` (modulo `mod`).
-        Parameter `exp` must be positive.
-    */
-    MpZ powm()(auto ref const MpZ exp,
-               auto ref const MpZ mod) const @trusted
-    {
-        typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
-        __gmpz_powm(y._ptr, _ptr,  exp._ptr, mod._ptr); version(ccc) ++y._ccc;
-        return y;
-    }
-    /// ditto
-    MpZ powm()(ulong exp,
-               auto ref const MpZ mod) const @trusted
-    {
-        typeof(return) y = 0;       // result, TODO reuse `exp` or `mod` if any is an r-value
-        __gmpz_powm_ui(y._ptr, _ptr, exp, mod._ptr); version(ccc) ++y._ccc;
-        return y;
-    }
-
     /// Returns: number of digits in base `base`.
     size_t sizeInBase(uint base) const @trusted
     {
@@ -1236,6 +1217,27 @@ MpZ gcd()(auto ref const MpZ x,
         const z_ui = __gmpz_gcd_ui(mut_x._ptr, x._ptr, y);
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
+}
+
+/** Returns: `base` ^^ `exp` (modulo `mod`).
+    Parameter `exp` must be positive.
+*/
+MpZ powm()(auto ref const MpZ base,
+           auto ref const MpZ exp,
+           auto ref const MpZ mod) @trusted
+{
+    typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
+    __gmpz_powm(y._ptr, base._ptr,  exp._ptr, mod._ptr); version(ccc) ++y._ccc;
+    return y;
+}
+/// ditto
+MpZ powm()(auto ref const MpZ base,
+           ulong exp,
+           auto ref const MpZ mod) @trusted
+{
+    typeof(return) y = 0;       // result, TODO reuse `exp` or `mod` if any is an r-value
+    __gmpz_powm_ui(y._ptr, base._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
+    return y;
 }
 
 ///
