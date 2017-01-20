@@ -1183,6 +1183,16 @@ int cmpabs()(auto ref const MpZ x,
 {
     return __gmpz_cmpabs(x._ptr, y._ptr);
 }
+/// ditto
+int cmpabs()(auto ref const MpZ x, double y) @trusted @nogc
+{
+    return __gmpz_cmpabs_d(x._ptr, y);
+}
+/// ditto
+int cmpabs()(auto ref const MpZ x, ulong y) @trusted @nogc
+{
+    return __gmpz_cmpabs_ui(x._ptr, y);
+}
 
 ///
 @safe @nogc unittest
@@ -1408,6 +1418,17 @@ int cmpabs()(auto ref const MpZ x,
     assert(cmpabs(-43.Z, -44.Z) == -1);
     assert(cmpabs(-44.Z, -43.Z) == +1);
     assert(cmpabs(-43.Z, -43.Z) ==  0);
+
+    assert(cmpabs(-43.Z,  44.0) == -1);
+    assert(cmpabs(-43.Z, -44.0) == -1);
+    assert(cmpabs(-44.Z, -43.0) == +1);
+    assert(cmpabs(-43.Z, -43.0) ==  0);
+
+    assert(cmpabs(-43.Z, 44) == -1);
+    assert(cmpabs( 43.Z, 44) == -1);
+    assert(cmpabs(-44.Z, 43) == +1);
+    assert(cmpabs( 44.Z, 43) == +1);
+    assert(cmpabs(-43.Z, 43) ==  0);
 
     // negated value
 
