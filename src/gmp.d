@@ -46,10 +46,10 @@ struct MpZ
     /// Default conversion base.
     private enum defaultBase = 10;
 
-    @trusted pure nothrow pragma(inline, true):
+    pure nothrow pragma(inline, true):
 
     /// Convert to `string` in base `base`.
-    string toString(uint base = defaultBase, bool upperCaseDigits = false) const
+    string toString(uint base = defaultBase, bool upperCaseDigits = false) const @trusted
     {
         assert((base >= -2 && base <= -36) ||
                (base >= 2 && base <= 62));
@@ -94,7 +94,7 @@ struct MpZ
     @disable this();
 
     /// Construct empty (undefined) from explicit `null`.
-    this(typeof(null))
+    this(typeof(null)) @trusted
     {
         initialize();             // TODO is there a faster way?
         assert(this == MpZ.init); // if this is same as default
@@ -109,7 +109,7 @@ struct MpZ
     }
 
     /** Construct from `value`. */
-    this(T)(T value)
+    this(T)(T value) @trusted
         if (isArithmetic!T)
     {
         version(ccc) ++_ccc;
@@ -125,7 +125,7 @@ struct MpZ
         If `base` is 0 it's guessed from contents of `value`.
         */
     pragma(inline, false)
-    this(in string value, uint base = 0) // TODO Use Optional/Nullable when value is nan, or inf
+    this(in string value, uint base = 0) @trusted // TODO Use Optional/Nullable when value is nan, or inf
     {
         assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(value);
@@ -147,7 +147,7 @@ struct MpZ
     static if (useCopy)
     {
         /// Construct copy of `value`.
-        this()(auto ref const MpZ value)
+        this()(auto ref const MpZ value) @trusted
         {
             mpz_init_set(_ptr, value._ptr);
         }
@@ -159,20 +159,20 @@ struct MpZ
     }
 
     /** Initialize internal struct. */
-    private void initialize() // cannot be called `init` as that will override builtin type property
+    private void initialize() @trusted // cannot be called `init` as that will override builtin type property
     {
         __gmpz_init(_ptr); version(ccc) ++_ccc;
     }
 
     /// Swap content of `this` with `rhs`.
-    void swap(ref MpZ rhs)
+    void swap(ref MpZ rhs) @safe
     {
         import std.algorithm.mutation : swap;
         swap(this, rhs); // faster than __gmpz_swap(_ptr, rhs._ptr); version(ccc) ++_ccc;
     }
 
     /// Returns: (duplicate) copy of `this`.
-    MpZ dup() const
+    MpZ dup() const @trusted
     {
         typeof(return) y = void;
         __gmpz_init_set(y._ptr, _ptr); ++y._ccc;
@@ -180,13 +180,13 @@ struct MpZ
     }
 
     /// Assign from `rhs`.
-    ref MpZ opAssign()(auto ref const MpZ rhs) return // TODO scope
+    ref MpZ opAssign()(auto ref const MpZ rhs) return @trusted // TODO scope
     {
         __gmpz_set(_ptr, rhs._ptr); version(ccc) ++_ccc;
         return this;
     }
     /// ditto
-    ref MpZ opAssign(Expr)(auto ref Expr rhs) return // TODO scope
+    ref MpZ opAssign(Expr)(auto ref Expr rhs) return @trusted // TODO scope
         if (isLazyMpZExpr!Expr)
     {
         static      if (isInstanceOf!(MpzAddExpr, Expr))
@@ -231,7 +231,7 @@ struct MpZ
         return this;
     }
     /// ditto
-    ref MpZ opAssign(Integral)(Integral rhs) return // TODO scope
+    ref MpZ opAssign(Integral)(Integral rhs) return @trusted // TODO scope
         if (isIntegral!Integral)
     {
         static if (isUnsigned!Integral)
@@ -249,7 +249,7 @@ struct MpZ
         return this;
     }
     /// ditto
-    ref MpZ opAssign(double rhs) return // TODO scope
+    ref MpZ opAssign(double rhs) return @trusted // TODO scope
     {
         __gmpz_set_d(_ptr, rhs); version(ccc) ++_ccc;
         return this;
@@ -258,7 +258,7 @@ struct MpZ
     /** Assign `this` from `string` `rhs` interpreted in base `base`.
         If `base` is 0 it's guessed from contents of `value`.
     */
-    ref MpZ fromString(in string rhs, uint base = 0) return // TODO scope
+    ref MpZ fromString(in string rhs, uint base = 0) return @trusted // TODO scope
     {
         assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(rhs);
@@ -269,7 +269,7 @@ struct MpZ
     }
 
     /// Destruct `this`.
-    ~this()
+    ~this() @trusted
     {
         if (_ptr)
         {
@@ -278,7 +278,7 @@ struct MpZ
     }
 
     /// Returns: `true` iff `this` equals `rhs`.
-    bool opEquals()(auto ref const MpZ rhs) const // TODO scope
+    bool opEquals()(auto ref const MpZ rhs) const @trusted // TODO scope
     {
         if (_ptr == rhs._ptr)   // fast equality
         {
@@ -287,7 +287,7 @@ struct MpZ
         return __gmpz_cmp(_ptr, rhs._ptr) == 0;
     }
     /// ditto
-    bool opEquals(Rhs)(Rhs rhs) const // TODO scope
+    bool opEquals(Rhs)(Rhs rhs) const @trusted // TODO scope
         if (isArithmetic!Rhs)
     {
         if (rhs == 0)
@@ -309,7 +309,7 @@ struct MpZ
     }
 
     /// Compare `this` to `rhs`.
-    int opCmp()(auto ref const MpZ rhs) const // TODO scope
+    int opCmp()(auto ref const MpZ rhs) const @trusted // TODO scope
     {
         if (rhs == 0)
         {
@@ -319,7 +319,7 @@ struct MpZ
     }
 
     /// ditto
-    int opCmp(T)(T rhs) const // TODO scope
+    int opCmp(T)(T rhs) const @trusted // TODO scope
         if (isArithmetic!T)
     {
         if (rhs == 0)
@@ -347,7 +347,7 @@ struct MpZ
     }
 
     /// Cast to arithmetic type `T`.
-    T opCast(T)() const         // TODO scope
+    T opCast(T)() const @trusted // TODO scope
         if (isArithmetic!T)
     {
         static      if (isUnsigned!T)
@@ -364,13 +364,10 @@ struct MpZ
         }
     }
 
-    /// Cast to `double`.
-    // TODO double opCast(T : double)() const { return __gmpz_get_d(_ptr); }
-
     /** Returns: The value of this as a `long`, or +/- `long.max` if outside
         the representable range.
     */
-    long toLong() const
+    long toLong() const @trusted
     {
         // TODO can probably be optimized
         if (this <= long.min)
@@ -390,7 +387,7 @@ struct MpZ
     /** Returns: The value of this as a `int`, or +/- `int.max` if outside
         the representable range.
     */
-    int toInt() const
+    int toInt() const @trusted
     {
         // TODO can probably be optimized
         if (this <= int.min)
@@ -408,7 +405,7 @@ struct MpZ
     }
 
     /** Returns: `this` `s` `rhs`. */
-    MpZ opBinary(string s)(auto ref const MpZ rhs) const // direct value
+    MpZ opBinary(string s)(auto ref const MpZ rhs) const @trusted // direct value
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
         static if (!__traits(isRef, rhs)) // r-value `rhs`
@@ -484,7 +481,7 @@ struct MpZ
         static assert(false, "TODO");
     }
 
-    MpZ opBinary(string s, Rhs)(Rhs rhs) const
+    MpZ opBinary(string s, Rhs)(Rhs rhs) const @trusted
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
             isUnsigned!Rhs)
     {
@@ -518,7 +515,7 @@ struct MpZ
         return y;
     }
 
-    MpZ opBinary(string s, Rhs)(Rhs rhs) const
+    MpZ opBinary(string s, Rhs)(Rhs rhs) const @trusted
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
             isSigned!Rhs)
     {
@@ -578,7 +575,7 @@ struct MpZ
     }
 
     /// Remainer propagates modulus type.
-    Unqual!Rhs opBinary(string s, Rhs)(Rhs rhs) const
+    Unqual!Rhs opBinary(string s, Rhs)(Rhs rhs) const @trusted
         if ((s == "%") &&
             isIntegral!Rhs)
     {
@@ -608,7 +605,7 @@ struct MpZ
     }
 
     /// Returns: an unsigned type `lhs` divided by `this`.
-    MpZ opBinaryRight(string s, Lhs)(Lhs lhs) const
+    MpZ opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
         if ((s == "+" || s == "-" || s == "*" || s == "%") &&
             isUnsigned!Lhs)
     {
@@ -639,7 +636,7 @@ struct MpZ
     }
 
     /// Returns: a signed type `lhs` divided by `this`.
-    MpZ opBinaryRight(string s, Lhs)(Lhs lhs) const
+    MpZ opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
         if ((s == "+" || s == "-" || s == "*" || s == "%") &&
             isSigned!Lhs)
     {
@@ -678,7 +675,7 @@ struct MpZ
     }
 
     /// Dividend propagates quotient type to signed.
-    Unqual!Lhs opBinaryRight(string s, Lhs)(Lhs lhs) const
+    Unqual!Lhs opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
         if ((s == "/") &&
             isIntegral!Lhs)
     {
@@ -712,7 +709,7 @@ struct MpZ
         // return exp;
     }
 
-    ref MpZ opOpAssign(string s)(auto ref const MpZ rhs) return // TODO scope
+    ref MpZ opOpAssign(string s)(auto ref const MpZ rhs) return @trusted // TODO scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
         static      if (s == "+")
@@ -758,7 +755,7 @@ struct MpZ
         return this;
     }
 
-    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) return // TODO scope
+    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) return @trusted // TODO scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isUnsigned!Rhs)
     {
@@ -795,7 +792,7 @@ struct MpZ
         return this;
     }
 
-    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) return // TODO scope
+    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) return @trusted // TODO scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isSigned!Rhs)
     {
@@ -884,7 +881,7 @@ struct MpZ
     }
 
     /// Returns: negation of `this`.
-    MpZ unaryMinus() const
+    MpZ unaryMinus() const @safe
     {
         pragma(msg, "memberFun:", __traits(isRef, this) ? "ref" : "non-ref", " this");
         typeof(return) y = this.dup;
@@ -893,13 +890,13 @@ struct MpZ
     }
 
     /// Negate `this` in-place.
-    void negate()
+    void negate() @safe
     {
         _z._mp_size = -_z._mp_size; // fast C macro `mpz_neg` in gmp.h
     }
 
     /// Increase `this` by one.
-    ref MpZ opUnary(string s)() return // TODO scope
+    ref MpZ opUnary(string s)() return @trusted // TODO scope
         if (s == "++")
     {
         __gmpz_add_ui(_ptr, _ptr, 1); version(ccc) ++_ccc;
@@ -907,7 +904,7 @@ struct MpZ
     }
 
     /// Decrease `this` by one.
-    ref MpZ opUnary(string s)() return // TODO scope
+    ref MpZ opUnary(string s)() return @trusted // TODO scope
         if (s == "--")
     {
         __gmpz_sub_ui(_ptr, _ptr, 1); version(ccc) ++_ccc;
@@ -915,7 +912,7 @@ struct MpZ
     }
 
     /// Returns: `base` raised to the power of `exp`.
-    static typeof(this) pow(Base, Exp)(Base base, Exp exp)
+    static typeof(this) pow(Base, Exp)(Base base, Exp exp) @trusted
         if (isIntegral!Base &&
             isIntegral!Exp)
     {
@@ -954,7 +951,7 @@ struct MpZ
         Parameter `exp` must be positive.
     */
     MpZ powm()(auto ref const MpZ exp,
-               auto ref const MpZ mod) const
+               auto ref const MpZ mod) const @trusted
     {
         typeof(return) y = 0; // result
         __gmpz_powm(y._ptr, _ptr,  exp._ptr, mod._ptr); version(ccc) ++y._ccc;
@@ -962,7 +959,7 @@ struct MpZ
     }
     /// ditto
     MpZ powm()(ulong exp,
-               auto ref const MpZ mod) const
+               auto ref const MpZ mod) const @trusted
     {
         typeof(return) y = 0;       // result
         __gmpz_powm_ui(y._ptr, _ptr, exp, mod._ptr); version(ccc) ++y._ccc;
@@ -970,7 +967,7 @@ struct MpZ
     }
 
     /// Returns: absolute value of `this`.
-    MpZ abs() const
+    MpZ abs() const @trusted
     {
         typeof(return) y = null;
         __gmpz_abs(y._ptr, _ptr); version(ccc) ++y._ccc;
@@ -978,13 +975,13 @@ struct MpZ
     }
 
     /// Returns: number of digits in base `base`.
-    size_t sizeInBase(uint base) const
+    size_t sizeInBase(uint base) const @trusted
     {
         return __gmpz_sizeinbase(_ptr, base);
     }
 
     /// Returns: `true` iff `this` fits in a `T`.
-    bool fitsIn(T)() const
+    bool fitsIn(T)() const @trusted
         if (isIntegral!T)
     {
         static      if (is(T == ulong))  { return __gmpz_fits_ulong_p(_ptr) != 0; }
@@ -997,31 +994,31 @@ struct MpZ
     }
 
     /// Check if `this` is zero.
-    @property bool isZero() const
+    @property bool isZero() const @safe
     {
         return _z._mp_size == 0; // fast
     }
 
     /// Check if `this` is odd. TODO use as specialcase in: this & 1
-    @property bool isOdd() const
+    @property bool isOdd() const @safe
     {
         return (_z._mp_size != 0) & cast(int)(_z._mp_d[0]); // fast C macro `mpz_odd_p` in gmp.h
     }
 
     /// Check if `this` is odd.
-    @property bool isEven() const
+    @property bool isEven() const @safe
     {
         return !isOdd;            // fast C macro `mpz_even_p` in gmp.h
     }
 
     /// Check if `this` is negative. TODO use as specialcase in opCmp
-    @property bool isNegative() const
+    @property bool isNegative() const @safe
     {
         return _z._mp_size < 0; // fast
     }
 
     /// Check if `this` is positive.
-    @property bool isPositive() const
+    @property bool isPositive() const @safe
     {
         return !isNegative;     // fast
     }
@@ -1031,7 +1028,7 @@ struct MpZ
         -  0 (`this` == 0), or
         - +1 (`this` > 0).
      */
-    @property int sgn() const
+    @property int sgn() const @safe
     {
         return _z._mp_size < 0 ? -1 : _z._mp_size > 0; // fast C macro `mpz_sgn` in gmp.h
     }
@@ -1051,7 +1048,7 @@ struct MpZ
 private:
 
     /// Returns: evaluation of `this` expression which in this is a no-op.
-    ref inout(MpZ) eval() inout return { return this; }
+    ref inout(MpZ) eval() @safe inout return { return this; }
 
     /// Type of limb in internal representation.
     alias Limb = __mp_limb_t;   // GNU MP alias
@@ -1064,13 +1061,13 @@ private:
     }
 
     /// Get number of limbs in internal representation.
-    @property uint _limbCount() const
+    @property uint _limbCount() const @safe
     {
         return _integralAbs(_z._mp_size);
     }
 
     /// @nogc-variant of `toStringz` with heap allocation of null-terminated C-string `stringz`.
-    char* _allocStringzCopyOf(const string value) @nogc
+    char* _allocStringzCopyOf(const string value) @trusted @nogc
     {
         char* stringz = cast(char*)qualifiedMalloc(value.length + 1); // maximum this many characters
         size_t i = 0;
@@ -1087,7 +1084,7 @@ private:
     }
 
     /// Returns: pointer to internal GMP C struct.
-    inout(__mpz_struct)* _ptr() inout return // TODO scope
+    inout(__mpz_struct)* _ptr() inout return @system // TODO scope
     {
         return &_z;
     }
@@ -1108,7 +1105,7 @@ private:
         For instance the `x` in `x = y + z` should be assigned only once inside
         a call to `mpz_add`.
      */
-    @property size_t mutatingCallCount() const { return _ccc; }
+    @property size_t mutatingCallCount() const @safe { return _ccc; }
 
     version(ccc) size_t _ccc;  // C mutation call count. number of calls to C GMP function calls that mutate this object
 }
