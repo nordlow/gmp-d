@@ -9,6 +9,8 @@
 
     TODO disallow construction and assignment from floating point? Check with
     other GMP interfaces and std.bigint.
+
+    TODO Support __mpz_cmpabs
  */
 module gmp;
 
@@ -1154,9 +1156,24 @@ Unsigned!T absUnsign(T)(auto ref const MpZ x) // for `std.bigint.BigInt` compati
 /// Returns: absolute value of `x`.
 MpZ abs()(auto ref const MpZ x) @trusted @nogc
 {
-    typeof(return) y = null;
-    __gmpz_abs(y._ptr, x._ptr); version(ccc) ++y._ccc;
-    return y;
+    static if (__traits(isRef, x)) // l-value `x`
+    {
+        typeof(return) y = null; // must use temporary
+        __gmpz_abs(y._ptr, x._ptr); version(ccc) ++y._ccc;
+        return y;
+    }
+    else                        // r-value `x`
+    {
+        static assert(false, "TODO verify this");
+        y.makeAbsolute();
+        return move(y);
+    }
+}
+
+/// Returns: absolute value of `x`.
+MpZ cmpabs()(auto ref const MpZ x) @trusted @nogc
+{
+    static assert(false, "TODO");
 }
 
 ///
