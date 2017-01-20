@@ -152,7 +152,7 @@ struct MpZ
         /// Construct copy of `value`.
         this(MpZ value) @trusted
         {
-            moveEmplace(value, this);
+            moveEmplace(value, this); // fast
         }
     }
     else
