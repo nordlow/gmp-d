@@ -231,21 +231,21 @@ struct MpZ
     /// ditto
     ref MpZ opAssign(Integral)(Integral rhs) return // TODO scope
         if (isIntegral!Integral)
+    {
+        static if (isUnsigned!Integral)
         {
-            static if (isUnsigned!Integral)
-            {
-                __gmpz_set_ui(_ptr, rhs); version(ccc) ++_ccc;
-            }
-            else static if (isSigned!Integral)
-            {
-                __gmpz_set_si(_ptr, rhs); version(ccc) ++_ccc;
-            }
-            else
-            {
-                static assert(false);
-            }
-            return this;
+            __gmpz_set_ui(_ptr, rhs); version(ccc) ++_ccc;
         }
+        else static if (isSigned!Integral)
+        {
+            __gmpz_set_si(_ptr, rhs); version(ccc) ++_ccc;
+        }
+        else
+        {
+            static assert(false);
+        }
+        return this;
+    }
     /// ditto
     ref MpZ opAssign(double rhs) return // TODO scope
     {
