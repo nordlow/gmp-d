@@ -1219,6 +1219,47 @@ MpZ gcd()(auto ref const MpZ x,
     }
 }
 
+/// Returns: least common multiple (lcm) of `x` and `y`.
+MpZ lcm()(auto ref const MpZ x,
+          auto ref const MpZ y) @trusted @nogc
+{
+    static      if (!__traits(isRef, x)) // r-value `x`
+    {
+        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_lcm(mut_x._ptr, x._ptr, y._ptr);
+        return move(*mut_x);    // TODO shouldn't have to call `move` here
+    }
+    else static if (!__traits(isRef, y)) // r-value `y`
+    {
+        MpZ* mut_y = (cast(MpZ*)(&y)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_lcm(mut_y._ptr, x._ptr, y._ptr);
+        return move(*mut_y);    // TODO shouldn't have to call `move` here
+    }
+    else                        // l-value `x` and `y`
+    {
+        MpZ z = null;
+        __gmpz_lcm(z._ptr, x._ptr, y._ptr);
+        return z;
+    }
+}
+/// ditto
+MpZ lcm()(auto ref const MpZ x,
+          ulong y) @trusted @nogc
+{
+    static if (__traits(isRef, x)) // l-value `x`
+    {
+        MpZ z = null;
+        __gmpz_lcm_ui(z._ptr, x._ptr, y);
+        return z;
+    }
+    else
+    {
+        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_lcm_ui(mut_x._ptr, x._ptr, y);
+        return move(*mut_x);    // TODO shouldn't have to call `move` here
+    }
+}
+
 /** Returns: `base` ^^ `exp` (modulo `mod`).
     Parameter `exp` must be positive.
 */
@@ -1478,6 +1519,10 @@ MpZ powm()(auto ref const MpZ base,
     assert(cmpabs( 44.Z, 43) == +1);
     assert(cmpabs(-43.Z, 43) ==  0);
 
+    Z _43 = 43;
+    Z _4 = 4;
+    Z _24 = 24;
+
     // greatest common divisor
 
     assert(gcd(43.Z,  44.Z) == 1);
@@ -1490,14 +1535,27 @@ MpZ powm()(auto ref const MpZ base,
     assert(gcd(6.Z, 24) == 6);
     assert(gcd(10.Z, 100) == 10);
 
-    Z _43 = 43;
-    Z _4 = 4;
-    Z _24 = 24;
-
     assert(gcd(_43,  44) == 1);
     assert(gcd(_4, 24) == 4);
     assert(gcd(_4, _24) == 4);
     assert(gcd(_4, 24.Z) == 4);
+
+    // least common multiple
+
+    assert(lcm(43.Z,  44.Z) == 1892);
+    assert(lcm(4.Z, 24.Z) == 24);
+    assert(lcm(6.Z, 24.Z) == 24);
+    assert(lcm(10.Z, 100.Z) == 100);
+
+    assert(lcm(43.Z,  44) == 1892);
+    assert(lcm(4.Z, 24) == 24);
+    assert(lcm(6.Z, 24) == 24);
+    assert(lcm(10.Z, 100) == 100);
+
+    assert(lcm(_43,  44) == 1892);
+    assert(lcm(_4, 24) == 24);
+    assert(lcm(_4, _24) == 24);
+    assert(lcm(_4, 24.Z) == 24);
 
     // negated value
 
@@ -2457,6 +2515,9 @@ extern(C)
 
     void __gmpz_gcd (mpz_ptr, mpz_srcptr, mpz_srcptr);
     ulong __gmpz_gcd_ui (mpz_ptr, mpz_srcptr, ulong);
+
+    void __gmpz_lcm (mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_lcm_ui (mpz_ptr, mpz_srcptr, ulong);
 
     char *__gmpz_get_str (char*, int, mpz_srcptr);
     size_t __gmpz_sizeinbase (mpz_srcptr, int);
