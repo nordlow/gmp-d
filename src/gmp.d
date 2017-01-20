@@ -404,40 +404,86 @@ struct MpZ
         }
     }
 
-    MpZ opBinary(string s, Rhs)(auto ref const Rhs rhs) const
-        if (isMpZExpr!Rhs &&
-            (s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
+    /** Returns: `this` `s` `rhs`. */
+    MpZ opBinary(string s)(auto ref const MpZ rhs) const // direct value
+        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
-        typeof(return) y = null;
-        version(ccc) ++y._ccc;
         static      if (s == "+")
         {
-            __gmpz_add(y._ptr, _ptr, rhs._ptr);
+            static if (!isRef!rhs)
+            {
+                // commutative
+                MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
+                __gmpz_add(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+                return move(*mut_rhs); // TODO shouldn't have to call mut here
+            }
+            else
+            {
+                typeof(return) y = null;
+                __gmpz_add(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+                return y;
+            }
         }
         else static if (s == "-")
         {
-            __gmpz_sub(y._ptr, _ptr, rhs._ptr);
+            static if (!isRef!rhs)
+            {
+                MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
+                __gmpz_sub(mut_rhs._ptr, rhs._ptr, _ptr); version(ccc) ++mut_rhs._ccc;
+                mut_rhs.negate(); // fast
+                return move(*mut_rhs); // TODO shouldn't have to call mut here
+            }
+            else
+            {
+                typeof(return) y = null;
+                __gmpz_sub(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+                return y;
+            }
         }
         else static if (s == "*")
         {
-            __gmpz_mul(y._ptr, _ptr, rhs._ptr);
+            static if (!isRef!rhs)
+            {
+                // commutative
+                MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // safe to cast away constness of r-value `rhs`
+                __gmpz_mul(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+                return move(*mut_rhs); // TODO shouldn't have to call mut here
+            }
+            else
+            {
+                typeof(return) y = null;
+                __gmpz_mul(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+                return y;
+            }
         }
         else static if (s == "/")
         {
             assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_q(y._ptr, _ptr, rhs._ptr);
+            typeof(return) y = null;
+            __gmpz_tdiv_q(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+            return y;
         }
         else static if (s == "%")
         {
             // TODO use tdiv_r or mod?
-            __gmpz_tdiv_r(y._ptr, _ptr, rhs._ptr);
+            typeof(return) y = null;
+            __gmpz_tdiv_r(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
             // __gmpz_mod(y._ptr, _ptr, rhs._ptr); // sign of divisor is ignored
+            return y;
         }
         else
         {
             static assert(false);
         }
-        return y;
+    }
+
+    /// ditto
+    MpZ opBinary(string s, Rhs)(auto ref const Rhs rhs) const
+        if (isLazyMpZExpr!Rhs && // lazy value
+            (s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
+    {
+        pragma(msg, typeof(this), " ", s, " ", Rhs);
+        static assert(false, "TODO");
     }
 
     MpZ opBinary(string s, Rhs)(Rhs rhs) const
@@ -1142,6 +1188,24 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     assert(mpz( 42).absUnsign!ulong == 42);
 }
 
+/// lazy evaluation via expression templates
+@safe @nogc unittest
+{
+    Z a = 42;
+
+    Z b = a + 1.Z;
+    assert(b.mutatingCallCount == 2);
+    assert(b == 43);
+
+    Z c = a - 1.Z;
+    assert(c.mutatingCallCount == 2);
+    assert(c == 41);
+
+    Z d = a * 2.Z;
+    assert(d.mutatingCallCount == 2);
+    assert(d == 84);
+}
+
 ///
 @safe @nogc unittest
 {
@@ -1311,6 +1375,7 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
 
     assert(a + b == b + a);     // commutative
     assert(a + 43.Z == b + a);
+    assert(a - 43.Z == -(43.Z - a));
     assert(a + 0 == a);
     assert(a + 1 != a);
     assert(0 + a == a);
