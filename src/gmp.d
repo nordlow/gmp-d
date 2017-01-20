@@ -1,5 +1,7 @@
 /** High-level wrapper for GNU Multiple Precision (MP) library.
 
+    TODO remove `@trusted:` and make them explicit for all functions
+
     TODO _ccc Make _ccc two => uint _initCCC and uint _opCCC, mutatingCallCount return their sum
 
     TODO replace parameter types of type MpZ with (Rhs + isMpZExpr) and allow
