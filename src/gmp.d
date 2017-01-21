@@ -1762,6 +1762,18 @@ MpZ powm()(auto ref const MpZ base,
     assert(2.Z.powm(3, 16.Z) == 8.Z);
     assert(3.Z.powm(3, 16.Z) == 11.Z);
 
+    // bitwise and, or and xor
+
+    foreach (immutable i; 0 .. 10)
+    {
+        foreach (immutable j; 0 .. 10)
+        {
+            assert((i.Z & j.Z) == (i & j));
+            assert((i.Z | j.Z) == (i | j));
+            assert((i.Z ^ j.Z) == (i ^ j));
+        }
+    }
+
     // swap
 
     auto x = 42.Z;
