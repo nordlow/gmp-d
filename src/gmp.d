@@ -414,7 +414,7 @@ struct MpZ
 
     /** Returns: `this` `s` `rhs`. */
     MpZ opBinary(string s)(auto ref const MpZ rhs) const @trusted // direct value
-        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
+        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "&" || s == "|" || s == "^"))
     {
         static if (!__traits(isRef, rhs)) // r-value `rhs`
         {
@@ -440,6 +440,18 @@ struct MpZ
             {
                 assert(rhs != 0, "Divison by zero");
                 __gmpz_tdiv_r(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+            }
+            else static if (s == "&")
+            {
+                __gmpz_and(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+            }
+            else static if (s == "|")
+            {
+                __gmpz_ior(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+            }
+            else static if (s == "^")
+            {
+                __gmpz_xor(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
             }
             else
             {
@@ -471,6 +483,18 @@ struct MpZ
             {
                 assert(rhs != 0, "Divison by zero");
                 __gmpz_tdiv_r(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+            }
+            else static if (s == "&")
+            {
+                __gmpz_and(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+            }
+            else static if (s == "|")
+            {
+                __gmpz_ior(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+            }
+            else static if (s == "^")
+            {
+                __gmpz_xor(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
             }
             else
             {
@@ -2563,6 +2587,11 @@ extern(C)
     int __gmpz_fits_sint_p(mpz_srcptr);
     int __gmpz_fits_ushort_p(mpz_srcptr);
     int __gmpz_fits_sshort_p(mpz_srcptr);
+
+    void __gmpz_and (mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_ior (mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_xor (mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_com (mpz_ptr, mpz_srcptr);
 
     // TODO wrap:
     void __gmpz_root (mpz_ptr, mpz_srcptr, ulong);
