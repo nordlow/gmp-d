@@ -1,8 +1,8 @@
 # gmp-d
 
 D-language high-level wrapper for [GNU MP (GMP) library](https://gmplib.org/)
-that aims to be compatible with `std.bigint.BigInt` and `@safe pure nothrow
-@nogc` except when converting to `string`.
+that aims to be compatible with `std.bigint.BigInt` (copy construction excluded)
+and `@safe pure nothrow @nogc` except when converting to `string`.
 
 Implementation is optimized through
 
