@@ -923,7 +923,7 @@ struct MpZ
     /// Returns: negation of `this`.
     MpZ unaryMinus() const @safe
     {
-        pragma(msg, "memberFun:", __traits(isRef, this) ? "ref" : "non-ref", " this");
+        // pragma(msg, "memberFun:", __traits(isRef, this) ? "ref" : "non-ref", " this");
         typeof(return) y = this.dup;
         y.negate();
         return y;
