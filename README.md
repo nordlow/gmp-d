@@ -12,10 +12,11 @@ Implementation is optimized through
 - passing of `MpZ`-typed parameters as `auto ref const` in combination with
   conditional compilation for r-value `MpZ` passed parameters via
   `__traits(isRef)`. This enables clever reuse of `mpz_t` instances when passed
-  to `__gmpz`-functions. For instance is `x + 42.Z` lowered to `__gmpz_add(_ptr,
-  y._ptr, y._ptr)` in `opBinary!"+"`. Note that D's `__traits(isRef)` currently
-  cannot be used to distinguish l-value from r-value passing of `this` (it
-  should). This severly limits the possibilities of using
+  to `__gmpz`-functions. For instance, `x + 42.Z` can be lowered to
+  `__gmpz_add(rhs._ptr, this._ptr, rhs._ptr); return move(rhs);` in
+  `opBinary!"+"()(auto ref const MpZ rhs)`. Note that D's `__traits(isRef)`
+  currently cannot be used to distinguish l-value from r-value passing of `this`
+  (it should). This severly limits the possibilities of using
   C++-style
   [expression templates](https://en.wikipedia.org/wiki/Expression_templates) to
   realize lazy evaluation in operator overloading. If this limitation were to be
