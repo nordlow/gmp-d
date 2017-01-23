@@ -6,7 +6,12 @@
 
     TODO disallow construction and assignment from floating point? Check with
     other GMP interfaces and std.bigint.
- */
+
+    TODO Should `in` operator be used for anything good?
+
+    TODO Support shift operators
+          <<      >>      >>>
+*/
 module gmp;
 
 debug import core.stdc.stdio : printf;
