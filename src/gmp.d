@@ -246,23 +246,26 @@ struct MpZ
     }
     /// ditto
     ref MpZ opAssign(T)(T rhs) return @trusted // TODO scope
-        if (isUnsigned!T)
+        if (isArithmetic!T)
     {
-        __gmpz_set_ui(_ptr, rhs); version(ccc) ++_ccc;
-        return this;
-    }
-    /// ditto
-    ref MpZ opAssign(T)(T rhs) return @trusted // TODO scope
-        if (isSigned!T)
-    {
-        __gmpz_set_si(_ptr, rhs); version(ccc) ++_ccc;
-        return this;
-    }
-    /// ditto
-    ref MpZ opAssign(T)(T rhs) return @trusted // TODO scope
-        if (isFloating!T)
-    {
-        __gmpz_set_d(_ptr, rhs); version(ccc) ++_ccc;
+        static if      (isUnsigned!T)
+        {
+            __gmpz_set_ui(_ptr, rhs);
+        }
+        else static if (isFloating!T)
+        {
+            __gmpz_set_d(_ptr, rhs);
+        }
+        else static if (isSigned!T)
+        {
+            pragma(msg, T);
+            __gmpz_set_si(_ptr, rhs);
+        }
+        else
+        {
+            static assert(false);
+        }
+        version(ccc) ++_ccc;
         return this;
     }
 
@@ -1465,6 +1468,12 @@ MpZ powm()(auto ref const MpZ base,
     w = 2;
     w ^^= 6;
     assert(w == 64);
+
+    w = 32.0;
+    assert(w == 32);
+
+    w = 42UL;
+    assert(w == 42);
 
     // equality
     assert(z == 0);
