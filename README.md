@@ -10,9 +10,11 @@ Implementation is optimized through
   internal C-representation `__mpz_struct`,
 
 - passing of `MpZ`-typed parameters as `auto ref const`. This enables clever
-  reuse of `mpz_t` instances when passed to `__gmpz`-functions. Note that D's
-  `__traits(isRef)` currently cannot be used to distinguish l-value from r-value
-  passing of `this` (it should). This severly limits the possibilities of using
+  reuse of `mpz_t` instances when passed to `__gmpz`-functions. For instance is
+  `x + 42.Z` lowered to `__gmpz_add(_ptr, y._ptr, y._ptr)` in
+  `opBinary!"+"`. Note that D's `__traits(isRef)` currently cannot be used to
+  distinguish l-value from r-value passing of `this` (it should). This severly
+  limits the possibilities of using
   C++-style
   [expression templates](https://en.wikipedia.org/wiki/Expression_templates) to
   realize lazy evaluation in operator overloading. If this limitation were to be
