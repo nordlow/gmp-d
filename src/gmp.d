@@ -2477,34 +2477,22 @@ T _integralAbs(T)(T x)
 /** Faster than `std.traits`.
     See https://github.com/dlang/phobos/pull/5038
 */
-enum isArithmetic(T) = __traits(isArithmetic, T);
-enum isFloating(T) = __traits(isFloating, T);
-enum isFloatingPoint(T) = __traits(isFloating, T);
-enum isScalar(T) = __traits(isScalar, T);
-enum isScalarType(T) = __traits(isScalar, T);
-enum isIntegral(T) = __traits(isIntegral, T);
-enum isUnsigned(T) = __traits(isUnsigned, T);
-enum isSigned(T) = __traits(isArithmetic, T) && !__traits(isUnsigned, T);
-enum isStaticArray(T) = __traits(isStaticArray, T);
-enum isAssociativeArray(T) = __traits(isAssociativeArray, T);
-enum isAbstractClass(T) = __traits(isAbstractClass, T);
-enum isFinalClass(T) = __traits(isFinalClass, T);
-enum isPOD(T) = __traits(isPOD, T);
-enum isNested(T) = __traits(isNested, T);
-enum isVirtualFunction(alias fn) = __traits(isVirtualFunction, fn);
-enum isVirtualMethod(alias m) = __traits(isVirtualMethod, m);
-enum isAbstractFunction(alias fn) = __traits(isAbstractFunction, fn);
-enum isFinalFunction(alias fn) = __traits(isFinalFunction, fn);
-enum isOverrideFunction(alias fn) = __traits(isOverrideFunction, fn);
-enum isStaticFunction(alias fn) = __traits(isStaticFunction, fn);
-enum isOut(alias fn) = __traits(isOut, fn);
-enum isLazy(alias fn) = __traits(isLazy, fn);
-enum isTemplate(alias sym) = __traits(isTemplate, sym);
-enum hasMember(T, string member) = __traits(hasMember, T, member);
-enum IdentifierStringOfSymbol(alias sym) = __traits(identifier, sym);
-
-// TODO WARNING disabled because this cannot be wrapped in a template
-enum isRef(alias fn) = __traits(isRef, fn);
+private enum isArithmetic(T) = __traits(isArithmetic, T);
+private enum isFloating(T) = __traits(isFloating, T);
+private enum isFloatingPoint(T) = __traits(isFloating, T);
+private enum isScalar(T) = __traits(isScalar, T);
+private enum isScalarType(T) = __traits(isScalar, T);
+private enum isIntegral(T) = __traits(isIntegral, T);
+private enum isUnsigned(T) = __traits(isUnsigned, T);
+private enum isSigned(T) = __traits(isArithmetic, T) && !__traits(isUnsigned, T);
+private enum isStaticArray(T) = __traits(isStaticArray, T);
+private enum isAssociativeArray(T) = __traits(isAssociativeArray, T);
+private enum isPOD(T) = __traits(isPOD, T);
+private enum isNested(T) = __traits(isNested, T);
+private enum isOut(alias fn) = __traits(isOut, fn);
+private enum isLazy(alias fn) = __traits(isLazy, fn);
+private enum isTemplate(alias sym) = __traits(isTemplate, sym);
+private enum isRef(alias fn) = __traits(isRef, fn);
 
 /// http://forum.dlang.org/post/llwrbirvlqxawifyytqq@forum.dlang.org
 @safe pure nothrow @nogc unittest
