@@ -16,9 +16,9 @@ Implementation is optimized through
   C++-style
   [expression templates](https://en.wikipedia.org/wiki/Expression_templates) to
   realize lazy evaluation in operator overloading. If this limitation were to be
-  fixed the compiler could lower expression such `base^^exp % modulo` to the
-  builtin `__gmpz_powm(base, expr, modulo)`. See the unittests for `MpzAddExpr`,
-  `MpzMulExpr`, etc for details on how should be implmemeted.
+  fixed this library could implement lowering of expressions such `base^^exp %
+  modulo` to the builtin `__gmpz_powm(base, expr, modulo)`. See the unittests
+  for `MpzAddExpr`, `MpzMulExpr`, etc for details on how should be implmemeted.
 
 Copy construction is currently disabled for now. Instead use `move(z)` (from
 `std.algorithm.mutation`) to pass by move or `z.dup` property if duplication is
