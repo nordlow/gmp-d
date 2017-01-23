@@ -13,8 +13,19 @@ Implementation is optimized through
   conditional compilation for r-value `MpZ` passed parameters via
   `__traits(isRef)`. This enables clever reuse of `mpz_t` instances when passed
   to `__gmpz`-functions. For instance, `x + 42.Z` can be lowered to
-  `__gmpz_add(rhs._ptr, this._ptr, rhs._ptr); return move(rhs);` in
-  `opBinary!"+"()(auto ref const MpZ rhs)`. Note that D's `__traits(isRef)`
+
+```D
+__gmpz_add(rhs._ptr, this._ptr, rhs._ptr);
+return move(rhs);
+```
+
+in
+
+```D
+opBinary!"+"()(auto ref const MpZ rhs)
+```
+
+  Note that D's `__traits(isRef)`
   currently cannot be used to distinguish l-value from r-value passing of `this`
   (it should). This severly limits the possibilities of using
   C++-style
