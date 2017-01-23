@@ -1,8 +1,10 @@
 # gmp-d
 
 D-language high-level wrapper for [GNU MP (GMP) library](https://gmplib.org/)
-that aims to be compatible with `std.bigint.BigInt` (copy construction excluded)
-and `@safe pure nothrow @nogc` except when converting to `string`.
+that aims to
+be [compatible](https://github.com/nordlow/gmp-d/blob/master/src/gmp.d#L1956)
+with `std.bigint.BigInt` (copy construction excluded) and `@safe pure nothrow
+@nogc` except when converting to `string`.
 
 Copy construction is disabled (for now) to prevent inadvertent copying. Instead
 use `f(move(z))` (from `std.algorithm.mutation`) to pass by move or `f(z.dup)`
