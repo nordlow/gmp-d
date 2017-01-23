@@ -9,8 +9,9 @@
 
     TODO Should `in` operator be used for anything good?
 
-    TODO Support shift operators
+    TODO Support operators
           <<      >>      >>>
+          &= |= ^=
 */
 module gmp;
 
