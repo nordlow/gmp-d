@@ -10,7 +10,8 @@ Implementation is optimized through
   internal C-representation `__mpz_struct`,
 
 - passing of `MpZ`-typed parameters as `auto ref const`. This enables clever
-  reuse of `mpz_t` instances in when passing them to `__gmpz`-functions.
+  reuse of `mpz_t` instances in when passing them to `__gmpz`-functions. In
+  C++-land this technique is called expression templates.
 
 Copy construction is currently disabled for now. Instead use `move(z)` (from
 `std.algorithm.mutation`) to pass by move or `z.dup` property if duplication is
