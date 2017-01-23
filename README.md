@@ -40,7 +40,7 @@ Z result = base^^exp % modulo
 to the builtin
 
 ```D
-__gmpz_powm(result, base, expr, modulo)
+__gmpz_powm(result._ptr, base._ptr, expr._ptr, modulo._ptr)
 ```
 
 See the unittests for
