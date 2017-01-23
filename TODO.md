@@ -1,5 +1,17 @@
 # TODO list (in order of priority)
 
+- Support bitwise shift operators
+          <<      >>      >>>
+
+- _ccc Make _ccc two => uint _initCCC and uint _opCCC, mutatingCallCount return
+  their sum. Use these counters to make more precise asserts on how assignments
+  and operators are lowered to calls to C __gmpz-calls
+
+- Disallow construction and assignment from floating point? Check with other GMP
+  interfaces and std.bigint.
+
+- Should `in` operator be used for anything good?
+
 - Delayed evaluation via expression templates is in development. Evaluation can
   kick in automatically for r-value parameters (when `!__traits(isRef, param)`
   when param is passed as `(T)(auto ref const T
@@ -30,24 +42,6 @@
   and [Rust wrappers such as rust-gmp](https://github.com/thestinger/rust-gmp)
   to see that no optimization has been overseen
 
-- Forbid usage of
-  - `gmp_randinit` (not thread-safe, obsolete)
-  - `mpz_random` (not thread-safe, obsolete)
-  - `mpz_random2` (not thread-safe, obsolete)
-  - `mpf_set_default_prec` (not thread-safe)
-  - `mpf_get_default_prec` (not thread-safe)
-  - `mpf_init` (not thread-safe)
-  - `mpf_inits` (not thread-safe, va_list wrapper)
-  - `mpf_clears` (va_list wrapper)
-  - `mpf_swap` (no better than D's own `std.algorithm.swap`)
-  - `mpf_set_prec_raw` (could be exposed with an unsafe function if needed)
-  - `mpz_inits` (va_list wrapper)
-  - `mpz_clears` (va_list wrapper)
-  - `mpz_swap` (no better than D's own `std.algorithm.swap`)
-  - `mpq_inits` (va_list wrapper)
-  - `mpq_clears` (va_list wrapper)
-  - `mpq_swap` (no better than D's own `std.algorithm.swap`)
-
 - Lazy evaluation
   via [expression templates](https://en.wikipedia.org/wiki/Expression_templates)
   - `x = -x`        => Assign(x, Neg(x)) => `x.negate()` (if compiler doesn't already rewrite this)
@@ -65,27 +59,22 @@
   in C++ libraries. If value is <= `2^^(64-1)-1` it fits in the non-heap
   allocated small value.
 
+- Don't use
+  - `gmp_randinit` (not thread-safe, obsolete)
+  - `mpz_random` (not thread-safe, obsolete)
+  - `mpz_random2` (not thread-safe, obsolete)
+  - `mpf_set_default_prec` (not thread-safe)
+  - `mpf_get_default_prec` (not thread-safe)
+  - `mpf_init` (not thread-safe)
+  - `mpf_inits` (not thread-safe, va_list wrapper)
+  - `mpf_clears` (va_list wrapper)
+  - `mpf_swap` (no better than D's own `std.algorithm.swap`)
+  - `mpf_set_prec_raw` (could be exposed with an unsafe function if needed)
+  - `mpz_inits` (va_list wrapper)
+  - `mpz_clears` (va_list wrapper)
+  - `mpz_swap` (no better than D's own `std.algorithm.swap`)
+  - `mpq_inits` (va_list wrapper)
+  - `mpq_clears` (va_list wrapper)
+  - `mpq_swap` (no better than D's own `std.algorithm.swap`)
+
 - [Code generation](http://forum.dlang.org/post/wyduglxwbxmfcgwtczra@forum.dlang.org) via something like
-
-```D
-ulong a = 27, b = 84, c = 110, d = 133;
-compileGMP!"Integer res = a ^^ 5 + b ^^ 5 + c ^^ 5 + d ^^ 5"();
-```
-
-might generate the code
-
-
-```D
-Integer res, r2; // r2 used as a register of sorts (minimise allocation of Integers)
-mpz_init(res); mpz_init(r2);
-
-mpz_ui_pow_ui(res, a, 5);
-mpz_ui_pow_ui(r2, b, 5);
-mpz_add(res, res, r2);
-
-mpz_ui_pow_ui(res, c 5);
-mpz_add(res, res, r2);
-
-mpz_ui_pow_ui(r2, d, 5);
-mpz_add(res, res, r2);
-```
