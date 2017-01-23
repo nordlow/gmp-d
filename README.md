@@ -4,6 +4,10 @@ D-language high-level wrapper for [GNU MP (GMP) library](https://gmplib.org/)
 that aims to be compatible with `std.bigint.BigInt` (copy construction excluded)
 and `@safe pure nothrow @nogc` except when converting to `string`.
 
+Copy construction is disabled (for now) to prevent inadvertent copying. Instead
+use `f(move(z))` (from `std.algorithm.mutation`) to pass by move or `f(z.dup)`
+to pass by value (via `.dup` member function).
+
 Implementation is optimized through
 
 - mapping of GMP's C macros into D inline functions that operate directly on the
@@ -46,10 +50,6 @@ __gmpz_powm(result._ptr, base._ptr, expr._ptr, modulo._ptr)
 See the unittests for `MpzAddExpr`, `MpzMulExpr`, etc for details on how this
 currently can be implemented and verified (in `ccc`-version) with free
 functions such `add` and `sub`.
-
-Copy construction is currently disabled for now. Instead use `f(move(z))` (from
-`std.algorithm.mutation`) to pass by move or `f(z.dup)` to pass by value
-(via `.dup` member function).
 
 Further note, that as, wrapper types doesn't have to be templatized, compilation
 is very fast (DMD compiles it in 0.04 seconds on my machine and test-build in
