@@ -1,17 +1,4 @@
 /** High-level wrapper for GNU Multiple Precision (MP) library.
-
-    TODO _ccc Make _ccc two => uint _initCCC and uint _opCCC, mutatingCallCount
-    return their sum. Use these counters to make more precise asserts on how
-    assignments and operators are lowered to calls to C __gmpz-calls
-
-    TODO disallow construction and assignment from floating point? Check with
-    other GMP interfaces and std.bigint.
-
-    TODO Should `in` operator be used for anything good?
-
-    TODO Support operators
-          <<      >>      >>>
-          &= |= ^=
 */
 module gmp;
 
