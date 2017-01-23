@@ -34,13 +34,13 @@ realize lazy evaluation in operator overloading. If this limitation were to be
 fixed this library could implement lowering of expressions such
 
 ```D
-base^^exp % modulo
+Z result = base^^exp % modulo
 ```
 
 to the builtin
 
 ```D
-__gmpz_powm(base, expr, modulo)
+__gmpz_powm(result, base, expr, modulo)
 ```
 
 See the unittests for
