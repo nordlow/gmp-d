@@ -1792,13 +1792,29 @@ MpZ powm()(auto ref const MpZ base,
 
     // bitwise and, or and xor
 
-    foreach (immutable i; 0 .. 10)
     {
-        foreach (immutable j; 0 .. 10)
+        foreach (immutable i; 0 .. 10)
         {
-            assert((i.Z & j.Z) == (i & j));
-            assert((i.Z | j.Z) == (i | j));
-            assert((i.Z ^ j.Z) == (i ^ j));
+            foreach (immutable j; 0 .. 10)
+            {
+                assert((i.Z & j.Z) == (i & j));
+                assert((i.Z | j.Z) == (i | j));
+                assert((i.Z ^ j.Z) == (i ^ j));
+
+                Z x = null;
+
+                x = i.Z;
+                x &= j.Z;
+                assert(x == (i & j));
+
+                x = i.Z;
+                x |= j.Z;
+                assert(x == (i | j));
+
+                x = i.Z;
+                x ^= j.Z;
+                assert(x == (i ^ j));
+            }
         }
     }
 
