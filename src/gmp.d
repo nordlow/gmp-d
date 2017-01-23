@@ -3,6 +3,7 @@
 module gmp;
 
 import std.typecons : Unsigned, Unqual;
+import std.traits : isInstanceOf; // needed by expression templates
 import std.algorithm.mutation : move, moveEmplace;
 
 /// Call unittests taking long to execute.
@@ -26,9 +27,7 @@ enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct va
  */
 struct MpZ
 {
-    import std.traits : isInstanceOf;
-
-    /// Default conversion base.
+/// Default conversion base.
     private enum defaultBase = 10;
 
     pure nothrow pragma(inline, true):
