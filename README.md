@@ -12,7 +12,8 @@ Implementation is optimized through
 - passing of `MpZ`-typed parameters as `auto ref const`. This enables clever
   reuse of `mpz_t` instances in when passing them to `__gmpz`-functions.
 
-Copy construction is currently disabled for now. Instead use `move(z)` to pass
-by move or `z.dup` property if duplication is needed.
+Copy construction is currently disabled for now. Instead use `move(z)` (from
+`std.algorithm.mutation`) to pass by move or `z.dup` property if duplication is
+needed.
 
 There are more `mpz_t` functions that could be wrapped but these are good start.
