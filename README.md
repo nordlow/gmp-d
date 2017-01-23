@@ -31,8 +31,19 @@ possibilities of using
 C++-style
 [expression templates](https://en.wikipedia.org/wiki/Expression_templates) to
 realize lazy evaluation in operator overloading. If this limitation were to be
-fixed this library could implement lowering of expressions such `base^^exp %
-modulo` to the builtin `__gmpz_powm(base, expr, modulo)`. See the unittests for
+fixed this library could implement lowering of expressions such
+
+```D
+base^^exp % modulo
+```
+
+to the builtin
+
+```D
+__gmpz_powm(base, expr, modulo)
+```
+
+See the unittests for
 `MpzAddExpr`, `MpzMulExpr`, etc for details on how this should be implemented
 and verified (in `ccc`-version).
 
