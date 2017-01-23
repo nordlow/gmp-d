@@ -21,9 +21,9 @@ Implementation is optimized through
   for `MpzAddExpr`, `MpzMulExpr`, etc for details on how this should be
   implemented and verified (in `ccc`-version).
 
-Copy construction is currently disabled for now. Instead use `move(z)` (from
-`std.algorithm.mutation`) to pass by move or `z.dup` property if duplication is
-needed.
+Copy construction is currently disabled for now. Instead use `f(move(z))` (from
+`std.algorithm.mutation`) to pass by move or `f(z.dup)` to pass by value
+(via `.dup` member function).
 
 Further note, that as, wrapper types doesn't have to be templatized compilation is
 very fast (DMD compiles it in 0.04 seconds on my machine).
