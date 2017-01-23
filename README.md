@@ -26,6 +26,7 @@ Copy construction is currently disabled for now. Instead use `f(move(z))` (from
 (via `.dup` member function).
 
 Further note, that as, wrapper types doesn't have to be templatized, compilation
-is very fast (DMD compiles it in 0.04 seconds on my machine).
+is very fast (DMD compiles it in 0.04 seconds on my machine and test-build in
+0.22 seconds).
 
 There are more `mpz_t` functions that could be wrapped but these are good start.
