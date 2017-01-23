@@ -25,7 +25,7 @@ Copy construction is currently disabled for now. Instead use `f(move(z))` (from
 `std.algorithm.mutation`) to pass by move or `f(z.dup)` to pass by value
 (via `.dup` member function).
 
-Further note, that as, wrapper types doesn't have to be templatized compilation is
-very fast (DMD compiles it in 0.04 seconds on my machine).
+Further note, that as, wrapper types doesn't have to be templatized, compilation
+is very fast (DMD compiles it in 0.04 seconds on my machine).
 
 There are more `mpz_t` functions that could be wrapped but these are good start.
