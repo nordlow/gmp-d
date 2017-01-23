@@ -90,7 +90,7 @@ struct MpZ
     @disable this();
 
     /// Construct empty (undefined) from explicit `null`.
-    this(typeof(null)) @trusted
+    this(typeof(null)) @safe
     {
         initialize();             // TODO is there a faster way?
         assert(this == MpZ.init); // if this is same as default
