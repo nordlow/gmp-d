@@ -420,7 +420,9 @@ struct MpZ
 
     /** Returns: `this` `s` `rhs`. */
     MpZ opBinary(string s)(auto ref const MpZ rhs) const @trusted // direct value
-        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "&" || s == "|" || s == "^"))
+        if ((s == "+" || s == "-" ||
+             s == "*" || s == "/" || s == "%" ||
+             s == "&" || s == "|" || s == "^"))
     {
         static if (!__traits(isRef, rhs)) // r-value `rhs`
         {
@@ -747,7 +749,9 @@ struct MpZ
     }
 
     ref MpZ opOpAssign(string s)(auto ref const MpZ rhs) return @trusted // TODO scope
-        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
+        if ((s == "+" || s == "-" ||
+             s == "*" || s == "/" || s == "%" ||
+             s == "&" || s == "|" || s == "^"))
     {
         static      if (s == "+")
         {
@@ -784,6 +788,18 @@ struct MpZ
         {
             assert(rhs != 0, "Divison by zero");
             __gmpz_tdiv_r(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
+        }
+        else static if (s == "&")
+        {
+            __gmpz_and(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
+        }
+        else static if (s == "|")
+        {
+            __gmpz_ior(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
+        }
+        else static if (s == "^")
+        {
+            __gmpz_xor(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
         }
         else
         {
