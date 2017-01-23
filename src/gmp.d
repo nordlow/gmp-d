@@ -1423,6 +1423,12 @@ MpZ powm()(auto ref const MpZ base,
     w += 100UL;
     assert(w == 142);
 
+    w -= 100.Z;
+    assert(w == 42);
+
+    w += 100UL;
+    assert(w == 142);
+
     w -= 100UL;
     assert(w == 42);
 
@@ -1474,6 +1480,24 @@ MpZ powm()(auto ref const MpZ base,
 
     w = 42UL;
     assert(w == 42);
+
+    w /= 2.Z;
+    assert(w == 21);
+
+    w /= -2.Z;
+    assert(w == -10);
+
+    w *= -2.Z;
+    assert(w == 20);
+
+    w %= 3.Z;
+    assert(w == 2);
+
+    w *= -1.Z;
+    assert(w == -2);
+
+    w /= -1.Z;
+    assert(w == 2);
 
     // equality
     assert(z == 0);
