@@ -25,16 +25,16 @@ in
 opBinary!"+"()(auto ref const MpZ rhs)
 ```
 
-  Note that D's `__traits(isRef)`
-  currently cannot be used to distinguish l-value from r-value passing of `this`
-  (it should). This severly limits the possibilities of using
-  C++-style
-  [expression templates](https://en.wikipedia.org/wiki/Expression_templates) to
-  realize lazy evaluation in operator overloading. If this limitation were to be
-  fixed this library could implement lowering of expressions such `base^^exp %
-  modulo` to the builtin `__gmpz_powm(base, expr, modulo)`. See the unittests
-  for `MpzAddExpr`, `MpzMulExpr`, etc for details on how this should be
-  implemented and verified (in `ccc`-version).
+Note that D's `__traits(isRef)` currently cannot be used to distinguish l-value
+from r-value passing of `this` (it should). This severly limits the
+possibilities of using
+C++-style
+[expression templates](https://en.wikipedia.org/wiki/Expression_templates) to
+realize lazy evaluation in operator overloading. If this limitation were to be
+fixed this library could implement lowering of expressions such `base^^exp %
+modulo` to the builtin `__gmpz_powm(base, expr, modulo)`. See the unittests for
+`MpzAddExpr`, `MpzMulExpr`, etc for details on how this should be implemented
+and verified (in `ccc`-version).
 
 Copy construction is currently disabled for now. Instead use `f(move(z))` (from
 `std.algorithm.mutation`) to pass by move or `f(z.dup)` to pass by value
