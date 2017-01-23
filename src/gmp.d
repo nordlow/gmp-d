@@ -245,25 +245,22 @@ struct MpZ
         return this;
     }
     /// ditto
-    ref MpZ opAssign(Integral)(Integral rhs) return @trusted // TODO scope
-        if (isIntegral!Integral)
+    ref MpZ opAssign(T)(T rhs) return @trusted // TODO scope
+        if (isUnsigned!T)
     {
-        static if (isUnsigned!Integral)
-        {
-            __gmpz_set_ui(_ptr, rhs); version(ccc) ++_ccc;
-        }
-        else static if (isSigned!Integral)
-        {
-            __gmpz_set_si(_ptr, rhs); version(ccc) ++_ccc;
-        }
-        else
-        {
-            static assert(false);
-        }
+        __gmpz_set_ui(_ptr, rhs); version(ccc) ++_ccc;
         return this;
     }
     /// ditto
-    ref MpZ opAssign(double rhs) return @trusted // TODO scope
+    ref MpZ opAssign(T)(T rhs) return @trusted // TODO scope
+        if (isSigned!T)
+    {
+        __gmpz_set_si(_ptr, rhs); version(ccc) ++_ccc;
+        return this;
+    }
+    /// ditto
+    ref MpZ opAssign(T)(T rhs) return @trusted // TODO scope
+        if (isFloating!T)
     {
         __gmpz_set_d(_ptr, rhs); version(ccc) ++_ccc;
         return this;
