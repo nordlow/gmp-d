@@ -10,11 +10,12 @@ Implementation is optimized through
   internal C-representation `__mpz_struct`,
 
 - passing of `MpZ`-typed parameters as `auto ref const`. This enables clever
-  reuse of `mpz_t` instances in when passing them to `__gmpz`-functions. In
-  C++-land this technique is called *expression templates*. Note that D's
+  reuse of `mpz_t` instances when passed to `__gmpz`-functions. Note that D's
   `__traits(isRef)` currently cannot be used to distinguish l-value from r-value
   passing of `this` (it should). This severly limits the possibilities of using
-  expression template for operator overloading. If this limitation were to be
+  C++-style
+  [expression templates](https://en.wikipedia.org/wiki/Expression_templates) to
+  realize lazy evaluation in operator overloading. If this limitation were to be
   fixed the compiler could lower expression such `base^^exp % modulo` to the
   builtin `__gmpz_powm(base, expr, modulo)`. See the unittests for `MpzAddExpr`,
   `MpzMulExpr`, etc for details on how should be implmemeted.
