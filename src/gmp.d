@@ -176,7 +176,7 @@ struct MpZ
     MpZ dup() const @trusted
     {
         typeof(return) y = void;
-        __gmpz_init_set(y._ptr, _ptr); ++y._ccc;
+        __gmpz_init_set(y._ptr, _ptr); version(ccc) ++y._ccc;
         return y;
     }
 
@@ -1121,16 +1121,19 @@ private:
         pragma(mangle, "free") void qualifiedFree(void* ptr);
     }
 
-    /** Number of calls made to `__gmpz`--functions that construct or changes
-        this value. Used to verify correct lowering and evaluation of template
-        expressions.
+    version(ccc)
+    {
 
-        For instance the `x` in `x = y + z` should be assigned only once inside
-        a call to `mpz_add`.
-     */
-    @property size_t mutatingCallCount() const @safe { return _ccc; }
+        /** Number of calls made to `__gmpz`--functions that construct or changes
+            this value. Used to verify correct lowering and evaluation of template
+            expressions.
 
-    version(ccc) size_t _ccc;  // C mutation call count. number of calls to C GMP function calls that mutate this object
+            For instance the `x` in `x = y + z` should be assigned only once inside
+            a call to `mpz_add`.
+        */
+        @property size_t mutatingCallCount() const @safe { return _ccc; }
+        size_t _ccc;  // C mutation call count. number of calls to C GMP function calls that mutate this object
+    }
 }
 
 version(unittest) static assert(isMpZExpr!MpZ);
