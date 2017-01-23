@@ -3,8 +3,6 @@
 module gmp;
 
 import std.typecons : Unsigned, Unqual;
-import std.meta : AliasSeq;
-import std.traits : isInstanceOf;
 import std.algorithm.mutation : move, moveEmplace;
 
 /// Call unittests taking long to execute.
@@ -28,7 +26,9 @@ enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct va
  */
 struct MpZ
 {
-/// Default conversion base.
+    import std.traits : isInstanceOf;
+
+    /// Default conversion base.
     private enum defaultBase = 10;
 
     pure nothrow pragma(inline, true):
@@ -2524,6 +2524,7 @@ version(unittest)
     debug import core.stdc.stdio : printf;
     version = ccc;              // do C mutation call count
     static assert(!isMpZExpr!int);
+    import std.meta : AliasSeq;
 }
 
 // C API
