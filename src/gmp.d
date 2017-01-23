@@ -2,7 +2,6 @@
 */
 module gmp;
 
-debug import core.stdc.stdio : printf;
 import std.typecons : Unsigned, Unqual;
 import std.meta : AliasSeq;
 import std.traits : isInstanceOf;
@@ -10,11 +9,6 @@ import std.algorithm.mutation : move, moveEmplace;
 
 /// Call unittests taking long to execute.
 enum unittestLong = false;
-
-version(unittest)
-{
-    version = ccc;              // do C mutation call count
-}
 
 /** Is `true` iff `T` is a GNU MP arithmetic type (`long`, `ulong` or `double`). */
 enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
@@ -25,11 +19,6 @@ enum isMpZExpr(T) = (is(Unqual!(typeof(T.eval())) == MpZ)); // which returns an 
 enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct value
                          isMpZExpr!T);
 
-version(unittest)
-{
-    static assert(!isMpZExpr!int);
-}
-
 // TODO use these imports instead of the ones below
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
@@ -39,7 +28,7 @@ version(unittest)
  */
 struct MpZ
 {
-    /// Default conversion base.
+/// Default conversion base.
     private enum defaultBase = 10;
 
     pure nothrow pragma(inline, true):
@@ -2530,8 +2519,11 @@ private enum isRef(alias fn) = __traits(isRef, fn);
 
 version(unittest)
 {
-    import dbgio;
+    import dbgio : dln;
     alias Z = MpZ;
+    debug import core.stdc.stdio : printf;
+    version = ccc;              // do C mutation call count
+    static assert(!isMpZExpr!int);
 }
 
 // C API
