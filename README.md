@@ -43,9 +43,9 @@ to the builtin
 __gmpz_powm(result._ptr, base._ptr, expr._ptr, modulo._ptr)
 ```
 
-See the unittests for
-`MpzAddExpr`, `MpzMulExpr`, etc for details on how this should be implemented
-and verified (in `ccc`-version).
+See the unittests for `MpzAddExpr`, `MpzMulExpr`, etc for details on how this
+currently can be implemented and verified (in `ccc`-version) with free
+functions such `add` and `sub`.
 
 Copy construction is currently disabled for now. Instead use `f(move(z))` (from
 `std.algorithm.mutation`) to pass by move or `f(z.dup)` to pass by value
