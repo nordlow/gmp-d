@@ -21,7 +21,7 @@ enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct va
 // import deimos.gmp.integer;
 
 /** Arbitrary (multi) precision signed integer (Z).
-    Wrapper for GNU MP (GMP)'s type `mpz_t` and functions `mpz_.*`.
+    Wrapper for GNU MP (GMP)'s type `mpz_t` and functions `__gmpz_.*`.
  */
 struct MpZ
 {
@@ -31,7 +31,8 @@ struct MpZ
     pure nothrow pragma(inline, true):
 
     /// Convert to `string` in base `base`.
-    string toString(uint base = defaultBase, bool upperCaseDigits = false) const @trusted
+    string toString(uint base = defaultBase,
+                    bool upperCaseDigits = false) const @trusted
     {
         assert((base >= -2 && base <= -36) ||
                (base >= 2 && base <= 62));
