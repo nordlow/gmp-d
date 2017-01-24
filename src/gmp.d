@@ -936,7 +936,7 @@ struct MpZ
     /** Make `this` the one's complement value of itself in-place.
         Returns: `void` to make it obvious `this` is mutated.
     */
-    void complement() @trusted
+    void onesComplement() @trusted
     {
         __gmpz_com(_ptr, _ptr); version(ccc) ++_ccc;
     }
@@ -1184,6 +1184,25 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     {
         MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
         mut_x.absolute();
+        return move(*mut_x);    // TODO shouldn't have to call `move` here
+    }
+}
+
+/** Returns: one's complement of value of `x`.
+    Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
+*/
+MpZ onesComplement()(auto ref const MpZ x) @trusted @nogc
+{
+    static if (__traits(isRef, x)) // l-value `x`
+    {
+        typeof(return) y = null; // must use temporary
+        __gmpz_com(y._ptr, x._ptr); version(ccc) ++y._ccc;
+        return y;
+    }
+    else                        // r-value `x`
+    {
+        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        mut_x.onesComplement();
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
 }
@@ -1662,8 +1681,10 @@ MpZ powm()(auto ref const MpZ base,
     n.absolute();
     assert(n == 42);
 
-    n.complement();
+    n.onesComplement();
     assert(n == -43);
+    assert(onesComplement(n) == 42);
+    assert(onesComplement(-43.Z) == 42);
 
     // addition
 
