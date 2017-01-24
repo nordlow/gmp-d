@@ -1041,7 +1041,7 @@ struct MpZ
         return !isOdd;            // fast C macro `mpz_even_p` in gmp.h
     }
 
-    /// Check if `this` is negative. TODO use as specialcase in opCmp
+    /// Check if `this` is negative.
     @property bool isNegative() const @safe
     {
         return _z._mp_size < 0; // fast
