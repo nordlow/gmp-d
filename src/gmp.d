@@ -60,7 +60,7 @@ struct MpZ
 
     // TODO toRCString wrapped in UniqueRange
 
-    // Returns: A unique hash of the `MpZ` value suitable for use in a hash table.
+    /// Returns: A unique hash of the `MpZ` value suitable for use in a hash table.
     size_t toHash() const
     {
         import core.internal.hash : hashOf;
