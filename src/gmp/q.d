@@ -73,7 +73,7 @@ struct MpQ
     }
 
     /// Returns: numerator of `this`.
-    @property MpZ numerator() @safe const
+    @property MpZ numerator() @trusted const
     {
         return MpZ.init;
     }
@@ -81,7 +81,7 @@ struct MpQ
     alias P = numerator;
 
     /// Returns: denominator of `this`.
-    @property MpZ denominator() @safe const
+    @property MpZ denominator() @trusted const
     {
         return MpZ.init;
     }
@@ -91,7 +91,7 @@ struct MpQ
 private:
 
     /// Default conversion base.
-    private enum defaultBase = 10;
+    enum defaultBase = 10;
 
     /// Returns: pointer to internal GMP C struct.
     inout(__mpq_struct)* _ptr() inout return @system // TODO scope
