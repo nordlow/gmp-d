@@ -1029,7 +1029,7 @@ struct MpZ
         return _z._mp_size == 0; // fast
     }
 
-    /// Check if `this` is odd. TODO use as specialcase in: this & 1
+    /// Check if `this` is odd.
     @property bool isOdd() const @safe
     {
         return (_z._mp_size != 0) & cast(int)(_z._mp_d[0]); // fast C macro `mpz_odd_p` in gmp.h
