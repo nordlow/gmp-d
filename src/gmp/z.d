@@ -1137,7 +1137,7 @@ private:
         return stringz;
     }
 
-    /// Returns: pointer to internal GMP C struct.
+    /// Returns: pointer to internal C struct.
     inout(__mpz_struct)* _ptr() inout return @system // TODO scope
     {
         return &_z;
