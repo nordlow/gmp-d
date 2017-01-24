@@ -1012,6 +1012,16 @@ struct MpZ
         else { static assert(false, "Unsupported type " ~ T.stringof); }
     }
 
+    /** Returns: population count of `this`. If
+        - `this` >= 0, number of 1 bits in the binary representation
+        - otherwise, ???
+     */
+    @property mp_bitcnt_t populationCount() const @trusted
+    {
+        return __gmpz_popcount(this._ptr); // TODO use core.bitop `popcnt` inline here instead?
+    }
+    alias countOnes = populationCount;
+
     /// Check if `this` is zero.
     @property bool isZero() const @safe
     {
@@ -2674,6 +2684,8 @@ extern(C)
     void __gmpz_ior (mpz_ptr, mpz_srcptr, mpz_srcptr);
     void __gmpz_xor (mpz_ptr, mpz_srcptr, mpz_srcptr);
     void __gmpz_com (mpz_ptr, mpz_srcptr);
+
+    mp_bitcnt_t __gmpz_popcount (mpz_srcptr);
 
     // TODO wrap:
     void __gmpz_root (mpz_ptr, mpz_srcptr, ulong);
