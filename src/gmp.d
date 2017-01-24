@@ -1018,6 +1018,7 @@ struct MpZ
      */
     @property mp_bitcnt_t populationCount() const @trusted
     {
+        if (isZero) { return 0; }
         return __gmpz_popcount(this._ptr); // TODO use core.bitop `popcnt` inline here instead?
     }
     alias countOnes = populationCount;
