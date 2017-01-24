@@ -3,7 +3,7 @@
 dub.selections.json
 
 # DMD coverage output
-src/*.lst
+*.lst
 
 # DUB test artifacts
 __test__library__
