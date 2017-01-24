@@ -229,7 +229,6 @@ struct MpZ
         }
         else static if (isSigned!T)
         {
-            pragma(msg, T);
             __gmpz_set_si(_ptr, rhs);
         }
         else
@@ -1419,31 +1418,31 @@ MpZ powm()(auto ref const MpZ base,
     Z a = 42;
     {
         Z b = a + 1.Z;              // r-value `rhs`
-        assert(b.mutatingCallCount == 2);
+        version(ccc) assert(b.mutatingCallCount == 2);
         assert(b == 43);
     }
 
     {
         Z b = a - 1.Z;              // r-value `rhs`
-        assert(b.mutatingCallCount == 2);
+        version(ccc) assert(b.mutatingCallCount == 2);
         assert(b == 41);
     }
 
     {
         Z b = a * 2.Z;              // r-value `rhs`
-        assert(b.mutatingCallCount == 2);
+        version(ccc) assert(b.mutatingCallCount == 2);
         assert(b == 84);
     }
 
     {
         Z b = a / 2.Z;              // r-value `rhs`
-        assert(b.mutatingCallCount == 2);
+        version(ccc) assert(b.mutatingCallCount == 2);
         assert(b == 21);
     }
 
     {
         Z b = a % 10.Z;              // r-value `rhs`
-        assert(b.mutatingCallCount == 2);
+        version(ccc) assert(b.mutatingCallCount == 2);
         assert(b == 2);
     }
 }
@@ -2303,7 +2302,7 @@ pure @nogc unittest
                               (Z(c) ^^ POWER) +
                               (Z(d) ^^ POWER));
                         Z rem = 0;
-                        __gmpz_rootrem(r1._ptr, rem._ptr, r1._ptr, POWER); ++r1._ccc;
+                        __gmpz_rootrem(r1._ptr, rem._ptr, r1._ptr, POWER); version(ccc) ++r1._ccc;
                         if (rem == 0UL)
                         {
                             debug printf("Counter Example Found: %lu^5 + %lu^5 + %lu^5 + %lu^5 = %lu^5\n",
@@ -2332,7 +2331,7 @@ struct MpzAddExpr(T1, T2)
     MpZ eval() const @trusted
     {
         typeof(return) y = null;
-        __gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr); ++y._ccc;
+        __gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
         return y;
     }
 }
@@ -2352,12 +2351,12 @@ MpzAddExpr!(T1, T2) mpzAddExpr(T1, T2)(T1 t1, T2 t2)
     assert(MpzAddExpr!(Z, Z)(3.Z, 4.Z).eval() == 3 + 4);
 
     const Z x = MpzAddExpr!(Z, Z)(3.Z, 4.Z);
-    assert(x.mutatingCallCount == 1); // lower to `mpz_add`
+    version(ccc) assert(x.mutatingCallCount == 1); // lower to `mpz_add`
     assert(x == 7);
 
     Z y = null;
     y = MpzAddExpr!(Z, Z)(3.Z, 4.Z);
-    assert(y.mutatingCallCount == 2); // lowers to `mpz_init`, `mpz_add`
+    version(ccc) assert(y.mutatingCallCount == 2); // lowers to `mpz_init`, `mpz_add`
     assert(y == 7);
 
 }
@@ -2373,7 +2372,7 @@ struct MpzSubExpr(T1, T2)
     MpZ eval() const @trusted
     {
         typeof(return) y = null;
-        __gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr); ++y._ccc;
+        __gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
         return y;
     }
 }
@@ -2383,7 +2382,7 @@ version(unittest) static assert(isMpZExpr!(MpzSubExpr!(MpZ, MpZ)));
 {
     assert(MpzSubExpr!(Z, Z)(3.Z, 4.Z).eval() == 3 - 4);
     const Z x = MpzSubExpr!(Z, Z)(3.Z, 4.Z);
-    assert(x.mutatingCallCount == 1); // lowers to `mpz_sub`
+    version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_sub`
     assert(x == -1);
 }
 
@@ -2398,7 +2397,7 @@ struct MpzMulExpr(F1, F2)
     MpZ eval() const @trusted
     {
         typeof(return) y = null;
-        __gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr); ++y._ccc;
+        __gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
         return y;
     }
 }
@@ -2410,7 +2409,7 @@ version(unittest) static assert(isMpZExpr!(MpzMulExpr!(MpZ, MpZ)));
 
     const Z x = MpzMulExpr!(Z, Z)(3.Z, 4.Z);
     assert(x == 12);
-    assert(x.mutatingCallCount == 1); // lowers to `mpz_mul`
+    version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_mul`
 }
 
 /// `MpZ`-`MpZ` division expression.
@@ -2424,7 +2423,7 @@ struct MpzDivExpr(P, Q)
     MpZ eval() const @trusted
     {
         typeof(return) y = null;
-        __gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr); ++y._ccc;
+        __gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
         return y;
     }
 }
@@ -2439,7 +2438,7 @@ version(unittest) static assert(isMpZExpr!(MpzDivExpr!(MpZ, MpZ)));
 
     const Z x = MpzDivExpr!(Z, Z)(28.Z, 3.Z);
     assert(x == 9);
-    assert(x.mutatingCallCount == 1); // lowers to `mpz_tdiv_q`
+    version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_tdiv_q`
 }
 
 /// `MpZ`-`MpZ` modulus expression.
@@ -2453,7 +2452,7 @@ struct MpzModExpr(P, Q)
     MpZ eval() const @trusted
     {
         typeof(return) y = null;
-        __gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr); ++y._ccc;
+        __gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
         return y;
     }
 }
@@ -2468,7 +2467,7 @@ version(unittest) static assert(isMpZExpr!(MpzModExpr!(MpZ, MpZ)));
 
     const Z x = MpzModExpr!(Z, Z)(29.Z, 3.Z);
     assert(x == 2);
-    assert(x.mutatingCallCount == 1); // lowers to `mpz_tdiv_r`
+    version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_tdiv_r`
 }
 
 /// `MpZ`-`ulong` power expression.
@@ -2482,7 +2481,7 @@ struct MpzPowUExpr(P, Q)
     MpZ eval() const @trusted
     {
         typeof(return) y = null;
-        __gmpz_pow_ui(y._ptr, e1.eval()._ptr, e2); ++y._ccc;
+        __gmpz_pow_ui(y._ptr, e1.eval()._ptr, e2); version(ccc) ++y._ccc;
         return y;
     }
 }
@@ -2506,7 +2505,7 @@ struct MpzPowMUExpr(P, Q, M)
     MpZ eval() const @trusted
     {
         typeof(return) y = null;
-        __gmpz_powm_ui(y._ptr, base.eval()._ptr, exp, mod._ptr); ++y._ccc;
+        __gmpz_powm_ui(y._ptr, base.eval()._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
         return y;
     }
 }
@@ -2526,7 +2525,7 @@ struct MpzNegExpr(A)
     MpZ eval() const @trusted
     {
         typeof(return) y = null;
-        __gmpz_neg(y._ptr, e1.eval()._ptr); ++y._ccc;
+        __gmpz_neg(y._ptr, e1.eval()._ptr); version(ccc) ++y._ccc;
         return y;
     }
 }
@@ -2537,7 +2536,7 @@ version(unittest) static assert(isMpZExpr!(MpzNegExpr!(MpZ)));
     assert(MpzNegExpr!(Z)(27.Z).eval() == -27);
 
     const Z x = MpzNegExpr!(Z)(27.Z);
-    assert(x.mutatingCallCount == 1); // lowers to `mpz_neg`
+    version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_neg`
     assert(x == -27);
 }
 
