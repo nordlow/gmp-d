@@ -1023,6 +1023,31 @@ struct MpZ
     }
     alias countOnes = populationCount;
 
+    /// Set bit at 0-offset index `bitIndex` (to one).
+    void setBit(mp_bitcnt_t bitIndex) @trusted
+    {
+        __gmpz_setbit(_ptr, bitIndex);
+    }
+
+    /// Clear bit at 0-offset index `bitIndex` (to zero).
+    void clearBit(mp_bitcnt_t bitIndex) @trusted
+    {
+        __gmpz_clrbit(_ptr, bitIndex);
+    }
+
+    /// Complement bit at 0-offset index `bitIndex` (to zero).
+    void complementBit(mp_bitcnt_t bitIndex) @trusted
+    {
+        __gmpz_combit(_ptr, bitIndex);
+    }
+
+    /// Test/Get bit at 0-offset index `bitIndex`.
+    bool testBit(mp_bitcnt_t bitIndex) const @trusted
+    {
+        return __gmpz_tstbit(_ptr, bitIndex) != 0;
+    }
+    alias getBit = testBit;
+
     /// Check if `this` is zero.
     @property bool isZero() const @safe
     {
@@ -1952,6 +1977,15 @@ MpZ powm()(auto ref const MpZ base,
     assert(6.Z.populationCount == 2);
     assert(7.Z.populationCount == 3);
 
+    // {
+    //     Z g = null;
+    //     assert(!b.testBit(0));
+    //     g.setBit(0);
+    //     assert(b.testBit(0));
+    //     g.clearBit(0);
+    //     assert(!b.testBit(0));
+    // }
+
     // fits in type
 
     foreach (Integral; AliasSeq!(short, int, long,
@@ -2693,6 +2727,11 @@ extern(C)
     void __gmpz_ior (mpz_ptr, mpz_srcptr, mpz_srcptr);
     void __gmpz_xor (mpz_ptr, mpz_srcptr, mpz_srcptr);
     void __gmpz_com (mpz_ptr, mpz_srcptr);
+
+    void __gmpz_setbit (mpz_ptr, mp_bitcnt_t);
+    void __gmpz_clrbit (mpz_ptr, mp_bitcnt_t);
+    void __gmpz_combit (mpz_ptr, mp_bitcnt_t);
+    int __gmpz_tstbit (mpz_srcptr, mp_bitcnt_t);
 
     mp_bitcnt_t __gmpz_popcount (mpz_srcptr);
 
