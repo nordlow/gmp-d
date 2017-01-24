@@ -93,19 +93,19 @@ private:
     /// Default conversion base.
     enum defaultBase = 10;
 
-    /// Returns: pointer to internal GMP C struct.
+    /// Returns: pointer to internal rational C struct.
     inout(__mpq_struct)* _ptr() inout return @system // TODO scope
     {
         return &_z;
     }
 
-    /// Returns: pointer to internal GMP C struct.
+    /// Returns: pointer to internal numerator C struct.
     inout(__mpz_struct)* _numptr() inout return @system // TODO scope
     {
         return &_z._mp_num;
     }
 
-    /// Returns: pointer to internal GMP C struct.
+    /// Returns: pointer to internal denominator C struct.
     inout(__mpz_struct)* _denptr() inout return @system // TODO scope
     {
         return &_z._mp_den;
