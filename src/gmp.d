@@ -1943,6 +1943,14 @@ MpZ powm()(auto ref const MpZ base,
     assert(!int.max.Z.isZero);
     assert(!long.max.Z.isZero);
 
+    assert(1.Z.populationCount == 1);
+    assert(2.Z.populationCount == 1);
+    assert(3.Z.populationCount == 2);
+    assert(4.Z.populationCount == 1);
+    assert(5.Z.populationCount == 2);
+    assert(6.Z.populationCount == 2);
+    assert(7.Z.populationCount == 3);
+
     // fits in type
 
     foreach (Integral; AliasSeq!(short, int, long,
