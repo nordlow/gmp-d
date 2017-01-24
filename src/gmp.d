@@ -933,6 +933,14 @@ struct MpZ
         __gmpz_abs(_ptr, _ptr); version(ccc) ++_ccc;
     }
 
+    /** Make `this` the one's complement value of itself in-place.
+        Returns: `void` to make it obvious `this` is mutated.
+    */
+    void complement() @trusted
+    {
+        __gmpz_com(_ptr, _ptr); version(ccc) ++_ccc;
+    }
+
     /// Increase `this` by one.
     ref MpZ opUnary(string s)() return @trusted // TODO scope
         if (s == "++")
@@ -1653,6 +1661,9 @@ MpZ powm()(auto ref const MpZ base,
     assert(n == 42);
     n.absolute();
     assert(n == 42);
+
+    n.complement();
+    assert(n == -43);
 
     // addition
 
