@@ -25,9 +25,6 @@ enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct va
  */
 struct MpZ
 {
-    /// Default conversion base.
-    private enum defaultBase = 10;
-
     pure nothrow pragma(inline, true):
 
     /// Convert to `string` in base `base`.
@@ -1101,6 +1098,8 @@ struct MpZ
     }
 
 private:
+    /// Default conversion base.
+    private enum defaultBase = 10;
 
     /// Returns: evaluation of `this` expression which in this is a no-op.
     ref inout(MpZ) eval() @safe inout return { return this; }
