@@ -1977,6 +1977,7 @@ MpZ powm()(auto ref const MpZ base,
     assert(6.Z.populationCount == 2);
     assert(7.Z.populationCount == 3);
 
+    // TODO
     // {
     //     Z g = null;
     //     assert(!b.testBit(0));
