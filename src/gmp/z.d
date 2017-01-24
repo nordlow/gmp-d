@@ -1099,7 +1099,7 @@ struct MpZ
 private:
 
     /// Default conversion base.
-    private enum defaultBase = 10;
+    enum defaultBase = 10;
 
     /// Returns: evaluation of `this` expression which in this is a no-op.
     ref inout(MpZ) eval() @safe inout return { return this; }
