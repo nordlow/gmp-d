@@ -27,7 +27,7 @@ enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct va
  */
 struct MpZ
 {
-/// Default conversion base.
+    /// Default conversion base.
     private enum defaultBase = 10;
 
     pure nothrow pragma(inline, true):
