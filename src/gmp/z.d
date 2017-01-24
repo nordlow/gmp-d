@@ -1098,6 +1098,7 @@ struct MpZ
     }
 
 private:
+
     /// Default conversion base.
     private enum defaultBase = 10;
 
