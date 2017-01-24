@@ -2,16 +2,13 @@
 module gmp.z;
 
 import std.typecons : Unsigned, Unqual;
-import std.traits : isInstanceOf; // needed by expression templates
+import std.traits : isInstanceOf; // used by expression templates
 import std.algorithm.mutation : move, moveEmplace;
 
 import gmp.traits;
 
 /// Call unittests taking long to execute.
 enum unittestLong = false;
-
-/** Is `true` iff `T` is a GNU MP arithmetic type (`long`, `ulong` or `double`). */
-enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
 
 /// Is `true` if type `T` can be evaluated to a `MpZ` value.
 enum isMpZExpr(T) = (is(Unqual!(typeof(T.eval())) == MpZ)); // which returns an `MpZ`
