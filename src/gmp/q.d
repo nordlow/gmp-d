@@ -49,6 +49,17 @@ struct MpQ
         initialize();
     }
 
+    /** Construct from floating-point `value`.
+     */
+    this(P)(P value) @trusted
+        if (isFloating!P)
+    {
+        initialize();
+
+        version(ccc) ++_ccc;
+        __gmpq_set_d(_ptr, value);
+    }
+
     /** Construct from `pValue` / `qValue`.
 
         Note that `qValue` must be explicitly given, to prevent accidental
@@ -177,6 +188,10 @@ pure nothrow @nogc:
     immutable Q z = Q(7UL, 13UL);
     assert(z.numerator == 7);
     assert(z.denominator == 13);
+
+    immutable Q w = 0.25;
+    assert(w.numerator == 1);
+    assert(w.denominator == 4);
 }
 
 /// canonicalization
@@ -233,6 +248,7 @@ extern(C)
 
     void __gmpq_set_ui (mpq_ptr, ulong, ulong);
     void __gmpq_set_si (mpq_ptr, long, ulong);
+    void __gmpq_set_d (mpq_ptr, double);
 
     double __gmpq_get_d (mpq_srcptr);
 
