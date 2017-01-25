@@ -247,8 +247,8 @@ struct MpQ
     }
 
     MpQ opBinary(string s)(auto ref const MpQ rhs) const @trusted // direct value
-    if ((s == "+" || s == "-" ||
-         s == "*" || s == "/"))
+        if ((s == "+" || s == "-" ||
+             s == "*" || s == "/"))
     {
         static if (!__traits(isRef, rhs)) // r-value `rhs`
         {
@@ -514,6 +514,7 @@ pure nothrow:
     assert(Q(2, 3) / Q(2, 3) == 1);
     assert(Q(2, 3) / Q(3, 2) == Q(4, 9));
     assert(Q(3, 2) / Q(2, 3) == Q(9, 4));
+    assert(1 / Q(2, 3) == Q(3, 2));
 }
 
 version(unittest)
