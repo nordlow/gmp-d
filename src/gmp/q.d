@@ -97,6 +97,13 @@ struct MpQ
         return *(cast(inout(MpZ)*)_den_ptr);
     }
 
+    /// Cast to arithmetic type `T`.
+    T opCast(T)() const @trusted // TODO scope
+        if (isFloating!T)
+    {
+        return cast(T)__gmpq_get_d(_ptr);
+    }
+
 private:
 
     /// Default conversion base.
@@ -179,6 +186,14 @@ pure nothrow @nogc:
     assert(x.denominator == 2);
 }
 
+/// casting
+@safe unittest
+{
+    assert(cast(double)Q(1, 2) == 0.5);
+    assert(cast(double)Q(2, 4) == 0.5);
+    assert(cast(double)Q(1, 8) == 1.0/8);
+}
+
 version(unittest)
 {
     import dbgio : dln;
@@ -214,6 +229,8 @@ extern(C)
 
     void __gmpq_set_ui (mpq_ptr, ulong, ulong);
     void __gmpq_set_si (mpq_ptr, long, ulong);
+
+    double __gmpq_get_d (mpq_srcptr);
 
     void __gmpq_canonicalize (mpq_ptr);
 }
