@@ -255,10 +255,8 @@ struct MpZ
     /// Destruct `this`.
     ~this() @trusted
     {
-        if (_ptr)
-        {
-            __gmpz_clear(_ptr); version(ccc) ++_ccc;
-        }
+        assert(_ptr, "Pointer to this is null");
+        __gmpz_clear(_ptr); version(ccc) ++_ccc;
     }
 
     /// Returns: `true` iff `this` equals `rhs`.
