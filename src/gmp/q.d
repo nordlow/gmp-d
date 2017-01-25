@@ -55,9 +55,7 @@ struct MpQ
         if (isFloating!P)
     {
         initialize();
-
-        version(ccc) ++_ccc;
-        __gmpq_set_d(_ptr, value);
+        this = value;           // reuse opAssign
     }
 
     /** Construct from `pValue` / `qValue`.
@@ -85,6 +83,16 @@ struct MpQ
             __gmpq_set_si(_ptr, pValue, cast(ulong)qValue);
 
         if (canonicalizeFlag) { canonicalize(); }
+    }
+
+    /** Construct from floating-point `value`.
+     */
+    ref MpQ opAssign(P)(P value) @trusted // TODO scope
+        if (isFloating!P)
+    {
+        version(ccc) ++_ccc;
+        __gmpq_set_d(_ptr, value);
+        return this;
     }
 
     /** Canonicalize `this`. */
@@ -189,9 +197,13 @@ pure nothrow @nogc:
     assert(z.numerator == 7);
     assert(z.denominator == 13);
 
-    immutable Q w = 0.25;
+    Q w = 0.25;
     assert(w.numerator == 1);
     assert(w.denominator == 4);
+
+    w = 0.125;
+    assert(w.numerator == 1);
+    assert(w.denominator == 8);
 }
 
 /// canonicalization
