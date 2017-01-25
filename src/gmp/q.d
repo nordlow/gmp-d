@@ -50,22 +50,32 @@ struct MpQ
     }
 
     /** Construct from `pValue` / `qValue`. */
-    this(P, Q)(P pValue, Q qValue) @trusted
+    this(P, Q)(P pValue, Q qValue,
+               bool canonicalizeFlag = false) @trusted
         if (isIntegral!P &&
-            isUnsigned!Q)
+            isIntegral!Q)
     {
         initialize();
+
         version(ccc) ++_ccc;
+
+        static if (isSigned!Q)
+        {
+            assert(qValue >= 1, "Negative denominator");
+        }
+
         static      if (isUnsigned!P)
-            __gmpq_set_ui(_ptr, pValue, qValue);
+            __gmpq_set_ui(_ptr, pValue, cast(ulong)qValue);
         else                    // signed integral
-            __gmpq_set_si(_ptr, pValue, qValue);
+            __gmpq_set_si(_ptr, pValue, cast(ulong)qValue);
+
+        if (canonicalizeFlag) { canonicalize(); }
     }
 
-    /** Initialize internal struct. */
-    private void initialize() @trusted // cannot be called `init` as that will override builtin type property
+    /** Canonicalize `this`. */
+    void canonicalize() @trusted
     {
-        __gmpq_init(_ptr); version(ccc) ++_ccc;
+        __gmpq_canonicalize(_ptr); version(ccc) ++_ccc;
     }
 
     /// Destruct `this`.
@@ -91,6 +101,12 @@ private:
 
     /// Default conversion base.
     enum defaultBase = 10;
+
+    /** Initialize internal struct. */
+    private void initialize() @trusted // cannot be called `init` as that will override builtin type property
+    {
+        __gmpq_init(_ptr); version(ccc) ++_ccc;
+    }
 
     /// Returns: pointer to internal rational C struct.
     inout(__mpq_struct)* _ptr() inout return @system // TODO scope
@@ -150,6 +166,17 @@ unittest
     assert(z.denominator == 13);
 }
 
+/// canonicalization
+unittest
+{
+    Q x = Q(2, 4);
+    assert(x.numerator == 2);
+    assert(x.denominator == 4);
+    x.canonicalize();
+    assert(x.numerator == 1);
+    assert(x.denominator == 2);
+}
+
 version(unittest)
 {
     import dbgio : dln;
@@ -185,6 +212,8 @@ extern(C)
 
     void __gmpq_set_ui (mpq_ptr, ulong, ulong);
     void __gmpq_set_si (mpq_ptr, long, ulong);
+
+    void __gmpq_canonicalize (mpq_ptr);
 }
 
 pragma(lib, "gmp");
