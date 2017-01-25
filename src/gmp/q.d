@@ -226,7 +226,6 @@ struct MpQ
         {
             swap(numerator, denominator); // fast inline
         }
-
     }
 
     /** Returns: sign as either
