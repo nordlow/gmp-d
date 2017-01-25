@@ -160,6 +160,7 @@ struct MpZ
     }
 
     /// Returns: (duplicate) copy of `this`.
+    pragma(inline, false)
     MpZ dup() const @trusted
     {
         typeof(return) y = void;
@@ -263,6 +264,7 @@ struct MpZ
     }
 
     /// Returns: `true` iff `this` equals `rhs`.
+    pragma(inline, false)
     bool opEquals()(auto ref const MpZ rhs) const @trusted // TODO scope
     {
         if (_ptr == rhs._ptr)   // fast equality
@@ -390,6 +392,7 @@ struct MpZ
     }
 
     /** Returns: `this` `s` `rhs`. */
+    pragma(inline, false)
     MpZ opBinary(string s)(auto ref const MpZ rhs) const @trusted // direct value
         if ((s == "+" || s == "-" ||
              s == "*" || s == "/" || s == "%" ||
@@ -1128,6 +1131,7 @@ private:
     }
 
     /// @nogc-variant of `toStringz` with heap allocation of null-terminated C-string `stringz`.
+    pragma(inline, false)
     char* _allocStringzCopyOf(const string value) @trusted @nogc
     {
         char* stringz = cast(char*)qualifiedMalloc(value.length + 1); // maximum this many characters
@@ -1153,7 +1157,7 @@ private:
     __mpz_struct _z;            // internal libgmp C struct
 
     // qualified C memory managment
-    static @safe
+    static @safe pragma(inline, false)
     {
         pragma(mangle, "malloc") void* qualifiedMalloc(size_t size);
         pragma(mangle, "free") void qualifiedFree(void* ptr);
@@ -2576,7 +2580,7 @@ version(unittest)
 }
 
 // C API
-extern(C)
+extern(C) pragma(inline, false)
 {
     alias __mp_limb_t = ulong;    // see `mp_limb_t` gmp.h. TODO detect when it is `uint` instead
     struct __mpz_struct
