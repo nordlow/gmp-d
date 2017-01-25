@@ -152,12 +152,6 @@ struct MpZ
         @disable this(this);
     }
 
-    /** Initialize internal struct. */
-    private void initialize() @trusted // cannot be called `init` as that will override builtin type property
-    {
-        __gmpz_init(_ptr); version(ccc) ++_ccc;
-    }
-
     /// Swap content of `this` with `rhs`.
     void swap(ref MpZ rhs) @safe
     {
@@ -1104,6 +1098,12 @@ struct MpZ
     }
 
 private:
+
+    /** Initialize internal struct. */
+    void initialize() @trusted // cannot be called `init` as that will override builtin type property
+    {
+        __gmpz_init(_ptr); version(ccc) ++_ccc;
+    }
 
     /// Default conversion base.
     enum defaultBase = 10;
