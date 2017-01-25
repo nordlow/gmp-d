@@ -78,9 +78,9 @@ struct MpQ
         }
 
         static      if (isUnsigned!P)
-            __gmpq_set_ui(_ptr, pValue, cast(ulong)qValue);
+            __gmpq_set_ui(_ptr, pValue, qValue);
         else                    // signed integral
-            __gmpq_set_si(_ptr, pValue, cast(ulong)qValue);
+            __gmpq_set_si(_ptr, pValue, qValue);
 
         if (canonicalizeFlag) { canonicalize(); }
     }
@@ -141,6 +141,34 @@ struct MpQ
         return cast(T)__gmpq_get_d(_ptr);
     }
 
+    /** Invert `this` in-place.
+        Returns: `void` to make it obvious that `this` is mutated.
+     */
+    void invert() @trusted
+    {
+        import std.algorithm.mutation : swap;
+        const bool negative = numerator < 0;
+        if (negative)
+        {
+            numerator.absolute();         // fast inline
+            swap(numerator, denominator); // fast inline
+            numerator.negate();           // fast inline
+        }
+        else
+        {
+            swap(numerator, denominator); // fast inline
+        }
+
+    }
+
+    /** Make `this` the absolute value of itself in-place.
+        Returns: `void` to make it obvious that `this` is mutated.
+     */
+    void absolute() @trusted
+    {
+        numerator.absolute();
+    }
+
 private:
 
     /// Default conversion base.
@@ -194,10 +222,10 @@ private:
     }
 }
 
-pure nothrow @nogc:
+pure nothrow:
 
 /// construction and assignment
-@safe unittest
+@safe @nogc unittest
 {
     Q x = null;
     assert(x.numerator == 0);
@@ -229,7 +257,7 @@ pure nothrow @nogc:
 }
 
 /// canonicalization
-@safe unittest
+@safe @nogc unittest
 {
     Q x = Q(2, 4);
     assert(x.numerator == 2);
@@ -239,8 +267,32 @@ pure nothrow @nogc:
     assert(x.denominator == 2);
 }
 
-/// casting
+/// inversion
 @safe unittest
+{
+    Q x = Q(1, 2);
+    assert(x.numerator == 1);
+    assert(x.denominator == 2);
+
+    x.invert();
+    assert(x.numerator == 2);
+    assert(x.denominator == 1);
+
+    Q y = Q(-1, 2);
+    dln(x.numerator.toString);
+    dln(x.denominator.toString);
+
+    // TODO:
+    // assert(x.numerator == -1);
+    // assert(x.denominator == 2);
+
+    // x.invert();
+    // assert(x.numerator == -2);
+    // assert(x.denominator == 1);
+}
+
+/// casting
+@safe @nogc unittest
 {
     assert(cast(double)Q(1, 2) == 0.5);
     assert(cast(double)Q(2, 4) == 0.5);
