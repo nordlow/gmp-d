@@ -446,6 +446,7 @@ pure nothrow:
 {
     assert(Q(1, 2) + Q(1, 2) == Q(1, 1));
     assert(Q(1, 3) + Q(1, 3) == Q(2, 3));
+    assert(Q(1, 2) + Q(1, 3) == Q(5, 6));
 }
 
 version(unittest)
