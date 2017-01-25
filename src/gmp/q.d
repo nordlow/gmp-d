@@ -245,6 +245,7 @@ struct MpQ
     */
     @property int sgn() const @safe
     {
+        assert(denominator >= 1);
         return numerator.sgn;   // fast
     }
 
@@ -472,6 +473,17 @@ alias inv = inverse;
     assert(x.denominator == 4);
     x.canonicalize();
     assert(x.numerator == 1);
+    assert(x.denominator == 2);
+}
+
+/// negative numerator canonicalization
+@safe @nogc unittest
+{
+    Q x = Q(-2, 4);
+    assert(x.numerator == -2);
+    assert(x.denominator == 4);
+    x.canonicalize();
+    assert(x.numerator == -1);
     assert(x.denominator == 2);
 }
 
