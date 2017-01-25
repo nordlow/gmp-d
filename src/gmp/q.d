@@ -582,6 +582,14 @@ alias inv = inverse;
     assert(x == x);             // same
 }
 
+/// sign
+@safe unittest
+{
+    assert(Q(-1, 3).sgn == -1);
+    assert(Q( 0, 3).sgn ==  0);
+    assert(Q( 1, 3).sgn ==  1);
+}
+
 /// comparison
 @safe unittest
 {
