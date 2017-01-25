@@ -4,6 +4,8 @@ module gmp.q;
 import gmp.traits;
 import gmp.z;
 
+import std.algorithm.mutation : move, moveEmplace;
+
 /** Arbitrary (multi) precision rational number (Q).
     Wrapper for GNU MP (GMP)'s type `mpq_t` and functions `__gmpq_.*`.
  */
@@ -23,7 +25,7 @@ struct MpQ
 
     // TODO toRCString wrapped in UniqueRange
 
-    /// Returns: A unique hash of the `Mpq` value suitable for use in a hash table.
+    /// Returns: A unique hash of the `MpQ` value suitable for use in a hash table.
     size_t toHash() const
     {
         assert(false, "TODO");
@@ -128,6 +130,26 @@ struct MpQ
         __gmpq_clear(_ptr); version(ccc) ++_ccc;
     }
 
+    /// Returns: `true` iff `this` equals `rhs`.
+    bool opEquals()(auto ref const MpQ rhs) const @trusted // TODO scope
+    {
+        if (_ptr == rhs._ptr)   // fast equality
+        {
+            return true;        // fast bailout
+        }
+        return __gmpq_equal(_ptr, rhs._ptr) != 0;
+    }
+
+    /// Compare `this` to `rhs`.
+    int opCmp()(auto ref const MpQ rhs) const @trusted // TODO scope
+    {
+        if (rhs.numerator == 0)
+        {
+            return numerator.sgn(); // optimization
+        }
+        return __gmpq_cmp(_ptr, rhs._ptr);
+    }
+
     /// Returns: numerator reference of `this`.
     @property ref inout(MpZ) numerator() @trusted inout return // TODO scope
     {
@@ -162,7 +184,7 @@ struct MpQ
 
     /** Invert `this` in-place.
         Returns: `void` to make it obvious that `this` is mutated.
-     */
+    */
     void invert() @trusted
     {
         import std.algorithm.mutation : swap;
@@ -182,10 +204,68 @@ struct MpQ
 
     /** Make `this` the absolute value of itself in-place.
         Returns: `void` to make it obvious that `this` is mutated.
-     */
+    */
     void absolute() @trusted
     {
         numerator.absolute();
+    }
+
+    MpQ opBinary(string s)(auto ref const MpQ rhs) const @trusted // direct value
+    if ((s == "+" || s == "-" ||
+         s == "*" || s == "/"))
+    {
+        static if (!__traits(isRef, rhs)) // r-value `rhs`
+        {
+            MpQ* mut_rhs = (cast(MpQ*)(&rhs)); // @trusted because `MpQ` has no aliased indirections
+            static      if (s == "+")
+            {
+                __gmpq_add(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+            }
+            else static if (s == "-")
+            {
+                __gmpq_sub(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+            }
+            else static if (s == "*")
+            {
+                __gmpq_mul(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+            }
+            else static if (s == "/")
+            {
+                assert(rhs != 0, "Divison by zero");
+                __gmpq_div(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+            }
+            else
+            {
+                static assert(false);
+            }
+            return move(*mut_rhs); // TODO shouldn't have to call `move` here
+        }
+        else
+        {
+            typeof(return) y = null;
+            static      if (s == "+")
+            {
+                __gmpq_add(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+            }
+            else static if (s == "-")
+            {
+                __gmpq_sub(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+            }
+            else static if (s == "*")
+            {
+                __gmpq_mul(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+            }
+            else static if (s == "/")
+            {
+                assert(rhs != 0, "Divison by zero");
+                __gmpq_div(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+            }
+            else
+            {
+                static assert(false);
+            }
+            return y;
+        }
     }
 
 private:
@@ -341,6 +421,33 @@ pure nothrow:
     assert(cast(double)Q(1, 8) == 1.0/8);
 }
 
+/// equality
+@safe unittest
+{
+    assert(Q(1, 1) == Q(1, 1));
+    assert(Q(1, 1) != Q(1, 2));
+    const x = Q(1, 3);
+    assert(x == x);             // same
+}
+
+/// comparison
+@safe unittest
+{
+    assert(Q( 1, 3) < Q(1, 2));
+    assert(Q( 1, 2) > Q(1, 3));
+    assert(Q( 1, 2) > Q(0, 1));
+    assert(Q( 0, 1) == Q(0, 1));
+    assert(Q( 0, 2) == Q(0, 1));
+    assert(Q(-1, 2) < Q(0, 1));
+}
+
+/// arithmetic
+@safe unittest
+{
+    assert(Q(1, 2) + Q(1, 2) == Q(1, 1));
+    assert(Q(1, 3) + Q(1, 3) == Q(2, 3));
+}
+
 version(unittest)
 {
     import dbgio : dln;
@@ -381,6 +488,14 @@ extern(C)
     double __gmpq_get_d (mpq_srcptr);
 
     void __gmpq_canonicalize (mpq_ptr);
+
+    int __gmpq_equal (mpq_srcptr, mpq_srcptr);
+    int __gmpq_cmp (mpq_srcptr, mpq_srcptr);
+
+    void __gmpq_add (mpq_ptr, mpq_srcptr, mpq_srcptr);
+    void __gmpq_sub (mpq_ptr, mpq_srcptr, mpq_srcptr);
+    void __gmpq_mul (mpq_ptr, mpq_srcptr, mpq_srcptr);
+    void __gmpq_div (mpq_ptr, mpq_srcptr, mpq_srcptr);
 }
 
 pragma(lib, "gmp");
