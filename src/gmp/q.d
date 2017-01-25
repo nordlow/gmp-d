@@ -49,8 +49,9 @@ struct MpQ
         initialize();
     }
 
-    /** Construct from `pValue` / `qValue`. */
-    this(P, Q)(P pValue, Q qValue = 1,
+    /** Construct from `pValue` / `qValue`.
+     */
+    this(P, Q)(P pValue, Q qValue,
                bool canonicalizeFlag = false) @trusted
         if (isIntegral!P &&
             isIntegral!Q)
