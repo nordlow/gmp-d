@@ -1182,14 +1182,14 @@ version(unittest) static assert(isMpZExpr!MpZ);
 pure nothrow pragma(inline, true):
 
 /** Instantiator for `MpZ`. */
-MpZ mpz(Args...)(Args args) @safe @nogc
+MpZ mpz(Args...)(Args args) @safe
 {
     return typeof(return)(args);
 }
 
 /// Swap contents of `x` with contents of `y`.
 void swap()(ref MpZ x,
-            ref MpZ y) @nogc
+            ref MpZ y)
 {
     import std.algorithm.mutation : swap;
     swap(x, y); // x.swap(y);
