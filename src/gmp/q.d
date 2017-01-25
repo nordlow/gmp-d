@@ -50,7 +50,7 @@ struct MpQ
     }
 
     /** Construct from `pValue` / `qValue`. */
-    this(P, Q)(P pValue, Q qValue,
+    this(P, Q)(P pValue, Q qValue = 1,
                bool canonicalizeFlag = false) @trusted
         if (isIntegral!P &&
             isIntegral!Q)
