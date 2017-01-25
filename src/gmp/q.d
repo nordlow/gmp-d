@@ -140,6 +140,19 @@ struct MpQ
         return *(cast(inout(MpZ)*)_den_ptr);
     }
 
+    /// Returns: the integer part of `this`, with any remainder truncated.
+    @property MpZ integerPart() @safe
+    {
+        return numerator / denominator;
+    }
+
+    /// Returns: the fractional part of `this`.
+    // TODO activate when sub(MpQ, MpZ) has been added
+    // @property MpQ fractionPart()
+    // {
+    //     return this - integerPart;
+    // }
+
     /// Cast to arithmetic type `T`.
     T opCast(T)() const @trusted // TODO scope
         if (isFloating!T)
@@ -293,6 +306,19 @@ pure nothrow:
     // x.invert();
     // assert(x.numerator == -2);
     // assert(x.denominator == 1);
+}
+
+/// integer and fractional part
+@safe unittest
+{
+    Q x = Q(5, 2);
+    assert(x.integerPart == 2);
+
+    x = Q(7, 2);
+    assert(x.integerPart == 3);
+
+    x = Q(10, 2);
+    assert(x.integerPart == 5);
 }
 
 /// casting
