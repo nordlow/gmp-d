@@ -379,6 +379,14 @@ private:
 
 pure nothrow pragma(inline, true):
 
+/// Swap contents of `x` with contents of `y`.
+void swap()(ref MpQ x,
+            ref MpQ y)
+{
+    import std.algorithm.mutation : swap;
+    swap(x, y); // x.swap(y);
+}
+
 /** Returns: inverse of `x`.
 */
 MpQ inverse()(auto ref const MpQ x) @trusted
@@ -439,6 +447,16 @@ alias inv = inverse;
     x.canonicalize();
     assert(x.numerator == 1);
     assert(x.denominator == 2);
+}
+
+/// swap
+@safe @nogc unittest
+{
+    Q x = Q(1, 2);
+    Q y = Q(1, 3);
+    swap(x, y);
+    assert(x == Q(1, 3));
+    assert(y == Q(1, 2));
 }
 
 /// invert
