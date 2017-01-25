@@ -42,8 +42,7 @@ struct MpQ
     /// Construct empty (undefined) from explicit `null`.
     this(typeof(null)) @safe
     {
-        _znum = MpZ.init;
-        _zden = MpZ.init;
+        initialize();
     }
 
     /** Construct from `pValue` / `qValue`. */
@@ -51,8 +50,10 @@ struct MpQ
         if (isIntegral!P && isSigned!P &&
             isUnsigned!Q)
     {
-        _znum = MpZ.init;
-        _zden = MpZ.init;
+        // dln((cast(__mpz_struct*)&_znum)._mp_alloc);
+        // dln((cast(__mpz_struct*)&_znum)._mp_size);
+        // dln((cast(__mpz_struct*)&_znum)._mp_d);
+
         version(ccc) ++_ccc;
         static      if (isUnsigned!P)
             __gmpq_set_ui(_ptr, pValue, qValue);
@@ -74,20 +75,16 @@ struct MpQ
     }
 
     /// Returns: numerator of `this`.
-    @property ref inout(MpZ) numerator() @trusted inout return // TODO scope
+    @property inout(MpZ)* numeratorPtr() @trusted inout return // TODO scope
     {
-        return _znum;
+        return cast(MpZ*)_num_ptr;
     }
-    alias num = numerator;
-    alias P = numerator;
 
     /// Returns: denominator of `this`.
-    @property ref inout(MpZ) denominator() @trusted inout return // TODO scope
+    @property inout(MpZ)* denominatorPtr() @trusted inout return // TODO scope
     {
-        return _zden;
+        return cast(MpZ*)_den_ptr;
     }
-    alias den = denominator;
-    alias Q = denominator;
 
 private:
 
@@ -97,23 +94,22 @@ private:
     /// Returns: pointer to internal rational C struct.
     inout(__mpq_struct)* _ptr() inout return @system // TODO scope
     {
-        return cast(typeof(return))&_znum;
+        return &_q;
     }
 
     /// Returns: pointer to internal numerator C struct.
-    inout(__mpz_struct)* _numptr() inout return @system // TODO scope
+    inout(__mpz_struct)* _num_ptr() inout return @system // TODO scope
     {
-        return cast(typeof(return))&_znum;
+        return cast(typeof(return))&_q._mp_num;
     }
 
     /// Returns: pointer to internal denominator C struct.
-    inout(__mpz_struct)* _denptr() inout return @system // TODO scope
+    inout(__mpz_struct)* _den_ptr() inout return @system // TODO scope
     {
-        return cast(typeof(return))&_zden;
+        return cast(typeof(return))&_q._mp_den;
     }
 
-    MpZ _znum;                  // numerator
-    MpZ _zden;                  // denominator
+    __mpq_struct _q;            // internal libgmp C struct
 
     // qualified C memory managment
     static @safe
@@ -142,15 +138,10 @@ private:
 /// basics
 unittest
 {
-    dln();
     Q x = null;
-    dln();
-    Q y = Q(11, 13UL);
-    dln();
-    assert(y.numerator == 11);
-    dln();
-    assert(y.denominator == 13);
-    dln();
+    // Q y = Q(11, 13UL);
+    // assert(y.numerator == 11);
+    // assert(y.denominator == 13);
 }
 
 version(unittest)
