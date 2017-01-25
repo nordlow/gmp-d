@@ -605,6 +605,10 @@ alias inv = inverse;
     assert(Q( 1, 3) > 0);
     assert(Q(-1, 3) < 0);
 
+    assert(Q( 1, 3) < 1UL);
+    assert(Q( 1, 3) > 0UL);
+    assert(Q(-1, 3) < 0UL);
+
     assert(Q( 1, 3) < 1.Z);
     assert(Q( 1, 3) > 0.Z);
     assert(Q(-1, 3) < 0.Z);
