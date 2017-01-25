@@ -71,7 +71,7 @@ struct MpZ
     @nogc:
 
     /** No default construction for now, because `mpz_init` initialize
-        `__mpz_struct`-fields at `_ptr` to non-zero values.
+        `__mpz_struct`-fields to non-zero values.
 
         TODO Allow default construction by delaying call to initialize().
     */
