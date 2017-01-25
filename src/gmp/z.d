@@ -304,7 +304,6 @@ struct MpZ
         }
         return __gmpz_cmp(_ptr, rhs._ptr);
     }
-
     /// ditto
     int opCmp(T)(T rhs) const @trusted // TODO scope
         if (isArithmetic!T)
