@@ -155,7 +155,7 @@ pure nothrow @nogc:
 /// construction
 @safe unittest
 {
-    const Q x = null;
+    Q x = null;
     assert(x.numerator == 0);
     assert(x.denominator == 1);
 
