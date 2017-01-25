@@ -139,7 +139,7 @@ struct MpZ
     }
     else
     {
-        /// Disable copy construction.
+        /// No copy construction.
         @disable this(this);
     }
 
