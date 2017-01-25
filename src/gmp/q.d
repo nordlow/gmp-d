@@ -448,19 +448,19 @@ alias inv = inverse;
     assert(z.numerator == 7);
     assert(z.denominator == 13);
 
-    Q w = 0.25;                 // construct from floating point
+    Q w = 0.25;                 // construct from `double`
     assert(w.numerator == 1);
     assert(w.denominator == 4);
 
-    w = 0.125;                  // assign from floating point
+    w = 0.125f;                 // assign from `float`
     assert(w.numerator == 1);
     assert(w.denominator == 8);
 
-    w = 2;                      // assign from integral
+    w = 2;                      // assign from `int`
     assert(w.numerator == 2);
     assert(w.denominator == 1);
 
-    w = 3;                      // assign from integral
+    w = 3;                      // assign from `int`
     assert(w.numerator == 3);
     assert(w.denominator == 1);
 }
@@ -566,6 +566,7 @@ alias inv = inverse;
 /// casting
 @safe @nogc unittest
 {
+    assert(cast(double)Q(1, 2) == 0.5f);
     assert(cast(double)Q(1, 2) == 0.5);
     assert(cast(double)Q(2, 4) == 0.5);
     assert(cast(double)Q(1, 8) == 1.0/8);
