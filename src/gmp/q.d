@@ -50,10 +50,7 @@ struct MpQ
         if (isIntegral!P && isSigned!P &&
             isUnsigned!Q)
     {
-        // dln((cast(__mpz_struct*)&_znum)._mp_alloc);
-        // dln((cast(__mpz_struct*)&_znum)._mp_size);
-        // dln((cast(__mpz_struct*)&_znum)._mp_d);
-
+        initialize();
         version(ccc) ++_ccc;
         static      if (isUnsigned!P)
             __gmpq_set_ui(_ptr, pValue, qValue);
@@ -139,9 +136,9 @@ private:
 unittest
 {
     Q x = null;
-    // Q y = Q(11, 13UL);
-    // assert(y.numerator == 11);
-    // assert(y.denominator == 13);
+    Q y = Q(11, 13UL);
+    assert(*y.numeratorPtr == 11);
+    assert(*y.denominatorPtr == 13);
 }
 
 version(unittest)
