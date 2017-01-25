@@ -441,12 +441,28 @@ pure nothrow:
     assert(Q(-1, 2) < Q(0, 1));
 }
 
-/// arithmetic
+/// addition
 @safe unittest
 {
     assert(Q(1, 2) + Q(1, 2) == Q(1, 1));
     assert(Q(1, 3) + Q(1, 3) == Q(2, 3));
     assert(Q(1, 2) + Q(1, 3) == Q(5, 6));
+}
+
+/// subtraction
+@safe unittest
+{
+    assert(Q(1, 2) - Q(1, 2) == Q( 0, 1));
+    assert(Q(1, 2) - Q(1, 3) == Q (1, 6));
+    assert(Q(1, 3) - Q(1, 2) == Q(-1, 6));
+}
+
+/// multiplication
+@safe unittest
+{
+    assert(Q(1, 2) * Q(1, 2) == Q(1, 4));
+    assert(Q(2, 3) * Q(2, 3) == Q(4, 9));
+    assert(Q(1, 2) * Q(1, 3) == Q(1, 6));
 }
 
 version(unittest)
