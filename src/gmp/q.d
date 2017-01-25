@@ -95,6 +95,20 @@ struct MpQ
         return this;
     }
 
+    /** Assign from integer `value`. */
+    ref MpQ opAssign(P)(P value) @trusted // TODO scope
+        if (isIntegral!P)
+    {
+        version(ccc) ++_ccc;
+
+        static      if (isUnsigned!P)
+            __gmpq_set_ui(_ptr, value, 1);
+        else                    // signed integral
+            __gmpq_set_si(_ptr, value, 1);
+
+        return this;
+    }
+
     /** Canonicalize `this`. */
     void canonicalize() @trusted
     {
@@ -182,7 +196,7 @@ private:
 
 pure nothrow @nogc:
 
-/// construction
+/// construction and assignment
 @safe unittest
 {
     Q x = null;
@@ -197,13 +211,21 @@ pure nothrow @nogc:
     assert(z.numerator == 7);
     assert(z.denominator == 13);
 
-    Q w = 0.25;
+    Q w = 0.25;                 // construct from floating point
     assert(w.numerator == 1);
     assert(w.denominator == 4);
 
-    w = 0.125;
+    w = 0.125;                  // assign from floating point
     assert(w.numerator == 1);
     assert(w.denominator == 8);
+
+    w = 2;                      // assign from integral
+    assert(w.numerator == 2);
+    assert(w.denominator == 1);
+
+    w = 3;                      // assign from integral
+    assert(w.numerator == 3);
+    assert(w.denominator == 1);
 }
 
 /// canonicalization
