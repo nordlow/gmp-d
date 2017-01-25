@@ -70,13 +70,22 @@ struct MpZ
 
     @nogc:
 
-    /// No default construction.
+    /** No default construction for now, because `mpz_init` initialize
+        `__mpz_struct`-fields at `_ptr` to non-zero values.
+
+        TODO Allow default construction by delaying call to initialize().
+    */
     @disable this();
 
     /// Construct empty (undefined) from explicit `null`.
-    this(typeof(null)) @safe
+    this(typeof(null)) @trusted
     {
         initialize();             // TODO is there a faster way?
+
+        // dln("alloc:", _ptr._mp_alloc);
+        // dln("size:", _ptr._mp_size);
+        // dln("ptr:", _ptr._mp_d);
+
         assert(this == MpZ.init); // if this is same as default
     }
 
