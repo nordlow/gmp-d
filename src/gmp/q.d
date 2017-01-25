@@ -50,6 +50,9 @@ struct MpQ
     }
 
     /** Construct from `pValue` / `qValue`.
+
+        Note that `qValue` must be explicitly given, to prevent accidental
+        storage of integers as rations with denominator being 1.
      */
     this(P, Q)(P pValue, Q qValue,
                bool canonicalizeFlag = false) @trusted
