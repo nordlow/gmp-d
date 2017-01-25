@@ -4,8 +4,6 @@ module gmp.q;
 import gmp.traits;
 import gmp.z;
 
-pragma(lib, "gmp");
-
 /** Arbitrary (multi) precision rational number (Q).
     Wrapper for GNU MP (GMP)'s type `mpq_t` and functions `__gmpq_.*`.
  */
