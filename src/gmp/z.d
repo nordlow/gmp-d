@@ -255,7 +255,7 @@ struct MpZ
     /// Destruct `this`.
     ~this() @trusted
     {
-        assert(_ptr, "Pointer to this is null");
+        assert(_ptr, "Pointer is null");
         __gmpz_clear(_ptr); version(ccc) ++_ccc;
     }
 
