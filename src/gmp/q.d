@@ -159,6 +159,16 @@ struct MpQ
         }
         return __gmpq_cmp(_ptr, rhs._ptr);
     }
+    /// Compare `this` to `rhs`.
+    int opCmp()(auto ref const MpZ rhs) const @trusted // TODO scope
+    {
+        if (rhs == 0)
+        {
+            return sgn;         // optimization
+        }
+        return __gmpq_cmp_z(_ptr,
+                            cast(const(__mpz_struct)*)&rhs); // TODO wrap cast?
+    }
     /// ditto
     int opCmp(T)(T rhs) const @trusted // TODO scope
         if (isIntegral!T)
@@ -573,6 +583,10 @@ alias inv = inverse;
     assert(Q( 1, 3) < 1);
     assert(Q( 1, 3) > 0);
     assert(Q(-1, 3) < 0);
+
+    assert(Q( 1, 3) < 1.Z);
+    assert(Q( 1, 3) > 0.Z);
+    assert(Q(-1, 3) < 0.Z);
 }
 
 /// addition
@@ -652,6 +666,7 @@ extern(C) pragma(inline, false)
 
     int __gmpq_equal (mpq_srcptr, mpq_srcptr);
     int __gmpq_cmp (mpq_srcptr, mpq_srcptr);
+    int __gmpq_cmp_z (mpq_srcptr, mpz_srcptr);
 
     int __gmpq_cmp_ui (mpq_srcptr, ulong, ulong);
     int __gmpq_cmp_si (mpq_srcptr, long, ulong);
