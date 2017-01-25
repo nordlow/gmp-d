@@ -308,7 +308,7 @@ pure nothrow:
     // assert(x.denominator == 1);
 }
 
-/// integer and fractional part
+/// integer part
 @safe unittest
 {
     Q x = Q(5, 2);
@@ -319,6 +319,19 @@ pure nothrow:
 
     x = Q(10, 2);
     assert(x.integerPart == 5);
+
+    x = Q(11, 2);
+    assert(x.integerPart == 5);
+
+    x = Q(12, 2);
+    assert(x.integerPart == 6);
+}
+
+/// fractional part
+@safe unittest
+{
+    Q x = Q(5, 2);
+    // TODO assert(x.fractionalPart == Q(1, 2));
 }
 
 /// casting
