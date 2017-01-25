@@ -136,7 +136,7 @@ private:
 
 @safe pure nothrow @nogc:
 
-/// basics
+/// construction
 unittest
 {
     Q x = null;
@@ -148,7 +148,6 @@ unittest
     Q z = Q(7UL, 13UL);
     assert(z.numerator == 7);
     assert(z.denominator == 13);
-
 }
 
 version(unittest)
