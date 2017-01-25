@@ -51,7 +51,7 @@ struct MpQ
 
     /** Construct from floating-point `value`.
      */
-    this(P)(P value) @trusted
+    this(P)(P value) @safe
         if (isFloating!P)
     {
         initialize();
@@ -140,7 +140,7 @@ struct MpQ
         return __gmpq_equal(_ptr, rhs._ptr) != 0;
     }
     /// ditto
-    int opEquals(T)(T rhs) const @trusted // TODO scope
+    int opEquals(T)(T rhs) const @safe // TODO scope
         if (isIntegral!T)
     {
         if (rhs == 0)
@@ -241,7 +241,7 @@ struct MpQ
     /** Make `this` the absolute value of itself in-place.
         Returns: `void` to make it obvious that `this` is mutated.
     */
-    void absolute() @trusted
+    void absolute() @safe
     {
         numerator.absolute();
     }
