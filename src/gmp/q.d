@@ -150,24 +150,26 @@ private:
     }
 }
 
-@safe pure nothrow @nogc:
+pure nothrow @nogc:
 
 /// construction
-unittest
+@safe unittest
 {
-    Q x = null;
+    const Q x = null;
+    assert(x.numerator == 0);
+    assert(x.denominator == 1);
 
-    Q y = Q(11, 13UL);
+    const Q y = Q(11, 13UL);
     assert(y.numerator == 11);
     assert(y.denominator == 13);
 
-    Q z = Q(7UL, 13UL);
+    immutable Q z = Q(7UL, 13UL);
     assert(z.numerator == 7);
     assert(z.denominator == 13);
 }
 
 /// canonicalization
-unittest
+@safe unittest
 {
     Q x = Q(2, 4);
     assert(x.numerator == 2);
