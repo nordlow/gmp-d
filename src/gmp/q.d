@@ -385,8 +385,8 @@ MpQ inverse()(auto ref const MpQ x) @trusted
 {
     static if (__traits(isRef, x)) // l-value `x`
     {
-        MpZ y = x;
-        y.invert();
+        MpQ y = null;
+        __gmpq_inv(y._ptr, x._ptr);
         return y;
     }
     else                        // r-value `x`
@@ -466,6 +466,9 @@ alias inv = inverse;
 /// inversion
 @safe unittest
 {
+    const Q q = Q(2, 3);
+    assert(inverse(q) == Q(3, 2));
+
     assert(inverse(Q(2, 3)) == Q(3, 2));
     assert(inverse(Q(1, 10)) == 10);
     assert(inverse(Q(10, 1)) == Q(1, 10));
@@ -615,6 +618,8 @@ extern(C)
     void __gmpq_sub (mpq_ptr, mpq_srcptr, mpq_srcptr);
     void __gmpq_mul (mpq_ptr, mpq_srcptr, mpq_srcptr);
     void __gmpq_div (mpq_ptr, mpq_srcptr, mpq_srcptr);
-}
+
+    void __gmpq_inv (mpq_ptr, mpq_srcptr);
+    }
 
 pragma(lib, "gmp");
