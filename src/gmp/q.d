@@ -377,7 +377,7 @@ private:
     }
 }
 
-pure nothrow:
+pure nothrow pragma(inline, true):
 
 /** Returns: inverse of `x`.
 */
@@ -579,7 +579,7 @@ version(unittest)
 }
 
 // C API
-extern(C)
+extern(C) pragma(inline, false)
 {
     struct __mpq_struct
     {
