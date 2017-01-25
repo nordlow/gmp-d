@@ -512,6 +512,8 @@ pure nothrow:
 {
     assert(Q(2, 3) / Q(2, 3) == Q(1, 1));
     assert(Q(2, 3) / Q(2, 3) == 1);
+    assert(Q(2, 3) / Q(3, 2) == Q(4, 9));
+    assert(Q(3, 2) / Q(2, 3) == Q(9, 4));
 }
 
 version(unittest)
