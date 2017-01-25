@@ -915,7 +915,7 @@ struct MpZ
     }
 
     /** Negate `this` in-place.
-        Returns: `void` to make it obvious `this` is mutated.
+        Returns: `void` to make it obvious that `this` is mutated.
      */
     void negate() @safe
     {
@@ -923,7 +923,7 @@ struct MpZ
     }
 
     /** Make `this` the absolute value of itself in-place.
-        Returns: `void` to make it obvious `this` is mutated.
+        Returns: `void` to make it obvious that `this` is mutated.
      */
     void absolute() @trusted
     {
@@ -931,7 +931,7 @@ struct MpZ
     }
 
     /** Make `this` the one's complement value of itself in-place.
-        Returns: `void` to make it obvious `this` is mutated.
+        Returns: `void` to make it obvious that `this` is mutated.
     */
     void onesComplement() @trusted
     {
