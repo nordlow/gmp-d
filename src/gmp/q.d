@@ -36,6 +36,9 @@ struct MpQ
     /// No default construction.
     @disable this();
 
+    /// No copy construction.
+    @disable this(this);
+
     /// Construct empty (undefined) from explicit `null`.
     this(typeof(null)) @safe
     {
@@ -139,10 +142,15 @@ private:
 /// basics
 unittest
 {
+    dln();
     Q x = null;
-    x = Q(11, 13UL);
-    assert(x.numerator == 11);
-    assert(x.denominator == 13);
+    dln();
+    Q y = Q(11, 13UL);
+    dln();
+    assert(y.numerator == 11);
+    dln();
+    assert(y.denominator == 13);
+    dln();
 }
 
 version(unittest)
