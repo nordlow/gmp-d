@@ -145,9 +145,26 @@ struct MpQ
     {
         if (rhs.numerator == 0)
         {
-            return numerator.sgn(); // optimization
+            return sgn;         // optimization
         }
         return __gmpq_cmp(_ptr, rhs._ptr);
+    }
+    /// ditto
+    int opCmp(T)(T rhs) const @trusted // TODO scope
+        if (isIntegral!T)
+    {
+        if (rhs == 0)
+        {
+            return sgn;         // optimization
+        }
+        static if (isUnsigned!T)
+        {
+            return __gmpq_cmp_ui(_ptr, rhs, 1UL);
+        }
+        else                    // isSigned integral
+        {
+            return __gmpq_cmp_si(_ptr, rhs, 1UL);
+        }
     }
 
     /// Returns: numerator reference of `this`.
@@ -200,6 +217,16 @@ struct MpQ
             swap(numerator, denominator); // fast inline
         }
 
+    }
+
+    /** Returns: sign as either
+        - -1 (`this` < 0),
+        -  0 (`this` == 0), or
+        - +1 (`this` > 0).
+    */
+    @property int sgn() const @safe
+    {
+        return numerator.sgn;   // fast
     }
 
     /** Make `this` the absolute value of itself in-place.
@@ -439,6 +466,10 @@ pure nothrow:
     assert(Q( 0, 1) == Q(0, 1));
     assert(Q( 0, 2) == Q(0, 1));
     assert(Q(-1, 2) < Q(0, 1));
+
+    assert(Q( 1, 3) < 1);
+    assert(Q( 1, 3) > 0);
+    assert(Q(-1, 3) < 0);
 }
 
 /// addition
@@ -463,6 +494,12 @@ pure nothrow:
     assert(Q(1, 2) * Q(1, 2) == Q(1, 4));
     assert(Q(2, 3) * Q(2, 3) == Q(4, 9));
     assert(Q(1, 2) * Q(1, 3) == Q(1, 6));
+}
+
+/// division
+@safe unittest
+{
+    // assert(Q(2, 3) / Q(2, 3) == Q(1, 1));
 }
 
 version(unittest)
@@ -508,6 +545,9 @@ extern(C)
 
     int __gmpq_equal (mpq_srcptr, mpq_srcptr);
     int __gmpq_cmp (mpq_srcptr, mpq_srcptr);
+
+    int __gmpq_cmp_ui (mpq_srcptr, ulong, ulong);
+    int __gmpq_cmp_si (mpq_srcptr, long, ulong);
 
     void __gmpq_add (mpq_ptr, mpq_srcptr, mpq_srcptr);
     void __gmpq_sub (mpq_ptr, mpq_srcptr, mpq_srcptr);
