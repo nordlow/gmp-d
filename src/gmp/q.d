@@ -246,7 +246,7 @@ struct MpQ
     @property int sgn() const @safe
     {
         assert(denominator >= 1);
-        return numerator.sgn;   // fast
+        return numerator.sgn;   // sign always stored in numerator so reuse fast
     }
 
     /** Make `this` the absolute value of itself in-place.
