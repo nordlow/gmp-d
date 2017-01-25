@@ -387,8 +387,24 @@ void swap()(ref MpQ x,
     swap(x, y); // x.swap(y);
 }
 
-/** Returns: inverse of `x`.
-*/
+/// Returns: absolute value of `x`.
+MpQ abs()(auto ref const MpQ x) @trusted
+{
+    static if (__traits(isRef, x)) // l-value `x`
+    {
+        MpQ y = null;
+        __gmpq_abs(y._ptr, x._ptr);
+        return y;
+    }
+    else                        // r-value `x`
+    {
+        MpQ* mut_x = (cast(MpQ*)(&x)); // @trusted because `MpQ` has no aliased indirections
+        mut_x.absolute();
+        return move(*mut_x);    // TODO shouldn't have to call `move` here
+    }
+}
+
+/// Returns: inverse of `x`.
 MpQ inverse()(auto ref const MpQ x) @trusted
 {
     static if (__traits(isRef, x)) // l-value `x`
@@ -490,6 +506,14 @@ alias inv = inverse;
     assert(inverse(Q(2, 3)) == Q(3, 2));
     assert(inverse(Q(1, 10)) == 10);
     assert(inverse(Q(10, 1)) == Q(1, 10));
+}
+
+/// absolute value
+@safe unittest
+{
+    const Q q = Q(-2, 3);
+    assert(abs(q) == Q(2, 3));
+    assert(abs(Q(-2, 3)) == Q(2, 3));
 }
 
 /// integer and fractional part
@@ -637,6 +661,7 @@ extern(C) pragma(inline, false)
     void __gmpq_mul (mpq_ptr, mpq_srcptr, mpq_srcptr);
     void __gmpq_div (mpq_ptr, mpq_srcptr, mpq_srcptr);
 
+    void __gmpq_abs (mpq_ptr, mpq_srcptr);
     void __gmpq_inv (mpq_ptr, mpq_srcptr);
     }
 
