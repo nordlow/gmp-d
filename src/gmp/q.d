@@ -75,10 +75,18 @@ struct MpQ
             assert(qValue >= 1, "Negative denominator");
         }
 
+        // dln("qValue:", qValue);
+
         static      if (isUnsigned!P)
+        {
+            // dln("unsigned pValue:", pValue);
             __gmpq_set_ui(_ptr, pValue, qValue);
+        }
         else                    // signed integral
+        {
+            // dln("signed pValue:", pValue);
             __gmpq_set_si(_ptr, pValue, qValue);
+        }
 
         if (canonicalizeFlag) { canonicalize(); }
     }
@@ -277,8 +285,6 @@ pure nothrow:
     assert(x.denominator == 1);
 
     Q y = Q(-1, 2);
-    dln(x.numerator.toString);
-    dln(x.denominator.toString);
 
     // TODO:
     // assert(x.numerator == -1);
