@@ -139,6 +139,16 @@ struct MpQ
         }
         return __gmpq_equal(_ptr, rhs._ptr) != 0;
     }
+    /// ditto
+    int opEquals(T)(T rhs) const @trusted // TODO scope
+        if (isIntegral!T)
+    {
+        if (rhs == 0)
+        {
+            return numerator.isZero; // optimization
+        }
+        return numerator == rhs && denominator == 1;
+    }
 
     /// Compare `this` to `rhs`.
     int opCmp()(auto ref const MpQ rhs) const @trusted // TODO scope
@@ -451,6 +461,8 @@ pure nothrow:
 /// equality
 @safe unittest
 {
+    assert(Q(1, 1) == 1);
+    assert(Q(2, 1) == 2);
     assert(Q(1, 1) == Q(1, 1));
     assert(Q(1, 1) != Q(1, 2));
     const x = Q(1, 3);
@@ -499,7 +511,8 @@ pure nothrow:
 /// division
 @safe unittest
 {
-    // assert(Q(2, 3) / Q(2, 3) == Q(1, 1));
+    assert(Q(2, 3) / Q(2, 3) == Q(1, 1));
+    assert(Q(2, 3) / Q(2, 3) == 1);
 }
 
 version(unittest)
