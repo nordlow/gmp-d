@@ -51,7 +51,7 @@ struct MpQ
 
     /** Construct from `pValue` / `qValue`. */
     this(P, Q)(P pValue, Q qValue) @trusted
-        if (isIntegral!P && isSigned!P &&
+        if (isIntegral!P &&
             isUnsigned!Q)
     {
         initialize();
@@ -140,9 +140,15 @@ private:
 unittest
 {
     Q x = null;
+
     Q y = Q(11, 13UL);
     assert(y.numerator == 11);
     assert(y.denominator == 13);
+
+    Q z = Q(7UL, 13UL);
+    assert(z.numerator == 7);
+    assert(z.denominator == 13);
+
 }
 
 version(unittest)
