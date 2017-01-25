@@ -33,7 +33,11 @@ struct MpQ
 
     @nogc:
 
-    /// No default construction.
+    /** No default construction for now, because `mpq_init` initialize
+        `__mpq_struct`-fields to non-zero values.
+
+        TODO Allow default construction by delaying call to initialize().
+    */
     @disable this();
 
     /// No copy construction.
