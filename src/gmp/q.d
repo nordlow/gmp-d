@@ -71,19 +71,19 @@ struct MpQ
         __gmpq_clear(_ptr); version(ccc) ++_ccc;
     }
 
+    /// Returns: numerator reference of `this`.
+    @property ref inout(MpZ) numerator() @trusted inout return // TODO scope
+    {
+        return *(cast(inout(MpZ)*)_num_ptr);
+    }
+
+    /// Returns: denominator reference of `this`.
+    @property ref inout(MpZ) denominator() @trusted inout return // TODO scope
+    {
+        return *(cast(inout(MpZ)*)_den_ptr);
+    }
+
 private:
-
-    /// Returns: numerator pointer of `this`.
-    @property inout(MpZ)* numPtr() @trusted inout return // TODO scope
-    {
-        return cast(MpZ*)_num_ptr;
-    }
-
-    /// Returns: denominator pointer of `this`.
-    @property inout(MpZ)* denPtr() @trusted inout return // TODO scope
-    {
-        return cast(MpZ*)_den_ptr;
-    }
 
     /// Default conversion base.
     enum defaultBase = 10;
@@ -137,8 +137,8 @@ unittest
 {
     Q x = null;
     Q y = Q(11, 13UL);
-    assert(*y.numPtr == 11);
-    assert(*y.denPtr == 13);
+    assert(y.numerator == 11);
+    assert(y.denominator == 13);
 }
 
 version(unittest)
