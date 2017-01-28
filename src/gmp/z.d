@@ -493,6 +493,7 @@ struct MpZ
         static assert(false, "TODO");
     }
 
+    /// ditto
     MpZ opBinary(string s, Rhs)(Rhs rhs) const @trusted
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
             isUnsigned!Rhs)
@@ -527,6 +528,7 @@ struct MpZ
         return y;
     }
 
+    /// ditto
     MpZ opBinary(string s, Rhs)(Rhs rhs) const @trusted
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
             isSigned!Rhs)
@@ -721,6 +723,7 @@ struct MpZ
         // return exp;
     }
 
+    /// Operate-assign to `this` from `rhs`.
     ref MpZ opOpAssign(string s)(auto ref const MpZ rhs) return @trusted // TODO scope
         if ((s == "+" || s == "-" ||
              s == "*" || s == "/" || s == "%" ||
@@ -781,6 +784,7 @@ struct MpZ
         return this;
     }
 
+    /// ditto
     ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) return @trusted // TODO scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isUnsigned!Rhs)
@@ -818,6 +822,7 @@ struct MpZ
         return this;
     }
 
+    /// ditto
     ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) return @trusted // TODO scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isSigned!Rhs)
@@ -1148,7 +1153,7 @@ private:
     }
 
     /// Returns: pointer to internal C struct.
-    inout(__mpz_struct)* _ptr() inout return @system // TODO scope
+    inout(__mpz_struct)* _ptr() inout return @system scope
     {
         return &_z;
     }
