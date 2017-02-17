@@ -95,7 +95,7 @@ struct MpQ
 
     /** Construct from floating-point `value`.
      */
-    ref MpQ opAssign(P)(P value) @trusted // TODO scope
+    ref MpQ opAssign(P)(P value) @trusted scope
         if (isFloating!P)
     {
         version(ccc) ++_ccc;
@@ -104,7 +104,7 @@ struct MpQ
     }
 
     /** Assign from integer `value`. */
-    ref MpQ opAssign(P)(P value) @trusted // TODO scope
+    ref MpQ opAssign(P)(P value) @trusted scope
         if (isIntegral!P)
     {
         version(ccc) ++_ccc;
@@ -131,7 +131,7 @@ struct MpQ
     }
 
     /// Returns: `true` iff `this` equals `rhs`.
-    bool opEquals()(auto ref const MpQ rhs) const @trusted // TODO scope
+    bool opEquals()(auto ref const MpQ rhs) const @trusted scope
     {
         if (_ptr == rhs._ptr)   // fast equality
         {
@@ -140,7 +140,7 @@ struct MpQ
         return __gmpq_equal(_ptr, rhs._ptr) != 0;
     }
     /// ditto
-    int opEquals(T)(T rhs) const @safe // TODO scope
+    int opEquals(T)(T rhs) const @safe scope
         if (isIntegral!T)
     {
         if (rhs == 0)
@@ -151,7 +151,7 @@ struct MpQ
     }
 
     /// Compare `this` to `rhs`.
-    int opCmp()(auto ref const MpQ rhs) const @trusted // TODO scope
+    int opCmp()(auto ref const MpQ rhs) const @trusted scope
     {
         if (rhs.numerator == 0)
         {
@@ -160,7 +160,7 @@ struct MpQ
         return __gmpq_cmp(_ptr, rhs._ptr);
     }
     /// Compare `this` to `rhs`.
-    int opCmp()(auto ref const MpZ rhs) const @trusted // TODO scope
+    int opCmp()(auto ref const MpZ rhs) const @trusted scope
     {
         if (rhs == 0)
         {
@@ -170,7 +170,7 @@ struct MpQ
                             cast(const(__mpz_struct)*)&rhs); // TODO wrap cast?
     }
     /// ditto
-    int opCmp(T)(T rhs) const @trusted // TODO scope
+    int opCmp(T)(T rhs) const @trusted scope
         if (isIntegral!T)
     {
         if (rhs == 0)
@@ -188,13 +188,13 @@ struct MpQ
     }
 
     /// Returns: numerator reference of `this`.
-    @property ref inout(MpZ) numerator() @trusted inout return // TODO scope
+    @property ref inout(MpZ) numerator() @trusted inout return scope
     {
         return *(cast(inout(MpZ)*)_num_ptr);
     }
 
     /// Returns: denominator reference of `this`.
-    @property ref inout(MpZ) denominator() @trusted inout return // TODO scope
+    @property ref inout(MpZ) denominator() @trusted inout return scope
     {
         return *(cast(inout(MpZ)*)_den_ptr);
     }
@@ -213,7 +213,7 @@ struct MpQ
     // }
 
     /// Cast to arithmetic type `T`.
-    T opCast(T)() const @trusted // TODO scope
+    T opCast(T)() const @trusted scope
         if (isFloating!T)
     {
         return cast(T)__gmpq_get_d(_ptr);
@@ -347,19 +347,19 @@ private:
     }
 
     /// Returns: pointer to internal rational C struct.
-    inout(__mpq_struct)* _ptr() inout return @system // TODO scope
+    inout(__mpq_struct)* _ptr() inout return @system scope
     {
         return &_q;
     }
 
     /// Returns: pointer to internal numerator C struct.
-    inout(__mpz_struct)* _num_ptr() inout return @system // TODO scope
+    inout(__mpz_struct)* _num_ptr() inout return @system scope
     {
         return cast(typeof(return))&_q._mp_num;
     }
 
     /// Returns: pointer to internal denominator C struct.
-    inout(__mpz_struct)* _den_ptr() inout return @system // TODO scope
+    inout(__mpz_struct)* _den_ptr() inout return @system scope
     {
         return cast(typeof(return))&_q._mp_den;
     }
