@@ -131,7 +131,7 @@ struct MpQ
     }
 
     /// Returns: `true` iff `this` equals `rhs`.
-    bool opEquals()(auto ref const MpQ rhs) const @trusted scope
+    bool opEquals()(auto ref const MpQ rhs) const @trusted
     {
         if (_ptr == rhs._ptr)   // fast equality
         {
@@ -140,7 +140,7 @@ struct MpQ
         return __gmpq_equal(_ptr, rhs._ptr) != 0;
     }
     /// ditto
-    int opEquals(T)(T rhs) const @safe scope
+    int opEquals(T)(T rhs) const @safe
         if (isIntegral!T)
     {
         if (rhs == 0)
@@ -151,7 +151,7 @@ struct MpQ
     }
 
     /// Compare `this` to `rhs`.
-    int opCmp()(auto ref const MpQ rhs) const @trusted scope
+    int opCmp()(auto ref const MpQ rhs) const @trusted
     {
         if (rhs.numerator == 0)
         {
@@ -160,7 +160,7 @@ struct MpQ
         return __gmpq_cmp(_ptr, rhs._ptr);
     }
     /// Compare `this` to `rhs`.
-    int opCmp()(auto ref const MpZ rhs) const @trusted scope
+    int opCmp()(auto ref const MpZ rhs) const @trusted
     {
         if (rhs == 0)
         {
@@ -170,7 +170,7 @@ struct MpQ
                             cast(const(__mpz_struct)*)&rhs); // TODO wrap cast?
     }
     /// ditto
-    int opCmp(T)(T rhs) const @trusted scope
+    int opCmp(T)(T rhs) const @trusted
         if (isIntegral!T)
     {
         if (rhs == 0)
