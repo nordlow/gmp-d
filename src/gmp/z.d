@@ -265,7 +265,7 @@ struct MpZ
 
     /// Returns: `true` iff `this` equals `rhs`.
     pragma(inline, false)
-    bool opEquals()(auto ref const MpZ rhs) const @trusted scope
+    bool opEquals()(auto ref const MpZ rhs) const @trusted
     {
         if (_ptr == rhs._ptr)   // fast equality
         {
@@ -274,7 +274,7 @@ struct MpZ
         return __gmpz_cmp(_ptr, rhs._ptr) == 0;
     }
     /// ditto
-    bool opEquals(Rhs)(Rhs rhs) const @trusted scope
+    bool opEquals(Rhs)(Rhs rhs) const @trusted
         if (isArithmetic!Rhs)
     {
         if (rhs == 0)
@@ -296,7 +296,7 @@ struct MpZ
     }
 
     /// Compare `this` to `rhs`.
-    int opCmp()(auto ref const MpZ rhs) const @trusted scope
+    int opCmp()(auto ref const MpZ rhs) const @trusted
     {
         if (rhs == 0)
         {
@@ -305,7 +305,7 @@ struct MpZ
         return __gmpz_cmp(_ptr, rhs._ptr);
     }
     /// ditto
-    int opCmp(T)(T rhs) const @trusted scope
+    int opCmp(T)(T rhs) const @trusted
         if (isArithmetic!T)
     {
         if (rhs == 0)
@@ -327,13 +327,13 @@ struct MpZ
     }
 
     /// Cast to `bool`.
-    bool opCast(T : bool)() const scope
+    bool opCast(T : bool)() const
     {
         return !isZero;
     }
 
     /// Cast to arithmetic type `T`.
-    T opCast(T)() const @trusted scope
+    T opCast(T)() const @trusted
         if (isArithmetic!T)
     {
         static      if (isUnsigned!T)
