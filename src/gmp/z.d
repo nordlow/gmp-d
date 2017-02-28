@@ -1,9 +1,9 @@
 /// Multiple precision integers (Z).
 module gmp.z;
 
-import std.typecons : Unsigned, Unqual;
-import std.traits : isInstanceOf; // used by expression templates
 import std.algorithm.mutation : move, moveEmplace;
+import std.traits : isInstanceOf; // used by expression templates
+import std.typecons : Unsigned, Unqual;
 
 import gmp.traits;
 
