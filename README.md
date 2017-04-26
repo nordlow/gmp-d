@@ -8,8 +8,8 @@ with `std.bigint.BigInt` (copy construction excluded) and `@safe pure nothrow
 
 ## Basics
 
-- Integers (GMP's `mpz_t`) are wrapped in `gmp.z`.
-- Rationals (GMP's `mpq_t`) are wrapped in `gmp.q`.
+- Integers (GMP's `mpz_t`) are wrapped in `gmp.z.MpZ`.
+- Rationals (GMP's `mpq_t`) are wrapped in `gmp.q.MpQ`.
 
 ## Features
 
