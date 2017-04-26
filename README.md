@@ -6,6 +6,11 @@ be [mostly compatible](https://github.com/nordlow/gmp-d/blob/master/src/gmp/z.d#
 with `std.bigint.BigInt` (copy construction excluded) and `@safe pure nothrow
 @nogc` except when converting to `string`.
 
+## Basics
+
+- Integers (GMP's `mpz_t`) are wrapped in `gmp.z`.
+- Rationals (GMP's `mpq_t`) are wrapped in `gmp.q`.
+
 ## Features
 
 Copy construction is disabled (for now) to prevent inadvertent copying. Instead
@@ -15,7 +20,7 @@ to pass by value (via `.dup` member function).
 Implementation is optimized through
 
 - mapping of GMP's C macros into D inline functions that operate directly on the
-  internal C-representation `__mpz_struct`,
+  internal C-representations `__mpz_struct` and `__mpq_struct`,
 
 - passing of `MpZ`-typed parameters as `auto ref const` in combination with
   conditional compilation for r-value `MpZ` passed parameters via
