@@ -33,6 +33,11 @@ in
 opBinary!"+"()(auto ref const MpZ rhs)
 ```
 
+## Performance
+
+Wrapper types doesn't have to be templatized, compilation is very fast (DMD
+compiles it in 0.04 seconds on my machine and test-build in 0.22 seconds).
+
 ## Limitations
 
 Note that D's `__traits(isRef)` currently cannot be used to distinguish l-value
@@ -57,8 +62,6 @@ See the unittests for `MpzAddExpr`, `MpzMulExpr`, etc for details on how this
 currently can be implemented and verified (in `ccc`-version) with free
 functions such `add` and `sub`.
 
-Further note, that as, wrapper types doesn't have to be templatized, compilation
-is very fast (DMD compiles it in 0.04 seconds on my machine and test-build in
-0.22 seconds).
+## Future
 
 There are more `mpz_t` functions that could be wrapped but these are good start.
