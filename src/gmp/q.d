@@ -95,7 +95,7 @@ struct MpQ
 
     /** Construct from floating-point `value`.
      */
-    ref MpQ opAssign(P)(P value) @trusted scope
+    ref MpQ opAssign(P)(P value) @trusted /*TODO scope*/
         if (isFloating!P)
     {
         version(ccc) ++_ccc;
@@ -104,7 +104,7 @@ struct MpQ
     }
 
     /** Assign from integer `value`. */
-    ref MpQ opAssign(P)(P value) @trusted scope
+    ref MpQ opAssign(P)(P value) @trusted /*TODO scope*/
         if (isIntegral!P)
     {
         version(ccc) ++_ccc;
@@ -188,13 +188,13 @@ struct MpQ
     }
 
     /// Returns: numerator reference of `this`.
-    @property ref inout(MpZ) numerator() @trusted inout return scope
+    @property ref inout(MpZ) numerator() @trusted inout return /*TODO scope*/
     {
         return *(cast(inout(MpZ)*)_num_ptr);
     }
 
     /// Returns: denominator reference of `this`.
-    @property ref inout(MpZ) denominator() @trusted inout return scope
+    @property ref inout(MpZ) denominator() @trusted inout return /*TODO scope*/
     {
         return *(cast(inout(MpZ)*)_den_ptr);
     }
@@ -213,7 +213,7 @@ struct MpQ
     // }
 
     /// Cast to arithmetic type `T`.
-    T opCast(T)() const @trusted scope
+    T opCast(T)() const @trusted /*TODO scope*/
         if (isFloating!T)
     {
         return cast(T)__gmpq_get_d(_ptr);
@@ -347,19 +347,19 @@ private:
     }
 
     /// Returns: pointer to internal rational C struct.
-    inout(__mpq_struct)* _ptr() inout return @system scope
+    inout(__mpq_struct)* _ptr() inout return @system /*TODO scope*/
     {
         return &_q;
     }
 
     /// Returns: pointer to internal numerator C struct.
-    inout(__mpz_struct)* _num_ptr() inout return @system scope
+    inout(__mpz_struct)* _num_ptr() inout return @system /*TODO scope*/
     {
         return cast(typeof(return))&_q._mp_num;
     }
 
     /// Returns: pointer to internal denominator C struct.
-    inout(__mpz_struct)* _den_ptr() inout return @system scope
+    inout(__mpz_struct)* _den_ptr() inout return @system /*TODO scope*/
     {
         return cast(typeof(return))&_q._mp_den;
     }
