@@ -6,6 +6,8 @@ be [mostly compatible](https://github.com/nordlow/gmp-d/blob/master/src/gmp/z.d#
 with `std.bigint.BigInt` (copy construction excluded) and `@safe pure nothrow
 @nogc` except when converting to `string`.
 
+## Features
+
 Copy construction is disabled (for now) to prevent inadvertent copying. Instead
 use `f(move(z))` (from `std.algorithm.mutation`) to pass by move or `f(z.dup)`
 to pass by value (via `.dup` member function).
@@ -30,6 +32,8 @@ in
 ```D
 opBinary!"+"()(auto ref const MpZ rhs)
 ```
+
+## Limitations
 
 Note that D's `__traits(isRef)` currently cannot be used to distinguish l-value
 from r-value passing of `this` (it should). This severly limits the
