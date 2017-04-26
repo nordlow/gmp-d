@@ -366,13 +366,6 @@ private:
 
     __mpq_struct _q;            // internal libgmp C struct
 
-    // qualified C memory managment
-    static @safe
-    {
-        pragma(mangle, "malloc") void* qualifiedMalloc(size_t size);
-        pragma(mangle, "free") void qualifiedFree(void* ptr);
-    }
-
     version(ccc)
     {
 
