@@ -44,7 +44,8 @@ opBinary!"+"()(auto ref const MpZ rhs)
 ## Performance
 
 Because, wrapper types don't have to be templatized, compilation is very fast;
-DMD compiles gmp-d in 0.04 seconds on my machine and test-build in 0.22 seconds.
+DMD compiles `gmp-d` in 0.04 seconds on my machine and test-build in 0.22
+seconds.
 
 ## Limitations
 
