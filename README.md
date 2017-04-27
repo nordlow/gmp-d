@@ -43,8 +43,8 @@ opBinary!"+"()(auto ref const MpZ rhs)
 
 ## Performance
 
-Wrapper types doesn't have to be templatized, compilation is very fast (DMD
-compiles it in 0.04 seconds on my machine and test-build in 0.22 seconds).
+Because, wrapper types don't have to be templatized, compilation is very fast
+(DMD compiles it in 0.04 seconds on my machine and test-build in 0.22 seconds).
 
 ## Limitations
 
