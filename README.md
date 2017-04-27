@@ -17,8 +17,8 @@ functions, free functions or both.
 ## Features
 
 Copy construction is disabled (for now) to prevent inadvertent copying. Instead
-use `f(move(z))` (from `std.algorithm.mutation`) to pass by move or `f(z.dup)`
-to pass by value (via `.dup` member function).
+use `f(move(z))` or `f(z.move)` (from `std.algorithm.mutation`) to pass by move
+or `f(z.dup)` to pass by value (via `.dup` member function).
 
 Implementation is optimized through
 
