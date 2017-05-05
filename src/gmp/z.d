@@ -169,13 +169,13 @@ struct MpZ
     }
 
     /// Assign from `rhs`.
-    ref MpZ opAssign()(auto ref const MpZ rhs) return @trusted /*TODO scope*/
+    ref MpZ opAssign()(auto ref const MpZ rhs) @trusted return scope
     {
         __gmpz_set(_ptr, rhs._ptr); version(ccc) ++_ccc;
         return this;
     }
     /// ditto
-    ref MpZ opAssign(Expr)(auto ref Expr rhs) return @trusted /*TODO scope*/
+    ref MpZ opAssign(Expr)(auto ref Expr rhs) @trusted return scope
         if (isLazyMpZExpr!Expr)
     {
         static      if (isInstanceOf!(MpzAddExpr, Expr))
@@ -220,7 +220,7 @@ struct MpZ
         return this;
     }
     /// ditto
-    ref MpZ opAssign(T)(T rhs) return @trusted /*TODO scope*/
+    ref MpZ opAssign(T)(T rhs) @trusted return scope
         if (isArithmetic!T)
     {
         static if      (isUnsigned!T)
@@ -246,7 +246,7 @@ struct MpZ
     /** Assign `this` from `string` `rhs` interpreted in base `base`.
         If `base` is 0 it's guessed from contents of `value`.
     */
-    ref MpZ fromString(in string rhs, uint base = 0) return @trusted /*TODO scope*/
+    ref MpZ fromString(in string rhs, uint base = 0) @trusted return
     {
         assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(rhs);
@@ -724,7 +724,7 @@ struct MpZ
     }
 
     /// Operate-assign to `this` from `rhs`.
-    ref MpZ opOpAssign(string s)(auto ref const MpZ rhs) return @trusted /*TODO scope*/
+    ref MpZ opOpAssign(string s)(auto ref const MpZ rhs) @trusted return scope
         if ((s == "+" || s == "-" ||
              s == "*" || s == "/" || s == "%" ||
              s == "&" || s == "|" || s == "^"))
@@ -785,7 +785,7 @@ struct MpZ
     }
 
     /// ditto
-    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) return @trusted /*TODO scope*/
+    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) @trusted return scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isUnsigned!Rhs)
     {
@@ -823,7 +823,7 @@ struct MpZ
     }
 
     /// ditto
-    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) return @trusted /*TODO scope*/
+    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) @trusted return scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isSigned!Rhs)
     {
@@ -946,7 +946,7 @@ struct MpZ
     }
 
     /// Increase `this` by one.
-    ref MpZ opUnary(string s)() return @trusted /*TODO scope*/
+    ref MpZ opUnary(string s)() @trusted return scope
         if (s == "++")
     {
         __gmpz_add_ui(_ptr, _ptr, 1); version(ccc) ++_ccc;
@@ -954,7 +954,7 @@ struct MpZ
     }
 
     /// Decrease `this` by one.
-    ref MpZ opUnary(string s)() return @trusted /*TODO scope*/
+    ref MpZ opUnary(string s)() @trusted return scope
         if (s == "--")
     {
         __gmpz_sub_ui(_ptr, _ptr, 1); version(ccc) ++_ccc;
@@ -1122,7 +1122,7 @@ private:
     alias Limb = __mp_limb_t;   // GNU MP alias
 
     /** Returns: limbs. */
-    inout(Limb)[] _limbs() inout return @system /*TODO scope*/
+    inout(Limb)[] _limbs() inout return @system
     {
         // import std.math : abs;
         return _z._mp_d[0 .. _limbCount];
@@ -1153,7 +1153,7 @@ private:
     }
 
     /// Returns: pointer to internal C struct.
-    inout(__mpz_struct)* _ptr() inout return @system /*TODO scope*/
+    inout(__mpz_struct)* _ptr() inout return @system
     {
         return &_z;
     }
