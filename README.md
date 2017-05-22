@@ -25,7 +25,7 @@ import gmp.z;
     alias Z = MpZ;
     assert(Z.mersennePrime(15) == 2^^15 - 1);
     const a = 42.Z;
-    const b = a.dup; // explicity duplication/copying
+    const b = a.dup; // explicit copying via `.dup` member
 }
 ```
 
