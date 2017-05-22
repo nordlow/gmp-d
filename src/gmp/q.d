@@ -515,8 +515,8 @@ alias inv = inverse;
 /// inversion
 @safe unittest
 {
-    const Q q = Q(2, 3);
-    assert(inverse(q) == Q(3, 2));
+    const Q q = Q(-2, 3);
+    assert(inverse(q) == Q(-3, 2));
 
     assert(inverse(Q(2, 3)) == Q(3, 2));
     assert(inverse(Q(1, 10)) == 10);
