@@ -20,9 +20,13 @@ functions, free functions or both.
 
 ```D
 import gmp.z;
-alias Z = MpZ;
-const a = 42.Z;
-assert(Z.mersennePrime(15) == 2^^15 - 1);
+@safe pure nothrow @nogc unittest
+{
+    alias Z = MpZ;
+    assert(Z.mersennePrime(15) == 2^^15 - 1);
+    const a = 42.Z;
+    const b = a.dup; // explicity duplication/copying
+}
 ```
 
 ## Features
