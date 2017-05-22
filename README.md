@@ -18,7 +18,7 @@ functions, free functions or both.
 
 ### MpZ
 
-```
+```D
 import gmp.z;
 alias Z = MpZ;
 const a = 42.Z;
