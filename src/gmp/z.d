@@ -2718,3 +2718,4 @@ extern(C) pragma(inline, false)
 }
 
 pragma(lib, "gmp");
+pragma(lib, "c");               // needed by `malloc` and `free`
