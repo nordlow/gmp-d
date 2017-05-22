@@ -14,6 +14,17 @@ with `std.bigint.BigInt` (copy construction excluded) and `@safe pure nothrow
 along with most of their common operations implemented either as member
 functions, free functions or both.
 
+## Sample Usage
+
+### MpZ
+
+```
+import gmp.z;
+alias Z = MpZ;
+const a = 42.Z;
+assert(Z.mersennePrime(15) == 2^^15 - 1);
+```
+
 ## Features
 
 Copy construction is disabled (for now) to prevent inadvertent copying. Instead
@@ -73,4 +84,4 @@ functions such `add` and `sub`.
 
 ## Future
 
-There are more `mpz_t` functions that could be wrapped but these are good start.
+There are more `mpz_t`- and `mpq_t`-functions that should be wrapped but these are good start.
