@@ -25,7 +25,31 @@ import gmp.z;
     alias Z = MpZ;
     assert(Z.mersennePrime(15) == 2^^15 - 1);
     const a = 42.Z;
-    const b = a.dup; // explicit copying via `.dup` member
+    const b = a.dup; // explicit copying required
+}
+```
+
+### MpQ
+
+```D
+import gmp.q;
+@safe pure nothrow @nogc unittest
+{
+    alias Q = MpQ;
+
+    Q x = Q(-4, 6);
+
+    assert(x.numerator == -4);
+    assert(x.denominator == 6);
+
+    x.canonicalize();
+
+    assert(x.numerator == -2);
+    assert(x.denominator == 3);
+
+    assert(inverse(x) == Q(-3, 2));
+
+    assert(Q(1, 2) + Q(1, 3) == Q(5, 6));
 }
 ```
 
