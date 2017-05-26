@@ -54,8 +54,6 @@ struct MpZ
         return str[0] == '-' ? str : str.ptr[0 .. size];
     }
 
-    // TODO toRCString wrapped in UniqueRange
-
     /// Returns: A unique hash of the `MpZ` value suitable for use in a hash table.
     size_t toHash() const
     {
