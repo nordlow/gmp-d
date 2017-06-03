@@ -88,9 +88,9 @@ seconds.
 
 ## Run-time Performance
 
-Wrapper is as light-weight as possible. For instance, some D-functions directly
-access the internal C-datastructure exposed by the structs and macros in the
-C-headers of GNU GMP.
+Wrapper is as light-weight as possible; Some D-functions directly access the
+internal C-datastructure exposed by the structs and macros in the C-headers of
+GNU GMP.
 
 ## Limitations
 
