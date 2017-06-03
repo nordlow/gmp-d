@@ -86,6 +86,12 @@ Because, wrapper types don't have to be templatized, compilation is very fast;
 DMD compiles `gmp-d` in 0.04 seconds on my machine and test-build in 0.22
 seconds.
 
+## Run-time Performance
+
+Wrapper is as light-weight as possible. For instance, some D-functions directly
+access the internal C-datastructure exposed by the structs and macros in the
+C-headers of GNU GMP.
+
 ## Limitations
 
 Note that D's `__traits(isRef)` currently cannot be used to distinguish l-value
