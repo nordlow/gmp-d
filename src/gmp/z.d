@@ -1136,7 +1136,8 @@ private:
     pragma(inline, false)
     char* _allocStringzCopyOf(const string value) @trusted @nogc
     {
-        char* stringz = cast(char*)qualifiedMalloc(value.length + 1); // maximum this many characters
+        import core.memory : pureMalloc;
+        char* stringz = cast(char*)pureMalloc(value.length + 1); // maximum this many characters
         size_t i = 0;
         foreach (immutable char ch; value[])
         {
@@ -1161,7 +1162,6 @@ private:
     // qualified C memory managment
     static @safe pragma(inline, false)
     {
-        pragma(mangle, "malloc") void* qualifiedMalloc(size_t size);
         pragma(mangle, "free") void qualifiedFree(void* ptr);
     }
 
