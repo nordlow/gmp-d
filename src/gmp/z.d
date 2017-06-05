@@ -1162,7 +1162,18 @@ private:
     // qualified C memory managment
     static @safe pragma(inline, false)
     {
-        pragma(mangle, "free") void qualifiedFree(void* ptr);
+        version(linux)
+        {
+            pragma(mangle, "free") void qualifiedFree(void* ptr);
+        }
+        else version(OSX)
+        {
+            pragma(mangle, "_free") void qualifiedFree(void* ptr);
+        }
+        else
+        {
+            pragma(mangle, "free") void qualifiedFree(void* ptr);
+        }
     }
 
     version(ccc)
