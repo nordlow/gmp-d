@@ -1160,7 +1160,7 @@ private:
     __mpz_struct _z;            // internal libgmp C struct
 
     // qualified C memory managment
-    static @safe pragma(inline, false) extern(C)
+    static @trusted pragma(inline, false) extern(C)
     {
         version(linux)
         {
