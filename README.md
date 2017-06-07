@@ -20,7 +20,10 @@ functions, free functions or both.
 
 ```D
 import gmp.z;
-@safe pure nothrow @nogc unittest
+
+@safe pure nothrow @nogc:
+
+unittest
 {
     alias Z = MpZ;
     assert(Z.mersennePrime(15) == 2^^15 - 1);
@@ -33,7 +36,10 @@ import gmp.z;
 
 ```D
 import gmp.q;
-@safe pure nothrow @nogc unittest
+
+@safe pure nothrow @nogc:
+
+unittest
 {
     alias Q = MpQ;
 
