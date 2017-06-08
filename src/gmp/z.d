@@ -1162,18 +1162,7 @@ private:
     // qualified C memory managment
     static @trusted pragma(inline, false) extern(C) // locally `@trusted`
     {
-        version(linux)
-        {
-            pragma(mangle, "free") void qualifiedFree(void* ptr);
-        }
-        else version(OSX)
-        {
-            pragma(mangle, "free") void qualifiedFree(void* ptr);
-        }
-        else
-        {
-            pragma(mangle, "free") void qualifiedFree(void* ptr);
-        }
+        pragma(mangle, "free") void qualifiedFree(void* ptr);
     }
 
     version(ccc)
