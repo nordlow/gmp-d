@@ -1136,7 +1136,10 @@ private:
     pragma(inline, false)
     char* _allocStringzCopyOf(const string value) @trusted @nogc
     {
-        import core.memory : pureMalloc;
+        static if (__VERSION__ >= 2074)
+        {
+            import core.memory : pureMalloc;
+        }
         char* stringz = cast(char*)pureMalloc(value.length + 1); // maximum this many characters
         size_t i = 0;
         foreach (immutable char ch; value[])
@@ -1177,6 +1180,26 @@ private:
         */
         @property size_t mutatingCallCount() const @safe { return _ccc; }
         size_t _ccc;  // C mutation call count. number of calls to C GMP function calls that mutate this object
+    }
+}
+
+static if (__VERSION__ < 2074)  // backport of pureMalloc
+{
+    extern (C) private pure @system @nogc nothrow
+    {
+        pragma(mangle, "getErrno") int fakePureGetErrno();
+        pragma(mangle, "setErrno") int fakePureSetErrno(int);
+        pragma(mangle, "malloc") void* fakePureMalloc(size_t);
+    }
+    void* pureMalloc(size_t size) @trusted pure @nogc nothrow
+    {
+        const errno = fakePureGetErrno();
+        void* ret = fakePureMalloc(size);
+        if (!ret || errno != 0)
+        {
+            cast(void)fakePureSetErrno(errno);
+        }
+        return ret;
     }
 }
 
