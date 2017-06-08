@@ -1160,7 +1160,7 @@ private:
     __mpz_struct _z;            // internal libgmp C struct
 
     // qualified C memory managment
-    static @trusted pragma(inline, false) // locally `@trusted`
+    static @trusted pragma(inline, false) extern(C) // locally `@trusted`
     {
         version(linux)
         {
@@ -1168,7 +1168,7 @@ private:
         }
         else version(OSX)
         {
-            pragma(mangle, "_free") void qualifiedFree(void* ptr);
+            pragma(mangle, "free") void qualifiedFree(void* ptr);
         }
         else
         {
