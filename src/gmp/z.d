@@ -73,7 +73,7 @@ private struct _MpZ(bool copyable = false)
 
         TODO Allow default construction by delaying call to initialize().
     */
-    @disable this();
+    // @disable this();
 
     /// Construct empty (undefined) from explicit `null`.
     this(typeof(null)) @trusted
@@ -1431,6 +1431,15 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
     typeof(return) y = 0;       // result, TODO reuse `exp` or `mod` if any is an r-value
     __gmpz_powm_ui(y._ptr, base._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
     return y;
+}
+
+/// null construction
+@safe nothrow @nogc unittest
+{
+    Z x = null;
+    Z y = null;
+    assert(x == y);
+    assert(x !is y);
 }
 
 ///
