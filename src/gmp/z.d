@@ -1475,6 +1475,12 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
     assert(w._z._mp_size == 0);
     assert(w._z._mp_d is null);
 
+    assert(w == 0);
+    assert(w == 0L);
+    assert(w == 0UL);
+    assert(w == 0.0f);
+    assert(w == 0.0);
+
     assert(w.toString == `0`);
     assert(w.toHash == 0);
     assert(w.sizeInBase(10) == 1);
@@ -1499,7 +1505,13 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
     w.negate();
     assert(w is Z.init);        // should be unchanged
     w.negate();
-    assert(w is Z.init);        //
+    assert(w is Z.init);        // should be unchanged
+
+    w = -w;
+    assert(w is Z.init);        // should be unchanged
+
+    w = +w;
+    assert(w is Z.init);        // should be unchanged
 
     w.absolute();
     assert(w is Z.init);        // should be unchanged
@@ -1508,6 +1520,9 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
     assert(w is Z.init);        // should be unchanged
     w.onesComplement();
     assert(w is Z.init);        // should be unchanged
+
+    assert(w^^10 == 0);
+    assert(w^^0 == 1);          // TODO correct?
 
     // change it and check its contents
     w = 42;
