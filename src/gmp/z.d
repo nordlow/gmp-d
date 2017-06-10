@@ -937,7 +937,7 @@ private struct _MpZ(bool copyable = false)
      */
     void absolute() @trusted
     {
-        if (isZero) { return; } // default-constructed `this`
+        if (isZero) { return; } // `__gmpz_abs` cannot handle default-constructed `this`
         __gmpz_abs(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
 
@@ -946,7 +946,7 @@ private struct _MpZ(bool copyable = false)
     */
     void onesComplement() @trusted
     {
-        if (isZero) { return; } // default-constructed `this`
+        if (isZero) { return; } // `__gmpz_co` cannot handle default-constructed `this`
         __gmpz_com(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
 
@@ -954,7 +954,7 @@ private struct _MpZ(bool copyable = false)
     ref _MpZ opUnary(string s)() @trusted return scope
         if (s == "++")
     {
-        if (isDefaultConstructed)
+        if (isDefaultConstructed) // `__gmpz_add_ui` cannot handle default-constructed `this`
         {
             __gmpz_init_set_si(_ptr, 1);
         }
@@ -969,7 +969,7 @@ private struct _MpZ(bool copyable = false)
     ref _MpZ opUnary(string s)() @trusted return scope
         if (s == "--")
     {
-        if (isDefaultConstructed)
+        if (isDefaultConstructed) // `__gmpz_sub_ui` cannot handle default-constructed `this`
         {
             __gmpz_init_set_si(_ptr, -1);
         }
