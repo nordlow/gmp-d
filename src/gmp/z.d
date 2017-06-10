@@ -933,6 +933,7 @@ private struct _MpZ(bool copyable = false)
     /** Make `this` the absolute value of itself in-place.
         Returns: `void` to make it obvious that `this` is mutated.
      */
+    pragma(inline)              // can't be inlined with DMD
     void absolute() @trusted
     {
         if (isZero) { return; } // `__gmpz_abs` cannot handle default-constructed `this`
