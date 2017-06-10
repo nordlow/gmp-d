@@ -1591,8 +1591,15 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
 
     assert(Z.init + 1 == 1);
     assert(Z.init - 1 == -1);
+
     assert(Z.init * 1 == 0);
+    assert(Z.init / 1 == 0);
     assert(Z.init ^^ 1 == Z.init);
+    assert(Z.init ^^ 0 == 1);
+
+    assert(1 + Z.init == 1);
+    assert(1 - Z.init == 1);
+    assert(1 * Z.init == 0);
 }
 
 /// null construction
