@@ -2609,6 +2609,7 @@ T _integralAbs(T)(T x)
     // assert(aa[456.Z] == "def");
 }
 
+/// copyable integer
 @trusted unittest
 {
     alias CZ = CopyableMpZ;
@@ -2621,6 +2622,13 @@ T _integralAbs(T)(T x)
 
     CZ c = null;                // other value
     assert(a != c);             // should diff
+}
+
+/// reference counted
+@safe nothrow @nogc unittest
+{
+    // import std.typecons : RefCounted;
+    // alias RcMpZ = RefCounted!MpZ;
 }
 
 version(unittest)
