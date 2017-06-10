@@ -135,18 +135,18 @@ private struct _MpZ(bool copyable = false)
         }
 
         // /// Construct copy of `value`.
-        // this(ref const _MpZ value) @trusted
-        // {
-        //     dln("here");
-        //     __gmpz_init_set(_ptr, value._ptr); version(ccc) { ++_ccc; }
-        // }
+        this(ref const _MpZ value) @trusted
+        {
+            dln("here");
+            __gmpz_init_set(_ptr, value._ptr); version(ccc) { ++_ccc; }
+        }
 
         // /// Construct copy of `value`.
-        // this(_MpZ value) @trusted
-        // {
-        //     dln("here");
-        //     moveEmplace(value, this); // fast
-        // }
+        this(_MpZ value) @trusted
+        {
+            dln("here");
+            moveEmplace(value, this); // fast
+        }
     }
     else
     {
@@ -225,6 +225,7 @@ private struct _MpZ(bool copyable = false)
     ref _MpZ opAssign(T)(T rhs) @trusted return scope
         if (isArithmetic!T)
     {
+        assertInitialized();
         static if      (isUnsigned!T)
         {
             __gmpz_set_ui(_ptr, rhs);
@@ -1109,9 +1110,18 @@ private struct _MpZ(bool copyable = false)
 private:
 
     /** Initialize internal struct. */
-    void initialize() @trusted // cannot be called `init` as that will override builtin type property
+    void initialize() // cannot be called `init` as that will override builtin type property
     {
         __gmpz_init(_ptr); version(ccc) { ++_ccc; }
+    }
+
+    /** Initialize internal struct if needed. */
+    void assertInitialized()
+    {
+        if (_z == _z.init)
+        {
+            __gmpz_init(_ptr); version(ccc) { ++_ccc; }
+        }
     }
 
     /// Default conversion base.
@@ -1435,6 +1445,29 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
     Z y;
     assert(x == y);
     assert(x is y);             // TODO is this correct behaviour?
+    x = y;
+    y = x;
+
+    Z z = 42;
+    x = z;
+
+    assert(Z.init.dup == Z.init);
+    assert(Z.init.dup == Z.init.dup);
+
+    assert(Z.init.dup !is Z.init);
+    assert(Z.init.dup !is Z.init.dup);
+
+    Z w;
+    w = 42;
+}
+
+/// default construction to string conversion
+@safe nothrow unittest
+{
+    Z w;
+    assert(w.toString == `0`);
+    w = 42;
+    assert(w.toString == `42`);
 }
 
 /// null construction
