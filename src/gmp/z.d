@@ -945,6 +945,7 @@ private struct _MpZ(bool copyable = false)
     */
     void onesComplement() @trusted
     {
+        if (isZero) { return; }
         __gmpz_com(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
 
@@ -1010,6 +1011,7 @@ private struct _MpZ(bool copyable = false)
     bool fitsIn(T)() const @trusted
         if (isIntegral!T)
     {
+        if (isZero) { return true; } // default-constructed `this`
         static      if (is(T == ulong))  { return __gmpz_fits_ulong_p(_ptr) != 0; }
         else static if (is(T ==  long))  { return __gmpz_fits_slong_p(_ptr) != 0; }
         else static if (is(T ==  uint))  { return __gmpz_fits_uint_p(_ptr) != 0; }
@@ -1064,7 +1066,8 @@ private struct _MpZ(bool copyable = false)
     /// Check if `this` is odd.
     @property bool isOdd() const @safe
     {
-        return (_z._mp_size != 0) & cast(int)(_z._mp_d[0]); // fast C macro `mpz_odd_p` in gmp.h
+        return ((_z._mp_alloc != 0) && // this is needed for default (zero) initialized `__mpz_structs`
+                ((_z._mp_size != 0) & cast(int)(_z._mp_d[0]))); // fast C macro `mpz_odd_p` in gmp.h
     }
 
     /// Check if `this` is odd.
@@ -1465,9 +1468,42 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
 @safe nothrow unittest
 {
     Z w;
+
+    // should be zeroed
+    assert(w._z._mp_alloc == 0);
+    assert(w._z._mp_size == 0);
+    assert(w._z._mp_d is null);
+
     assert(w.toString == `0`);
     assert(w.toHash == 0);
     assert(w.sizeInBase(10) == 1);
+    assert(w.countOnes == 0);
+    assert(w.isZero);
+    assert(-w == w);
+    assert(abs(w) == w);
+
+    assert(w.fitsIn!ulong);
+    assert(w.fitsIn!long);
+    assert(w.fitsIn!uint);
+    assert(w.fitsIn!int);
+    assert(w.fitsIn!ushort);
+    assert(w.fitsIn!short);
+
+    assert(!w.isOdd);
+    assert(w.isEven);
+    assert(!w.isNegative);
+    assert(w.isPositive);
+    assert(w.sgn == 0);
+
+    w.negate();
+    assert(w == Z.init);
+    w.negate();
+    assert(w == Z.init);
+
+    w.onesComplement();
+    assert(w == Z.init);
+    w.onesComplement();
+    assert(w == Z.init);
 
     // change it and check its contents
     w = 42;
