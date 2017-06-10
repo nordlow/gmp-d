@@ -1072,7 +1072,13 @@ private struct _MpZ(bool copyable = false)
     }
     alias getBit = testBit;
 
-    /// Check if `this` is default-constructed (in constrast to having been initialized via `__gmpz_...`-operations).
+    /** Check if `this` is default-constructed (in constrast to having been
+        initialized via `__gmpz_...`-operations).
+
+        Used to specially prepare avoid some `__gmpz_`-functions that cannot
+        handle the case when the membere `_mp_alloc` is zero and, in turn,
+        `_mp_d` is `null`.
+     */
     @property bool isDefaultConstructed() const @safe
     {
         return _z._mp_alloc == 0; // fast, actually enough to just test this
