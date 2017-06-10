@@ -23,7 +23,7 @@ enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct va
 /** Arbitrary (multi) precision signed integer (Z).
     Wrapper for GNU MP (GMP)'s type `mpz_t` and functions `__gmpz_.*`.
  */
-struct MpZ
+struct _MpZ(bool copyable = false)
 {
     pure nothrow pragma(inline, true):
 
@@ -54,8 +54,8 @@ struct MpZ
         return str[0] == '-' ? str : str.ptr[0 .. size];
     }
 
-    /// Returns: A unique hash of the `MpZ` value suitable for use in a hash table.
-    size_t toHash() const
+    /// Returns: A unique hash of the `_MpZ` value suitable for use in a hash table.
+    size_t toHash() const @trusted
     {
         import core.internal.hash : hashOf;
         typeof(return) hash = _limbCount;
@@ -84,7 +84,7 @@ struct MpZ
         // dln("size:", _ptr._mp_size);
         // dln("ptr:", _ptr._mp_d);
 
-        assert(this == MpZ.init); // if this is same as default
+        assert(this == _MpZ.init); // if this is same as default
     }
 
     /// Construct from expression `expr`.
@@ -122,24 +122,21 @@ struct MpZ
     }
 
     /// Returns: the Mersenne prime, M(p) = 2 ^^ p - 1
-    static MpZ mersennePrime(Integral)(Integral p)
+    static _MpZ mersennePrime(Integral)(Integral p)
         if (isIntegral!Integral)
     {
         return typeof(this).pow(2UL, p) - 1;
     }
 
-    /// Use copy construction.
-    enum useCopy = false;       // disable copy construction for now
-
-    static if (useCopy)
+    static if (copyable)
     {
         /// Construct copy of `value`.
-        this(ref const MpZ value) @trusted
+        this(ref const _MpZ value) @trusted
         {
             __gmpz_init_set(_ptr, value._ptr); version(ccc) ++_ccc;
         }
         /// Construct copy of `value`.
-        this(MpZ value) @trusted
+        this(_MpZ value) @trusted
         {
             moveEmplace(value, this); // fast
         }
@@ -151,7 +148,7 @@ struct MpZ
     }
 
     /// Swap content of `this` with `rhs`.
-    void swap(ref MpZ rhs) @safe
+    void swap(ref _MpZ rhs) @safe
     {
         import std.algorithm.mutation : swap;
         swap(this, rhs); // faster than __gmpz_swap(_ptr, rhs._ptr); version(ccc) ++_ccc;
@@ -159,7 +156,7 @@ struct MpZ
 
     /// Returns: (duplicate) copy of `this`.
     pragma(inline, false)
-    MpZ dup() const @trusted
+    _MpZ dup() const @trusted
     {
         typeof(return) y = void;
         __gmpz_init_set(y._ptr, _ptr); version(ccc) ++y._ccc;
@@ -167,13 +164,13 @@ struct MpZ
     }
 
     /// Assign from `rhs`.
-    ref MpZ opAssign()(auto ref const MpZ rhs) @trusted return scope
+    ref _MpZ opAssign()(auto ref const _MpZ rhs) @trusted return scope
     {
         __gmpz_set(_ptr, rhs._ptr); version(ccc) ++_ccc;
         return this;
     }
     /// ditto
-    ref MpZ opAssign(Expr)(auto ref Expr rhs) @trusted return scope
+    ref _MpZ opAssign(Expr)(auto ref Expr rhs) @trusted return scope
         if (isLazyMpZExpr!Expr)
     {
         static      if (isInstanceOf!(MpzAddExpr, Expr))
@@ -218,7 +215,7 @@ struct MpZ
         return this;
     }
     /// ditto
-    ref MpZ opAssign(T)(T rhs) @trusted return scope
+    ref _MpZ opAssign(T)(T rhs) @trusted return scope
         if (isArithmetic!T)
     {
         static if      (isUnsigned!T)
@@ -244,7 +241,7 @@ struct MpZ
     /** Assign `this` from `string` `rhs` interpreted in base `base`.
         If `base` is 0 it's guessed from contents of `value`.
     */
-    ref MpZ fromString(in string rhs, uint base = 0) @trusted return
+    ref _MpZ fromString(in string rhs, uint base = 0) @trusted return
     {
         assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(rhs);
@@ -263,7 +260,7 @@ struct MpZ
 
     /// Returns: `true` iff `this` equals `rhs`.
     pragma(inline, false)
-    bool opEquals()(auto ref const MpZ rhs) const @trusted
+    bool opEquals()(auto ref const _MpZ rhs) const @trusted
     {
         if (_ptr == rhs._ptr)   // fast equality
         {
@@ -294,7 +291,7 @@ struct MpZ
     }
 
     /// Compare `this` to `rhs`.
-    int opCmp()(auto ref const MpZ rhs) const @trusted
+    int opCmp()(auto ref const _MpZ rhs) const @trusted
     {
         if (rhs == 0)
         {
@@ -390,14 +387,14 @@ struct MpZ
 
     /** Returns: `this` `s` `rhs`. */
     pragma(inline, false)
-    MpZ opBinary(string s)(auto ref const MpZ rhs) const @trusted // direct value
+    _MpZ opBinary(string s)(auto ref const _MpZ rhs) const @trusted // direct value
         if ((s == "+" || s == "-" ||
              s == "*" || s == "/" || s == "%" ||
              s == "&" || s == "|" || s == "^"))
     {
         static if (!__traits(isRef, rhs)) // r-value `rhs`
         {
-            MpZ* mut_rhs = (cast(MpZ*)(&rhs)); // @trusted because `MpZ` has no aliased indirections
+            _MpZ* mut_rhs = (cast(_MpZ*)(&rhs)); // @trusted because `_MpZ` has no aliased indirections
             static      if (s == "+")
             {
                 __gmpz_add(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
@@ -484,7 +481,7 @@ struct MpZ
     }
 
     /// ditto
-    MpZ opBinary(string s, Rhs)(auto ref const Rhs rhs) const
+    _MpZ opBinary(string s, Rhs)(auto ref const Rhs rhs) const
         if (isLazyMpZExpr!Rhs && // lazy value
             (s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
@@ -492,7 +489,7 @@ struct MpZ
     }
 
     /// ditto
-    MpZ opBinary(string s, Rhs)(Rhs rhs) const @trusted
+    _MpZ opBinary(string s, Rhs)(Rhs rhs) const @trusted
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
             isUnsigned!Rhs)
     {
@@ -527,7 +524,7 @@ struct MpZ
     }
 
     /// ditto
-    MpZ opBinary(string s, Rhs)(Rhs rhs) const @trusted
+    _MpZ opBinary(string s, Rhs)(Rhs rhs) const @trusted
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
             isSigned!Rhs)
     {
@@ -592,7 +589,7 @@ struct MpZ
             isIntegral!Rhs)
     {
         assert(rhs != 0, "Divison by zero");
-        MpZ y = null;
+        _MpZ y = null;
         version(ccc) ++y._ccc;
         static if (isSigned!Rhs)
         {
@@ -617,7 +614,7 @@ struct MpZ
     }
 
     /// Returns: an unsigned type `lhs` divided by `this`.
-    MpZ opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
+    _MpZ opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
         if ((s == "+" || s == "-" || s == "*" || s == "%") &&
             isUnsigned!Lhs)
     {
@@ -638,7 +635,7 @@ struct MpZ
         else static if (s == "%")
         {
             assert(this != 0, "Divison by zero");
-            __gmpz_tdiv_r(y._ptr, MpZ(lhs)._ptr, _ptr); // convert `lhs` to MpZ
+            __gmpz_tdiv_r(y._ptr, _MpZ(lhs)._ptr, _ptr); // convert `lhs` to _MpZ
         }
         else
         {
@@ -648,7 +645,7 @@ struct MpZ
     }
 
     /// Returns: a signed type `lhs` divided by `this`.
-    MpZ opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
+    _MpZ opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
         if ((s == "+" || s == "-" || s == "*" || s == "%") &&
             isSigned!Lhs)
     {
@@ -677,7 +674,7 @@ struct MpZ
             typeof(return) y = null;
             version(ccc) ++y._ccc;
             assert(this != 0, "Divison by zero");
-            __gmpz_tdiv_r(y._ptr, MpZ(lhs)._ptr, _ptr); // convert `lhs` to MpZ
+            __gmpz_tdiv_r(y._ptr, _MpZ(lhs)._ptr, _ptr); // convert `lhs` to _MpZ
             return y;
         }
         else
@@ -691,10 +688,10 @@ struct MpZ
         if ((s == "/") &&
             isIntegral!Lhs)
     {
-        MpZ y = null; // TODO avoid if !__traits(isRef, this)
+        _MpZ y = null; // TODO avoid if !__traits(isRef, this)
         version(ccc) ++y._ccc;
         assert(this != 0, "Divison by zero");
-        __gmpz_tdiv_q(y._ptr, MpZ(lhs)._ptr, _ptr);
+        __gmpz_tdiv_q(y._ptr, _MpZ(lhs)._ptr, _ptr);
         static      if (isSigned!Lhs)
         {
             return cast(typeof(return))y;
@@ -711,18 +708,18 @@ struct MpZ
     }
 
     /// Exponentation.
-    MpZ opBinaryRight(string s, Base)(Base base) const
+    _MpZ opBinaryRight(string s, Base)(Base base) const
         if ((s == "^^") &&
             isIntegral!Base)
     {
-        static assert(false, "Convert `this MpZ` exponent to `ulong` and calculate power via static method `pow()`");
-        // MpZ exp = null;
+        static assert(false, "Convert `this _MpZ` exponent to `ulong` and calculate power via static method `pow()`");
+        // _MpZ exp = null;
         // __gmpz_pow();
         // return exp;
     }
 
     /// Operate-assign to `this` from `rhs`.
-    ref MpZ opOpAssign(string s)(auto ref const MpZ rhs) @trusted return scope
+    ref _MpZ opOpAssign(string s)(auto ref const _MpZ rhs) @trusted return scope
         if ((s == "+" || s == "-" ||
              s == "*" || s == "/" || s == "%" ||
              s == "&" || s == "|" || s == "^"))
@@ -783,7 +780,7 @@ struct MpZ
     }
 
     /// ditto
-    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) @trusted return scope
+    ref _MpZ opOpAssign(string s, Rhs)(Rhs rhs) @trusted return scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isUnsigned!Rhs)
     {
@@ -821,7 +818,7 @@ struct MpZ
     }
 
     /// ditto
-    ref MpZ opOpAssign(string s, Rhs)(Rhs rhs) @trusted return scope
+    ref _MpZ opOpAssign(string s, Rhs)(Rhs rhs) @trusted return scope
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isSigned!Rhs)
     {
@@ -895,14 +892,14 @@ struct MpZ
     }
 
     /// Returns: `this`.
-    ref inout(MpZ) opUnary(string s)() inout
+    ref inout(_MpZ) opUnary(string s)() inout
         if (s == "+")
     {
         return this;
     }
 
     /// Returns: negation of `this`.
-    MpZ opUnary(string s)() const
+    _MpZ opUnary(string s)() const
         if (s == "-")
     {
         typeof(return) y = this.dup;
@@ -911,7 +908,7 @@ struct MpZ
     }
 
     /// Returns: negation of `this`.
-    MpZ unaryMinus() const @safe
+    _MpZ unaryMinus() const @safe
     {
         // pragma(msg, "memberFun:", __traits(isRef, this) ? "ref" : "non-ref", " this");
         typeof(return) y = this.dup;
@@ -944,7 +941,7 @@ struct MpZ
     }
 
     /// Increase `this` by one.
-    ref MpZ opUnary(string s)() @trusted return scope
+    ref _MpZ opUnary(string s)() @trusted return scope
         if (s == "++")
     {
         __gmpz_add_ui(_ptr, _ptr, 1); version(ccc) ++_ccc;
@@ -952,7 +949,7 @@ struct MpZ
     }
 
     /// Decrease `this` by one.
-    ref MpZ opUnary(string s)() @trusted return scope
+    ref _MpZ opUnary(string s)() @trusted return scope
         if (s == "--")
     {
         __gmpz_sub_ui(_ptr, _ptr, 1); version(ccc) ++_ccc;
@@ -1114,7 +1111,7 @@ private:
     enum defaultBase = 10;
 
     /// Returns: evaluation of `this` expression which in this is a no-op.
-    ref inout(MpZ) eval() @safe inout return { return this; }
+    ref inout(_MpZ) eval() @safe inout return { return this; }
 
     /// Type of limb in internal representation.
     alias Limb = __mp_limb_t;   // GNU MP alias
@@ -1183,6 +1180,12 @@ private:
     }
 }
 
+/** Non-copyable MpZ. */
+alias MpZ = _MpZ!false;
+
+/** Copyable MpZ. */
+alias CopyableMpZ = _MpZ!true;
+
 static if (__VERSION__ < 2074)  // backport of pureMalloc
 {
     extern (C) private pure @system @nogc nothrow
@@ -1203,38 +1206,38 @@ static if (__VERSION__ < 2074)  // backport of pureMalloc
     }
 }
 
-version(unittest) static assert(isMpZExpr!MpZ);
+version(unittest) static assert(isMpZExpr!(MpZ));
 
 pure nothrow pragma(inline, true):
 
 /** Instantiator for `MpZ`. */
-MpZ mpz(Args...)(Args args) @safe
+_MpZ!copyable mpz(bool copyable = false, Args...)(Args args) @safe
 {
     return typeof(return)(args);
 }
 
 /// Swap contents of `x` with contents of `y`.
-void swap()(ref MpZ x,
-            ref MpZ y)
+void swap(bool copyable)(ref _MpZ!copyable x,
+                         ref _MpZ!copyable y)
 {
     import std.algorithm.mutation : swap;
     swap(x, y); // x.swap(y);
 }
 
 /// Returns: `x` as a `string` in decimal base.
-string toDecimalString()(auto ref const MpZ x) // for `std.bigint.BigInt` compatibility
+string toDecimalString(bool copyable)(auto ref const _MpZ!copyable x) // for `std.bigint.BigInt` compatibility
 {
     return x.toString(10);
 }
 
 /// Returns: `x` as a uppercased `string` in hexadecimal base without any base prefix (0x).
-string toHex()(auto ref const MpZ x) // for `std.bigint.BigInt` compatibility
+string toHex(bool copyable)(auto ref const _MpZ!copyable x) // for `std.bigint.BigInt` compatibility
 {
     return x.toString(16, true);
 }
 
 /// Returns: the absolute value of `x` converted to the corresponding unsigned type.
-Unsigned!T absUnsign(T)(auto ref const MpZ x) // for `std.bigint.BigInt` compatibility
+Unsigned!T absUnsign(T, bool copyable)(auto ref const _MpZ!copyable x) // for `std.bigint.BigInt` compatibility
     if (isIntegral!T)
 {
     return _integralAbs(cast(T)x);
@@ -1243,7 +1246,7 @@ Unsigned!T absUnsign(T)(auto ref const MpZ x) // for `std.bigint.BigInt` compati
 /** Returns: absolute value of `x`.
     Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
  */
-MpZ abs()(auto ref const MpZ x) @trusted @nogc
+_MpZ!copyable abs(bool copyable)(auto ref const _MpZ!copyable x) @trusted @nogc
 {
     static if (__traits(isRef, x)) // l-value `x`
     {
@@ -1253,7 +1256,7 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
     }
     else                        // r-value `x`
     {
-        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
         mut_x.absolute();
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
@@ -1262,7 +1265,7 @@ MpZ abs()(auto ref const MpZ x) @trusted @nogc
 /** Returns: one's complement of value of `x`.
     Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
 */
-MpZ onesComplement()(auto ref const MpZ x) @trusted @nogc
+_MpZ!copyable onesComplement(bool copyable)(auto ref const _MpZ!copyable x) @trusted @nogc
 {
     static if (__traits(isRef, x)) // l-value `x`
     {
@@ -1272,25 +1275,25 @@ MpZ onesComplement()(auto ref const MpZ x) @trusted @nogc
     }
     else                        // r-value `x`
     {
-        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
         mut_x.onesComplement();
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
 }
 
 /// Returns: comparison of the absolute values of `x` and `y`.
-int cmpabs()(auto ref const MpZ x,
-             auto ref const MpZ y) @trusted @nogc
+int cmpabs(bool copyable)(auto ref const _MpZ!copyable x,
+                          auto ref const _MpZ!copyable y) @trusted @nogc
 {
     return __gmpz_cmpabs(x._ptr, y._ptr);
 }
 /// ditto
-int cmpabs()(auto ref const MpZ x, double y) @trusted @nogc
+int cmpabs(bool copyable)(auto ref const _MpZ!copyable x, double y) @trusted @nogc
 {
     return __gmpz_cmpabs_d(x._ptr, y);
 }
 /// ditto
-int cmpabs()(auto ref const MpZ x, ulong y) @trusted @nogc
+int cmpabs(bool copyable)(auto ref const _MpZ!copyable x, ulong y) @trusted @nogc
 {
     return __gmpz_cmpabs_ui(x._ptr, y);
 }
@@ -1298,7 +1301,7 @@ int cmpabs()(auto ref const MpZ x, ulong y) @trusted @nogc
 /** Returns: next prime greater than `x`.
     Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
 */
-MpZ nextPrime()(auto ref const MpZ x) @trusted @nogc
+_MpZ!copyable nextPrime(bool copyable)(auto ref const _MpZ!copyable x) @trusted @nogc
 {
     static if (__traits(isRef, x)) // l-value `x`
     {
@@ -1308,89 +1311,89 @@ MpZ nextPrime()(auto ref const MpZ x) @trusted @nogc
     }
     else                        // r-value `x`
     {
-        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
         __gmpz_nextprime(mut_x._ptr, x._ptr); version(ccc) ++mut_x._ccc;
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
 }
 
 /// Returns: greatest common divisor (gcd) of `x` and `y`.
-MpZ gcd()(auto ref const MpZ x,
-          auto ref const MpZ y) @trusted @nogc
+_MpZ!copyable gcd(bool copyable)(auto ref const _MpZ!copyable x,
+                                 auto ref const _MpZ!copyable y) @trusted @nogc
 {
     static      if (!__traits(isRef, x)) // r-value `x`
     {
-        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
         __gmpz_gcd(mut_x._ptr, x._ptr, y._ptr); version(ccc) ++mut_x._ccc;
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
     else static if (!__traits(isRef, y)) // r-value `y`
     {
-        MpZ* mut_y = (cast(MpZ*)(&y)); // @trusted because `MpZ` has no aliased indirections
+        typeof(return)* mut_y = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
         __gmpz_gcd(mut_y._ptr, x._ptr, y._ptr); version(ccc) ++mut_y._ccc;
         return move(*mut_y);    // TODO shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`
     {
-        MpZ z = null;
+        typeof(return) z = null;
         __gmpz_gcd(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
         return z;
     }
 }
 /// ditto
-MpZ gcd()(auto ref const MpZ x,
-          ulong y) @trusted @nogc
+_MpZ!copyable gcd(bool copyable)(auto ref const _MpZ!copyable x,
+                                 ulong y) @trusted @nogc
 {
     static if (__traits(isRef, x)) // l-value `x`
     {
-        MpZ z = null;
+        typeof(return) z = null;
         const z_ui = __gmpz_gcd_ui(z._ptr, x._ptr, y); version(ccc) ++z._ccc;
         return z;
     }
     else
     {
-        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
         const z_ui = __gmpz_gcd_ui(mut_x._ptr, x._ptr, y); version(ccc) ++mut_x._ccc;
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
 }
 
 /// Returns: least common multiple (lcm) of `x` and `y`.
-MpZ lcm()(auto ref const MpZ x,
-          auto ref const MpZ y) @trusted @nogc
+_MpZ!copyable lcm(bool copyable)(auto ref const _MpZ!copyable x,
+                                 auto ref const _MpZ!copyable y) @trusted @nogc
 {
     static      if (!__traits(isRef, x)) // r-value `x`
     {
-        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
         __gmpz_lcm(mut_x._ptr, x._ptr, y._ptr); version(ccc) ++mut_x._ccc;
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
     else static if (!__traits(isRef, y)) // r-value `y`
     {
-        MpZ* mut_y = (cast(MpZ*)(&y)); // @trusted because `MpZ` has no aliased indirections
+        typeof(return)* mut_y = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
         __gmpz_lcm(mut_y._ptr, x._ptr, y._ptr); version(ccc) ++mut_y._ccc;
         return move(*mut_y);    // TODO shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`
     {
-        MpZ z = null;
+        typeof(return) z = null;
         __gmpz_lcm(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
         return z;
     }
 }
 /// ditto
-MpZ lcm()(auto ref const MpZ x,
-          ulong y) @trusted @nogc
+_MpZ!copyable lcm(bool copyable)(auto ref const _MpZ!copyable x,
+                                 ulong y) @trusted @nogc
 {
     static if (__traits(isRef, x)) // l-value `x`
     {
-        MpZ z = null;
+        typeof(return) z = null;
         __gmpz_lcm_ui(z._ptr, x._ptr, y);
         return z;
     }
     else
     {
-        MpZ* mut_x = (cast(MpZ*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
         __gmpz_lcm_ui(mut_x._ptr, x._ptr, y); version(ccc) ++mut_x._ccc;
         return move(*mut_x);    // TODO shouldn't have to call `move` here
     }
@@ -1399,9 +1402,9 @@ MpZ lcm()(auto ref const MpZ x,
 /** Returns: `base` ^^ `exp` (modulo `mod`).
     Parameter `exp` must be positive.
 */
-MpZ powm()(auto ref const MpZ base,
-           auto ref const MpZ exp,
-           auto ref const MpZ mod) @trusted
+_MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
+                                  auto ref const _MpZ!copyable exp,
+                                  auto ref const _MpZ!copyable mod) @trusted
 {
     typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
     assert(exp >= 0, "Negative exponent");
@@ -1409,9 +1412,9 @@ MpZ powm()(auto ref const MpZ base,
     return y;
 }
 /// ditto
-MpZ powm()(auto ref const MpZ base,
-           ulong exp,
-           auto ref const MpZ mod) @trusted
+_MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
+                                  ulong exp,
+                                  auto ref const _MpZ!copyable mod) @trusted
 {
     typeof(return) y = 0;       // result, TODO reuse `exp` or `mod` if any is an r-value
     __gmpz_powm_ui(y._ptr, base._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
