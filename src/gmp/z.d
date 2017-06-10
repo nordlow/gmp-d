@@ -1468,6 +1468,8 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
     assert(w.toString == `0`);
     assert(w.toHash == 0);
     assert(w.sizeInBase(10) == 1);
+
+    // change it and check its contents
     w = 42;
     assert(w.toString == `42`);
     assert(w.toHash != 0);      // should at least be non-zero
