@@ -1072,7 +1072,7 @@ private struct _MpZ(bool copyable = false)
     }
     alias getBit = testBit;
 
-    /// Check if `this` is default-constructed (all bits in struct `_z` are zero).
+    /// Check if `this` is default-constructed (in constrast to having been initialized via `__gmpz_...`-operations).
     @property bool isDefaultConstructed() const @safe
     {
         return _z._mp_d == null; // fast, actually enough to just test this
