@@ -23,7 +23,7 @@ enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct va
 /** Arbitrary (multi) precision signed integer (Z).
     Wrapper for GNU MP (GMP)'s type `mpz_t` and functions `__gmpz_.*`.
  */
-struct _MpZ(bool copyable = false)
+private struct _MpZ(bool copyable = false)
 {
     pure nothrow pragma(inline, true):
 
