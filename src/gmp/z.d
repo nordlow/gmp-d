@@ -1227,7 +1227,14 @@ private:
     }
 }
 
-/** Non-copyable MpZ. */
+/** Non-copyable MpZ.
+
+    For reference counting semanticsc, use `RefCounted` as
+
+    import std.typecons : RefCounted;
+    alias RcMpZ = RefCounted!MpZ;
+    RcMpZ x;
+ */
 alias MpZ = _MpZ!false;
 
 /** Copyable MpZ. */
@@ -2800,13 +2807,6 @@ T _integralAbs(T)(T x)
 
     CZ c = null;                // other value
     assert(a != c);             // should diff
-}
-
-/// reference counted
-@safe nothrow @nogc unittest
-{
-    // import std.typecons : RefCounted;
-    // alias RcMpZ = RefCounted!MpZ;
 }
 
 version(unittest)
