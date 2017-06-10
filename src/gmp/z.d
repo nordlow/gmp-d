@@ -79,11 +79,6 @@ private struct _MpZ(bool copyable = false)
     this(typeof(null)) @trusted
     {
         initialize();             // TODO is there a faster way?
-
-        // dln("alloc:", _ptr._mp_alloc);
-        // dln("size:", _ptr._mp_size);
-        // dln("ptr:", _ptr._mp_d);
-
         assert(this == _MpZ.init); // if this is same as default
     }
 
@@ -1431,6 +1426,15 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
     typeof(return) y = 0;       // result, TODO reuse `exp` or `mod` if any is an r-value
     __gmpz_powm_ui(y._ptr, base._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
     return y;
+}
+
+/// default construction
+@safe nothrow @nogc unittest
+{
+    Z x;
+    Z y;
+    assert(x == y);
+    assert(x is y);             // TODO is this correct behaviour?
 }
 
 /// null construction
