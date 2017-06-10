@@ -954,7 +954,14 @@ private struct _MpZ(bool copyable = false)
     ref _MpZ opUnary(string s)() @trusted return scope
         if (s == "++")
     {
-        __gmpz_add_ui(_ptr, _ptr, 1); version(ccc) { ++_ccc; }
+        if (isDefaultConstructed)
+        {
+            __gmpz_init_set_si(_ptr, 1);
+        }
+        else
+        {
+            __gmpz_add_ui(_ptr, _ptr, 1); version(ccc) { ++_ccc; }
+        }
         return this;
     }
 
@@ -962,7 +969,14 @@ private struct _MpZ(bool copyable = false)
     ref _MpZ opUnary(string s)() @trusted return scope
         if (s == "--")
     {
-        __gmpz_sub_ui(_ptr, _ptr, 1); version(ccc) { ++_ccc; }
+        if (isDefaultConstructed)
+        {
+            __gmpz_init_set_si(_ptr, -1);
+        }
+        else
+        {
+            __gmpz_sub_ui(_ptr, _ptr, 1); version(ccc) { ++_ccc; }
+        }
         return this;
     }
 
@@ -1058,7 +1072,13 @@ private struct _MpZ(bool copyable = false)
     }
     alias getBit = testBit;
 
-    /// Check if `this` is zero.
+    /// Check if `this` is default-constructed (all bits in struct `_z` are zero).
+    @property bool isDefaultConstructed() const @safe
+    {
+        return _z == _z.init; // fast
+    }
+
+    /// Check if `this` is zero (either via default-construction or `__gmpz_...`-operations).
     @property bool isZero() const @safe
     {
         return _z._mp_size == 0; // fast
@@ -1122,7 +1142,7 @@ private:
     /** Initialize internal struct if needed. */
     void assertInitialized()
     {
-        if (_z == _z.init)
+        if (isDefaultConstructed)
         {
             __gmpz_init(_ptr); version(ccc) { ++_ccc; }
         }
@@ -1528,6 +1548,36 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
     w = 42;
     assert(w.toString == `42`);
     assert(w.toHash != 0);      // should at least be non-zero
+
+    {
+        Z p;
+        p.setBit(5);
+        assert(p == 32);
+    }
+    {
+        Z p;
+        p.clearBit(5);
+        assert(p == 0);
+    }
+    {
+        Z p;
+        p.complementBit(5);
+        assert(p == 32);
+    }
+    {
+        Z p;
+        assert(p.testBit(5) == 0);
+    }
+    {
+        Z p;
+        ++p;
+        assert(p == 1);
+    }
+    {
+        Z p;
+        --p;
+        assert(p == -1);
+    }
 }
 
 /// null construction
