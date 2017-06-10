@@ -1075,7 +1075,7 @@ private struct _MpZ(bool copyable = false)
     /// Check if `this` is default-constructed (all bits in struct `_z` are zero).
     @property bool isDefaultConstructed() const @safe
     {
-        return _z == _z.init; // fast
+        return _z._mp_d == null; // fast, actually enough to just test this
     }
 
     /// Check if `this` is zero (either via default-construction or `__gmpz_...`-operations).
