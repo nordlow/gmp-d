@@ -99,7 +99,7 @@ private struct _MpZ(bool copyable = false)
     this(T)(T value) @trusted
         if (isArithmetic!T)
     {
-        version(ccc) ++_ccc;
+        version(ccc) { ++_ccc; }
         static      if (isUnsigned!T)
             __gmpz_init_set_ui(_ptr, value);
         else static if (isFloating!T)
@@ -116,7 +116,7 @@ private struct _MpZ(bool copyable = false)
     {
         assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(value);
-        immutable int status = __gmpz_init_set_str(_ptr, stringz, base); version(ccc) ++_ccc;
+        immutable int status = __gmpz_init_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
         qualifiedFree(stringz);
         assert(status == 0, "Parameter `value` does not contain an integer");
     }
@@ -131,15 +131,27 @@ private struct _MpZ(bool copyable = false)
     static if (copyable)
     {
         /// Construct copy of `value`.
-        this(ref const _MpZ value) @trusted
+        this(this) @trusted
         {
-            __gmpz_init_set(_ptr, value._ptr); version(ccc) ++_ccc;
+            // TODO this might be made faster
+            __mpz_struct _z_copy = _z;
+            __gmpz_init_set(&_z_copy, _ptr); version(ccc) { ++_ccc; }
+            _z = _z_copy;
         }
-        /// Construct copy of `value`.
-        this(_MpZ value) @trusted
-        {
-            moveEmplace(value, this); // fast
-        }
+
+        // /// Construct copy of `value`.
+        // this(ref const _MpZ value) @trusted
+        // {
+        //     dln("here");
+        //     __gmpz_init_set(_ptr, value._ptr); version(ccc) { ++_ccc; }
+        // }
+
+        // /// Construct copy of `value`.
+        // this(_MpZ value) @trusted
+        // {
+        //     dln("here");
+        //     moveEmplace(value, this); // fast
+        // }
     }
     else
     {
@@ -151,7 +163,7 @@ private struct _MpZ(bool copyable = false)
     void swap(ref _MpZ rhs) @safe
     {
         import std.algorithm.mutation : swap;
-        swap(this, rhs); // faster than __gmpz_swap(_ptr, rhs._ptr); version(ccc) ++_ccc;
+        swap(this, rhs); // faster than __gmpz_swap(_ptr, rhs._ptr); version(ccc) { ++_ccc; }
     }
 
     /// Returns: (duplicate) copy of `this`.
@@ -166,7 +178,7 @@ private struct _MpZ(bool copyable = false)
     /// Assign from `rhs`.
     ref _MpZ opAssign()(auto ref const _MpZ rhs) @trusted return scope
     {
-        __gmpz_set(_ptr, rhs._ptr); version(ccc) ++_ccc;
+        __gmpz_set(_ptr, rhs._ptr); version(ccc) { ++_ccc; }
         return this;
     }
     /// ditto
@@ -177,36 +189,36 @@ private struct _MpZ(bool copyable = false)
         {
             __gmpz_add(this._ptr,
                        rhs.e1.eval()._ptr,
-                       rhs.e2.eval()._ptr); version(ccc) ++_ccc;
+                       rhs.e2.eval()._ptr); version(ccc) { ++_ccc; }
         }
         else static if (isInstanceOf!(MpzSubExpr, Expr))
         {
             __gmpz_sub(this._ptr,
                        rhs.e1.eval()._ptr,
-                       rhs.e2.eval()._ptr); version(ccc) ++_ccc;
+                       rhs.e2.eval()._ptr); version(ccc) { ++_ccc; }
         }
         else static if (isInstanceOf!(MpzMulExpr, Expr))
         {
             __gmpz_mul(this._ptr,
                        rhs.e1.eval()._ptr,
-                       rhs.e2.eval()._ptr); version(ccc) ++_ccc;
+                       rhs.e2.eval()._ptr); version(ccc) { ++_ccc; }
         }
         else static if (isInstanceOf!(MpzDivExpr, Expr))
         {
             __gmpz_tdiv_q(this._ptr,
                           rhs.e1.eval()._ptr,
-                          rhs.e2.eval()._ptr); version(ccc) ++_ccc;
+                          rhs.e2.eval()._ptr); version(ccc) { ++_ccc; }
         }
         else static if (isInstanceOf!(MpzModExpr, Expr))
         {
             __gmpz_tdiv_r(this._ptr,
                           rhs.e1.eval()._ptr,
-                          rhs.e2.eval()._ptr); version(ccc) ++_ccc;
+                          rhs.e2.eval()._ptr); version(ccc) { ++_ccc; }
         }
         else static if (isInstanceOf!(MpzNegExpr, Expr))
         {
             __gmpz_neg(this._ptr,
-                       rhs.e1.eval()._ptr); version(ccc) ++_ccc;
+                       rhs.e1.eval()._ptr); version(ccc) { ++_ccc; }
         }
         else
         {
@@ -234,7 +246,7 @@ private struct _MpZ(bool copyable = false)
         {
             static assert(false);
         }
-        version(ccc) ++_ccc;
+        version(ccc) { ++_ccc; }
         return this;
     }
 
@@ -245,7 +257,7 @@ private struct _MpZ(bool copyable = false)
     {
         assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(rhs);
-        immutable int status = __gmpz_set_str(_ptr, stringz, base); version(ccc) ++_ccc;
+        immutable int status = __gmpz_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
         qualifiedFree(stringz);
         assert(status == 0, "Parameter `rhs` does not contain an integer");
         return this;
@@ -255,7 +267,7 @@ private struct _MpZ(bool copyable = false)
     ~this() @trusted
     {
         assert(_ptr, "Pointer is null");
-        __gmpz_clear(_ptr); version(ccc) ++_ccc;
+        __gmpz_clear(_ptr); version(ccc) { ++_ccc; }
     }
 
     /// Returns: `true` iff `this` equals `rhs`.
@@ -726,11 +738,11 @@ private struct _MpZ(bool copyable = false)
     {
         static      if (s == "+")
         {
-            __gmpz_add(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
+            __gmpz_add(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
         }
         else static if (s == "-")
         {
-            __gmpz_sub(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
+            __gmpz_sub(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
         }
         else static if (s == "*")
         {
@@ -740,7 +752,7 @@ private struct _MpZ(bool copyable = false)
             }
             else
             {
-                __gmpz_mul(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
+                __gmpz_mul(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
             }
         }
         else static if (s == "/")
@@ -752,25 +764,25 @@ private struct _MpZ(bool copyable = false)
             }
             else
             {
-                __gmpz_tdiv_q(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
+                __gmpz_tdiv_q(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
             }
         }
         else static if (s == "%")
         {
             assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_r(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
+            __gmpz_tdiv_r(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
         }
         else static if (s == "&")
         {
-            __gmpz_and(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
+            __gmpz_and(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
         }
         else static if (s == "|")
         {
-            __gmpz_ior(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
+            __gmpz_ior(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
         }
         else static if (s == "^")
         {
-            __gmpz_xor(_ptr, _ptr, rhs._ptr); version(ccc) ++_ccc;
+            __gmpz_xor(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
         }
         else
         {
@@ -786,29 +798,29 @@ private struct _MpZ(bool copyable = false)
     {
         static      if (s == "+")
         {
-            __gmpz_add_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
+            __gmpz_add_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
         }
         else static if (s == "-")
         {
-            __gmpz_sub_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
+            __gmpz_sub_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
         }
         else static if (s == "*")
         {
-            __gmpz_mul_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
+            __gmpz_mul_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
         }
         else static if (s == "/")
         {
             assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_q_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
+            __gmpz_tdiv_q_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
         }
         else static if (s == "%")
         {
             assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
+            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
         }
         else static if (s == "^^")
         {
-            __gmpz_pow_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
+            __gmpz_pow_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
         }
         else
         {
@@ -828,11 +840,11 @@ private struct _MpZ(bool copyable = false)
             {
                 assert(rhs != rhs.min);
                 immutable ulong pos_rhs = -rhs; // make it positive
-                __gmpz_sub_ui(_ptr, _ptr, pos_rhs); version(ccc) ++_ccc;
+                __gmpz_sub_ui(_ptr, _ptr, pos_rhs); version(ccc) { ++_ccc; }
             }
             else
             {
-                __gmpz_add_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
+                __gmpz_add_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
             }
         }
         else static if (s == "-")
@@ -842,11 +854,11 @@ private struct _MpZ(bool copyable = false)
                 assert(rhs != rhs.min);
 
                 immutable ulong pos_rhs = -rhs; // make it positive
-                __gmpz_add_ui(_ptr, _ptr, pos_rhs); version(ccc) ++_ccc;
+                __gmpz_add_ui(_ptr, _ptr, pos_rhs); version(ccc) { ++_ccc; }
             }
             else
             {
-                __gmpz_sub_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
+                __gmpz_sub_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
             }
         }
         else static if (s == "*")
@@ -857,7 +869,7 @@ private struct _MpZ(bool copyable = false)
             }
             else
             {
-                __gmpz_mul_si(_ptr, _ptr, rhs); version(ccc) ++_ccc;
+                __gmpz_mul_si(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
             }
         }
         else static if (s == "/")
@@ -866,23 +878,23 @@ private struct _MpZ(bool copyable = false)
             if (rhs < 0)        // TODO handle `rhs == rhs.min`
             {
                 immutable ulong pos_rhs = -rhs; // make it positive
-                __gmpz_tdiv_q_ui(_ptr, _ptr, pos_rhs); version(ccc) ++_ccc;
+                __gmpz_tdiv_q_ui(_ptr, _ptr, pos_rhs); version(ccc) { ++_ccc; }
                 negate();
             }
             else
             {
-                __gmpz_tdiv_q_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
+                __gmpz_tdiv_q_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
             }
         }
         else static if (s == "%")
         {
             assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
+            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
         }
         else static if (s == "^^")
         {
             assert(rhs >= 0, "Negative power exponent");
-            __gmpz_pow_ui(_ptr, _ptr, rhs); version(ccc) ++_ccc;
+            __gmpz_pow_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
         }
         else
         {
@@ -929,7 +941,7 @@ private struct _MpZ(bool copyable = false)
      */
     void absolute() @trusted
     {
-        __gmpz_abs(_ptr, _ptr); version(ccc) ++_ccc;
+        __gmpz_abs(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
 
     /** Make `this` the one's complement value of itself in-place.
@@ -937,14 +949,14 @@ private struct _MpZ(bool copyable = false)
     */
     void onesComplement() @trusted
     {
-        __gmpz_com(_ptr, _ptr); version(ccc) ++_ccc;
+        __gmpz_com(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
 
     /// Increase `this` by one.
     ref _MpZ opUnary(string s)() @trusted return scope
         if (s == "++")
     {
-        __gmpz_add_ui(_ptr, _ptr, 1); version(ccc) ++_ccc;
+        __gmpz_add_ui(_ptr, _ptr, 1); version(ccc) { ++_ccc; }
         return this;
     }
 
@@ -952,7 +964,7 @@ private struct _MpZ(bool copyable = false)
     ref _MpZ opUnary(string s)() @trusted return scope
         if (s == "--")
     {
-        __gmpz_sub_ui(_ptr, _ptr, 1); version(ccc) ++_ccc;
+        __gmpz_sub_ui(_ptr, _ptr, 1); version(ccc) { ++_ccc; }
         return this;
     }
 
@@ -1104,7 +1116,7 @@ private:
     /** Initialize internal struct. */
     void initialize() @trusted // cannot be called `init` as that will override builtin type property
     {
-        __gmpz_init(_ptr); version(ccc) ++_ccc;
+        __gmpz_init(_ptr); version(ccc) { ++_ccc; }
     }
 
     /// Default conversion base.
@@ -2597,14 +2609,34 @@ T _integralAbs(T)(T x)
     // assert(aa[456.Z] == "def");
 }
 
+@trusted unittest
+{
+    alias CZ = CopyableMpZ;
+
+    CZ a = 42;
+
+    CZ b = a;                   // copy
+    assert(a == b);             // should equal
+    assert(a._ptr != b._ptr);   // but not the same
+    assert(a !is b);            // but not the same
+
+    CZ c = null;                // other value
+    assert(a != c);             // should diff
+}
+
 version(unittest)
 {
-    // import dbgio : dln;
+    import dbgio : dln;
     alias Z = MpZ;
     debug import core.stdc.stdio : printf;
     // version = ccc;              // do C mutation call count
     static assert(!isMpZExpr!int);
     import std.meta : AliasSeq;
+}
+
+version(unittest)
+{
+    alias CZ = _MpZ!true;
 }
 
 // C API
