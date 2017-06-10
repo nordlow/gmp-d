@@ -1461,11 +1461,12 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
     w = 42;
 }
 
-/// default construction to string conversion
+/// operate on default-constructed instances
 @safe nothrow unittest
 {
     Z w;
     assert(w.toString == `0`);
+    assert(w.toHash == 0);
     w = 42;
     assert(w.toString == `42`);
 }
