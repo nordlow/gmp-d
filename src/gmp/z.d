@@ -2617,7 +2617,6 @@ T _integralAbs(T)(T x)
 
     CZ b = a;                   // copy
     assert(a == b);             // should equal
-    assert(a._ptr != b._ptr);   // but not the same
     assert(a !is b);            // but not the same
 
     CZ c = null;                // other value
