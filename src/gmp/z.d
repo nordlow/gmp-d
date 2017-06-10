@@ -937,6 +937,7 @@ private struct _MpZ(bool copyable = false)
      */
     void absolute() @trusted
     {
+        if (isZero) { return; } // default-constructed `this`
         __gmpz_abs(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
 
@@ -945,7 +946,7 @@ private struct _MpZ(bool copyable = false)
     */
     void onesComplement() @trusted
     {
-        if (isZero) { return; }
+        if (isZero) { return; } // default-constructed `this`
         __gmpz_com(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
 
@@ -1027,7 +1028,7 @@ private struct _MpZ(bool copyable = false)
      */
     @property mp_bitcnt_t populationCount() const @trusted
     {
-        if (isZero) { return 0; }
+        if (isZero) { return 0; } // default-constructed `this`
         return __gmpz_popcount(this._ptr); // TODO use core.bitop `popcnt` inline here instead?
     }
     alias countOnes = populationCount;
@@ -1496,14 +1497,17 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
     assert(w.sgn == 0);
 
     w.negate();
-    assert(w == Z.init);
+    assert(w is Z.init);        // should be unchanged
     w.negate();
-    assert(w == Z.init);
+    assert(w is Z.init);        //
+
+    w.absolute();
+    assert(w is Z.init);        // should be unchanged
 
     w.onesComplement();
-    assert(w == Z.init);
+    assert(w is Z.init);        // should be unchanged
     w.onesComplement();
-    assert(w == Z.init);
+    assert(w is Z.init);        // should be unchanged
 
     // change it and check its contents
     w = 42;
