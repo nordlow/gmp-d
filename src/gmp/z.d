@@ -31,13 +31,23 @@ private struct _MpZ(bool copyable = false)
     string toString(uint base = defaultBase,
                     bool upperCaseDigits = false) const @trusted
     {
+        if (isZero) { return `0`; }
+
         assert((base >= -2 && base <= -36) ||
                (base >= 2 && base <= 62));
 
-        immutable size = sizeInBase(base);
+        immutable size = sizeInBase(base); // NOTE: one too much for some values
 
         string str = new string(size + 1); // one extra for minus sign
         __gmpz_get_str(cast(char*)str.ptr, base, _ptr); // fill it
+
+        // skip trailing garbage
+        import std.ascii : isAlphaNum;
+        while (str.length &&
+               !str[$ - 1].isAlphaNum)
+        {
+            str.length -= 1;
+        }
 
         if (upperCaseDigits)
         {
@@ -51,7 +61,7 @@ private struct _MpZ(bool copyable = false)
             }
         }
 
-        return str[0] == '-' ? str : str.ptr[0 .. size];
+        return str;
     }
 
     /// Returns: A unique hash of the `_MpZ` value suitable for use in a hash table.
@@ -1018,7 +1028,14 @@ private struct _MpZ(bool copyable = false)
     /// Returns: number of digits in base `base`.
     size_t sizeInBase(uint base) const @trusted
     {
-        return __gmpz_sizeinbase(_ptr, base);
+        if (isZero)
+        {
+            return 1;
+        }
+        else
+        {
+            return __gmpz_sizeinbase(_ptr, base);
+        }
     }
 
     /// Returns: `true` iff `this` fits in a `T`.
@@ -2806,6 +2823,16 @@ T _integralAbs(T)(T x)
 
     CZ c = null;                // other value
     assert(a != c);             // should diff
+}
+
+/// to string conversion
+@safe pure nothrow unittest
+{
+    for (int i = -100; i < 100; ++i)
+    {
+        import std.conv : to;
+        assert(i.Z.toString == i.to!string);
+    }
 }
 
 version(unittest)
