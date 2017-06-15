@@ -147,13 +147,13 @@ private struct _MpZ(bool copyable = false)
             }
         }
 
-        // /// Construct copy of `value`.
+        /// Construct copy of `value`.
         this(ref const _MpZ value) @trusted
         {
             __gmpz_init_set(_ptr, value._ptr); version(ccc) { ++_ccc; }
         }
 
-        // /// Construct copy of `value`.
+        /// Construct copy of `value`.
         this(_MpZ value) @trusted
         {
             moveEmplace(value, this); // fast
