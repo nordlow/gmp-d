@@ -270,7 +270,6 @@ private struct _MpZ(bool copyable = false)
     /// Destruct `this`.
     ~this() @trusted
     {
-        assert(_ptr, "Pointer is null");
         if (_z._mp_d)
         {
             __gmpz_clear(_ptr); version(ccc) { ++_ccc; }
