@@ -138,10 +138,13 @@ private struct _MpZ(bool copyable = false)
         /// Construct copy of `value`.
         this(this) @trusted
         {
-            // TODO this might be made faster
-            __mpz_struct _z_copy = _z;
-            __gmpz_init_set(&_z_copy, _ptr); version(ccc) { ++_ccc; }
-            _z = _z_copy;
+            if (_z._mp_d)
+            {
+                // TODO this might be made faster
+                __mpz_struct _z_copy = _z;
+                __gmpz_init_set(&_z_copy, _ptr); version(ccc) { ++_ccc; }
+                _z = _z_copy;
+            }
         }
 
         // /// Construct copy of `value`.
