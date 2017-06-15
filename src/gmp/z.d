@@ -271,7 +271,11 @@ private struct _MpZ(bool copyable = false)
     ~this() @trusted
     {
         assert(_ptr, "Pointer is null");
-        __gmpz_clear(_ptr); version(ccc) { ++_ccc; }
+        if (_z._mp_d)
+        {
+            __gmpz_clear(_ptr); version(ccc) { ++_ccc; }
+            _z._mp_d = null;    // prevent GC from scanning this memory
+        }
     }
 
     /// Returns: `true` iff `this` equals `rhs`.
