@@ -8,6 +8,6 @@ license "Boost"
 
 dependency "libgmp" version="~>1.0.0"
 
-dflags "-vcolumns" "-dip25" "-dip1000" # -fPIC?
+dflags "-vcolumns" "-dip25" # "-dip1000" # -fPIC?
 
 libs "gmp" "c"
