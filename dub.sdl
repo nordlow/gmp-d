@@ -1,9 +1,13 @@
 name "gmp-d"
-description "High-level wrapper for GNU MP (GMP)"
-copyright "Per Nordlöw"
-authors "Per Nordlöw"
-dflags "-vcolumns" "-dip25" "-dip1000" # -fPIC?
 targetType "library"
+description "High-level wrapper for GNU MP (GMP)"
+
+authors "Per Nordlöw"
+copyright "Per Nordlöw"
 license "Boost"
-libs "gmp" "c"
+
 dependency "libgmp" version="~>1.0.0"
+
+dflags "-vcolumns" "-dip25" "-dip1000" # -fPIC?
+
+libs "gmp" "c"
