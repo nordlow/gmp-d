@@ -95,7 +95,7 @@ struct MpQ
 
     /** Construct from floating-point `value`.
      */
-    ref MpQ opAssign(P)(P value) @trusted /*TODO scope*/
+    ref MpQ opAssign(P)(P value) @trusted return scope
         if (isFloating!P)
     {
         version(ccc) ++_ccc;
@@ -104,7 +104,7 @@ struct MpQ
     }
 
     /** Assign from integer `value`. */
-    ref MpQ opAssign(P)(P value) @trusted /*TODO scope*/
+    ref MpQ opAssign(P)(P value) @trusted return scope
         if (isIntegral!P)
     {
         version(ccc) ++_ccc;
@@ -188,13 +188,13 @@ struct MpQ
     }
 
     /// Returns: numerator reference of `this`.
-    @property ref inout(MpZ) numerator() @trusted inout return /*TODO scope*/
+    @property ref inout(MpZ) numerator() @trusted inout return scope
     {
         return *(cast(inout(MpZ)*)_num_ptr);
     }
 
     /// Returns: denominator reference of `this`.
-    @property ref inout(MpZ) denominator() @trusted inout return /*TODO scope*/
+    @property ref inout(MpZ) denominator() @trusted inout return scope
     {
         return *(cast(inout(MpZ)*)_den_ptr);
     }
@@ -347,19 +347,19 @@ private:
     }
 
     /// Returns: pointer to internal rational C struct.
-    inout(__mpq_struct)* _ptr() inout return @system /*TODO scope*/
+    inout(__mpq_struct)* _ptr() inout return @system
     {
         return &_q;
     }
 
     /// Returns: pointer to internal numerator C struct.
-    inout(__mpz_struct)* _num_ptr() inout return @system /*TODO scope*/
+    inout(__mpz_struct)* _num_ptr() inout return @system
     {
         return cast(typeof(return))&_q._mp_num;
     }
 
     /// Returns: pointer to internal denominator C struct.
-    inout(__mpz_struct)* _den_ptr() inout return @system /*TODO scope*/
+    inout(__mpz_struct)* _den_ptr() inout return @system
     {
         return cast(typeof(return))&_q._mp_den;
     }
@@ -429,19 +429,19 @@ alias inv = inverse;
 /// construction and assignment
 @safe @nogc unittest
 {
-    Q x = null;
+    scope Q x = null;
     assert(x.numerator == 0);
     assert(x.denominator == 1);
 
-    const Q y = Q(11, 13UL);
+    scope const Q y = Q(11, 13UL);
     assert(y.numerator == 11);
     assert(y.denominator == 13);
 
-    immutable Q z = Q(7UL, 13UL);
+    scope immutable Q z = Q(7UL, 13UL);
     assert(z.numerator == 7);
     assert(z.denominator == 13);
 
-    Q w = 0.25;                 // construct from `double`
+    scope Q w = 0.25;           // construct from `double`
     assert(w.numerator == 1);
     assert(w.denominator == 4);
 
