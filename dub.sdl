@@ -6,7 +6,7 @@ authors "Per Nordlöw"
 copyright "Per Nordlöw"
 license "Boost"
 
-dependency "libgmp" version="~>1.0.0"
+# dependency "libgmp" version="~>1.0.0"
 
 dflags "-vcolumns" "-dip25" # "-dip1000" # -fPIC?
 
