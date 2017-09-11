@@ -7,7 +7,5 @@ license "BSL-1.0"
 copyright "Per Nordlöw"
 
 # dependency "libgmp" version="~>1.0.0"
-
 dflags "-vcolumns" "-dip25" # "-dip1000" # -fPIC?
-
 libs "gmp" "c"
