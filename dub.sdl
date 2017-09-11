@@ -3,7 +3,6 @@ targetType "library"
 description "High-level wrapper for GNU MP (GMP)"
 
 authors "Per Nordlöw"
-
 license "BSL-1.0"
 copyright "Per Nordlöw"
 
