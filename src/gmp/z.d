@@ -1199,8 +1199,7 @@ private:
     }
 
     /// @nogc-variant of `toStringz` with heap allocation of null-terminated C-string `stringz`.
-    pragma(inline, false)
-    char* _allocStringzCopyOf(const string value) @trusted @nogc
+    char* _allocStringzCopyOf(in char[] value) @trusted @nogc
     {
         import core.memory : pureMalloc;
         char* stringz = cast(char*)pureMalloc(value.length + 1); // maximum this many characters
