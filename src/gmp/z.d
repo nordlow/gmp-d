@@ -1216,6 +1216,12 @@ private:
         return stringz;
     }
 
+    // qualified C memory managment
+    static @trusted pragma(inline, false) extern(C) // locally `@trusted`
+    {
+        pragma(mangle, "free") void qualifiedFree(void* ptr);
+    }
+
     /// Returns: pointer to internal C struct.
     inout(__mpz_struct)* _ptr() inout return @system
     {
@@ -1223,12 +1229,6 @@ private:
     }
 
     __mpz_struct _z;            // internal libgmp C struct
-
-    // qualified C memory managment
-    static @trusted pragma(inline, false) extern(C) // locally `@trusted`
-    {
-        pragma(mangle, "free") void qualifiedFree(void* ptr);
-    }
 
     version(ccc)
     {
