@@ -1202,10 +1202,7 @@ private:
     pragma(inline, false)
     char* _allocStringzCopyOf(const string value) @trusted @nogc
     {
-        static if (__VERSION__ >= 2074)
-        {
-            import core.memory : pureMalloc;
-        }
+        import core.memory : pureMalloc;
         char* stringz = cast(char*)pureMalloc(value.length + 1); // maximum this many characters
         size_t i = 0;
         foreach (immutable char ch; value[])
