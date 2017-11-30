@@ -1259,26 +1259,6 @@ alias MpZ = _MpZ!false;
 /** Copyable MpZ. */
 alias CopyableMpZ = _MpZ!true;
 
-static if (__VERSION__ < 2074)  // backport of pureMalloc
-{
-    extern (C) private pure @system @nogc nothrow
-    {
-        pragma(mangle, "getErrno") int fakePureGetErrno();
-        pragma(mangle, "setErrno") int fakePureSetErrno(int);
-        pragma(mangle, "malloc") void* fakePureMalloc(size_t);
-    }
-    void* pureMalloc(size_t size) @trusted pure @nogc nothrow
-    {
-        const errno = fakePureGetErrno();
-        void* ret = fakePureMalloc(size);
-        if (!ret || errno != 0)
-        {
-            cast(void)fakePureSetErrno(errno);
-        }
-        return ret;
-    }
-}
-
 version(unittest) static assert(isMpZExpr!(MpZ));
 
 pure nothrow pragma(inline, true):
