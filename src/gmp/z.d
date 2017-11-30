@@ -1217,7 +1217,7 @@ private:
     }
 
     // qualified C memory managment
-    static @trusted pragma(inline, false) extern(C) // locally `@trusted`
+    static @trusted extern(C) // locally `@trusted`
     {
         pragma(mangle, "free") void qualifiedFree(void* ptr);
     }
