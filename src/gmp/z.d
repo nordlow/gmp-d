@@ -2,8 +2,7 @@
 module gmp.z;
 
 import std.algorithm.mutation : move, moveEmplace;
-import std.traits : isInstanceOf, Unsigned; // used by expression templates
-import std.typecons : Unqual;
+import std.traits : isInstanceOf, Unsigned, Unqual; // used by expression templates
 
 import gmp.traits;
 
