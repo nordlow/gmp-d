@@ -719,7 +719,7 @@ private struct _MpZ(bool copyable = false)
         }
         else static if (isUnsigned!Lhs)
         {
-            import std.typecons : Signed;
+            import std.traits : Signed;
             return cast(Signed!(typeof(return)))y;
         }
         else
