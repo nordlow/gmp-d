@@ -11,7 +11,7 @@ import std.algorithm.mutation : move, moveEmplace;
  */
 struct MpQ
 {
-    pure nothrow pragma(inline, true):
+    pure nothrow:
 
     /// Convert to `string` in base `base`.
     string toString(uint base = defaultBase,
@@ -22,6 +22,8 @@ struct MpQ
 
         assert(false, "TODO");
     }
+
+pragma(inline, true):
 
     // TODO toRCString wrapped in UniqueRange
 

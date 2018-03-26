@@ -9,3 +9,12 @@ copyright "Per Nordlöw"
 # dependency "libgmp" version="~>1.0.0"
 dflags "-vcolumns" "-dip25" # "-dip1000" # -fPIC?
 libs "gmp" "c"
+
+buildType "release" {
+         buildOptions "releaseMode" "optimize" "inline" # TODO -march=native -ffast-math
+}
+
+buildType "test-release" {
+          dflags "-unittest"
+          uildOptions "releaseMode" "optimize" "inline" # TODO -march=native -ffast-math
+}

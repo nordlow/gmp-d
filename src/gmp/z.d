@@ -24,7 +24,7 @@ enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct va
  */
 private struct _MpZ(bool copyable = false)
 {
-    pure nothrow pragma(inline, true):
+    pure nothrow:
 
     /// Convert to `string` in base `base`.
     string toString(uint base = defaultBase,
@@ -62,6 +62,8 @@ private struct _MpZ(bool copyable = false)
 
         return str;
     }
+
+pragma(inline, true):
 
     /// Returns: A unique hash of the `_MpZ` value suitable for use in a hash table.
     size_t toHash() const @trusted
