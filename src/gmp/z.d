@@ -1199,30 +1199,6 @@ private:
         return _integralAbs(_z._mp_size);
     }
 
-    /// @nogc-variant of `toStringz` with heap allocation of null-terminated C-string `stringz`.
-    char* _allocStringzCopyOf(in char[] value) @trusted @nogc
-    {
-        import core.memory : pureMalloc;
-        char* stringz = cast(char*)pureMalloc(value.length + 1); // maximum this many characters
-        size_t i = 0;
-        foreach (immutable char ch; value[])
-        {
-            if (ch != '_')
-            {
-                stringz[i] = ch;
-                i += 1;
-            }
-        }
-        stringz[i] = '\0'; // set C null terminator
-        return stringz;
-    }
-
-    // qualified C memory managment
-    static @trusted extern(C) // locally `@trusted`
-    {
-        pragma(mangle, "free") void qualifiedFree(void* ptr);
-    }
-
     /// Returns: pointer to internal C struct.
     inout(__mpz_struct)* _ptr() inout return @system
     {
@@ -1243,6 +1219,33 @@ private:
         */
         @property size_t mutatingCallCount() const @safe { return _ccc; }
         size_t _ccc;  // C mutation call count. number of calls to C GMP function calls that mutate this object
+    }
+
+    /// @nogc-variant of `toStringz` with heap allocation of null-terminated C-string `stringz`.
+    pragma(inline, false)
+    char* _allocStringzCopyOf(in char[] value) @trusted @nogc
+    {
+        import core.memory : pureMalloc;
+        char* stringz = cast(char*)pureMalloc(value.length + 1); // maximum this many characters
+        size_t i = 0;
+        foreach (immutable char ch; value[])
+        {
+            if (ch != '_')
+            {
+                stringz[i] = ch;
+                i += 1;
+            }
+        }
+        stringz[i] = '\0'; // set C null terminator
+        return stringz;
+    }
+
+    // qualified C memory managment
+    pragma(inline, false)
+    static @trusted extern(C) // locally `@trusted`
+    {
+        pragma(mangle, "free")
+        void qualifiedFree(void* ptr);
     }
 }
 
