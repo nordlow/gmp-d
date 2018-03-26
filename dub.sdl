@@ -14,7 +14,7 @@ buildType "release" {
          buildOptions "releaseMode" "optimize" "inline" # TODO -march=native -ffast-math
 }
 
-buildType "test-release" {
+buildType "release-unittest" {
           dflags "-unittest"
           uildOptions "releaseMode" "optimize" "inline" # TODO -march=native -ffast-math
 }
