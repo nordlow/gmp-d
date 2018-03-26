@@ -14,3 +14,5 @@ libgmp-d.a
 # core dumps
 core
 src/core
+
+gmp-d-test-library
