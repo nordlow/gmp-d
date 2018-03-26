@@ -63,11 +63,10 @@ private struct _MpZ(bool copyable = false)
         return str;
     }
 
-pragma(inline, true):
-
     /// Returns: A unique hash of the `_MpZ` value suitable for use in a hash table.
     size_t toHash() const @trusted
     {
+        version(LDC) pragma(inline, true);
         import core.internal.hash : hashOf;
         typeof(return) hash = _limbCount;
         foreach (immutable i; 0 .. _limbCount)
@@ -87,6 +86,7 @@ pragma(inline, true):
     // @disable this();
 
     /// Construct empty (undefined) from explicit `null`.
+    pragma(inline, true)
     this(typeof(null)) @trusted
     {
         initialize();             // TODO is there a faster way?
@@ -97,11 +97,13 @@ pragma(inline, true):
     this(Expr)(Expr expr)
         if (isLazyMpZExpr!Expr)
     {
+        version(LDC) pragma(inline, true);
         // TODO ok to just assume zero-initialized contents at `_z` before...
         this = expr;            // ...calling this.opAssign ?x
     }
 
     /** Construct from `value`. */
+    pragma(inline, true)
     this(T)(T value) @trusted
         if (isArithmetic!T)
     {
@@ -131,12 +133,14 @@ pragma(inline, true):
     static _MpZ mersennePrime(Integral)(Integral p)
         if (isIntegral!Integral)
     {
+        version(LDC) pragma(inline, true);
         return typeof(this).pow(2UL, p) - 1;
     }
 
     static if (copyable)
     {
         /// Construct copy of `value`.
+        pragma(inline, true)
         this(this) @trusted
         {
             if (_z._mp_d)
@@ -167,6 +171,7 @@ pragma(inline, true):
     }
 
     /// Swap content of `this` with `rhs`.
+    pragma(inline, true)
     void swap(ref _MpZ rhs) @safe
     {
         import std.algorithm.mutation : swap;
@@ -174,9 +179,9 @@ pragma(inline, true):
     }
 
     /// Returns: (duplicate) copy of `this`.
-    pragma(inline, false)
     _MpZ dup() const @trusted
     {
+        version(LDC) pragma(inline, true);
         typeof(return) y = void;
         __gmpz_init_set(y._ptr, _ptr); version(ccc) ++y._ccc;
         return y;
@@ -185,6 +190,7 @@ pragma(inline, true):
     /// Assign from `rhs`.
     ref _MpZ opAssign()(auto ref const _MpZ rhs) @trusted return scope
     {
+        version(LDC) pragma(inline, true);
         __gmpz_set(_ptr, rhs._ptr); version(ccc) { ++_ccc; }
         return this;
     }
@@ -192,6 +198,7 @@ pragma(inline, true):
     ref _MpZ opAssign(Expr)(auto ref Expr rhs) @trusted return scope
         if (isLazyMpZExpr!Expr)
     {
+        version(LDC) pragma(inline, true);
         static      if (isInstanceOf!(MpzAddExpr, Expr))
         {
             __gmpz_add(this._ptr,
@@ -237,6 +244,7 @@ pragma(inline, true):
     ref _MpZ opAssign(T)(T rhs) @trusted return scope
         if (isArithmetic!T)
     {
+        version(LDC) pragma(inline, true);
         assertInitialized();
         static if      (isUnsigned!T)
         {
@@ -272,6 +280,7 @@ pragma(inline, true):
     }
 
     /// Destruct `this`.
+    pragma(inline, true)
     ~this() @trusted
     {
         if (_z._mp_d)
@@ -282,9 +291,9 @@ pragma(inline, true):
     }
 
     /// Returns: `true` iff `this` equals `rhs`.
-    pragma(inline, false)
     bool opEquals()(auto ref const _MpZ rhs) const @trusted
     {
+        version(LDC) pragma(inline, true);
         if (_ptr == rhs._ptr)   // fast equality
         {
             return true;        // fast bailout
@@ -292,6 +301,7 @@ pragma(inline, true):
         return __gmpz_cmp(_ptr, rhs._ptr) == 0;
     }
     /// ditto
+    pragma(inline, true)
     bool opEquals(Rhs)(Rhs rhs) const @trusted
         if (isArithmetic!Rhs)
     {
@@ -316,6 +326,7 @@ pragma(inline, true):
     /// Compare `this` to `rhs`.
     int opCmp()(auto ref const _MpZ rhs) const @trusted
     {
+        version(LDC) pragma(inline, true);
         if (rhs == 0)
         {
             return sgn();       // optimization
@@ -323,6 +334,7 @@ pragma(inline, true):
         return __gmpz_cmp(_ptr, rhs._ptr);
     }
     /// ditto
+    pragma(inline, true)
     int opCmp(T)(T rhs) const @trusted
         if (isArithmetic!T)
     {
@@ -345,12 +357,14 @@ pragma(inline, true):
     }
 
     /// Cast to `bool`.
+    pragma(inline, true)
     bool opCast(T : bool)() const
     {
         return !isZero;
     }
 
     /// Cast to arithmetic type `T`.
+    pragma(inline, true)
     T opCast(T)() const @trusted
         if (isArithmetic!T)
     {
@@ -373,6 +387,7 @@ pragma(inline, true):
     */
     long toLong() const @trusted
     {
+        version(LDC) pragma(inline, true);
         // TODO can probably be optimized
         if (this <= long.min)
         {
@@ -393,6 +408,7 @@ pragma(inline, true):
     */
     int toInt() const @trusted
     {
+        version(LDC) pragma(inline, true);
         // TODO can probably be optimized
         if (this <= int.min)
         {
@@ -409,12 +425,12 @@ pragma(inline, true):
     }
 
     /** Returns: `this` `s` `rhs`. */
-    pragma(inline, false)
     _MpZ opBinary(string s)(auto ref const _MpZ rhs) const @trusted // direct value
         if ((s == "+" || s == "-" ||
              s == "*" || s == "/" || s == "%" ||
              s == "&" || s == "|" || s == "^"))
     {
+        version(LDC) pragma(inline, true);
         static if (!__traits(isRef, rhs)) // r-value `rhs`
         {
             _MpZ* mut_rhs = (cast(_MpZ*)(&rhs)); // @trusted because `_MpZ` has no aliased indirections
@@ -504,6 +520,7 @@ pragma(inline, true):
     }
 
     /// ditto
+    pragma(inline, true)
     _MpZ opBinary(string s, Rhs)(auto ref const Rhs rhs) const
         if (isLazyMpZExpr!Rhs && // lazy value
             (s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
@@ -516,6 +533,7 @@ pragma(inline, true):
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
             isUnsigned!Rhs)
     {
+        version(LDC) pragma(inline, true);
         typeof(return) y = null;
         version(ccc) ++y._ccc;
         static      if (s == "+")
@@ -551,6 +569,7 @@ pragma(inline, true):
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
             isSigned!Rhs)
     {
+        version(LDC) pragma(inline, true);
         typeof(return) y = null;
         version(ccc) ++y._ccc;
         static      if (s == "+")
@@ -611,6 +630,7 @@ pragma(inline, true):
         if ((s == "%") &&
             isIntegral!Rhs)
     {
+        version(LDC) pragma(inline, true);
         assert(rhs != 0, "Divison by zero");
         _MpZ y = null;
         version(ccc) ++y._ccc;
@@ -618,8 +638,8 @@ pragma(inline, true):
         {
             if (rhs < 0)        // TODO handle `rhs == rhs.min`
             {
-                immutable ulong pos_rhs = -rhs; // make it positive
-                return -cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, pos_rhs);
+                immutable ulong pos_rhs = -cast(int)rhs; // make it positive
+                return cast(typeof(return))-__gmpz_tdiv_r_ui(y._ptr, _ptr, pos_rhs);
             }
             else
             {
@@ -641,6 +661,7 @@ pragma(inline, true):
         if ((s == "+" || s == "-" || s == "*" || s == "%") &&
             isUnsigned!Lhs)
     {
+        version(LDC) pragma(inline, true);
         typeof(return) y = null;
         version(ccc) ++y._ccc;
         static      if (s == "+")
@@ -672,6 +693,7 @@ pragma(inline, true):
         if ((s == "+" || s == "-" || s == "*" || s == "%") &&
             isSigned!Lhs)
     {
+        version(LDC) pragma(inline, true);
         static if (s == "+" || s == "*")
         {
             return opBinary!s(lhs); // commutative reuse
@@ -711,6 +733,7 @@ pragma(inline, true):
         if ((s == "/") &&
             isIntegral!Lhs)
     {
+        version(LDC) pragma(inline, true);
         _MpZ y = null; // TODO avoid if !__traits(isRef, this)
         version(ccc) ++y._ccc;
         assert(this != 0, "Divison by zero");
@@ -731,6 +754,7 @@ pragma(inline, true):
     }
 
     /// Exponentation.
+    pragma(inline, true)
     _MpZ opBinaryRight(string s, Base)(Base base) const
         if ((s == "^^") &&
             isIntegral!Base)
@@ -747,6 +771,7 @@ pragma(inline, true):
              s == "*" || s == "/" || s == "%" ||
              s == "&" || s == "|" || s == "^"))
     {
+        version(LDC) pragma(inline, true);
         static      if (s == "+")
         {
             __gmpz_add(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
@@ -807,6 +832,7 @@ pragma(inline, true):
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isUnsigned!Rhs)
     {
+        version(LDC) pragma(inline, true);
         static      if (s == "+")
         {
             __gmpz_add_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
@@ -845,6 +871,7 @@ pragma(inline, true):
         if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
             isSigned!Rhs)
     {
+        version(LDC) pragma(inline, true);
         static      if (s == "+")
         {
             if (rhs < 0)        // TODO handle `rhs == rhs.min`
@@ -915,6 +942,7 @@ pragma(inline, true):
     }
 
     /// Returns: `this`.
+    pragma(inline, true)
     ref inout(_MpZ) opUnary(string s)() inout
         if (s == "+")
     {
@@ -925,6 +953,7 @@ pragma(inline, true):
     _MpZ opUnary(string s)() const
         if (s == "-")
     {
+        version(LDC) pragma(inline, true);
         typeof(return) y = this.dup;
         y.negate();
         return y;
@@ -933,6 +962,7 @@ pragma(inline, true):
     /// Returns: negation of `this`.
     _MpZ unaryMinus() const @safe
     {
+        version(LDC) pragma(inline, true);
         // pragma(msg, "memberFun:", __traits(isRef, this) ? "ref" : "non-ref", " this");
         typeof(return) y = this.dup;
         y.negate();
@@ -942,6 +972,7 @@ pragma(inline, true):
     /** Negate `this` in-place.
         Returns: `void` to make it obvious that `this` is mutated.
      */
+    pragma(inline, true)
     void negate() @safe
     {
         _z._mp_size = -_z._mp_size; // fast C macro `mpz_neg` in gmp.h
@@ -950,9 +981,9 @@ pragma(inline, true):
     /** Make `this` the absolute value of itself in-place.
         Returns: `void` to make it obvious that `this` is mutated.
      */
-    pragma(inline)              // can't be inlined with DMD
     void absolute() @trusted
     {
+        version(LDC) pragma(inline, true);
         if (isZero) { return; } // `__gmpz_abs` cannot handle default-constructed `this`
         __gmpz_abs(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
@@ -962,6 +993,7 @@ pragma(inline, true):
     */
     void onesComplement() @trusted
     {
+        version(LDC) pragma(inline, true);
         if (isZero) { return; } // `__gmpz_co` cannot handle default-constructed `this`
         __gmpz_com(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
@@ -970,6 +1002,7 @@ pragma(inline, true):
     ref _MpZ opUnary(string s)() @trusted return scope
         if (s == "++")
     {
+        version(LDC) pragma(inline, true);
         if (isDefaultConstructed) // `__gmpz_add_ui` cannot handle default-constructed `this`
         {
             __gmpz_init_set_si(_ptr, 1);
@@ -985,6 +1018,7 @@ pragma(inline, true):
     ref _MpZ opUnary(string s)() @trusted return scope
         if (s == "--")
     {
+        version(LDC) pragma(inline, true);
         if (isDefaultConstructed) // `__gmpz_sub_ui` cannot handle default-constructed `this`
         {
             __gmpz_init_set_si(_ptr, -1);
@@ -1001,6 +1035,7 @@ pragma(inline, true):
         if (isIntegral!Base &&
             isIntegral!Exp)
     {
+        version(LDC) pragma(inline, true);
         static if (isSigned!Base)
         {
             immutable bool negate = base < 0;
@@ -1033,6 +1068,7 @@ pragma(inline, true):
     }
 
     /// Returns: number of digits in base `base`.
+    pragma(inline, true)
     size_t sizeInBase(uint base) const @trusted
     {
         if (isZero)
@@ -1046,6 +1082,7 @@ pragma(inline, true):
     }
 
     /// Returns: `true` iff `this` fits in a `T`.
+    pragma(inline, true)
     bool fitsIn(T)() const @trusted
         if (isIntegral!T)
     {
@@ -1063,6 +1100,7 @@ pragma(inline, true):
         - `this` >= 0, number of 1 bits in the binary representation
         - otherwise, ???
      */
+    pragma(inline, true)
     @property mp_bitcnt_t populationCount() const @trusted
     {
         if (isZero) { return 0; } // default-constructed `this`
@@ -1071,24 +1109,28 @@ pragma(inline, true):
     alias countOnes = populationCount;
 
     /// Set bit at 0-offset index `bitIndex` (to one).
+    pragma(inline, true)
     void setBit(mp_bitcnt_t bitIndex) @trusted
     {
         __gmpz_setbit(_ptr, bitIndex);
     }
 
     /// Clear bit at 0-offset index `bitIndex` (to zero).
+    pragma(inline, true)
     void clearBit(mp_bitcnt_t bitIndex) @trusted
     {
         __gmpz_clrbit(_ptr, bitIndex);
     }
 
     /// Complement bit at 0-offset index `bitIndex` (to zero).
+    pragma(inline, true)
     void complementBit(mp_bitcnt_t bitIndex) @trusted
     {
         __gmpz_combit(_ptr, bitIndex);
     }
 
     /// Test/Get bit at 0-offset index `bitIndex`.
+    pragma(inline, true)
     bool testBit(mp_bitcnt_t bitIndex) const @trusted
     {
         return __gmpz_tstbit(_ptr, bitIndex) != 0;
@@ -1102,18 +1144,21 @@ pragma(inline, true):
         handle the case when the membere `_mp_alloc` is zero and, in turn,
         `_mp_d` is `null`.
      */
+    pragma(inline, true)
     @property bool isDefaultConstructed() const @safe
     {
         return _z._mp_alloc == 0; // fast, actually enough to just test this
     }
 
     /// Check if `this` is zero (either via default-construction or `__gmpz_...`-operations).
+    pragma(inline, true)
     @property bool isZero() const @safe
     {
         return _z._mp_size == 0; // fast
     }
 
     /// Check if `this` is odd.
+    pragma(inline, true)
     @property bool isOdd() const @safe
     {
         return ((_z._mp_alloc != 0) && // this is needed for default (zero) initialized `__mpz_structs`
@@ -1121,18 +1166,21 @@ pragma(inline, true):
     }
 
     /// Check if `this` is odd.
+    pragma(inline, true)
     @property bool isEven() const @safe
     {
         return !isOdd;            // fast C macro `mpz_even_p` in gmp.h
     }
 
     /// Check if `this` is negative.
+    pragma(inline, true)
     @property bool isNegative() const @safe
     {
         return _z._mp_size < 0; // fast
     }
 
     /// Check if `this` is positive.
+    pragma(inline, true)
     @property bool isPositive() const @safe
     {
         return !isNegative;     // fast
@@ -1143,18 +1191,21 @@ pragma(inline, true):
         -  0 (`this` == 0), or
         - +1 (`this` > 0).
      */
+    pragma(inline, true)
     @property int sgn() const @safe
     {
         return _z._mp_size < 0 ? -1 : _z._mp_size > 0; // fast C macro `mpz_sgn` in gmp.h
     }
 
     /// Number of significant `uint`s used for storing `this`.
+    pragma(inline, true)
     @property size_t uintLength() const
     {
         assert(false, "TODO use mpz_size");
     }
 
     /// Number of significant `ulong`s used for storing `this`.
+    pragma(inline, true)
     @property size_t uintLong() const
     {
         assert(false, "TODO use mpz_size");
@@ -1163,12 +1214,14 @@ pragma(inline, true):
 private:
 
     /** Initialize internal struct. */
+    pragma(inline, true)
     void initialize() // cannot be called `init` as that will override builtin type property
     {
         __gmpz_init(_ptr); version(ccc) { ++_ccc; }
     }
 
     /** Initialize internal struct if needed. */
+    pragma(inline, true)
     void assertInitialized()
     {
         if (isDefaultConstructed)
@@ -1181,12 +1234,14 @@ private:
     enum defaultBase = 10;
 
     /// Returns: evaluation of `this` expression which in this is a no-op.
+    pragma(inline, true)
     ref inout(_MpZ) eval() @safe inout return { return this; }
 
     /// Type of limb in internal representation.
     alias Limb = __mp_limb_t;   // GNU MP alias
 
     /** Returns: limbs. */
+    pragma(inline, true)
     inout(Limb)[] _limbs() inout return @system
     {
         // import std.math : abs;
@@ -1194,12 +1249,14 @@ private:
     }
 
     /// Get number of limbs in internal representation.
+    pragma(inline, true)
     @property uint _limbCount() const @safe
     {
         return _integralAbs(_z._mp_size);
     }
 
     /// Returns: pointer to internal C struct.
+    pragma(inline, true)
     inout(__mpz_struct)* _ptr() inout return @system
     {
         return &_z;
@@ -1217,6 +1274,7 @@ private:
             For instance the `x` in `x = y + z` should be assigned only once inside
             a call to `mpz_add`.
         */
+        pragma(inline, true)
         @property size_t mutatingCallCount() const @safe { return _ccc; }
         size_t _ccc;  // C mutation call count. number of calls to C GMP function calls that mutate this object
     }
@@ -1264,15 +1322,17 @@ alias CopyableMpZ = _MpZ!true;
 
 version(unittest) static assert(isMpZExpr!(MpZ));
 
-pure nothrow pragma(inline, true):
+pure nothrow:
 
 /** Instantiator for `MpZ`. */
 _MpZ!copyable mpz(bool copyable = false, Args...)(Args args) @safe
 {
+    version(LDC) pragma(inline, true);
     return typeof(return)(args);
 }
 
 /// Swap contents of `x` with contents of `y`.
+pragma(inline, true)
 void swap(bool copyable)(ref _MpZ!copyable x,
                          ref _MpZ!copyable y)
 {
@@ -1283,12 +1343,14 @@ void swap(bool copyable)(ref _MpZ!copyable x,
 /// Returns: `x` as a `string` in decimal base.
 string toDecimalString(bool copyable)(auto ref const _MpZ!copyable x) // for `std.bigint.BigInt` compatibility
 {
+    version(LDC) pragma(inline, true);
     return x.toString(10);
 }
 
 /// Returns: `x` as a uppercased `string` in hexadecimal base without any base prefix (0x).
 string toHex(bool copyable)(auto ref const _MpZ!copyable x) // for `std.bigint.BigInt` compatibility
 {
+    version(LDC) pragma(inline, true);
     return x.toString(16, true);
 }
 
@@ -1296,6 +1358,7 @@ string toHex(bool copyable)(auto ref const _MpZ!copyable x) // for `std.bigint.B
 Unsigned!T absUnsign(T, bool copyable)(auto ref const _MpZ!copyable x) // for `std.bigint.BigInt` compatibility
     if (isIntegral!T)
 {
+    version(LDC) pragma(inline, true);
     return _integralAbs(cast(T)x);
 }
 
@@ -1304,6 +1367,7 @@ Unsigned!T absUnsign(T, bool copyable)(auto ref const _MpZ!copyable x) // for `s
  */
 _MpZ!copyable abs(bool copyable)(auto ref const _MpZ!copyable x) @trusted @nogc
 {
+    version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) y = null; // must use temporary
@@ -1323,6 +1387,7 @@ _MpZ!copyable abs(bool copyable)(auto ref const _MpZ!copyable x) @trusted @nogc
 */
 _MpZ!copyable onesComplement(bool copyable)(auto ref const _MpZ!copyable x) @trusted @nogc
 {
+    version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) y = null; // must use temporary
@@ -1341,16 +1406,19 @@ _MpZ!copyable onesComplement(bool copyable)(auto ref const _MpZ!copyable x) @tru
 int cmpabs(bool copyable)(auto ref const _MpZ!copyable x,
                           auto ref const _MpZ!copyable y) @trusted @nogc
 {
+    version(LDC) pragma(inline, true);
     return __gmpz_cmpabs(x._ptr, y._ptr);
 }
 /// ditto
 int cmpabs(bool copyable)(auto ref const _MpZ!copyable x, double y) @trusted @nogc
 {
+    version(LDC) pragma(inline, true);
     return __gmpz_cmpabs_d(x._ptr, y);
 }
 /// ditto
 int cmpabs(bool copyable)(auto ref const _MpZ!copyable x, ulong y) @trusted @nogc
 {
+    version(LDC) pragma(inline, true);
     return __gmpz_cmpabs_ui(x._ptr, y);
 }
 
@@ -1359,6 +1427,7 @@ int cmpabs(bool copyable)(auto ref const _MpZ!copyable x, ulong y) @trusted @nog
 */
 _MpZ!copyable nextPrime(bool copyable)(auto ref const _MpZ!copyable x) @trusted @nogc
 {
+    version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) y = null; // must use temporary
@@ -1377,6 +1446,7 @@ _MpZ!copyable nextPrime(bool copyable)(auto ref const _MpZ!copyable x) @trusted 
 _MpZ!copyable gcd(bool copyable)(auto ref const _MpZ!copyable x,
                                  auto ref const _MpZ!copyable y) @trusted @nogc
 {
+    version(LDC) pragma(inline, true);
     static      if (!__traits(isRef, x)) // r-value `x`
     {
         typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
@@ -1400,6 +1470,7 @@ _MpZ!copyable gcd(bool copyable)(auto ref const _MpZ!copyable x,
 _MpZ!copyable gcd(bool copyable)(auto ref const _MpZ!copyable x,
                                  ulong y) @trusted @nogc
 {
+    version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) z = null;
@@ -1418,6 +1489,7 @@ _MpZ!copyable gcd(bool copyable)(auto ref const _MpZ!copyable x,
 _MpZ!copyable lcm(bool copyable)(auto ref const _MpZ!copyable x,
                                  auto ref const _MpZ!copyable y) @trusted @nogc
 {
+    version(LDC) pragma(inline, true);
     static      if (!__traits(isRef, x)) // r-value `x`
     {
         typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
@@ -1441,6 +1513,7 @@ _MpZ!copyable lcm(bool copyable)(auto ref const _MpZ!copyable x,
 _MpZ!copyable lcm(bool copyable)(auto ref const _MpZ!copyable x,
                                  ulong y) @trusted @nogc
 {
+    version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) z = null;
@@ -1462,6 +1535,7 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
                                   auto ref const _MpZ!copyable exp,
                                   auto ref const _MpZ!copyable mod) @trusted
 {
+    version(LDC) pragma(inline, true);
     typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
     assert(exp >= 0, "Negative exponent");
     __gmpz_powm(y._ptr, base._ptr, exp._ptr, mod._ptr); version(ccc) ++y._ccc;
@@ -1472,6 +1546,7 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
                                   ulong exp,
                                   auto ref const _MpZ!copyable mod) @trusted
 {
+    version(LDC) pragma(inline, true);
     typeof(return) y = 0;       // result, TODO reuse `exp` or `mod` if any is an r-value
     __gmpz_powm_ui(y._ptr, base._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
     return y;
@@ -2366,8 +2441,8 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
 
         static assert(is(typeof(x % l)  == long));
         static assert(is(typeof(x % i)  == int));
-        static assert(is(typeof(x % s)  == short));
-        static assert(is(typeof(x % b)  == byte));
+        // TODO static assert(is(typeof(x % s)  == short));
+        // TODO static assert(is(typeof(x % b)  == byte));
 
         assert(x % ul == 500);
         assert(x % ui == 500);
@@ -2565,9 +2640,9 @@ struct MpzAddExpr(T1, T2)
 {
     T1 e1;                      // first term
     T2 e2;                      // second term
-    pragma(inline, true)
     MpZ eval() const @trusted
     {
+        version(LDC) pragma(inline, true);
         typeof(return) y = null;
         __gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
         return y;
@@ -2576,6 +2651,7 @@ struct MpzAddExpr(T1, T2)
 version(unittest) static assert(isMpZExpr!(MpzAddExpr!(MpZ, MpZ)));
 
 /// Instantiator for `MpzAddExpr`.
+pragma(inline, true)
 MpzAddExpr!(T1, T2) mpzAddExpr(T1, T2)(T1 t1, T2 t2)
     if (isMpZExpr!T1 &&
         isMpZExpr!T2)
@@ -2606,9 +2682,9 @@ struct MpzSubExpr(T1, T2)
 {
     T1 e1;                      // first term
     T2 e2;                      // second term
-    pragma(inline, true)
     MpZ eval() const @trusted
     {
+        version(LDC) pragma(inline, true);
         typeof(return) y = null;
         __gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
         return y;
@@ -2631,9 +2707,9 @@ struct MpzMulExpr(F1, F2)
 {
     F1 e1;                      // first factor
     F2 e2;                      // second factor
-    pragma(inline, true)
     MpZ eval() const @trusted
     {
+        version(LDC) pragma(inline, true);
         typeof(return) y = null;
         __gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
         return y;
@@ -2657,9 +2733,9 @@ struct MpzDivExpr(P, Q)
 {
     P e1;                       // divisor
     Q e2;                       // dividend
-    pragma(inline, true)
     MpZ eval() const @trusted
     {
+        version(LDC) pragma(inline, true);
         typeof(return) y = null;
         __gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
         return y;
@@ -2686,9 +2762,9 @@ struct MpzModExpr(P, Q)
 {
     P e1;                       // divisor
     Q e2;                       // dividend
-    pragma(inline, true)
     MpZ eval() const @trusted
     {
+        version(LDC) pragma(inline, true);
         typeof(return) y = null;
         __gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
         return y;
@@ -2715,9 +2791,9 @@ struct MpzPowUExpr(P, Q)
 {
     P e1;                       // base
     Q e2;                       // exponent
-    pragma(inline, true)
     MpZ eval() const @trusted
     {
+        version(LDC) pragma(inline, true);
         typeof(return) y = null;
         __gmpz_pow_ui(y._ptr, e1.eval()._ptr, e2); version(ccc) ++y._ccc;
         return y;
@@ -2739,9 +2815,9 @@ struct MpzPowMUExpr(P, Q, M)
     P base;                     // base
     Q exp;                      // exponent
     M mod;                      // modulo
-    pragma(inline, true)
     MpZ eval() const @trusted
     {
+        version(LDC) pragma(inline, true);
         typeof(return) y = null;
         __gmpz_powm_ui(y._ptr, base.eval()._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
         return y;
@@ -2759,9 +2835,9 @@ struct MpzNegExpr(A)
     if (isMpZExpr!A)
 {
     A e1;
-    pragma(inline, true)
     MpZ eval() const @trusted
     {
+        version(LDC) pragma(inline, true);
         typeof(return) y = null;
         __gmpz_neg(y._ptr, e1.eval()._ptr); version(ccc) ++y._ccc;
         return y;
@@ -2779,6 +2855,7 @@ version(unittest) static assert(isMpZExpr!(MpzNegExpr!(MpZ)));
 }
 
 /// Copied from `std.numeric` to prevent unnecessary Phobos deps.
+pragma(inline, true)
 T _integralAbs(T)(T x)
     if (isIntegral!T)
 {
