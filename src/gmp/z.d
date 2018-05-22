@@ -1552,6 +1552,21 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
     return y;
 }
 
+/** Returns: `base` ^^ `-1` (modulo `mod`).
+    Parameter `exp` must be positive.
+*/
+_MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
+                                               auto ref const _MpZ!copyable mod) @trusted
+{
+    version(LDC) pragma(inline, true);
+    typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
+    auto success = __gmpz_invert(y._ptr, base._ptr, mod._ptr);
+    assert(success >= 0, "cannot invert input");
+    version(ccc) ++y._ccc;
+    return y;
+}
+
+
 /// default construction
 @safe nothrow @nogc unittest
 {
@@ -2171,6 +2186,9 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
     assert(2.Z.powm(8, 8.Z) == 0.Z);
     assert(2.Z.powm(3, 16.Z) == 8.Z);
     assert(3.Z.powm(3, 16.Z) == 11.Z);
+
+    // Modular multiplicative inverse
+    assert(3.Z.invert(26.Z) == 9.Z);
 
     // bitwise and, or and xor
 
@@ -3013,6 +3031,8 @@ extern(C) pragma(inline, false)
 
     void __gmpz_powm (mpz_ptr, mpz_srcptr, mpz_srcptr, mpz_srcptr);
     void __gmpz_powm_ui (mpz_ptr, mpz_srcptr, ulong, mpz_srcptr);
+
+    int __gmpz_invert (mpz_ptr, mpz_srcptr, mpz_srcptr);
 
     ulong __gmpz_get_ui (mpz_srcptr);
     long __gmpz_get_si (mpz_srcptr);
