@@ -95,7 +95,7 @@ private struct _MpZ(bool copyable = false)
 
     /// Construct from expression `expr`.
     this(Expr)(Expr expr)
-        if (isLazyMpZExpr!Expr)
+    if (isLazyMpZExpr!Expr)
     {
         version(LDC) pragma(inline, true);
         // TODO ok to just assume zero-initialized contents at `_z` before...
@@ -105,7 +105,7 @@ private struct _MpZ(bool copyable = false)
     /** Construct from `value`. */
     pragma(inline, true)
     this(T)(T value) @trusted
-        if (isArithmetic!T)
+    if (isArithmetic!T)
     {
         version(ccc) { ++_ccc; }
         static      if (isUnsigned!T)
@@ -131,7 +131,7 @@ private struct _MpZ(bool copyable = false)
 
     /// Returns: the Mersenne prime, M(p) = 2 ^^ p - 1
     static _MpZ mersennePrime(Integral)(Integral p)
-        if (isIntegral!Integral)
+    if (isIntegral!Integral)
     {
         version(LDC) pragma(inline, true);
         return typeof(this).pow(2UL, p) - 1;
@@ -196,7 +196,7 @@ private struct _MpZ(bool copyable = false)
     }
     /// ditto
     ref _MpZ opAssign(Expr)(auto ref Expr rhs) @trusted return scope
-        if (isLazyMpZExpr!Expr)
+    if (isLazyMpZExpr!Expr)
     {
         version(LDC) pragma(inline, true);
         static      if (isInstanceOf!(MpzAddExpr, Expr))
@@ -242,7 +242,7 @@ private struct _MpZ(bool copyable = false)
     }
     /// ditto
     ref _MpZ opAssign(T)(T rhs) @trusted return scope
-        if (isArithmetic!T)
+    if (isArithmetic!T)
     {
         version(LDC) pragma(inline, true);
         assertInitialized();
@@ -303,7 +303,7 @@ private struct _MpZ(bool copyable = false)
     /// ditto
     pragma(inline, true)
     bool opEquals(Rhs)(Rhs rhs) const @trusted
-        if (isArithmetic!Rhs)
+    if (isArithmetic!Rhs)
     {
         if (rhs == 0)
         {
@@ -336,7 +336,7 @@ private struct _MpZ(bool copyable = false)
     /// ditto
     pragma(inline, true)
     int opCmp(T)(T rhs) const @trusted
-        if (isArithmetic!T)
+    if (isArithmetic!T)
     {
         if (rhs == 0)
         {
@@ -366,7 +366,7 @@ private struct _MpZ(bool copyable = false)
     /// Cast to arithmetic type `T`.
     pragma(inline, true)
     T opCast(T)() const @trusted
-        if (isArithmetic!T)
+    if (isArithmetic!T)
     {
         static      if (isUnsigned!T)
         {
@@ -426,9 +426,9 @@ private struct _MpZ(bool copyable = false)
 
     /** Returns: `this` `s` `rhs`. */
     _MpZ opBinary(string s)(auto ref const _MpZ rhs) const @trusted // direct value
-        if ((s == "+" || s == "-" ||
-             s == "*" || s == "/" || s == "%" ||
-             s == "&" || s == "|" || s == "^"))
+    if ((s == "+" || s == "-" ||
+         s == "*" || s == "/" || s == "%" ||
+         s == "&" || s == "|" || s == "^"))
     {
         version(LDC) pragma(inline, true);
         static if (!__traits(isRef, rhs)) // r-value `rhs`
@@ -522,16 +522,16 @@ private struct _MpZ(bool copyable = false)
     /// ditto
     pragma(inline, true)
     _MpZ opBinary(string s, Rhs)(auto ref const Rhs rhs) const
-        if (isLazyMpZExpr!Rhs && // lazy value
-            (s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
+    if (isLazyMpZExpr!Rhs && // lazy value
+        (s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
         static assert(false, "TODO");
     }
 
     /// ditto
     _MpZ opBinary(string s, Rhs)(Rhs rhs) const @trusted
-        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
-            isUnsigned!Rhs)
+    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
+        isUnsigned!Rhs)
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
@@ -566,8 +566,8 @@ private struct _MpZ(bool copyable = false)
 
     /// ditto
     _MpZ opBinary(string s, Rhs)(Rhs rhs) const @trusted
-        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
-            isSigned!Rhs)
+    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
+        isSigned!Rhs)
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
@@ -627,8 +627,8 @@ private struct _MpZ(bool copyable = false)
 
     /// Remainer propagates modulus type.
     Unqual!Rhs opBinary(string s, Rhs)(Rhs rhs) const @trusted
-        if ((s == "%") &&
-            isIntegral!Rhs)
+    if ((s == "%") &&
+        isIntegral!Rhs)
     {
         version(LDC) pragma(inline, true);
         assert(rhs != 0, "Divison by zero");
@@ -658,8 +658,8 @@ private struct _MpZ(bool copyable = false)
 
     /// Returns: an unsigned type `lhs` divided by `this`.
     _MpZ opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
-        if ((s == "+" || s == "-" || s == "*" || s == "%") &&
-            isUnsigned!Lhs)
+    if ((s == "+" || s == "-" || s == "*" || s == "%") &&
+        isUnsigned!Lhs)
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
@@ -690,8 +690,8 @@ private struct _MpZ(bool copyable = false)
 
     /// Returns: a signed type `lhs` divided by `this`.
     _MpZ opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
-        if ((s == "+" || s == "-" || s == "*" || s == "%") &&
-            isSigned!Lhs)
+    if ((s == "+" || s == "-" || s == "*" || s == "%") &&
+        isSigned!Lhs)
     {
         version(LDC) pragma(inline, true);
         static if (s == "+" || s == "*")
@@ -730,8 +730,8 @@ private struct _MpZ(bool copyable = false)
 
     /// Dividend propagates quotient type to signed.
     Unqual!Lhs opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
-        if ((s == "/") &&
-            isIntegral!Lhs)
+    if ((s == "/") &&
+        isIntegral!Lhs)
     {
         version(LDC) pragma(inline, true);
         _MpZ y = null; // TODO avoid if !__traits(isRef, this)
@@ -756,8 +756,8 @@ private struct _MpZ(bool copyable = false)
     /// Exponentation.
     pragma(inline, true)
     _MpZ opBinaryRight(string s, Base)(Base base) const
-        if ((s == "^^") &&
-            isIntegral!Base)
+    if ((s == "^^") &&
+        isIntegral!Base)
     {
         static assert(false, "Convert `this _MpZ` exponent to `ulong` and calculate power via static method `pow()`");
         // _MpZ exp = null;
@@ -767,9 +767,9 @@ private struct _MpZ(bool copyable = false)
 
     /// Operate-assign to `this` from `rhs`.
     ref _MpZ opOpAssign(string s)(auto ref const _MpZ rhs) @trusted return scope
-        if ((s == "+" || s == "-" ||
-             s == "*" || s == "/" || s == "%" ||
-             s == "&" || s == "|" || s == "^"))
+    if ((s == "+" || s == "-" ||
+         s == "*" || s == "/" || s == "%" ||
+         s == "&" || s == "|" || s == "^"))
     {
         version(LDC) pragma(inline, true);
         static      if (s == "+")
@@ -829,8 +829,8 @@ private struct _MpZ(bool copyable = false)
 
     /// ditto
     ref _MpZ opOpAssign(string s, Rhs)(Rhs rhs) @trusted return scope
-        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
-            isUnsigned!Rhs)
+    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
+        isUnsigned!Rhs)
     {
         version(LDC) pragma(inline, true);
         static      if (s == "+")
@@ -868,8 +868,8 @@ private struct _MpZ(bool copyable = false)
 
     /// ditto
     ref _MpZ opOpAssign(string s, Rhs)(Rhs rhs) @trusted return scope
-        if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
-            isSigned!Rhs)
+    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
+        isSigned!Rhs)
     {
         version(LDC) pragma(inline, true);
         static      if (s == "+")
@@ -944,14 +944,14 @@ private struct _MpZ(bool copyable = false)
     /// Returns: `this`.
     pragma(inline, true)
     ref inout(_MpZ) opUnary(string s)() inout
-        if (s == "+")
+    if (s == "+")
     {
         return this;
     }
 
     /// Returns: negation of `this`.
     _MpZ opUnary(string s)() const
-        if (s == "-")
+    if (s == "-")
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = this.dup;
@@ -1000,7 +1000,7 @@ private struct _MpZ(bool copyable = false)
 
     /// Increase `this` by one.
     ref _MpZ opUnary(string s)() @trusted return scope
-        if (s == "++")
+    if (s == "++")
     {
         version(LDC) pragma(inline, true);
         if (isDefaultConstructed) // `__gmpz_add_ui` cannot handle default-constructed `this`
@@ -1016,7 +1016,7 @@ private struct _MpZ(bool copyable = false)
 
     /// Decrease `this` by one.
     ref _MpZ opUnary(string s)() @trusted return scope
-        if (s == "--")
+    if (s == "--")
     {
         version(LDC) pragma(inline, true);
         if (isDefaultConstructed) // `__gmpz_sub_ui` cannot handle default-constructed `this`
@@ -1032,8 +1032,8 @@ private struct _MpZ(bool copyable = false)
 
     /// Returns: `base` raised to the power of `exp`.
     static typeof(this) pow(Base, Exp)(Base base, Exp exp) @trusted
-        if (isIntegral!Base &&
-            isIntegral!Exp)
+    if (isIntegral!Base &&
+        isIntegral!Exp)
     {
         version(LDC) pragma(inline, true);
         static if (isSigned!Base)
@@ -1084,7 +1084,7 @@ private struct _MpZ(bool copyable = false)
     /// Returns: `true` iff `this` fits in a `T`.
     pragma(inline, true)
     bool fitsIn(T)() const @trusted
-        if (isIntegral!T)
+    if (isIntegral!T)
     {
         if (isZero) { return true; } // default-constructed `this`
         static      if (is(T == ulong))  { return __gmpz_fits_ulong_p(_ptr) != 0; }
@@ -1356,7 +1356,7 @@ string toHex(bool copyable)(auto ref const _MpZ!copyable x) // for `std.bigint.B
 
 /// Returns: the absolute value of `x` converted to the corresponding unsigned type.
 Unsigned!T absUnsign(T, bool copyable)(auto ref const _MpZ!copyable x) // for `std.bigint.BigInt` compatibility
-    if (isIntegral!T)
+if (isIntegral!T)
 {
     version(LDC) pragma(inline, true);
     return _integralAbs(cast(T)x);
@@ -2635,8 +2635,8 @@ pure @nogc unittest
 
 /// `MpZ`-`MpZ` adding expression.
 struct MpzAddExpr(T1, T2)
-    if (isMpZExpr!T1 &&
-        isMpZExpr!T2)
+if (isMpZExpr!T1 &&
+    isMpZExpr!T2)
 {
     T1 e1;                      // first term
     T2 e2;                      // second term
@@ -2653,8 +2653,8 @@ version(unittest) static assert(isMpZExpr!(MpzAddExpr!(MpZ, MpZ)));
 /// Instantiator for `MpzAddExpr`.
 pragma(inline, true)
 MpzAddExpr!(T1, T2) mpzAddExpr(T1, T2)(T1 t1, T2 t2)
-    if (isMpZExpr!T1 &&
-        isMpZExpr!T2)
+if (isMpZExpr!T1 &&
+    isMpZExpr!T2)
 {
     // TODO don't eval certain type combinations of t1 and t2
     return MpzAddExpr!(T1, T2)(t1.eval(), t2.eval());
@@ -2677,8 +2677,8 @@ MpzAddExpr!(T1, T2) mpzAddExpr(T1, T2)(T1 t1, T2 t2)
 
 /// `MpZ`-`MpZ` subtraction expression.
 struct MpzSubExpr(T1, T2)
-    if (isMpZExpr!T1 &&
-        isMpZExpr!T2)
+if (isMpZExpr!T1 &&
+    isMpZExpr!T2)
 {
     T1 e1;                      // first term
     T2 e2;                      // second term
@@ -2702,8 +2702,8 @@ version(unittest) static assert(isMpZExpr!(MpzSubExpr!(MpZ, MpZ)));
 
 /// `MpZ`-`MpZ` multiplication expression.
 struct MpzMulExpr(F1, F2)
-    if (isMpZExpr!F1 &&
-        isMpZExpr!F2)
+if (isMpZExpr!F1 &&
+    isMpZExpr!F2)
 {
     F1 e1;                      // first factor
     F2 e2;                      // second factor
@@ -2728,8 +2728,8 @@ version(unittest) static assert(isMpZExpr!(MpzMulExpr!(MpZ, MpZ)));
 
 /// `MpZ`-`MpZ` division expression.
 struct MpzDivExpr(P, Q)
-    if (isMpZExpr!P &&
-        isMpZExpr!Q)
+if (isMpZExpr!P &&
+    isMpZExpr!Q)
 {
     P e1;                       // divisor
     Q e2;                       // dividend
@@ -2757,8 +2757,8 @@ version(unittest) static assert(isMpZExpr!(MpzDivExpr!(MpZ, MpZ)));
 
 /// `MpZ`-`MpZ` modulus expression.
 struct MpzModExpr(P, Q)
-    if (isMpZExpr!P &&
-        isMpZExpr!Q)
+if (isMpZExpr!P &&
+    isMpZExpr!Q)
 {
     P e1;                       // divisor
     Q e2;                       // dividend
@@ -2786,8 +2786,8 @@ version(unittest) static assert(isMpZExpr!(MpzModExpr!(MpZ, MpZ)));
 
 /// `MpZ`-`ulong` power expression.
 struct MpzPowUExpr(P, Q)
-    if (isMpZExpr!P &&
-        isUnsigned!Q)
+if (isMpZExpr!P &&
+    isUnsigned!Q)
 {
     P e1;                       // base
     Q e2;                       // exponent
@@ -2808,9 +2808,9 @@ version(unittest) static assert(isMpZExpr!(MpzPowUExpr!(MpZ, ulong)));
 
 /// `MpZ`-`ulong`-`MpZ` power-modulo expression.
 struct MpzPowMUExpr(P, Q, M)
-    if (isMpZExpr!P &&
-        isUnsigned!Q &&
-        isMpZExpr!M)
+if (isMpZExpr!P &&
+    isUnsigned!Q &&
+    isMpZExpr!M)
 {
     P base;                     // base
     Q exp;                      // exponent
@@ -2832,7 +2832,7 @@ version(unittest) static assert(isMpZExpr!(MpzPowMUExpr!(MpZ, ulong, MpZ)));
 
 /// `MpZ` negation expression.
 struct MpzNegExpr(A)
-    if (isMpZExpr!A)
+if (isMpZExpr!A)
 {
     A e1;
     MpZ eval() const @trusted
@@ -2857,7 +2857,7 @@ version(unittest) static assert(isMpZExpr!(MpzNegExpr!(MpZ)));
 /// Copied from `std.numeric` to prevent unnecessary Phobos deps.
 pragma(inline, true)
 T _integralAbs(T)(T x)
-    if (isIntegral!T)
+if (isIntegral!T)
 {
     return x >= 0 ? x : -x;
 }
