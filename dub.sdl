@@ -18,7 +18,12 @@ buildType "release" {
          buildOptions "releaseMode" "optimize" "inline" # TODO -march=native -ffast-math
 }
 
+buildType "sanitized-unittest" {
+         buildOptions "unittests" "debugMode" "debugInfo"
+         dflags "-fsanitize=address" platform="posix-ldc"
+}
+
 buildType "release-unittest" {
-          dflags "-unittest"
-          uildOptions "releaseMode" "optimize" "inline" # TODO -march=native -ffast-math
+         buildOptions "releaseMode" "optimize" "inline" # TODO -march=native -ffast-math
+         dflags "-unittest"
 }
