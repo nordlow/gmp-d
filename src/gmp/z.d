@@ -931,7 +931,7 @@ private struct _MpZ(bool copyable = false)
         }
         else static if (s == "^^")
         {
-            assert(rhs >= 0, "Negative power exponent");
+            assert(rhs >= 0, "Negative exponent");
             __gmpz_pow_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
         }
         else
