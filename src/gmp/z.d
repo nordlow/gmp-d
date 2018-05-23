@@ -1561,6 +1561,7 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
                                     auto ref const _MpZ!copyable mod) @trusted
 {
     version(LDC) pragma(inline, true);
+    assert(mod != 0, "Zero modulus");
     static if (!__traits(isRef, base)) // r-value `base`
     {
         typeof(return)* mut_base = (cast(typeof(return)*)(&base)); // @trusted because `MpZ` has no aliased indirections
