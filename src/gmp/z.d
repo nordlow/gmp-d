@@ -1537,6 +1537,7 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
                                   auto ref const _MpZ!copyable mod) @trusted
 {
     version(LDC) pragma(inline, true);
+    assert(mod != 0, "Zero modulus");
     typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
     assert(exp >= 0, "Negative exponent");
     __gmpz_powm(y._ptr, base._ptr, exp._ptr, mod._ptr); version(ccc) ++y._ccc;
@@ -1548,6 +1549,7 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
                                   auto ref const _MpZ!copyable mod) @trusted
 {
     version(LDC) pragma(inline, true);
+    assert(mod != 0, "Zero modulus");
     typeof(return) y = 0;       // result, TODO reuse `exp` or `mod` if any is an r-value
     __gmpz_powm_ui(y._ptr, base._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
     return y;
