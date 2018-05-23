@@ -1049,7 +1049,7 @@ private struct _MpZ(bool copyable = false)
 
         static if (isSigned!Exp)
         {
-            assert(exp >= 0, "Negative power exponent"); // TODO return mpq?
+            assert(exp >= 0, "Negative exponent"); // TODO return mpq?
             immutable uexp = cast(ulong)exp;
         }
         else
