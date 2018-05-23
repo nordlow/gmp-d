@@ -2207,6 +2207,7 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
 
     // modular multiplicative inverse
     assert(3.Z.invert(26.Z) == 9.Z); // r-value `base`
+    assert(3.Z.invert(-26.Z) == 9.Z); // r-value `base`
     {
         auto base = 3.Z;
         assert(base.invert(26.Z) == 9.Z); // l-value `base` and r-value `mod`
