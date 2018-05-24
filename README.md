@@ -107,7 +107,7 @@ C++-style [expression
 templates](https://en.wikipedia.org/wiki/Expression_templates) to realize lazy
 evaluation in operator overloading. If this limitation were to be fixed
 (probably via some introspection mechanism other than the trait `isRef` or
-non-member operator overloading), this library could implement lowering of
+non-`struct`-member operator overloading), this library could implement lowering of
 expressions such
 
 ```D
