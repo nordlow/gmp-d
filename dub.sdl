@@ -11,7 +11,7 @@ dflags "-vcolumns" "-dip25" # "-dip1000" # -fPIC?
 libs "gmp" "c"
 
 # use better linker
-dflags "-Xcc=-fuse-ld=gold" platform="posix-ldc" # use GNU gold linker
+dflags "-Xcc=-fuse-ld=gold" platform="linux-ldc" # use GNU gold linker
 # TODO benchmark LDC's new -link-internally
 
 buildType "release" {
