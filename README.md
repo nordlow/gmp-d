@@ -102,12 +102,12 @@ GNU GMP.
 ## Limitations
 
 Note that D's `__traits(isRef)` currently cannot be used to distinguish l-value
-from r-value passing of `this` (it should). This severly limits the
-possibilities of using
-C++-style
-[expression templates](https://en.wikipedia.org/wiki/Expression_templates) to
-realize lazy evaluation in operator overloading. If this limitation were to be
-fixed, this library could implement lowering of expressions such
+from r-value passing of `this` (to make that possible some other introspection
+mechanism needs to be added to the language and compiler). This severly limits
+the possibilities of using C++-style [expression
+templates](https://en.wikipedia.org/wiki/Expression_templates) to realize lazy
+evaluation in operator overloading. If this limitation were to be fixed, this
+library could implement lowering of expressions such
 
 ```D
 Z result = base^^exp % modulo
