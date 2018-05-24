@@ -15,6 +15,18 @@ enum isMpZExpr(T) = (is(Unqual!(typeof(T.eval())) == MpZ)); // which returns an 
 enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct value
                          isMpZExpr!T);
 
+enum Endianess {
+    host = 0,
+    bigEndian = 1,
+    littleEndian = -1,
+};
+
+enum WordOrder {
+    first = 1,
+    last = -1,
+};
+
+
 // TODO use these imports instead of the ones below
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
@@ -1081,6 +1093,23 @@ private struct _MpZ(bool copyable = false)
         }
     }
 
+    /** Exports to arbitrary words of binary data into `rop`. It's format defined by:
+        - `order`: the most significant word `first` or `last` for least significant first
+        - `size` in bytes of each word
+        - `endian` can be `bigEndian`, `littleEndian` or `host` default
+        - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
+
+        Returns: the number of words produced
+     */
+    pragma(inline, true)
+    size_t convert(void* rop, WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
+    {
+        assert(rop, "rop undefined");
+        size_t count;
+        __gmpz_export(rop, &count, order, size, endian, nails, _ptr);
+        return count;
+    }
+
     /// Returns: `true` iff `this` fits in a `T`.
     pragma(inline, true)
     bool fitsIn(T)() const @trusted
@@ -1760,6 +1789,17 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
     assert(mpz(-42).absUnsign!ulong == 42);
     assert(mpz( 42).absUnsign!ulong == 42);
 }
+
+///
+@nogc unittest
+{
+    ubyte[int.sizeof] storage;
+    assert(storage[0] == 0);
+    auto count = 2.Z.convert(storage.ptr, WordOrder.first, 1, Endianess.littleEndian, 0);
+    assert(count == 1);
+    assert(storage[0] == 2);
+}
+
 
 /// opBinary with r-value right-hand-side
 @safe @nogc unittest
@@ -3059,6 +3099,7 @@ extern(C) pragma(inline, false)
 
     char *__gmpz_get_str (char*, int, mpz_srcptr);
     size_t __gmpz_sizeinbase (mpz_srcptr, int);
+    void *__gmpz_export (void* , size_t*, int, size_t, int, size_t, mpz_srcptr);
 
     void __gmpz_powm (mpz_ptr, mpz_srcptr, mpz_srcptr, mpz_srcptr);
     void __gmpz_powm_ui (mpz_ptr, mpz_srcptr, ulong, mpz_srcptr);
