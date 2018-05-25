@@ -1106,6 +1106,11 @@ private struct _MpZ(bool copyable = false)
     {
         assert(rop, "rop undefined");
         size_t count;
+        debug {
+            auto numb = 8*size - nails;
+            size_t bytes_required = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
+            assert(T.sizeof*rop.length < bytes_required, "rop has no enough space pre-allocated");
+        }
         __gmpz_export(rop.ptr, &count, order, size, endian, nails, _ptr);
         return count;
     }
