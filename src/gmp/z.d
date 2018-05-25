@@ -1102,11 +1102,11 @@ private struct _MpZ(bool copyable = false)
         Returns: the number of words produced
      */
     pragma(inline, true)
-    size_t convert(void* rop, WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
+    size_t convert(T)(T[] rop, WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
     {
         assert(rop, "rop undefined");
         size_t count;
-        __gmpz_export(rop, &count, order, size, endian, nails, _ptr);
+        __gmpz_export(rop.ptr, &count, order, size, endian, nails, _ptr);
         return count;
     }
 
