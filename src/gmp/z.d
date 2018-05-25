@@ -1093,13 +1093,13 @@ private struct _MpZ(bool copyable = false)
         }
     }
 
-    /** Exports to arbitrary words of binary data into `rop` array. It's format defined by:
+    /** Exports to arbitrary words of binary data into `rop` pre-allocated slice. It's format defined by:
         - `order`: the most significant word `first` or `last` for least significant first
         - `size` in bytes of each word
         - `endian` can be `bigEndian`, `littleEndian` or `host` default
         - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
 
-        Returns: the number of words produced
+        Returns: the (sub-)slice with the number of words produced
      */
     pragma(inline, true)
     T[] convert(T)(T[] rop, WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
@@ -1107,13 +1107,31 @@ private struct _MpZ(bool copyable = false)
         assert(rop, "rop undefined");
         size_t count;
         debug {
-            auto numb = 8*size - nails;
-            size_t bytes_required = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
-            assert(T.sizeof*rop.length >= count *bytes_required, "rop has no enough space pre-allocated");
+            auto numb = 8 * size - nails;
+            size_t items = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
+            assert(T.sizeof * rop.length >= items * size , "rop has no enough space pre-allocated");
         }
         __gmpz_export(rop.ptr, &count, order, size, endian, nails, _ptr);
         return rop[0 .. count];
     }
+
+    /** Allocates slice and exports to it arbitrary words of binary data into . It's format defined by:
+        - `order`: the most significant word `first` or `last` for least significant first
+        - `endian` can be `bigEndian`, `littleEndian` or `host` default
+        - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
+
+        Returns: the new slice with the number of words produced
+     */
+    pragma(inline, true)
+    T[] convert(T)(WordOrder order, Endianess endian, size_t nails) const @trusted
+    {
+        T[] rop;
+        auto numb = 8 * T.sizeof - nails;
+        size_t count = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
+        rop.length = count;
+        return convert(T)(rop, order, T.sizeof, endian, nails);
+    }
+
 
     /// Returns: `true` iff `this` fits in a `T`.
     pragma(inline, true)
@@ -1803,6 +1821,9 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
     assert(storage[0] == 0);
     auto storage2 =  2.Z.convert(storage, WordOrder.first, 1, Endianess.littleEndian, 0);
     assert(storage2.ptr == storage.ptr);
+    assert(storage2 == expected);
+
+    ubyte[] storage3 = 2.Z.convert!(ubyte)(WordOrder.first, Endianess.littleEndian, 0);
     assert(storage2 == expected);
 }
 
