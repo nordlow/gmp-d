@@ -1093,7 +1093,7 @@ private struct _MpZ(bool copyable = false)
         }
     }
 
-    /** Exports to arbitrary words of binary data into `rop`. It's format defined by:
+    /** Exports to arbitrary words of binary data into `rop` array. It's format defined by:
         - `order`: the most significant word `first` or `last` for least significant first
         - `size` in bytes of each word
         - `endian` can be `bigEndian`, `littleEndian` or `host` default
@@ -1102,17 +1102,17 @@ private struct _MpZ(bool copyable = false)
         Returns: the number of words produced
      */
     pragma(inline, true)
-    size_t convert(T)(T[] rop, WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
+    T[] convert(T)(T[] rop, WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
     {
         assert(rop, "rop undefined");
         size_t count;
         debug {
             auto numb = 8*size - nails;
             size_t bytes_required = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
-            assert(T.sizeof*rop.length < bytes_required, "rop has no enough space pre-allocated");
+            assert(T.sizeof*rop.length >= count *bytes_required, "rop has no enough space pre-allocated");
         }
         __gmpz_export(rop.ptr, &count, order, size, endian, nails, _ptr);
-        return count;
+        return rop[0 .. count];
     }
 
     /// Returns: `true` iff `this` fits in a `T`.
@@ -1799,10 +1799,11 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
 @nogc unittest
 {
     ubyte[int.sizeof] storage;
+    ubyte[1] expected = [2];
     assert(storage[0] == 0);
-    auto count = 2.Z.convert(storage.ptr, WordOrder.first, 1, Endianess.littleEndian, 0);
-    assert(count == 1);
-    assert(storage[0] == 2);
+    auto storage2 =  2.Z.convert(storage, WordOrder.first, 1, Endianess.littleEndian, 0);
+    assert(storage2.ptr == storage.ptr);
+    assert(storage2 == expected);
 }
 
 
