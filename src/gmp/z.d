@@ -16,14 +16,14 @@ enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct va
                          isMpZExpr!T);
 
 enum Endianess {
-    host = 0,
-    bigEndian = 1,
-    littleEndian = -1,
+    host,
+    bigEndian,
+    littleEndian,
 };
 
 enum WordOrder {
-    first = 1,
-    last = -1,
+    mostSignificantWordFirst,
+    leastSignificantWordFirst,
 };
 
 
@@ -1128,7 +1128,21 @@ private struct _MpZ(bool copyable = false)
             size_t items = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
             assert(T.sizeof * rop.length >= items * size , "rop has no enough space pre-allocated");
         }
-        __gmpz_export(rop.ptr, &count, order, size, endian, nails, _ptr);
+
+        int realOrder;
+        final switch(order) {
+            case WordOrder.mostSignificantWordFirst:  realOrder = 1;  break;
+            case WordOrder.leastSignificantWordFirst: realOrder = -1; break;
+        }
+
+        int realEndian;
+        final switch(endian) {
+            case Endianess.littleEndian: realEndian = -1; break;
+            case Endianess.bigEndian:    realEndian =  1; break;
+            case Endianess.host:         realEndian =  0; break;
+        }
+
+        __gmpz_export(rop.ptr, &count, realOrder, size, realEndian, nails, _ptr);
         return rop[0 .. count];
     }
 
@@ -1819,7 +1833,7 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
     ubyte[int.sizeof] storage;
     ubyte[1] expected = [2];
     assert(storage[0] == 0);
-    auto storage2 =  2.Z.convert(storage, WordOrder.first, 1, Endianess.littleEndian, 0);
+    auto storage2 =  2.Z.convert(storage, WordOrder.mostSignificantWordFirst, 1, Endianess.littleEndian, 0);
     assert(storage2.ptr == storage.ptr);
     assert(storage2 == expected);
 }
@@ -1828,7 +1842,7 @@ unittest
 {
     ubyte[int.sizeof] storage;
     ubyte[1] expected = [2];
-    ubyte[] storage2 = 2.Z.convert!(ubyte)(WordOrder.first, Endianess.littleEndian, 0);
+    ubyte[] storage2 = 2.Z.convert!(ubyte)(WordOrder.mostSignificantWordFirst, Endianess.littleEndian, 0);
     assert(storage2 == expected);
 }
 
