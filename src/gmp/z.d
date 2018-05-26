@@ -98,11 +98,9 @@ private struct _MpZ(bool copyable = false)
     pragma(inline, true)
     T[] convert(T)(WordOrder order, Endianess endian, size_t nails) const @trusted
     {
-        T[] rop;
         auto numb = 8 * T.sizeof - nails;
         size_t count = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
-        rop.length = count;
-        return convert(rop, order, T.sizeof, endian, nails);
+        return convert(new T[count], order, T.sizeof, endian, nails);
     }
 
     @nogc:
