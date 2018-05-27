@@ -2,7 +2,7 @@
 module gmp.z;
 
 import std.algorithm.mutation : move, moveEmplace;
-import std.traits : isInstanceOf, Unsigned, Unqual, isIntegral; // used by expression templates
+import std.traits : isInstanceOf, Unsigned, Unqual, isIntegral, isUnsigned; // used by expression templates
 
 import gmp.traits;
 
@@ -98,7 +98,7 @@ private struct _MpZ(bool copyable = false)
      * Returns: the new slice with the number of words produced
      */
     T[] to(T)(WordOrder order, Endianess endian, size_t nails) const @trusted
-    if (isIntegral!T)
+    if (isUnsigned!T)
     {
         auto numb = 8 * T.sizeof - nails;
         size_t count = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
@@ -1121,7 +1121,7 @@ private struct _MpZ(bool copyable = false)
      * Returns: the (sub-)slice of `rop` containing the words produced.
      */
     T[] to(T)(return scope T[] rop, WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
-    if (isIntegral!T)
+    if (isUnsigned!T)
     {
         assert(rop, "rop is empty");
 
