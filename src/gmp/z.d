@@ -2,7 +2,7 @@
 module gmp.z;
 
 import std.algorithm.mutation : move, moveEmplace;
-import std.traits : isInstanceOf, Unsigned, Unqual; // used by expression templates
+import std.traits : isInstanceOf, Unsigned, Unqual, isIntegral; // used by expression templates
 
 import gmp.traits;
 
@@ -88,19 +88,21 @@ private struct _MpZ(bool copyable = false)
         return hash;
     }
 
-    /** Allocates slice and exports to it arbitrary words of binary data into . It's format defined by:
-        - `order`: the most significant word `first` or `last` for least significant first
-        - `endian` can be `bigEndian`, `littleEndian` or `host` default
-        - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
-
-        Returns: the new slice with the number of words produced
+    /** Allocates slice and exports to it arbitrary words of binary data into.
+     *
+     * It's format defined by:
+     * - `order`: the most significant word `first` or `last` for least significant first
+     * - `endian` can be `bigEndian`, `littleEndian` or `host` default
+     * - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
+     *
+     * Returns: the new slice with the number of words produced
      */
-    pragma(inline, true)
-    T[] convert(T)(WordOrder order, Endianess endian, size_t nails) const @trusted
+    T[] to(T)(WordOrder order, Endianess endian, size_t nails) const @trusted
+    if (isIntegral!T)
     {
         auto numb = 8 * T.sizeof - nails;
         size_t count = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
-        return convert(new T[count], order, T.sizeof, endian, nails);
+        return to(new T[count], order, T.sizeof, endian, nails);
     }
 
     @nogc:
@@ -1108,33 +1110,39 @@ private struct _MpZ(bool copyable = false)
         }
     }
 
-    /** Exports to arbitrary words of binary data into `rop` pre-allocated slice. It's format defined by:
-        - `order`: the most significant word `first` or `last` for least significant first
-        - `size` in bytes of each word
-        - `endian` can be `bigEndian`, `littleEndian` or `host` default
-        - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
-
-        Returns: the (sub-)slice with the number of words produced
+    /** Exports to arbitrary words of binary data into `rop` pre-allocated slice.
+     *
+     * It's format defined by:
+     * - `order`: the most significant word `first` or `last` for least significant first
+     * - `size` in bytes of each word
+     * - `endian` can be `bigEndian`, `littleEndian` or `host` default
+     * - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
+     *
+     * Returns: the (sub-)slice of `rop` containing the words produced.
      */
-    pragma(inline, true)
-    T[] convert(T)(T[] rop, WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
+    T[] to(T)(return scope T[] rop, WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
+    if (isIntegral!T)
     {
-        assert(rop, "rop undefined");
+        assert(rop, "rop is empty");
+
         size_t count;
-        debug {
-            auto numb = 8 * size - nails;
+        debug
+        {
+            const numb = 8 * size - nails;
             size_t items = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
             assert(T.sizeof * rop.length >= items * size , "rop has no enough space pre-allocated");
         }
 
         int realOrder;
-        final switch(order) {
+        final switch(order)
+        {
             case WordOrder.mostSignificantWordFirst:  realOrder = 1;  break;
             case WordOrder.leastSignificantWordFirst: realOrder = -1; break;
         }
 
         int realEndian;
-        final switch(endian) {
+        final switch(endian)
+        {
             case Endianess.littleEndian: realEndian = -1; break;
             case Endianess.bigEndian:    realEndian =  1; break;
             case Endianess.host:         realEndian =  0; break;
@@ -1831,7 +1839,7 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
     ubyte[int.sizeof] storage;
     ubyte[1] expected = [2];
     assert(storage[0] == 0);
-    auto storage2 =  2.Z.convert(storage, WordOrder.mostSignificantWordFirst, 1, Endianess.littleEndian, 0);
+    auto storage2 =  2.Z.to(storage, WordOrder.mostSignificantWordFirst, 1, Endianess.littleEndian, 0);
     assert(storage2.ptr == storage.ptr);
     assert(storage2 == expected);
 }
@@ -1840,7 +1848,7 @@ unittest
 {
     ubyte[int.sizeof] storage;
     ubyte[1] expected = [2];
-    ubyte[] storage2 = 2.Z.convert!(ubyte)(WordOrder.mostSignificantWordFirst, Endianess.littleEndian, 0);
+    ubyte[] storage2 = 2.Z.to!(ubyte)(WordOrder.mostSignificantWordFirst, Endianess.littleEndian, 0);
     assert(storage2 == expected);
 }
 
