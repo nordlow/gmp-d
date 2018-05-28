@@ -96,7 +96,7 @@ private struct _MpZ(bool copyable = false)
      * - `endian` can be `bigEndian`, `littleEndian` or `host` default
      * - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
      *
-     * Returns: the new slice with the number of words produced
+     * Returns: a new GC-allocated slice containing the words produced.
      */
     Word[] serialize(Word)(WordOrder order, Endianess endian, size_t nails) const @trusted
     if (isUnsigned!Word)
@@ -1120,7 +1120,7 @@ private struct _MpZ(bool copyable = false)
      * - `endian` can be `bigEndian`, `littleEndian` or `host` default
      * - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
      *
-     * Returns: the (sub-)slice of `words` containing only the words produced.
+     * Returns: a (sub-)slice of `words` containing only the words produced.
      */
     Word[] serialize(Word)(return scope Word[] words,
                                    WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
