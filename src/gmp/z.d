@@ -15,16 +15,24 @@ enum isMpZExpr(T) = (is(Unqual!(typeof(T.eval())) == MpZ)); // which returns an 
 enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct value
                          isMpZExpr!T);
 
-enum Endianess {
+/** Endianess of serialization in `MpZ.serialize` and
+ * unserialization-construction from integer array.
+ */
+enum Endianess
+{
     host,
     bigEndian,
     littleEndian,
-};
+}
 
-enum WordOrder {
+/** Word-order of serialization in `MpZ.serialize` and
+ * unserialization-construction from integer array.
+ */
+enum WordOrder
+{
     mostSignificantWordFirst,
     leastSignificantWordFirst,
-};
+}
 
 
 // TODO use these imports instead of the ones below
