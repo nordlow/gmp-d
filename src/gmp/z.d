@@ -88,7 +88,7 @@ private struct _MpZ(bool copyable = false)
         return hash;
     }
 
-    /** Allocates slice and exports to it arbitrary words of binary data into.
+    /** Serialize `this` into a new GC-allocated slice of words.
      *
      * It's format defined by:
      * - `order`: the most significant word `first` or `last` for least significant first
@@ -97,12 +97,12 @@ private struct _MpZ(bool copyable = false)
      *
      * Returns: the new slice with the number of words produced
      */
-    T[] to(T)(WordOrder order, Endianess endian, size_t nails) const @trusted
+    T[] serialize(T)(WordOrder order, Endianess endian, size_t nails) const @trusted
     if (isUnsigned!T)
     {
         auto numb = 8 * T.sizeof - nails;
         size_t count = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
-        return to(new T[count], order, T.sizeof, endian, nails);
+        return serialize(new T[count], order, T.sizeof, endian, nails);
     }
 
     @nogc:
@@ -1110,7 +1110,7 @@ private struct _MpZ(bool copyable = false)
         }
     }
 
-    /** Exports to arbitrary words of binary data into `rop` pre-allocated slice.
+    /** Serialize `this` into an existing pre-allocated slice of words `words`.
      *
      * It's format defined by:
      * - `order`: the most significant word `first` or `last` for least significant first
@@ -1118,19 +1118,19 @@ private struct _MpZ(bool copyable = false)
      * - `endian` can be `bigEndian`, `littleEndian` or `host` default
      * - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
      *
-     * Returns: the (sub-)slice of `rop` containing the words produced.
+     * Returns: the (sub-)slice of `words` containing only the words produced.
      */
-    T[] to(T)(return scope T[] rop, WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
+    T[] serialize(T)(return scope T[] words, WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
     if (isUnsigned!T)
     {
-        assert(rop, "rop is empty");
+        assert(words, "words is empty");
 
         size_t count;
         debug
         {
             const numb = 8 * size - nails;
             size_t items = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
-            assert(T.sizeof * rop.length >= items * size , "rop has no enough space pre-allocated");
+            assert(T.sizeof * words.length >= items * size , "words has no enough space pre-allocated");
         }
 
         int realOrder;
@@ -1148,8 +1148,8 @@ private struct _MpZ(bool copyable = false)
             case Endianess.host:         realEndian =  0; break;
         }
 
-        __gmpz_export(rop.ptr, &count, realOrder, size, realEndian, nails, _ptr);
-        return rop[0 .. count];
+        __gmpz_export(words.ptr, &count, realOrder, size, realEndian, nails, _ptr);
+        return words[0 .. count];
     }
 
 
@@ -1839,7 +1839,7 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
     ubyte[int.sizeof] storage;
     ubyte[1] expected = [2];
     assert(storage[0] == 0);
-    auto storage2 =  2.Z.to(storage, WordOrder.mostSignificantWordFirst, 1, Endianess.littleEndian, 0);
+    auto storage2 =  2.Z.serialize(storage, WordOrder.mostSignificantWordFirst, 1, Endianess.littleEndian, 0);
     assert(storage2.ptr == storage.ptr);
     assert(storage2 == expected);
 }
@@ -1848,7 +1848,7 @@ unittest
 {
     ubyte[int.sizeof] storage;
     ubyte[1] expected = [2];
-    ubyte[] storage2 = 2.Z.to!(ubyte)(WordOrder.mostSignificantWordFirst, Endianess.littleEndian, 0);
+    ubyte[] storage2 = 2.Z.serialize!(ubyte)(WordOrder.mostSignificantWordFirst, Endianess.littleEndian, 0);
     assert(storage2 == expected);
 }
 
