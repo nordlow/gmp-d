@@ -1884,12 +1884,19 @@ unittest
 
 unittest
 {
-    auto prime = 199.Z;
-    for (int i = 0; i < 20; ++i) {
+    auto prime = 33391.Z;
+    for (int i = 0; i < 20; ++i)
+    {
         prime = nextPrime(prime);
-        ubyte[] data = prime.to!(ubyte)(WordOrder.mostSignificantWordFirst, Endianess.littleEndian, 0);
-        auto samePrime = Z(data, WordOrder.mostSignificantWordFirst, 1, Endianess.littleEndian, 0);
-        assert(prime == samePrime);
+        for (auto order = WordOrder.min; order < WordOrder.max; ++order)
+        {
+            for (auto endianess = Endianess.min; endianess < Endianess.max; ++endianess)
+            {
+                ubyte[] data = prime.to!(ubyte)(order, endianess, 0);
+                auto samePrime = Z(data, order, 1, endianess, 0);
+                assert(prime == samePrime);
+            }
+        }
     }
 }
 
