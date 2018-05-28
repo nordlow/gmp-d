@@ -159,6 +159,36 @@ private struct _MpZ(bool copyable = false)
         assert(status == 0, "Parameter `value` does not contain an integer");
     }
 
+    /** Constucts number from serialized binary array. Arguments:
+     * - `rop` : array of unsinged values
+     * - `order`: the most significant word `first` or `last` for least significant first
+     * - `size` in bytes of each word
+     * - `endian` can be `bigEndian`, `littleEndian` or `host` default
+     * - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
+    */
+    this(T)(const T[] rop, WordOrder order, size_t size, Endianess endian, size_t nails)
+    if (isUnsigned!T)
+    {
+
+        int realOrder;
+        final switch(order)
+        {
+            case WordOrder.mostSignificantWordFirst:  realOrder = 1;  break;
+            case WordOrder.leastSignificantWordFirst: realOrder = -1; break;
+        }
+
+        int realEndian;
+        final switch(endian)
+        {
+            case Endianess.littleEndian: realEndian = -1; break;
+            case Endianess.bigEndian:    realEndian =  1; break;
+            case Endianess.host:         realEndian =  0; break;
+        }
+
+        __gmpz_init(_ptr);
+        __gmpz_import(_ptr, rop.length, realOrder, size, realEndian, nails, rop.ptr);
+    }
+
     /// Returns: the Mersenne prime, M(p) = 2 ^^ p - 1
     static _MpZ mersennePrime(Integral)(Integral p)
     if (isIntegral!Integral)
@@ -1855,6 +1885,25 @@ unittest
     assert(storage2 == expected);
 }
 
+unittest
+{
+    auto prime = 33391.Z;
+    for (int i = 0; i < 20; ++i)
+    {
+        prime = nextPrime(prime);
+        for (auto order = WordOrder.min; order < WordOrder.max; ++order)
+        {
+            for (auto endianess = Endianess.min; endianess < Endianess.max; ++endianess)
+            {
+                ubyte[] data = prime.serialize!(ubyte)(order, endianess, 0);
+                auto samePrime = Z(data, order, 1, endianess, 0);
+                assert(prime == samePrime);
+            }
+        }
+    }
+}
+
+
 
 /// opBinary with r-value right-hand-side
 @safe @nogc unittest
@@ -3155,6 +3204,7 @@ extern(C) pragma(inline, false)
     char *__gmpz_get_str (char*, int, mpz_srcptr);
     size_t __gmpz_sizeinbase (mpz_srcptr, int);
     void *__gmpz_export (void* , size_t*, int, size_t, int, size_t, mpz_srcptr);
+    void __gmpz_import (mpz_ptr, size_t, int, size_t, int, size_t, const void *);
 
     void __gmpz_powm (mpz_ptr, mpz_srcptr, mpz_srcptr, mpz_srcptr);
     void __gmpz_powm_ui (mpz_ptr, mpz_srcptr, ulong, mpz_srcptr);
