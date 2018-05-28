@@ -88,7 +88,8 @@ private struct _MpZ(bool copyable = false)
         return hash;
     }
 
-    /** Serialize `this` into a new GC-allocated slice of words.
+    /** Serialize `this` into a new GC-allocated slice of words, each word of
+     * type `Word`.
      *
      * It's format defined by:
      * - `order`: the most significant word `first` or `last` for least significant first
@@ -97,12 +98,12 @@ private struct _MpZ(bool copyable = false)
      *
      * Returns: the new slice with the number of words produced
      */
-    T[] serialize(T)(WordOrder order, Endianess endian, size_t nails) const @trusted
-    if (isUnsigned!T)
+    Word[] serialize(Word)(WordOrder order, Endianess endian, size_t nails) const @trusted
+    if (isUnsigned!Word)
     {
-        auto numb = 8 * T.sizeof - nails;
+        auto numb = 8 * Word.sizeof - nails;
         size_t count = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
-        return serialize(new T[count], order, T.sizeof, endian, nails);
+        return serialize(new Word[count], order, Word.sizeof, endian, nails);
     }
 
     @nogc:
@@ -1110,7 +1111,8 @@ private struct _MpZ(bool copyable = false)
         }
     }
 
-    /** Serialize `this` into an existing pre-allocated slice of words `words`.
+    /** Serialize `this` into an existing pre-allocated slice of words `words`,
+     * each word of type `Word`.
      *
      * It's format defined by:
      * - `order`: the most significant word `first` or `last` for least significant first
@@ -1120,8 +1122,9 @@ private struct _MpZ(bool copyable = false)
      *
      * Returns: the (sub-)slice of `words` containing only the words produced.
      */
-    T[] serialize(T)(return scope T[] words, WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
-    if (isUnsigned!T)
+    Word[] serialize(Word)(return scope Word[] words,
+                                   WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
+    if (isUnsigned!Word)
     {
         assert(words, "words is empty");
 
@@ -1130,7 +1133,7 @@ private struct _MpZ(bool copyable = false)
         {
             const numb = 8 * size - nails;
             size_t items = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
-            assert(T.sizeof * words.length >= items * size , "words has no enough space pre-allocated");
+            assert(Word.sizeof * words.length >= items * size , "words has no enough space pre-allocated");
         }
 
         int realOrder;
