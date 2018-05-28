@@ -88,21 +88,22 @@ private struct _MpZ(bool copyable = false)
         return hash;
     }
 
-    /** Allocates slice and exports to it arbitrary words of binary data into.
+    /** Serialize `this` into a new GC-allocated slice of words, each word of
+     * type `Word`.
      *
      * It's format defined by:
      * - `order`: the most significant word `first` or `last` for least significant first
      * - `endian` can be `bigEndian`, `littleEndian` or `host` default
      * - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
      *
-     * Returns: the new slice with the number of words produced
+     * Returns: a new GC-allocated slice containing the words produced.
      */
-    T[] to(T)(WordOrder order, Endianess endian, size_t nails) const @trusted
-    if (isUnsigned!T)
+    Word[] serialize(Word)(WordOrder order, Endianess endian, size_t nails) const @trusted
+    if (isUnsigned!Word)
     {
-        auto numb = 8 * T.sizeof - nails;
+        auto numb = 8 * Word.sizeof - nails;
         size_t count = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
-        return to(new T[count], order, T.sizeof, endian, nails);
+        return serialize(new Word[count], order, Word.sizeof, endian, nails);
     }
 
     @nogc:
@@ -1140,7 +1141,8 @@ private struct _MpZ(bool copyable = false)
         }
     }
 
-    /** Exports to arbitrary words of binary data into `rop` pre-allocated slice.
+    /** Serialize `this` into an existing pre-allocated slice of words `words`,
+     * each word of type `Word`.
      *
      * It's format defined by:
      * - `order`: the most significant word `first` or `last` for least significant first
@@ -1148,19 +1150,20 @@ private struct _MpZ(bool copyable = false)
      * - `endian` can be `bigEndian`, `littleEndian` or `host` default
      * - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
      *
-     * Returns: the (sub-)slice of `rop` containing the words produced.
+     * Returns: a (sub-)slice of `words` containing only the words produced.
      */
-    T[] to(T)(return scope T[] rop, WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
-    if (isUnsigned!T)
+    Word[] serialize(Word)(return scope Word[] words,
+                                   WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
+    if (isUnsigned!Word)
     {
-        assert(rop, "rop is empty");
+        assert(words, "words is empty");
 
         size_t count;
         debug
         {
             const numb = 8 * size - nails;
             size_t items = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
-            assert(T.sizeof * rop.length >= items * size , "rop has no enough space pre-allocated");
+            assert(Word.sizeof * words.length >= items * size , "words has no enough space pre-allocated");
         }
 
         int realOrder;
@@ -1178,8 +1181,8 @@ private struct _MpZ(bool copyable = false)
             case Endianess.host:         realEndian =  0; break;
         }
 
-        __gmpz_export(rop.ptr, &count, realOrder, size, realEndian, nails, _ptr);
-        return rop[0 .. count];
+        __gmpz_export(words.ptr, &count, realOrder, size, realEndian, nails, _ptr);
+        return words[0 .. count];
     }
 
 
@@ -1869,7 +1872,7 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
     ubyte[int.sizeof] storage;
     ubyte[1] expected = [2];
     assert(storage[0] == 0);
-    auto storage2 =  2.Z.to(storage, WordOrder.mostSignificantWordFirst, 1, Endianess.littleEndian, 0);
+    auto storage2 =  2.Z.serialize(storage, WordOrder.mostSignificantWordFirst, 1, Endianess.littleEndian, 0);
     assert(storage2.ptr == storage.ptr);
     assert(storage2 == expected);
 }
@@ -1878,7 +1881,7 @@ unittest
 {
     ubyte[int.sizeof] storage;
     ubyte[1] expected = [2];
-    ubyte[] storage2 = 2.Z.to!(ubyte)(WordOrder.mostSignificantWordFirst, Endianess.littleEndian, 0);
+    ubyte[] storage2 = 2.Z.serialize!(ubyte)(WordOrder.mostSignificantWordFirst, Endianess.littleEndian, 0);
     assert(storage2 == expected);
 }
 
