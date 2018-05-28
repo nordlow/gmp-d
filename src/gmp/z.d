@@ -1895,7 +1895,7 @@ unittest
         {
             for (auto endianess = Endianess.min; endianess < Endianess.max; ++endianess)
             {
-                ubyte[] data = prime.to!(ubyte)(order, endianess, 0);
+                ubyte[] data = prime.serialize!(ubyte)(order, endianess, 0);
                 auto samePrime = Z(data, order, 1, endianess, 0);
                 assert(prime == samePrime);
             }
