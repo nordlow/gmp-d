@@ -15,10 +15,10 @@ enum isMpZExpr(T) = (is(Unqual!(typeof(T.eval())) == MpZ)); // which returns an 
 enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct value
                          isMpZExpr!T);
 
-/** Endianess of serialization in `MpZ.serialize` and
+/** WordEndianess of serialization in `MpZ.serialize` and
  * unserialization-construction from integer array.
  */
-enum Endianess
+enum WordEndianess
 {
     host,
     bigEndian,
@@ -106,7 +106,7 @@ private struct _MpZ(bool copyable = false)
      *
      * Returns: a new GC-allocated slice containing the words produced.
      */
-    Word[] serialize(Word)(WordOrder order, Endianess endian, size_t nails) const @trusted
+    Word[] serialize(Word)(WordOrder order, WordEndianess endian, size_t nails) const @trusted
     if (isUnsigned!Word)
     {
         auto numb = 8 * Word.sizeof - nails;
@@ -174,7 +174,7 @@ private struct _MpZ(bool copyable = false)
      * - `endian` can be `bigEndian`, `littleEndian` or `host` default
      * - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
     */
-    this(T)(const T[] rop, WordOrder order, size_t size, Endianess endian, size_t nails)
+    this(T)(const T[] rop, WordOrder order, size_t size, WordEndianess endian, size_t nails)
     if (isUnsigned!T)
     {
 
@@ -188,9 +188,9 @@ private struct _MpZ(bool copyable = false)
         int realEndian;
         final switch(endian)
         {
-            case Endianess.littleEndian: realEndian = -1; break;
-            case Endianess.bigEndian:    realEndian =  1; break;
-            case Endianess.host:         realEndian =  0; break;
+            case WordEndianess.littleEndian: realEndian = -1; break;
+            case WordEndianess.bigEndian:    realEndian =  1; break;
+            case WordEndianess.host:         realEndian =  0; break;
         }
 
         __gmpz_init(_ptr);
@@ -1161,17 +1161,18 @@ private struct _MpZ(bool copyable = false)
      * Returns: a (sub-)slice of `words` containing only the words produced.
      */
     Word[] serialize(Word)(return scope Word[] words,
-                                   WordOrder order, size_t size, Endianess endian, size_t nails) const @trusted
+                           WordOrder order, size_t size, WordEndianess endian, size_t nails) const @trusted
     if (isUnsigned!Word)
     {
-        assert(words, "words is empty");
+        assert(words, "Words is empty");
 
         size_t count;
         debug
         {
             const numb = 8 * size - nails;
             size_t items = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
-            assert(Word.sizeof * words.length >= items * size , "words has no enough space pre-allocated");
+            assert(Word.sizeof * words.length >= items * size ,
+                   "Words has not enough space pre-allocated");
         }
 
         int realOrder;
@@ -1184,9 +1185,9 @@ private struct _MpZ(bool copyable = false)
         int realEndian;
         final switch(endian)
         {
-            case Endianess.littleEndian: realEndian = -1; break;
-            case Endianess.bigEndian:    realEndian =  1; break;
-            case Endianess.host:         realEndian =  0; break;
+            case WordEndianess.littleEndian: realEndian = -1; break;
+            case WordEndianess.bigEndian:    realEndian =  1; break;
+            case WordEndianess.host:         realEndian =  0; break;
         }
 
         __gmpz_export(words.ptr, &count, realOrder, size, realEndian, nails, _ptr);
@@ -1880,7 +1881,7 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
     ubyte[int.sizeof] storage;
     ubyte[1] expected = [2];
     assert(storage[0] == 0);
-    auto storage2 =  2.Z.serialize(storage, WordOrder.mostSignificantWordFirst, 1, Endianess.littleEndian, 0);
+    auto storage2 =  2.Z.serialize(storage, WordOrder.mostSignificantWordFirst, 1, WordEndianess.littleEndian, 0);
     assert(storage2.ptr == storage.ptr);
     assert(storage2 == expected);
 }
@@ -1889,7 +1890,7 @@ unittest
 {
     ubyte[int.sizeof] storage;
     ubyte[1] expected = [2];
-    ubyte[] storage2 = 2.Z.serialize!(ubyte)(WordOrder.mostSignificantWordFirst, Endianess.littleEndian, 0);
+    ubyte[] storage2 = 2.Z.serialize!(ubyte)(WordOrder.mostSignificantWordFirst, WordEndianess.littleEndian, 0);
     assert(storage2 == expected);
 }
 
@@ -1901,7 +1902,7 @@ unittest
         prime = nextPrime(prime);
         for (auto order = WordOrder.min; order < WordOrder.max; ++order)
         {
-            for (auto endianess = Endianess.min; endianess < Endianess.max; ++endianess)
+            for (auto endianess = WordEndianess.min; endianess < WordEndianess.max; ++endianess)
             {
                 ubyte[] data = prime.serialize!(ubyte)(order, endianess, 0);
                 auto samePrime = Z(data, order, 1, endianess, 0);
