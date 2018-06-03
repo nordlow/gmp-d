@@ -124,9 +124,9 @@ private struct _MpZ(bool copyable = false)
     // @disable this();
 
     /// Construct empty (undefined) from explicit `null`.
-    pragma(inline, true)
     this(typeof(null)) @trusted
     {
+        pragma(inline, true);
         initialize();             // TODO is there a faster way?
         assert(this == _MpZ.init); // if this is same as default
     }
@@ -141,10 +141,10 @@ private struct _MpZ(bool copyable = false)
     }
 
     /** Construct from `value`. */
-    pragma(inline, true)
     this(T)(T value) @trusted
     if (isArithmetic!T)
     {
+        pragma(inline, true);
         version(ccc) { ++_ccc; }
         static      if (isUnsigned!T)
             __gmpz_init_set_ui(_ptr, value);
@@ -208,9 +208,9 @@ private struct _MpZ(bool copyable = false)
     static if (copyable)
     {
         /// Construct copy of `value`.
-        pragma(inline, true)
         this(this) @trusted
         {
+            pragma(inline, true);
             if (_z._mp_d)
             {
                 // TODO this might be made faster
@@ -239,9 +239,9 @@ private struct _MpZ(bool copyable = false)
     }
 
     /// Swap content of `this` with `rhs`.
-    pragma(inline, true)
     void swap(ref _MpZ rhs) @safe
     {
+        pragma(inline, true);
         import std.algorithm.mutation : swap;
         swap(this, rhs); // faster than __gmpz_swap(_ptr, rhs._ptr); version(ccc) { ++_ccc; }
     }
@@ -348,9 +348,9 @@ private struct _MpZ(bool copyable = false)
     }
 
     /// Destruct `this`.
-    pragma(inline, true)
     ~this() @trusted
     {
+        pragma(inline, true);
         if (_z._mp_d)
         {
             __gmpz_clear(_ptr); version(ccc) { ++_ccc; }
@@ -369,10 +369,10 @@ private struct _MpZ(bool copyable = false)
         return __gmpz_cmp(_ptr, rhs._ptr) == 0;
     }
     /// ditto
-    pragma(inline, true)
     bool opEquals(Rhs)(Rhs rhs) const @trusted
     if (isArithmetic!Rhs)
     {
+        pragma(inline, true)
         if (rhs == 0)
         {
             return isZero;      // optimization
@@ -402,10 +402,10 @@ private struct _MpZ(bool copyable = false)
         return __gmpz_cmp(_ptr, rhs._ptr);
     }
     /// ditto
-    pragma(inline, true)
     int opCmp(T)(T rhs) const @trusted
     if (isArithmetic!T)
     {
+        pragma(inline, true);
         if (rhs == 0)
         {
             return sgn();       // optimization
@@ -425,17 +425,17 @@ private struct _MpZ(bool copyable = false)
     }
 
     /// Cast to `bool`.
-    pragma(inline, true)
     bool opCast(T : bool)() const
     {
+        pragma(inline, true);
         return !isZero;
     }
 
     /// Cast to arithmetic type `T`.
-    pragma(inline, true)
     T opCast(T)() const @trusted
     if (isArithmetic!T)
     {
+        pragma(inline, true);
         static      if (isUnsigned!T)
         {
             return cast(T)__gmpz_get_ui(_ptr);
@@ -588,11 +588,11 @@ private struct _MpZ(bool copyable = false)
     }
 
     /// ditto
-    pragma(inline, true)
     _MpZ opBinary(string s, Rhs)(auto ref const Rhs rhs) const
     if (isLazyMpZExpr!Rhs && // lazy value
         (s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
+        pragma(inline, true);
         static assert(false, "TODO");
     }
 
@@ -822,11 +822,11 @@ private struct _MpZ(bool copyable = false)
     }
 
     /// Exponentation.
-    pragma(inline, true)
     _MpZ opBinaryRight(string s, Base)(Base base) const
     if ((s == "^^") &&
         isIntegral!Base)
     {
+        pragma(inline, true);
         static assert(false, "Convert `this _MpZ` exponent to `ulong` and calculate power via static method `pow()`");
         // _MpZ exp = null;
         // __gmpz_pow();
@@ -1010,10 +1010,10 @@ private struct _MpZ(bool copyable = false)
     }
 
     /// Returns: `this`.
-    pragma(inline, true)
     ref inout(_MpZ) opUnary(string s)() inout
     if (s == "+")
     {
+        pragma(inline, true);
         return this;
     }
 
@@ -1040,9 +1040,9 @@ private struct _MpZ(bool copyable = false)
     /** Negate `this` in-place.
         Returns: `void` to make it obvious that `this` is mutated.
      */
-    pragma(inline, true)
     void negate() @safe
     {
+        pragma(inline, true);
         _z._mp_size = -_z._mp_size; // fast C macro `mpz_neg` in gmp.h
     }
 
@@ -1136,9 +1136,9 @@ private struct _MpZ(bool copyable = false)
     }
 
     /// Returns: number of digits in base `base`.
-    pragma(inline, true)
     size_t sizeInBase(uint base) const @trusted
     {
+        pragma(inline, true);
         if (isZero)
         {
             return 1;
@@ -1196,10 +1196,10 @@ private struct _MpZ(bool copyable = false)
 
 
     /// Returns: `true` iff `this` fits in a `T`.
-    pragma(inline, true)
     bool fitsIn(T)() const @trusted
     if (isIntegral!T)
     {
+        pragma(inline, true);
         if (isZero) { return true; } // default-constructed `this`
         static      if (is(T == ulong))  { return __gmpz_fits_ulong_p(_ptr) != 0; }
         else static if (is(T ==  long))  { return __gmpz_fits_slong_p(_ptr) != 0; }
@@ -1214,39 +1214,39 @@ private struct _MpZ(bool copyable = false)
         - `this` >= 0, number of 1 bits in the binary representation
         - otherwise, ???
      */
-    pragma(inline, true)
     @property mp_bitcnt_t populationCount() const @trusted
     {
+        pragma(inline, true);
         if (isZero) { return 0; } // default-constructed `this`
         return __gmpz_popcount(this._ptr); // TODO use core.bitop `popcnt` inline here instead?
     }
     alias countOnes = populationCount;
 
     /// Set bit at 0-offset index `bitIndex` (to one).
-    pragma(inline, true)
     void setBit(mp_bitcnt_t bitIndex) @trusted
     {
+        pragma(inline, true);
         __gmpz_setbit(_ptr, bitIndex);
     }
 
     /// Clear bit at 0-offset index `bitIndex` (to zero).
-    pragma(inline, true)
     void clearBit(mp_bitcnt_t bitIndex) @trusted
     {
+        pragma(inline, true);
         __gmpz_clrbit(_ptr, bitIndex);
     }
 
     /// Complement bit at 0-offset index `bitIndex` (to zero).
-    pragma(inline, true)
     void complementBit(mp_bitcnt_t bitIndex) @trusted
     {
+        pragma(inline, true);
         __gmpz_combit(_ptr, bitIndex);
     }
 
     /// Test/Get bit at 0-offset index `bitIndex`.
-    pragma(inline, true)
     bool testBit(mp_bitcnt_t bitIndex) const @trusted
     {
+        pragma(inline, true);
         return __gmpz_tstbit(_ptr, bitIndex) != 0;
     }
     alias getBit = testBit;
@@ -1258,45 +1258,45 @@ private struct _MpZ(bool copyable = false)
         handle the case when the membere `_mp_alloc` is zero and, in turn,
         `_mp_d` is `null`.
      */
-    pragma(inline, true)
     @property bool isDefaultConstructed() const @safe
     {
+        pragma(inline, true);
         return _z._mp_alloc == 0; // fast, actually enough to just test this
     }
 
     /// Check if `this` is zero (either via default-construction or `__gmpz_...`-operations).
-    pragma(inline, true)
     @property bool isZero() const @safe
     {
+        pragma(inline, true);
         return _z._mp_size == 0; // fast
     }
 
     /// Check if `this` is odd.
-    pragma(inline, true)
     @property bool isOdd() const @safe
     {
+        pragma(inline, true);
         return ((_z._mp_alloc != 0) && // this is needed for default (zero) initialized `__mpz_structs`
                 ((_z._mp_size != 0) & cast(int)(_z._mp_d[0]))); // fast C macro `mpz_odd_p` in gmp.h
     }
 
     /// Check if `this` is odd.
-    pragma(inline, true)
     @property bool isEven() const @safe
     {
+        pragma(inline, true);
         return !isOdd;            // fast C macro `mpz_even_p` in gmp.h
     }
 
     /// Check if `this` is negative.
-    pragma(inline, true)
     @property bool isNegative() const @safe
     {
+        pragma(inline, true);
         return _z._mp_size < 0; // fast
     }
 
     /// Check if `this` is positive.
-    pragma(inline, true)
     @property bool isPositive() const @safe
     {
+        pragma(inline, true);
         return !isNegative;     // fast
     }
 
@@ -1305,39 +1305,39 @@ private struct _MpZ(bool copyable = false)
         -  0 (`this` == 0), or
         - +1 (`this` > 0).
      */
-    pragma(inline, true)
     @property int sgn() const @safe
     {
+        pragma(inline, true);
         return _z._mp_size < 0 ? -1 : _z._mp_size > 0; // fast C macro `mpz_sgn` in gmp.h
     }
 
     /// Number of significant `uint`s used for storing `this`.
-    pragma(inline, true)
     @property size_t uintLength() const
     {
+        pragma(inline, true);
         assert(false, "TODO use mpz_size");
     }
 
     /// Number of significant `ulong`s used for storing `this`.
-    pragma(inline, true)
     @property size_t uintLong() const
     {
+        pragma(inline, true);
         assert(false, "TODO use mpz_size");
     }
 
 private:
 
     /** Initialize internal struct. */
-    pragma(inline, true)
     void initialize() // cannot be called `init` as that will override builtin type property
     {
+        pragma(inline, true);
         __gmpz_init(_ptr); version(ccc) { ++_ccc; }
     }
 
     /** Initialize internal struct if needed. */
-    pragma(inline, true)
     void assertInitialized()
     {
+        pragma(inline, true);
         if (isDefaultConstructed)
         {
             __gmpz_init(_ptr); version(ccc) { ++_ccc; }
@@ -1348,31 +1348,34 @@ private:
     enum defaultBase = 10;
 
     /// Returns: evaluation of `this` expression which in this is a no-op.
-    pragma(inline, true)
-    ref inout(_MpZ) eval() @safe inout return { return this; }
+    ref inout(_MpZ) eval() @safe inout return
+    {
+        pragma(inline, true);
+        return this;
+    }
 
     /// Type of limb in internal representation.
     alias Limb = __mp_limb_t;   // GNU MP alias
 
     /** Returns: limbs. */
-    pragma(inline, true)
     inout(Limb)[] _limbs() inout return @system
     {
+        pragma(inline, true);
         // import std.math : abs;
         return _z._mp_d[0 .. _limbCount];
     }
 
     /// Get number of limbs in internal representation.
-    pragma(inline, true)
     @property uint _limbCount() const @safe
     {
+        pragma(inline, true);
         return _integralAbs(_z._mp_size);
     }
 
     /// Returns: pointer to internal C struct.
-    pragma(inline, true)
     inout(__mpz_struct)* _ptr() inout return @system
     {
+        pragma(inline, true);
         return &_z;
     }
 
@@ -1388,7 +1391,6 @@ private:
             For instance the `x` in `x = y + z` should be assigned only once inside
             a call to `mpz_add`.
         */
-        pragma(inline, true)
         @property size_t mutatingCallCount() const @safe { return _ccc; }
         size_t _ccc;  // C mutation call count. number of calls to C GMP function calls that mutate this object
     }
@@ -1446,10 +1448,10 @@ _MpZ!copyable mpz(bool copyable = false, Args...)(Args args) @safe
 }
 
 /// Swap contents of `x` with contents of `y`.
-pragma(inline, true)
 void swap(bool copyable)(ref _MpZ!copyable x,
                          ref _MpZ!copyable y)
 {
+    pragma(inline, true);
     import std.algorithm.mutation : swap;
     swap(x, y); // x.swap(y);
 }
@@ -2853,11 +2855,11 @@ if (isMpZExpr!T1 &&
 version(unittest) static assert(isMpZExpr!(MpzAddExpr!(MpZ, MpZ)));
 
 /// Instantiator for `MpzAddExpr`.
-pragma(inline, true)
 MpzAddExpr!(T1, T2) mpzAddExpr(T1, T2)(T1 t1, T2 t2)
 if (isMpZExpr!T1 &&
     isMpZExpr!T2)
 {
+    pragma(inline, true);
     // TODO don't eval certain type combinations of t1 and t2
     return MpzAddExpr!(T1, T2)(t1.eval(), t2.eval());
 }
