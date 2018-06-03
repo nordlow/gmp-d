@@ -83,7 +83,7 @@ private struct _MpZ(bool copyable = false)
         return str;
     }
 
-    /// Returns: A unique hash of the `_MpZ` value suitable for use in a hash table.
+    /// Get the unique hash of the `_MpZ` value suitable for use in a hash table.
     size_t toHash() const @trusted
     {
         version(LDC) pragma(inline, true);
@@ -197,7 +197,7 @@ private struct _MpZ(bool copyable = false)
         __gmpz_import(_ptr, rop.length, realOrder, size, realEndian, nails, rop.ptr);
     }
 
-    /// Returns: the Mersenne prime, M(p) = 2 ^^ p - 1
+    /// Mersenne prime, M(p) = 2 ^^ p - 1
     static _MpZ mersennePrime(Integral)(Integral p)
     if (isIntegral!Integral)
     {
@@ -246,7 +246,7 @@ private struct _MpZ(bool copyable = false)
         swap(this, rhs); // faster than __gmpz_swap(_ptr, rhs._ptr); version(ccc) { ++_ccc; }
     }
 
-    /// Returns: (duplicate) copy of `this`.
+    /// (Duplicate) Copy `this`.
     _MpZ dup() const @trusted
     {
         version(LDC) pragma(inline, true);
@@ -450,9 +450,9 @@ private struct _MpZ(bool copyable = false)
         }
     }
 
-    /** Returns: The value of this as a `long`, or +/- `long.max` if outside
-        the representable range.
-    */
+    /** Get the value of this as a `long`, or +/- `long.max` if outside
+     * the representable range.
+     */
     long toLong() const @trusted
     {
         version(LDC) pragma(inline, true);
@@ -471,9 +471,9 @@ private struct _MpZ(bool copyable = false)
         }
     }
 
-    /** Returns: The value of this as a `int`, or +/- `int.max` if outside
-        the representable range.
-    */
+    /** Get the value of this as a `int`, or +/- `int.max` if outside the
+     * representable range.
+     */
     int toInt() const @trusted
     {
         version(LDC) pragma(inline, true);
@@ -492,7 +492,7 @@ private struct _MpZ(bool copyable = false)
         }
     }
 
-    /** Returns: `this` `s` `rhs`. */
+    /** Get `this` `s` `rhs`. */
     _MpZ opBinary(string s)(auto ref const _MpZ rhs) const @trusted // direct value
     if ((s == "+" || s == "-" ||
          s == "*" || s == "/" || s == "%" ||
@@ -724,7 +724,7 @@ private struct _MpZ(bool copyable = false)
         }
     }
 
-    /// Returns: an unsigned type `lhs` divided by `this`.
+    /// Get an unsigned type `lhs` divided by `this`.
     _MpZ opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
     if ((s == "+" || s == "-" || s == "*" || s == "%") &&
         isUnsigned!Lhs)
@@ -756,7 +756,7 @@ private struct _MpZ(bool copyable = false)
         return y;
     }
 
-    /// Returns: a signed type `lhs` divided by `this`.
+    /// Get a signed type `lhs` divided by `this`.
     _MpZ opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
     if ((s == "+" || s == "-" || s == "*" || s == "%") &&
         isSigned!Lhs)
@@ -1017,7 +1017,7 @@ private struct _MpZ(bool copyable = false)
         return this;
     }
 
-    /// Returns: negation of `this`.
+    /// Negation of `this`.
     _MpZ opUnary(string s)() const
     if (s == "-")
     {
@@ -1027,7 +1027,7 @@ private struct _MpZ(bool copyable = false)
         return y;
     }
 
-    /// Returns: negation of `this`.
+    /// Negation of `this`.
     _MpZ unaryMinus() const @safe
     {
         version(LDC) pragma(inline, true);
@@ -1038,7 +1038,8 @@ private struct _MpZ(bool copyable = false)
     }
 
     /** Negate `this` in-place.
-        Returns: `void` to make it obvious that `this` is mutated.
+     *
+     * Returns: `void` to make it obvious that `this` is mutated.
      */
     void negate() @safe
     {
@@ -1047,7 +1048,8 @@ private struct _MpZ(bool copyable = false)
     }
 
     /** Make `this` the absolute value of itself in-place.
-        Returns: `void` to make it obvious that `this` is mutated.
+     *
+     * Returns: `void` to make it obvious that `this` is mutated.
      */
     void absolute() @trusted
     {
@@ -1057,8 +1059,9 @@ private struct _MpZ(bool copyable = false)
     }
 
     /** Make `this` the one's complement value of itself in-place.
-        Returns: `void` to make it obvious that `this` is mutated.
-    */
+     *
+     * Returns: `void` to make it obvious that `this` is mutated.
+     */
     void onesComplement() @trusted
     {
         version(LDC) pragma(inline, true);
@@ -1098,7 +1101,7 @@ private struct _MpZ(bool copyable = false)
         return this;
     }
 
-    /// Returns: `base` raised to the power of `exp`.
+    /// Get `base` raised to the power of `exp`.
     static typeof(this) pow(Base, Exp)(Base base, Exp exp) @trusted
     if (isIntegral!Base &&
         isIntegral!Exp)
@@ -1135,7 +1138,7 @@ private struct _MpZ(bool copyable = false)
         return y;
     }
 
-    /// Returns: number of digits in base `base`.
+    /// Get number of digits in base `base`.
     size_t sizeInBase(uint base) const @trusted
     {
         pragma(inline, true);
@@ -1210,9 +1213,11 @@ private struct _MpZ(bool copyable = false)
         else { static assert(false, "Unsupported type " ~ T.stringof); }
     }
 
-    /** Returns: population count of `this`. If
-        - `this` >= 0, number of 1 bits in the binary representation
-        - otherwise, ???
+    /** Get population count of `this`.
+     *
+     * If
+     * - `this` >= 0, number of 1 bits in the binary representation
+     * - otherwise, ???
      */
     @property mp_bitcnt_t populationCount() const @trusted
     {
@@ -1456,21 +1461,21 @@ void swap(bool copyable)(ref _MpZ!copyable x,
     swap(x, y); // x.swap(y);
 }
 
-/// Returns: `x` as a `string` in decimal base.
+/// Get `x` as a `string` in decimal base.
 string toDecimalString(bool copyable)(auto ref const _MpZ!copyable x) // for `std.bigint.BigInt` compatibility
 {
     version(LDC) pragma(inline, true);
     return x.toString(10);
 }
 
-/// Returns: `x` as a uppercased `string` in hexadecimal base without any base prefix (0x).
+/// Get `x` as a uppercased `string` in hexadecimal base without any base prefix (0x).
 string toHex(bool copyable)(auto ref const _MpZ!copyable x) // for `std.bigint.BigInt` compatibility
 {
     version(LDC) pragma(inline, true);
     return x.toString(16, true);
 }
 
-/// Returns: the absolute value of `x` converted to the corresponding unsigned type.
+/// Get the absolute value of `x` converted to the corresponding unsigned type.
 Unsigned!T absUnsign(T, bool copyable)(auto ref const _MpZ!copyable x) // for `std.bigint.BigInt` compatibility
 if (isIntegral!T)
 {
@@ -1478,8 +1483,9 @@ if (isIntegral!T)
     return _integralAbs(cast(T)x);
 }
 
-/** Returns: absolute value of `x`.
-    Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
+/** Get absolute value of `x`.
+ *
+ * Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
  */
 _MpZ!copyable abs(bool copyable)(auto ref const _MpZ!copyable x) @trusted @nogc
 {
@@ -1498,9 +1504,10 @@ _MpZ!copyable abs(bool copyable)(auto ref const _MpZ!copyable x) @trusted @nogc
     }
 }
 
-/** Returns: one's complement of value of `x`.
-    Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
-*/
+/** Get one's complement of value of `x`.
+ *
+ * Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
+ */
 _MpZ!copyable onesComplement(bool copyable)(auto ref const _MpZ!copyable x) @trusted @nogc
 {
     version(LDC) pragma(inline, true);
@@ -1518,7 +1525,7 @@ _MpZ!copyable onesComplement(bool copyable)(auto ref const _MpZ!copyable x) @tru
     }
 }
 
-/// Returns: comparison of the absolute values of `x` and `y`.
+/// Comparison of the absolute values of `x` and `y`.
 int cmpabs(bool copyable)(auto ref const _MpZ!copyable x,
                           auto ref const _MpZ!copyable y) @trusted @nogc
 {
@@ -1538,9 +1545,10 @@ int cmpabs(bool copyable)(auto ref const _MpZ!copyable x, ulong y) @trusted @nog
     return __gmpz_cmpabs_ui(x._ptr, y);
 }
 
-/** Returns: next prime greater than `x`.
-    Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
-*/
+/** Get next prime greater than `x`.
+ *
+ * Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
+ */
 _MpZ!copyable nextPrime(bool copyable)(auto ref const _MpZ!copyable x) @trusted @nogc
 {
     version(LDC) pragma(inline, true);
@@ -1558,7 +1566,7 @@ _MpZ!copyable nextPrime(bool copyable)(auto ref const _MpZ!copyable x) @trusted 
     }
 }
 
-/// Returns: greatest common divisor (gcd) of `x` and `y`.
+/// Get greatest common divisor (gcd) of `x` and `y`.
 _MpZ!copyable gcd(bool copyable)(auto ref const _MpZ!copyable x,
                                  auto ref const _MpZ!copyable y) @trusted @nogc
 {
@@ -1601,7 +1609,7 @@ _MpZ!copyable gcd(bool copyable)(auto ref const _MpZ!copyable x,
     }
 }
 
-/// Returns: least common multiple (lcm) of `x` and `y`.
+/// Get least common multiple (lcm) of `x` and `y`.
 _MpZ!copyable lcm(bool copyable)(auto ref const _MpZ!copyable x,
                                  auto ref const _MpZ!copyable y) @trusted @nogc
 {
@@ -1644,7 +1652,7 @@ _MpZ!copyable lcm(bool copyable)(auto ref const _MpZ!copyable x,
     }
 }
 
-/** Returns: `base` ^^ `exp` (modulo `mod`).
+/** Get `base` ^^ `exp` (modulo `mod`).
  *
  * Parameter `exp` must be positive.
  */
@@ -1671,7 +1679,7 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
     return y;
 }
 
-/** Returns: `base` ^^ `-1` (modulo `mod`).
+/** Get `base` ^^ `-1` (modulo `mod`).
  *
  * Parameter `mod` must be positive.
  */
