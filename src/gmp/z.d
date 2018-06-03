@@ -3056,11 +3056,11 @@ version(unittest) static assert(isMpZExpr!(MpzNegExpr!(MpZ)));
     assert(x == -27);
 }
 
-/// Copied from `std.numeric` to prevent unnecessary Phobos deps.
-pragma(inline, true)
-T _integralAbs(T)(T x)
+// Copied from `std.numeric` to prevent unnecessary Phobos deps.
+private T _integralAbs(T)(T x)
 if (isIntegral!T)
 {
+    pragma(inline, true);
     return x >= 0 ? x : -x;
 }
 
