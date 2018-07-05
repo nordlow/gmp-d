@@ -100,6 +100,7 @@ pragma(inline, true):
     ref MpQ opAssign(P)(P value) @trusted return scope
         if (isFloating!P)
     {
+        version(DigitalMars) pragma(inline, false);
         version(ccc) ++_ccc;
         __gmpq_set_d(_ptr, value);
         return this;
@@ -109,6 +110,7 @@ pragma(inline, true):
     ref MpQ opAssign(P)(P value) @trusted return scope
         if (isIntegral!P)
     {
+        version(DigitalMars) pragma(inline, false);
         version(ccc) ++_ccc;
 
         static      if (isUnsigned!P)
@@ -135,6 +137,7 @@ pragma(inline, true):
     /// Returns: `true` iff `this` equals `rhs`.
     bool opEquals()(auto ref const MpQ rhs) const @trusted
     {
+        version(DigitalMars) pragma(inline, false);
         if (_ptr == rhs._ptr)   // fast equality
         {
             return true;        // fast bailout
@@ -155,6 +158,7 @@ pragma(inline, true):
     /// Compare `this` to `rhs`.
     int opCmp()(auto ref const MpQ rhs) const @trusted
     {
+        version(DigitalMars) pragma(inline, false);
         if (rhs.numerator == 0)
         {
             return sgn;         // optimization
@@ -164,6 +168,7 @@ pragma(inline, true):
     /// Compare `this` to `rhs`.
     int opCmp()(auto ref const MpZ rhs) const @trusted
     {
+        version(DigitalMars) pragma(inline, false);
         if (rhs == 0)
         {
             return sgn;         // optimization
@@ -226,6 +231,7 @@ pragma(inline, true):
     */
     void invert() @trusted
     {
+        version(DigitalMars) pragma(inline, false);
         import std.algorithm.mutation : swap;
         const bool negative = numerator < 0;
         if (negative)
@@ -263,6 +269,7 @@ pragma(inline, true):
         if ((s == "+" || s == "-" ||
              s == "*" || s == "/"))
     {
+        version(DigitalMars) pragma(inline, false);
         static if (!__traits(isRef, rhs)) // r-value `rhs`
         {
             MpQ* mut_rhs = (cast(MpQ*)(&rhs)); // @trusted because `MpQ` has no aliased indirections
@@ -396,6 +403,7 @@ void swap()(ref MpQ x,
 /// Returns: absolute value of `x`.
 MpQ abs()(auto ref const MpQ x) @trusted
 {
+    version(DigitalMars) pragma(inline, false);
     static if (__traits(isRef, x)) // l-value `x`
     {
         MpQ y = null;
@@ -413,6 +421,7 @@ MpQ abs()(auto ref const MpQ x) @trusted
 /// Returns: inverse of `x`.
 MpQ inverse()(auto ref const MpQ x) @trusted
 {
+    version(DigitalMars) pragma(inline, false);
     static if (__traits(isRef, x)) // l-value `x`
     {
         MpQ y = null;
