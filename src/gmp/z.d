@@ -50,10 +50,10 @@ private struct _MpZ(bool copyable = false)
     string toString(uint base = defaultBase,
                     bool upperCaseDigits = false) const @trusted
     {
-        if (isZero) { return `0`; }
-
         assert((base >= -2 && base <= -36) ||
                (base >= 2 && base <= 62));
+
+        if (isZero) { return `0`; }
 
         immutable size = sizeInBase(base); // NOTE: one too much for some values
 
@@ -86,7 +86,6 @@ private struct _MpZ(bool copyable = false)
     /// Get the unique hash of the `_MpZ` value suitable for use in a hash table.
     size_t toHash() const @trusted
     {
-        version(LDC) pragma(inline, true);
         import core.internal.hash : hashOf;
         typeof(return) hash = _limbCount;
         foreach (immutable i; 0 .. _limbCount)
@@ -157,7 +156,6 @@ private struct _MpZ(bool copyable = false)
     /** Construct from `value` in base `base`.
         If `base` is 0 it's guessed from contents of `value`.
         */
-    pragma(inline, false)
     this(in string value, uint base = 0) @trusted // TODO Use Optional/Nullable when value is nan, or inf
     {
         assert(base == 0 || (base >= 2 && base <= 62));
@@ -1401,7 +1399,6 @@ private:
     }
 
     /// @nogc-variant of `toStringz` with heap allocation of null-terminated C-string `stringz`.
-    pragma(inline, false)
     char* _allocStringzCopyOf(in char[] value) @trusted @nogc
     {
         import core.memory : pureMalloc;
@@ -1420,7 +1417,6 @@ private:
     }
 
     // qualified C memory managment
-    pragma(inline, false)
     static @trusted extern(C) // locally `@trusted`
     {
         pragma(mangle, "free")
