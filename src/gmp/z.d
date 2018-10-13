@@ -1439,6 +1439,20 @@ alias CopyableMpZ = _MpZ!true;
 
 version(unittest) static assert(isMpZExpr!(MpZ));
 
+version(benchmark)
+@safe unittest
+{
+    import std.datetime.stopwatch : benchmark;
+    bool odd;
+    void test()
+    {
+        odd = (9.Z^^333333333L).isOdd;
+    }
+    immutable results = benchmark!test(1);
+    import std.stdio;
+    writeln("Took:", results[0]);
+}
+
 pure nothrow:
 
 /** Instantiator for `MpZ`. */
@@ -2337,7 +2351,6 @@ unittest
     assert(1UL - six == -5);
 
     // exponentiation
-
     assert(0.Z^^0 == 1);
     assert(3.Z^^3 == 27);
     assert(3.Z^^3L == 27);
