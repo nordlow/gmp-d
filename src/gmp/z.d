@@ -1446,7 +1446,7 @@ version(benchmark)
     bool odd;
     void test()
     {
-        odd = (9.Z^^333333333L).isOdd;
+        odd = (9.Z^^333333L).isOdd;
     }
     immutable results = benchmark!test(1);
     import std.stdio;
