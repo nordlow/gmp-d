@@ -40,7 +40,8 @@ enum WordOrder
 // import deimos.gmp.integer;
 
 /** Arbitrary (multi) precision signed integer (Z).
-    Wrapper for GNU MP (GMP)'s type `mpz_t` and functions `__gmpz_.*`.
+ *
+ * Wrapper for GNU MP (GMP)'s type `mpz_t` and functions `__gmpz_.*`.
  */
 private struct _MpZ(bool copyable = false)
 {
@@ -1425,12 +1426,12 @@ private:
 }
 
 /** Non-copyable MpZ.
-
-    For reference counting semantics, use `RefCounted` as
-
-    import std.typecons : RefCounted;
-    alias RcMpZ = RefCounted!MpZ;
-    RcMpZ x;
+ *
+ * For reference counting semantics, use `RefCounted` as
+ *
+ * import std.typecons : RefCounted;
+ * alias RcMpZ = RefCounted!MpZ;
+ * RcMpZ x;
  */
 alias MpZ = _MpZ!false;
 
