@@ -1,7 +1,10 @@
 /// Multiple precision integers (Z).
 module gmp.z;
 
-import std.algorithm.mutation : move, moveEmplace;
+version(LDC) { import std.algorithm.mutation : move, moveEmplace;
+    static if (__VERSION__ >= 2085) { static assert(0, "Use core.lifetime instead"); }
+} else import core.lifetime : move, moveEmplace;
+
 import std.traits : isInstanceOf, Unsigned, Unqual, isIntegral, isUnsigned; // used by expression templates
 
 import gmp.traits;
@@ -238,7 +241,7 @@ private struct _MpZ(bool copyable = false)
     }
 
     /// Swap content of `this` with `rhs`.
-    void swap(ref _MpZ rhs) @safe
+    void swap()(ref _MpZ rhs) @safe
     {
         pragma(inline, true);
         import std.algorithm.mutation : swap;
