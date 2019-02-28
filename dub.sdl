@@ -9,7 +9,8 @@ copyright "Per Nordlöw"
 # dependency "libgmp" version="~>1.0.0"
 
 dflags "-vcolumns" "-dip25" # "-dip1000" # -fPIC?
-dflags "-transition=dtorfields" platform="dmd"
+dflags "-preview=intpromote" "-preview=dtorfields" "-preview=markdown" platform="dmd"
+dflags "-transition=intpromote" "-transition=dtorfields" platform="ldc"
 
 libs "gmp" "c"
 
