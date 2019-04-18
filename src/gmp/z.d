@@ -154,9 +154,10 @@ private struct _MpZ(bool copyable = false)
     }
 
     /** Construct from `value` in base `base`.
-        If `base` is 0 it's guessed from contents of `value`.
-        */
-    this(in string value, uint base = 0) @trusted // TODO Use Optional/Nullable when value is nan, or inf
+     *
+     * If `base` is 0 it's guessed from contents of `value`.
+     */
+    this(scope const(char)[] value, uint base = 0) @trusted // TODO Use Optional/Nullable when value is nan, or inf
     {
         assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(value);
@@ -335,7 +336,7 @@ private struct _MpZ(bool copyable = false)
     /** Assign `this` from `string` `rhs` interpreted in base `base`.
         If `base` is 0 it's guessed from contents of `value`.
     */
-    ref _MpZ fromString(in string rhs, uint base = 0) @trusted return
+    ref _MpZ fromString(scope const(char)[] rhs, uint base = 0) @trusted return
     {
         assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(rhs);
