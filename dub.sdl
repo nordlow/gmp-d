@@ -18,6 +18,8 @@ libs "gmp" "c"
 dflags "-Xcc=-fuse-ld=gold" platform="linux-ldc" # use GNU gold linker
 # TODO benchmark LDC's new -link-internally
 
+importPaths "src"
+
 buildType "release" {
          buildOptions "releaseMode" "optimize" "inline" # TODO -march=native -ffast-math
 }
