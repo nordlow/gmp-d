@@ -1,12 +1,8 @@
 /// Multiple precision integers (Z).
 module gmp.z;
 
-version(LDC) { import std.algorithm.mutation : move, moveEmplace;
-    static if (__VERSION__ >= 2085) { static assert(0, "Use core.lifetime instead"); }
-} else import core.lifetime : move, moveEmplace;
-
+import core.lifetime : move, moveEmplace;
 import std.traits : isInstanceOf, Unsigned, Unqual, isIntegral, isUnsigned; // used by expression templates
-
 import gmp.traits;
 
 /// Call unittests taking long to execute.

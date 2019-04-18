@@ -1,12 +1,9 @@
 /// Multiple precision rational numbers (Q).
 module gmp.q;
 
+import core.lifetime : move;
 import gmp.traits;
 import gmp.z;
-
-version(LDC) { import std.algorithm.mutation : move;
-    static if (__VERSION__ >= 2085) { static assert(0, "Use core.lifetime instead"); }
-} else import core.lifetime : move;
 
 /** Arbitrary (multi) precision rational number (Q).
     Wrapper for GNU MP (GMP)'s type `mpq_t` and functions `__gmpq_.*`.
