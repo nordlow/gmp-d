@@ -653,7 +653,6 @@ alias inv = inverse;
 
 version(unittest)
 {
-    // import dbgio : dln;
     alias Z = MpZ;
     alias Q = MpQ;
     version = ccc;              // do C mutation call count
