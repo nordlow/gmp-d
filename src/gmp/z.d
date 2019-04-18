@@ -3121,7 +3121,6 @@ if (isIntegral!T)
 
 version(unittest)
 {
-    import dbgio : dln;
     alias Z = MpZ;
     debug import core.stdc.stdio : printf;
     // version = ccc;              // do C mutation call count
