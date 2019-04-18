@@ -166,13 +166,15 @@ private struct _MpZ(bool copyable = false)
         assert(status == 0, "Parameter `value` does not contain an integer");
     }
 
-    /** Constucts number from serialized binary array. Arguments:
+    /** Constucts number from serialized binary array.
+     *
+     * Arguments:
      * - `rop` : array of unsinged values
      * - `order`: the most significant word `first` or `last` for least significant first
      * - `size` in bytes of each word
      * - `endian` can be `bigEndian`, `littleEndian` or `host` default
      * - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
-    */
+     */
     this(T)(const T[] rop, WordOrder order, size_t size, WordEndianess endian, size_t nails)
     if (isUnsigned!T)
     {
