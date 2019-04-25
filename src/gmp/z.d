@@ -65,7 +65,7 @@ private struct _MpZ(bool copyable = false)
         while (str.length &&
                !str[$ - 1].isAlphaNum)
         {
-            str.length -= 1;
+            str = str[0 .. $ - 1]; // skip last
         }
 
         if (upperCaseDigits)
@@ -81,6 +81,53 @@ private struct _MpZ(bool copyable = false)
         }
 
         return str;
+    }
+
+    /** Convert in base `base` into `chars` of length `length`.
+     *
+     * Returns: char[] which must be freed manually with `pureFree`.
+     */
+    char[] toChars(uint base = defaultBase,
+                   bool upperCaseDigits = false) const @system
+    {
+        import core.memory : pureMalloc;
+
+        assert((base >= -2 && base <= -36) ||
+               (base >= 2 && base <= 62));
+
+        if (isZero)
+        {
+            char[] chars = (cast(char*)pureMalloc(1))[0 .. 1];
+            chars[0] = '0';
+            return chars;
+        }
+
+        immutable size = sizeInBase(base); // NOTE: one too much for some values
+
+        char[] chars = (cast(char*)pureMalloc(size + 1))[0 .. size + 1]; // one extra for minus sign
+        __gmpz_get_str(chars.ptr, base, _ptr); // fill it
+
+        // skip trailing garbage
+        import std.ascii : isAlphaNum;
+        while (chars.length &&
+               !chars[$ - 1].isAlphaNum)
+        {
+            chars = chars[0 .. $ - 1]; // skip last
+        }
+
+        if (upperCaseDigits)
+        {
+            foreach (ref e; chars)
+            {
+                import std.ascii : isLower, toUpper;
+                if (e.isLower)
+                {
+                    e = e.toUpper;
+                }
+            }
+        }
+
+        return chars;
     }
 
     /// Get the unique hash of the `_MpZ` value suitable for use in a hash table.
