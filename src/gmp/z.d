@@ -1795,6 +1795,16 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
     w = 42;
 }
 
+/// @nogc to ASCII generation
+@trusted nothrow unittest
+{
+    Z w;
+    auto chars = w.toChars;
+    assert(chars == `0`);
+    import core.memory : pureFree;
+    pureFree(chars.ptr);
+}
+
 /// operate on default-constructed instances
 @safe nothrow unittest
 {
@@ -1810,7 +1820,7 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
     assert(w == 0UL);
     assert(w == 0.0f);
     assert(w == 0.0);
-
+    
     assert(w.toString == `0`);
     assert(w.toHash == 0);
     assert(w.sizeInBase(10) == 1);
@@ -2148,7 +2158,7 @@ unittest
     assert(`101`.Z == 101);
     assert(`101`.Z == 101);
 
-    immutable ic = 101UL.Z;
+    const ic = 101UL.Z;
 
     assert(a == a.dup);
     assert(ic == ic.dup);
@@ -2378,11 +2388,11 @@ unittest
 
     // modulo/remainder
 
-    immutable one = 1.Z;
+    const one = 1.Z;
     const two = 2.Z;
-    immutable three = 3.Z;
+    const three = 3.Z;
     const four = 4.Z;
-    immutable five = 5.Z;
+    const five = 5.Z;
     const six = 6.Z;
     assert(six % one == 0);
     assert(six % two == 0);
@@ -2636,7 +2646,7 @@ unittest
         assert(g == c);
         e = 12_345_678;
         g = c + e;
-        immutable h = g / b;
+        const h = g / b;
         const i = g % b;
         assert(h == a);
         assert(i == e);
