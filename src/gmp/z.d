@@ -88,7 +88,7 @@ private struct _MpZ(bool copyable = false)
      * Returns: char[] which must be freed manually with `pureFree`.
      */
     char[] toChars(uint base = defaultBase,
-                   bool upperCaseDigits = false) const @system
+                   bool upperCaseDigits = false) const @system @nogc
     {
         import core.memory : pureMalloc;
 
