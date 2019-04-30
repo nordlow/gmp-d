@@ -18,7 +18,18 @@ struct MpQ
     {
         assert((base >= -2 && base <= -36) ||
                (base >= 2 && base <= 62));
+        assert(false, "TODO");
+    }
 
+    /** Convert in base `base` into `chars` of length `length`.
+     *
+     * Returns: char[] which must be freed manually with `pureFree`.
+     */
+    char[] toChars(uint base = defaultBase,
+                   bool upperCaseDigits = false) const @system
+    {
+        assert((base >= -2 && base <= -36) ||
+               (base >= 2 && base <= 62));
         assert(false, "TODO");
     }
 
