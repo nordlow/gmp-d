@@ -204,6 +204,13 @@ pragma(inline, true):
         }
     }
 
+    /// Get the hash suitable for use in a hash table.
+    size_t toHash() const @safe
+    {
+        return (numerator.toHash ^
+                denominator.toHash);
+    }
+
     /// Returns: numerator reference of `this`.
     @property ref inout(MpZ) numerator() @trusted inout return scope
     {
