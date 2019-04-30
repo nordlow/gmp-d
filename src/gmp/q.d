@@ -26,7 +26,7 @@ struct MpQ
      * Returns: char[] which must be freed manually with `pureFree`.
      */
     char[] toChars(uint base = defaultBase,
-                   bool upperCaseDigits = false) const @system
+                   bool upperCaseDigits = false) const @system @nogc
     {
         assert((base >= -2 && base <= -36) ||
                (base >= 2 && base <= 62));
