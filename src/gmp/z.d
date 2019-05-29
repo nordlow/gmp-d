@@ -1543,37 +1543,82 @@ if (isIntegral!T)
     return _integralAbs(cast(T)x);
 }
 
-/** Get sum of `first` and `second`.
+/** Get sum of `x` and `y` (`x` + `y`).
  */
-_MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable first,
-                                 auto ref const _MpZ!copyable second) @trusted
+_MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
+                                 auto ref const _MpZ!copyable y) @trusted
 {
     version(LDC) pragma(inline, true);
-    typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
-    __gmpz_add(y._ptr, first._ptr, second._ptr); version(ccc) ++y._ccc;
-    return y;
+    static      if (!__traits(isRef, x)) // r-value `x`
+    {
+        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_add(mut_x._ptr, x._ptr, y._ptr); version(ccc) ++mut_x._ccc;
+        return move(*mut_x);    // TODO shouldn't have to call `move` here
+    }
+    else static if (!__traits(isRef, y)) // r-value `y`
+    {
+        typeof(return)* mut_y = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_add(mut_y._ptr, x._ptr, y._ptr); version(ccc) ++mut_y._ccc;
+        return move(*mut_y);    // TODO shouldn't have to call `move` here
+    }
+    else                        // l-value `x` and `y`
+    {
+        typeof(return) z = null;
+        __gmpz_add(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
+        return z;
+    }
 }
 
-/** Get difference of `first` and `second`.
+/** Get difference of `x` and `y` (`x` - `y`).
  */
-_MpZ!copyable sub(bool copyable)(auto ref const _MpZ!copyable first,
-                                 auto ref const _MpZ!copyable second) @trusted
+_MpZ!copyable sub(bool copyable)(auto ref const _MpZ!copyable x,
+                                 auto ref const _MpZ!copyable y) @trusted
 {
     version(LDC) pragma(inline, true);
-    typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
-    __gmpz_sub(y._ptr, first._ptr, second._ptr); version(ccc) ++y._ccc;
-    return y;
+    static      if (!__traits(isRef, x)) // r-value `x`
+    {
+        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_sub(mut_x._ptr, x._ptr, y._ptr); version(ccc) ++mut_x._ccc;
+        return move(*mut_x);    // TODO shouldn't have to call `move` here
+    }
+    else static if (!__traits(isRef, y)) // r-value `y`
+    {
+        typeof(return)* mut_y = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_sub(mut_y._ptr, x._ptr, y._ptr); version(ccc) ++mut_y._ccc;
+        return move(*mut_y);    // TODO shouldn't have to call `move` here
+    }
+    else                        // l-value `x` and `y`
+    {
+        typeof(return) z = null;
+        __gmpz_sub(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
+        return z;
+    }
 }
 
-/** Get product of `first` and `second`.
+/** Get product of `x` and `y` (`x` + `y`).
  */
-_MpZ!copyable mul(bool copyable)(auto ref const _MpZ!copyable first,
-                                 auto ref const _MpZ!copyable second) @trusted
+_MpZ!copyable mul(bool copyable)(auto ref const _MpZ!copyable x,
+                                 auto ref const _MpZ!copyable y) @trusted
 {
     version(LDC) pragma(inline, true);
-    typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
-    __gmpz_mul(y._ptr, first._ptr, second._ptr); version(ccc) ++y._ccc;
-    return y;
+    static      if (!__traits(isRef, x)) // r-value `x`
+    {
+        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_mul(mut_x._ptr, x._ptr, y._ptr); version(ccc) ++mut_x._ccc;
+        return move(*mut_x);    // TODO shouldn't have to call `move` here
+    }
+    else static if (!__traits(isRef, y)) // r-value `y`
+    {
+        typeof(return)* mut_y = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_mul(mut_y._ptr, x._ptr, y._ptr); version(ccc) ++mut_y._ccc;
+        return move(*mut_y);    // TODO shouldn't have to call `move` here
+    }
+    else                        // l-value `x` and `y`
+    {
+        typeof(return) z = null;
+        __gmpz_mul(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
+        return z;
+    }
 }
 
 /** Get absolute value of `x`.
