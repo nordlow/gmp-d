@@ -1543,6 +1543,39 @@ if (isIntegral!T)
     return _integralAbs(cast(T)x);
 }
 
+/** Get sum of `first` and `second`.
+ */
+_MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable first,
+                                 auto ref const _MpZ!copyable second) @trusted
+{
+    version(LDC) pragma(inline, true);
+    typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
+    __gmpz_add(y._ptr, first._ptr, second._ptr); version(ccc) ++y._ccc;
+    return y;
+}
+
+/** Get difference of `first` and `second`.
+ */
+_MpZ!copyable sub(bool copyable)(auto ref const _MpZ!copyable first,
+                                 auto ref const _MpZ!copyable second) @trusted
+{
+    version(LDC) pragma(inline, true);
+    typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
+    __gmpz_sub(y._ptr, first._ptr, second._ptr); version(ccc) ++y._ccc;
+    return y;
+}
+
+/** Get product of `first` and `second`.
+ */
+_MpZ!copyable mul(bool copyable)(auto ref const _MpZ!copyable first,
+                                 auto ref const _MpZ!copyable second) @trusted
+{
+    version(LDC) pragma(inline, true);
+    typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
+    __gmpz_mul(y._ptr, first._ptr, second._ptr); version(ccc) ++y._ccc;
+    return y;
+}
+
 /** Get absolute value of `x`.
  *
  * Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
