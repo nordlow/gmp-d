@@ -1569,6 +1569,17 @@ _MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
     }
 }
 
+/// binary `add`, `sub` and `mul`
+@safe nothrow @nogc unittest
+{
+    alias Z = MpZ;
+    Z x = 11;
+    Z y = 12;
+    assert(add(x, y) == 23);
+    assert(sub(x, y) == -1);
+    assert(mul(x, y) == 132);
+}
+
 /** Get difference of `x` and `y` (`x` - `y`).
  */
 _MpZ!copyable sub(bool copyable)(auto ref const _MpZ!copyable x,
