@@ -1643,12 +1643,14 @@ _MpZ!copyable sub(bool copyable)(auto ref const _MpZ!copyable x,
 ///
 @safe nothrow @nogc unittest
 {
-    Z x = 12;
-    const long y = 12;
-    assert(sub(x, Z(y)) ==
-           sub(Z(y), x));
-    assert(sub(x, x) ==
-           sub(Z(y), Z(y)));
+    Z x = 2.Z^^100;
+    Z y = 12;
+    assert(sub(x, Z(12)) ==
+           -sub(Z(12), x));
+    assert(sub(x, y) ==
+           sub(2.Z^^100, 12.Z));
+    assert(sub(12.Z, 2.Z^^100) ==
+           -sub(2.Z^^100, 12.Z));
 }
 
 /** Get product of `x` and `y` (`x` + `y`).
