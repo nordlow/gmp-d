@@ -1588,9 +1588,11 @@ _MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
 ///
 @safe nothrow @nogc unittest
 {
-    Z x = 11;
-    Z y = 12;
-    assert(add(x, y) == 23);
+    Z x = 12;
+    assert(add(x, x) == 24);
+    assert(add(x, 12.Z) == 24);
+    assert(add(12.Z, x) == 24);
+    assert(add(12.Z, 12.Z) == 24);
 }
 
 /** Get difference of `x` and `y` (`x` - `y`).
@@ -1638,9 +1640,11 @@ _MpZ!copyable sub(bool copyable)(auto ref const _MpZ!copyable x,
 ///
 @safe nothrow @nogc unittest
 {
-    Z x = 11;
-    Z y = 12;
-    assert(sub(x, y) == -1);
+    Z x = 12;
+    assert(sub(x, x) == 0);
+    assert(sub(x, 12.Z) == 0);
+    assert(sub(12.Z, x) == 0);
+    assert(sub(12.Z, 12.Z) == 0);
 }
 
 /** Get product of `x` and `y` (`x` + `y`).
@@ -1688,9 +1692,11 @@ _MpZ!copyable mul(bool copyable)(auto ref const _MpZ!copyable x,
 ///
 @safe nothrow @nogc unittest
 {
-    Z x = 11;
-    Z y = 12;
-    assert(mul(x, y) == 132);
+    Z x = 12;
+    assert(mul(x, x) == 144);
+    assert(mul(x, 12.Z) == 144);
+    assert(mul(12.Z, x) == 144);
+    assert(mul(12.Z, 12.Z) == 144);
 }
 
 /** Get absolute value of `x`.
