@@ -1589,10 +1589,11 @@ _MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
 @safe nothrow @nogc unittest
 {
     Z x = 12;
-    assert(add(x, x) == 24);
-    assert(add(x, 12.Z) == 24);
-    assert(add(12.Z, x) == 24);
-    assert(add(12.Z, 12.Z) == 24);
+    const long y = 12;
+    assert(add(x, Z(y)) ==
+           add(Z(y), x));
+    assert(add(x, x) ==
+           add(Z(y), Z(y)));
 }
 
 /** Get difference of `x` and `y` (`x` - `y`).
@@ -1641,10 +1642,11 @@ _MpZ!copyable sub(bool copyable)(auto ref const _MpZ!copyable x,
 @safe nothrow @nogc unittest
 {
     Z x = 12;
-    assert(sub(x, x) == 0);
-    assert(sub(x, 12.Z) == 0);
-    assert(sub(12.Z, x) == 0);
-    assert(sub(12.Z, 12.Z) == 0);
+    const long y = 12;
+    assert(sub(x, Z(y)) ==
+           sub(Z(y), x));
+    assert(sub(x, x) ==
+           sub(Z(y), Z(y)));
 }
 
 /** Get product of `x` and `y` (`x` + `y`).
@@ -1693,10 +1695,11 @@ _MpZ!copyable mul(bool copyable)(auto ref const _MpZ!copyable x,
 @safe nothrow @nogc unittest
 {
     Z x = 12;
-    assert(mul(x, x) == 144);
-    assert(mul(x, 12.Z) == 144);
-    assert(mul(12.Z, x) == 144);
-    assert(mul(12.Z, 12.Z) == 144);
+    const long y = 12;
+    assert(mul(x, Z(y)) ==
+           mul(Z(y), x));
+    assert(mul(x, x) ==
+           mul(Z(y), Z(y)));
 }
 
 /** Get absolute value of `x`.
