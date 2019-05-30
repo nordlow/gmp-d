@@ -1585,7 +1585,7 @@ _MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
     }
 }
 
-/// binary `add`, `sub` and `mul`
+/// 
 @safe nothrow @nogc unittest
 {
     Z x = 11;
@@ -1635,7 +1635,7 @@ _MpZ!copyable sub(bool copyable)(auto ref const _MpZ!copyable x,
     }
 }
 
-/// binary `add`, `sub` and `mul`
+/// 
 @safe nothrow @nogc unittest
 {
     Z x = 11;
@@ -1685,7 +1685,7 @@ _MpZ!copyable mul(bool copyable)(auto ref const _MpZ!copyable x,
     }
 }
 
-/// binary `add`, `sub` and `mul`
+/// 
 @safe nothrow @nogc unittest
 {
     Z x = 11;
