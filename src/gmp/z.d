@@ -1645,12 +1645,12 @@ _MpZ!copyable sub(bool copyable)(auto ref const _MpZ!copyable x,
 {
     Z x = 2.Z^^100;
     Z y = 12;
-    assert(sub(x, Z(12)) ==
-           -sub(Z(12), x));
-    assert(sub(x, y) ==
-           sub(2.Z^^100, 12.Z));
-    assert(sub(12.Z, 2.Z^^100) ==
-           -sub(2.Z^^100, 12.Z));
+    assert(sub(x, Z(12)) ==     // l-value, r-value
+           -sub(Z(12), x));     // r-value, l-value
+    assert(sub(x, y) ==         // l-value, l-value
+           sub(2.Z^^100, 12.Z));  // r-value, r-value
+    assert(sub(12.Z, 2.Z^^100) == // r-value, r-value
+           -sub(2.Z^^100, 12.Z)); // r-value, r-value
 }
 
 /** Get product of `x` and `y` (`x` + `y`).
