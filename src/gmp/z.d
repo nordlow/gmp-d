@@ -1733,7 +1733,7 @@ _MpZ!copyable abs(bool copyable)(auto ref const _MpZ!copyable x) @trusted @nogc
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        zp.absolute();
+        zp.absolute(); version(ccc) ++zp._ccc;
         return move(*zp);    // TODO shouldn't have to call `move` here
     }
 }
@@ -1754,7 +1754,7 @@ _MpZ!copyable onesComplement(bool copyable)(auto ref const _MpZ!copyable x) @tru
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        zp.onesComplement();
+        zp.onesComplement(); version(ccc) ++zp._ccc;
         return move(*zp);    // TODO shouldn't have to call `move` here
     }
 }
