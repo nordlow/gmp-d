@@ -134,8 +134,8 @@ private struct _MpZ(bool copyable = false)
     size_t toHash() const @trusted
     {
         import core.internal.hash : hashOf;
-        typeof(return) hash = _limbCount;
-        foreach (immutable i; 0 .. _limbCount)
+        typeof(return) hash = limbCount;
+        foreach (immutable i; 0 .. limbCount)
         {
             hash ^= _limbs[i].hashOf;
         }
@@ -1354,9 +1354,9 @@ private struct _MpZ(bool copyable = false)
     }
 
     /** Returns: sign as either
-        - -1 (`this` < 0),
-        -  0 (`this` == 0), or
-        - +1 (`this` > 0).
+     * - -1 (`this` < 0),
+     * -  0 (`this` == 0), or
+     * - +1 (`this` > 0).
      */
     @property int sgn() const @safe
     {
@@ -1376,6 +1376,13 @@ private struct _MpZ(bool copyable = false)
     {
         pragma(inline, true);
         assert(false, "TODO use mpz_size");
+    }
+
+    /// Get number of limbs in internal representation.
+    @property uint limbCount() const @safe
+    {
+        pragma(inline, true);
+        return _integralAbs(_z._mp_size);
     }
 
 private:
@@ -1415,14 +1422,7 @@ private:
     {
         pragma(inline, true);
         // import std.math : abs;
-        return _z._mp_d[0 .. _limbCount];
-    }
-
-    /// Get number of limbs in internal representation.
-    @property uint _limbCount() const @safe
-    {
-        pragma(inline, true);
-        return _integralAbs(_z._mp_size);
+        return _z._mp_d[0 .. limbCount];
     }
 
     /// Returns: pointer to internal C struct.
@@ -1549,19 +1549,35 @@ _MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
                                  auto ref const _MpZ!copyable y) @trusted
 {
     version(LDC) pragma(inline, true);
-    static      if (!__traits(isRef, x)) // r-value `x`
+    static if (!__traits(isRef, x) && // r-value `x`
+               !__traits(isRef, y))   // r-value `y`
     {
-        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_add(mut_x._ptr, x._ptr, y._ptr); version(ccc) ++mut_x._ccc;
-        return move(*mut_x);    // TODO shouldn't have to call `move` here
+        if (x.limbCount > y.limbCount) // larger r-value `x` 
+        {
+            typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+            __gmpz_add(xMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++xMutPtr._ccc;
+            return move(*xMutPtr);    // TODO shouldn't have to call `move` here
+        }
+        else                    // larger r-value `y`
+        {
+            typeof(return)* yMutPtr = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+            __gmpz_add(yMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++yMutPtr._ccc;
+            return move(*yMutPtr);    // TODO shouldn't have to call `move` here
+        }
+    }
+    else static if (!__traits(isRef, x)) // r-value `x`
+    {
+        typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_add(xMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++xMutPtr._ccc;
+        return move(*xMutPtr);    // TODO shouldn't have to call `move` here
     }
     else static if (!__traits(isRef, y)) // r-value `y`
     {
-        typeof(return)* mut_y = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_add(mut_y._ptr, x._ptr, y._ptr); version(ccc) ++mut_y._ccc;
-        return move(*mut_y);    // TODO shouldn't have to call `move` here
+        typeof(return)* yMutPtr = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_add(yMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++yMutPtr._ccc;
+        return move(*yMutPtr);    // TODO shouldn't have to call `move` here
     }
-    else                        // l-value `x` and `y`
+    else                        // l-value `x` and `y`, no reuse in output
     {
         typeof(return) z = null;
         __gmpz_add(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
@@ -1572,12 +1588,9 @@ _MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
 /// binary `add`, `sub` and `mul`
 @safe nothrow @nogc unittest
 {
-    alias Z = MpZ;
     Z x = 11;
     Z y = 12;
     assert(add(x, y) == 23);
-    assert(sub(x, y) == -1);
-    assert(mul(x, y) == 132);
 }
 
 /** Get difference of `x` and `y` (`x` - `y`).
@@ -1586,24 +1599,48 @@ _MpZ!copyable sub(bool copyable)(auto ref const _MpZ!copyable x,
                                  auto ref const _MpZ!copyable y) @trusted
 {
     version(LDC) pragma(inline, true);
-    static      if (!__traits(isRef, x)) // r-value `x`
+    static if (!__traits(isRef, x) && // r-value `x`
+               !__traits(isRef, y))   // r-value `y`
     {
-        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_sub(mut_x._ptr, x._ptr, y._ptr); version(ccc) ++mut_x._ccc;
-        return move(*mut_x);    // TODO shouldn't have to call `move` here
+        if (x.limbCount > y.limbCount) // larger r-value `x` 
+        {
+            typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+            __gmpz_sub(xMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++xMutPtr._ccc;
+            return move(*xMutPtr);    // TODO shouldn't have to call `move` here
+        }
+        else                    // larger r-value `y`
+        {
+            typeof(return)* yMutPtr = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+            __gmpz_sub(yMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++yMutPtr._ccc;
+            return move(*yMutPtr);    // TODO shouldn't have to call `move` here
+        }
+    }
+    else static if (!__traits(isRef, x)) // r-value `x`
+    {
+        typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_sub(xMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++xMutPtr._ccc;
+        return move(*xMutPtr);    // TODO shouldn't have to call `move` here
     }
     else static if (!__traits(isRef, y)) // r-value `y`
     {
-        typeof(return)* mut_y = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_sub(mut_y._ptr, x._ptr, y._ptr); version(ccc) ++mut_y._ccc;
-        return move(*mut_y);    // TODO shouldn't have to call `move` here
+        typeof(return)* yMutPtr = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_sub(yMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++yMutPtr._ccc;
+        return move(*yMutPtr);    // TODO shouldn't have to call `move` here
     }
-    else                        // l-value `x` and `y`
+    else                        // l-value `x` and `y`, no reuse in output
     {
         typeof(return) z = null;
         __gmpz_sub(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
         return z;
     }
+}
+
+/// binary `add`, `sub` and `mul`
+@safe nothrow @nogc unittest
+{
+    Z x = 11;
+    Z y = 12;
+    assert(sub(x, y) == -1);
 }
 
 /** Get product of `x` and `y` (`x` + `y`).
@@ -1612,24 +1649,48 @@ _MpZ!copyable mul(bool copyable)(auto ref const _MpZ!copyable x,
                                  auto ref const _MpZ!copyable y) @trusted
 {
     version(LDC) pragma(inline, true);
-    static      if (!__traits(isRef, x)) // r-value `x`
+    static if (!__traits(isRef, x) && // r-value `x`
+               !__traits(isRef, y))   // r-value `y`
     {
-        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_mul(mut_x._ptr, x._ptr, y._ptr); version(ccc) ++mut_x._ccc;
-        return move(*mut_x);    // TODO shouldn't have to call `move` here
+        if (x.limbCount > y.limbCount) // larger r-value `x` 
+        {
+            typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+            __gmpz_mul(xMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++xMutPtr._ccc;
+            return move(*xMutPtr);    // TODO shouldn't have to call `move` here
+        }
+        else                    // larger r-value `y`
+        {
+            typeof(return)* yMutPtr = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+            __gmpz_mul(yMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++yMutPtr._ccc;
+            return move(*yMutPtr);    // TODO shouldn't have to call `move` here
+        }
+    }
+    else static if (!__traits(isRef, x)) // r-value `x`
+    {
+        typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_mul(xMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++xMutPtr._ccc;
+        return move(*xMutPtr);    // TODO shouldn't have to call `move` here
     }
     else static if (!__traits(isRef, y)) // r-value `y`
     {
-        typeof(return)* mut_y = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_mul(mut_y._ptr, x._ptr, y._ptr); version(ccc) ++mut_y._ccc;
-        return move(*mut_y);    // TODO shouldn't have to call `move` here
+        typeof(return)* yMutPtr = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_mul(yMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++yMutPtr._ccc;
+        return move(*yMutPtr);    // TODO shouldn't have to call `move` here
     }
-    else                        // l-value `x` and `y`
+    else                        // l-value `x` and `y`, no reuse in output
     {
         typeof(return) z = null;
         __gmpz_mul(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
         return z;
     }
+}
+
+/// binary `add`, `sub` and `mul`
+@safe nothrow @nogc unittest
+{
+    Z x = 11;
+    Z y = 12;
+    assert(mul(x, y) == 132);
 }
 
 /** Get absolute value of `x`.
@@ -1647,9 +1708,9 @@ _MpZ!copyable abs(bool copyable)(auto ref const _MpZ!copyable x) @trusted @nogc
     }
     else                        // r-value `x`
     {
-        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        mut_x.absolute();
-        return move(*mut_x);    // TODO shouldn't have to call `move` here
+        typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        xMutPtr.absolute();
+        return move(*xMutPtr);    // TODO shouldn't have to call `move` here
     }
 }
 
@@ -1668,9 +1729,9 @@ _MpZ!copyable onesComplement(bool copyable)(auto ref const _MpZ!copyable x) @tru
     }
     else                        // r-value `x`
     {
-        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        mut_x.onesComplement();
-        return move(*mut_x);    // TODO shouldn't have to call `move` here
+        typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        xMutPtr.onesComplement();
+        return move(*xMutPtr);    // TODO shouldn't have to call `move` here
     }
 }
 
@@ -1709,9 +1770,9 @@ _MpZ!copyable nextPrime(bool copyable)(auto ref const _MpZ!copyable x) @trusted 
     }
     else                        // r-value `x`
     {
-        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_nextprime(mut_x._ptr, x._ptr); version(ccc) ++mut_x._ccc;
-        return move(*mut_x);    // TODO shouldn't have to call `move` here
+        typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_nextprime(xMutPtr._ptr, x._ptr); version(ccc) ++xMutPtr._ccc;
+        return move(*xMutPtr);    // TODO shouldn't have to call `move` here
     }
 }
 
@@ -1722,15 +1783,15 @@ _MpZ!copyable gcd(bool copyable)(auto ref const _MpZ!copyable x,
     version(LDC) pragma(inline, true);
     static      if (!__traits(isRef, x)) // r-value `x`
     {
-        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_gcd(mut_x._ptr, x._ptr, y._ptr); version(ccc) ++mut_x._ccc;
-        return move(*mut_x);    // TODO shouldn't have to call `move` here
+        typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_gcd(xMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++xMutPtr._ccc;
+        return move(*xMutPtr);    // TODO shouldn't have to call `move` here
     }
     else static if (!__traits(isRef, y)) // r-value `y`
     {
-        typeof(return)* mut_y = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_gcd(mut_y._ptr, x._ptr, y._ptr); version(ccc) ++mut_y._ccc;
-        return move(*mut_y);    // TODO shouldn't have to call `move` here
+        typeof(return)* yMutPtr = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_gcd(yMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++yMutPtr._ccc;
+        return move(*yMutPtr);    // TODO shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`
     {
@@ -1752,9 +1813,9 @@ _MpZ!copyable gcd(bool copyable)(auto ref const _MpZ!copyable x,
     }
     else
     {
-        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        const z_ui = __gmpz_gcd_ui(mut_x._ptr, x._ptr, y); version(ccc) ++mut_x._ccc;
-        return move(*mut_x);    // TODO shouldn't have to call `move` here
+        typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        const z_ui = __gmpz_gcd_ui(xMutPtr._ptr, x._ptr, y); version(ccc) ++xMutPtr._ccc;
+        return move(*xMutPtr);    // TODO shouldn't have to call `move` here
     }
 }
 
@@ -1765,15 +1826,15 @@ _MpZ!copyable lcm(bool copyable)(auto ref const _MpZ!copyable x,
     version(LDC) pragma(inline, true);
     static      if (!__traits(isRef, x)) // r-value `x`
     {
-        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_lcm(mut_x._ptr, x._ptr, y._ptr); version(ccc) ++mut_x._ccc;
-        return move(*mut_x);    // TODO shouldn't have to call `move` here
+        typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_lcm(xMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++xMutPtr._ccc;
+        return move(*xMutPtr);    // TODO shouldn't have to call `move` here
     }
     else static if (!__traits(isRef, y)) // r-value `y`
     {
-        typeof(return)* mut_y = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_lcm(mut_y._ptr, x._ptr, y._ptr); version(ccc) ++mut_y._ccc;
-        return move(*mut_y);    // TODO shouldn't have to call `move` here
+        typeof(return)* yMutPtr = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_lcm(yMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++yMutPtr._ccc;
+        return move(*yMutPtr);    // TODO shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`
     {
@@ -1795,9 +1856,9 @@ _MpZ!copyable lcm(bool copyable)(auto ref const _MpZ!copyable x,
     }
     else
     {
-        typeof(return)* mut_x = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_lcm_ui(mut_x._ptr, x._ptr, y); version(ccc) ++mut_x._ccc;
-        return move(*mut_x);    // TODO shouldn't have to call `move` here
+        typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        __gmpz_lcm_ui(xMutPtr._ptr, x._ptr, y); version(ccc) ++xMutPtr._ccc;
+        return move(*xMutPtr);    // TODO shouldn't have to call `move` here
     }
 }
 
@@ -2080,8 +2141,6 @@ unittest
         }
     }
 }
-
-
 
 /// opBinary with r-value right-hand-side
 @safe @nogc unittest
@@ -2684,22 +2743,22 @@ unittest
     // assert(ushort.min.Z.fitsIn!ushort);
     // assert(ushort.max.Z.fitsIn!ushort);
 
-    // internal limb count
+    // limb count
 
-    assert(0.Z._limbCount == 0);
-    assert(1.Z._limbCount == 1);
-    assert(2.Z._limbCount == 1);
+    assert(0.Z.limbCount == 0);
+    assert(1.Z.limbCount == 1);
+    assert(2.Z.limbCount == 1);
 
-    assert(Z.pow(2UL, 32UL)._limbCount == 1);
+    assert(Z.pow(2UL, 32UL).limbCount == 1);
 
-    assert(Z.pow(2UL, 63UL)._limbCount == 1);
-    assert(Z.pow(2UL, 63UL + 1)._limbCount == 2);
+    assert(Z.pow(2UL, 63UL).limbCount == 1);
+    assert(Z.pow(2UL, 63UL + 1).limbCount == 2);
 
-    assert(Z.pow(2UL, 127UL)._limbCount == 2);
-    assert(Z.pow(2UL, 127UL + 1)._limbCount == 3);
+    assert(Z.pow(2UL, 127UL).limbCount == 2);
+    assert(Z.pow(2UL, 127UL + 1).limbCount == 3);
 
-    assert(Z.pow(2UL, 255UL)._limbCount == 4);
-    assert(Z.pow(2UL, 255UL + 1)._limbCount == 5);
+    assert(Z.pow(2UL, 255UL).limbCount == 4);
+    assert(Z.pow(2UL, 255UL + 1).limbCount == 5);
 }
 
 /// generators
