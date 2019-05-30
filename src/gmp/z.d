@@ -1805,19 +1805,38 @@ _MpZ!copyable gcd(bool copyable)(auto ref const _MpZ!copyable x,
                                  auto ref const _MpZ!copyable y) @trusted @nogc
 {
     version(LDC) pragma(inline, true);
-    static      if (!__traits(isRef, x)) // r-value `x`
+    static if (!__traits(isRef, x) || // r-value `x`
+               !__traits(isRef, y))   // r-value `y`
     {
-        typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_gcd(zp._ptr, x._ptr, y._ptr); version(ccc) ++zp._ccc;
+        typeof(return)* zp = null;        // reuse: will point to either `x` or `y`
+        static if (!__traits(isRef, x) && // r-value `x`
+                   !__traits(isRef, y))   // r-value `y`
+        {
+            if (x.limbCount > y.limbCount) // larger r-value `x`
+            {
+                zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+                __gmpz_gcd(zp._ptr, x._ptr, y._ptr); 
+            }
+            else                    // larger r-value `y`
+            {
+                zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+                __gmpz_gcd(zp._ptr, x._ptr, y._ptr); 
+            }
+        }
+        else static if (!__traits(isRef, x)) // r-value `x`
+        {
+            zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+            __gmpz_gcd(zp._ptr, x._ptr, y._ptr); 
+        }
+        else static if (!__traits(isRef, y)) // r-value `y`
+        {
+            zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+            __gmpz_gcd(zp._ptr, x._ptr, y._ptr); 
+        }
+        version(ccc) ++zp._ccc;
         return move(*zp);    // TODO shouldn't have to call `move` here
     }
-    else static if (!__traits(isRef, y)) // r-value `y`
-    {
-        typeof(return)* zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_gcd(zp._ptr, x._ptr, y._ptr); version(ccc) ++zp._ccc;
-        return move(*zp);    // TODO shouldn't have to call `move` here
-    }
-    else                        // l-value `x` and `y`
+    else                        // l-value `x` and `y`, no reuse in output
     {
         typeof(return) z = null;
         __gmpz_gcd(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
@@ -1848,19 +1867,38 @@ _MpZ!copyable lcm(bool copyable)(auto ref const _MpZ!copyable x,
                                  auto ref const _MpZ!copyable y) @trusted @nogc
 {
     version(LDC) pragma(inline, true);
-    static      if (!__traits(isRef, x)) // r-value `x`
+    static if (!__traits(isRef, x) || // r-value `x`
+               !__traits(isRef, y))   // r-value `y`
     {
-        typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_lcm(zp._ptr, x._ptr, y._ptr); version(ccc) ++zp._ccc;
+        typeof(return)* zp = null;        // reuse: will point to either `x` or `y`
+        static if (!__traits(isRef, x) && // r-value `x`
+                   !__traits(isRef, y))   // r-value `y`
+        {
+            if (x.limbCount > y.limbCount) // larger r-value `x`
+            {
+                zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+                __gmpz_lcm(zp._ptr, x._ptr, y._ptr); 
+            }
+            else                    // larger r-value `y`
+            {
+                zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+                __gmpz_lcm(zp._ptr, x._ptr, y._ptr); 
+            }
+        }
+        else static if (!__traits(isRef, x)) // r-value `x`
+        {
+            zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+            __gmpz_lcm(zp._ptr, x._ptr, y._ptr); 
+        }
+        else static if (!__traits(isRef, y)) // r-value `y`
+        {
+            zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
+            __gmpz_lcm(zp._ptr, x._ptr, y._ptr); 
+        }
+        version(ccc) ++zp._ccc;
         return move(*zp);    // TODO shouldn't have to call `move` here
     }
-    else static if (!__traits(isRef, y)) // r-value `y`
-    {
-        typeof(return)* zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-        __gmpz_lcm(zp._ptr, x._ptr, y._ptr); version(ccc) ++zp._ccc;
-        return move(*zp);    // TODO shouldn't have to call `move` here
-    }
-    else                        // l-value `x` and `y`
+    else                        // l-value `x` and `y`, no reuse in output
     {
         typeof(return) z = null;
         __gmpz_lcm(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
