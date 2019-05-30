@@ -1588,12 +1588,12 @@ _MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
 ///
 @safe nothrow @nogc unittest
 {
-    Z x = 12;
-    const long y = 12;
-    assert(add(x, Z(y)) ==
-           add(Z(y), x));
-    assert(add(x, x) ==
-           add(Z(y), Z(y)));
+    Z x = 2.Z^^100;
+    Z y = 12;
+    assert(add(x, Z(12)) ==
+           add(Z(12), x));
+    assert(add(x, y) ==
+           add(2.Z^^100, 12.Z));
 }
 
 /** Get difference of `x` and `y` (`x` - `y`).
