@@ -544,7 +544,8 @@ private struct _MpZ(bool copyable = false)
     _MpZ opBinary(string s)(auto ref const _MpZ rhs) const @trusted // direct value
     if ((s == "+" || s == "-" ||
          s == "*" || s == "/" || s == "%" ||
-         s == "&" || s == "|" || s == "^"))
+         s == "&" || s == "|" || s == "^" ||
+         s == "<<"))            // left shift
     {
         version(LDC) pragma(inline, true);
         static if (!__traits(isRef, rhs)) // r-value `rhs`
@@ -583,6 +584,11 @@ private struct _MpZ(bool copyable = false)
             else static if (s == "^")
             {
                 __gmpz_xor(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+            }
+            else static if (s == "<<")
+            {
+                const rhs_ulong = cast(ulong)rhs;
+                __gmpz_mul_2exp(mut_rhs._ptr, _ptr, rhs_ulong); version(ccc) ++mut_rhs._ccc;
             }
             else
             {
@@ -627,6 +633,11 @@ private struct _MpZ(bool copyable = false)
             {
                 __gmpz_xor(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
             }
+            else static if (s == "<<")
+            {
+                const rhs_ulong = cast(ulong)rhs;
+                __gmpz_mul_2exp(y._ptr, _ptr, rhs_ulong); version(ccc) ++y._ccc;
+            }
             else
             {
                 static assert(false);
@@ -646,7 +657,7 @@ private struct _MpZ(bool copyable = false)
 
     /// ditto
     _MpZ opBinary(string s, Rhs)(Rhs rhs) const @trusted
-    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
+    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^" || s == "<<") &&
         isUnsigned!Rhs)
     {
         version(LDC) pragma(inline, true);
@@ -672,6 +683,10 @@ private struct _MpZ(bool copyable = false)
         else static if (s == "^^")
         {
             __gmpz_pow_ui(y._ptr, _ptr, rhs);
+        }
+        else static if (s == "<<")
+        {
+            __gmpz_mul_2exp(y._ptr, _ptr, rhs); version(ccc) ++rhs._ccc;
         }
         else
         {
@@ -2828,6 +2843,20 @@ unittest
 {
     assert(Z.mersennePrime(15) == 2^^15 - 1);
     assert(Z.mersennePrime(15UL) == 2^^15 - 1);
+}
+
+/// left shift 
+@safe @nogc unittest
+{
+    assert(1.Z << 1.Z == 2^^1);
+    assert(1.Z << 2.Z == 2^^2);
+    assert(1.Z << 32.Z == 2UL^^32);
+    assert(1.Z << 63.Z == 2UL^^63);
+
+    assert(1.Z << 1U == 2^^1);
+    assert(1.Z << 2U == 2^^2);
+    assert(1.Z << 32U == 2UL^^32);
+    assert(1.Z << 63U == 2UL^^63);
 }
 
 /// Phobos unittests
