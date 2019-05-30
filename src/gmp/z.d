@@ -1551,9 +1551,8 @@ _MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
                !__traits(isRef, y))   // r-value `y`
-
     {
-        typeof(return)* zp = null;        // will point to either `x` or `y`
+        typeof(return)* zp = null;        // reuse: will point to either `x` or `y`
         static if (!__traits(isRef, x) && // r-value `x`
                    !__traits(isRef, y))   // r-value `y`
         {
