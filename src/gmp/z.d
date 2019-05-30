@@ -1590,12 +1590,12 @@ _MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
 {
     Z x = 2.Z^^100;
     Z y = 12;
-    assert(add(x, Z(12)) ==
-           add(Z(12), x));
-    assert(add(x, y) ==
-           add(2.Z^^100, 12.Z));
-    assert(add(12.Z, 2.Z^^100) ==
-           add(2.Z^^100, 12.Z));
+    assert(add(x, Z(12)) ==     // l-value, r-value
+           add(Z(12), x));      // r-value, l-value
+    assert(add(x, y) ==         // l-value, l-value
+           add(2.Z^^100, 12.Z)); // r-value, r-value
+    assert(add(12.Z, 2.Z^^100) == // r-value, r-value
+           add(2.Z^^100, 12.Z));  // r-value, r-value
 }
 
 /** Get difference of `x` and `y` (`x` - `y`).
