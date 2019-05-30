@@ -1594,6 +1594,8 @@ _MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
            add(Z(12), x));
     assert(add(x, y) ==
            add(2.Z^^100, 12.Z));
+    assert(add(12.Z, 2.Z^^100) ==
+           add(2.Z^^100, 12.Z));
 }
 
 /** Get difference of `x` and `y` (`x` - `y`).
