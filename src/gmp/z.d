@@ -1552,7 +1552,7 @@ _MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
     static if (!__traits(isRef, x) && // r-value `x`
                !__traits(isRef, y))   // r-value `y`
     {
-        if (x.limbCount > y.limbCount) // larger r-value `x` 
+        if (x.limbCount > y.limbCount) // larger r-value `x`
         {
             typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
             __gmpz_add(xMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++xMutPtr._ccc;
@@ -1585,7 +1585,7 @@ _MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
     }
 }
 
-/// 
+///
 @safe nothrow @nogc unittest
 {
     Z x = 11;
@@ -1602,7 +1602,7 @@ _MpZ!copyable sub(bool copyable)(auto ref const _MpZ!copyable x,
     static if (!__traits(isRef, x) && // r-value `x`
                !__traits(isRef, y))   // r-value `y`
     {
-        if (x.limbCount > y.limbCount) // larger r-value `x` 
+        if (x.limbCount > y.limbCount) // larger r-value `x`
         {
             typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
             __gmpz_sub(xMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++xMutPtr._ccc;
@@ -1635,7 +1635,7 @@ _MpZ!copyable sub(bool copyable)(auto ref const _MpZ!copyable x,
     }
 }
 
-/// 
+///
 @safe nothrow @nogc unittest
 {
     Z x = 11;
@@ -1652,7 +1652,7 @@ _MpZ!copyable mul(bool copyable)(auto ref const _MpZ!copyable x,
     static if (!__traits(isRef, x) && // r-value `x`
                !__traits(isRef, y))   // r-value `y`
     {
-        if (x.limbCount > y.limbCount) // larger r-value `x` 
+        if (x.limbCount > y.limbCount) // larger r-value `x`
         {
             typeof(return)* xMutPtr = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
             __gmpz_mul(xMutPtr._ptr, x._ptr, y._ptr); version(ccc) ++xMutPtr._ccc;
@@ -1685,7 +1685,7 @@ _MpZ!copyable mul(bool copyable)(auto ref const _MpZ!copyable x,
     }
 }
 
-/// 
+///
 @safe nothrow @nogc unittest
 {
     Z x = 11;
@@ -1970,7 +1970,7 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
     assert(w == 0UL);
     assert(w == 0.0f);
     assert(w == 0.0);
-    
+
     assert(w.toString == `0`);
     assert(w.toHash == 0);
     assert(w.sizeInBase(10) == 1);
