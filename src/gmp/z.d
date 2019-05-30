@@ -1698,12 +1698,14 @@ _MpZ!copyable mul(bool copyable)(auto ref const _MpZ!copyable x,
 ///
 @safe nothrow @nogc unittest
 {
-    Z x = 12;
-    const long y = 12;
-    assert(mul(x, Z(y)) ==
-           mul(Z(y), x));
-    assert(mul(x, x) ==
-           mul(Z(y), Z(y)));
+    Z x = 2.Z^^100;
+    Z y = 12;
+    assert(mul(x, Z(12)) ==       // l-value, r-value
+           mul(Z(12), x));        // r-value, l-value
+    assert(mul(x, y) ==           // l-value, l-value
+           mul(2.Z^^100, 12.Z));  // r-value, r-value
+    assert(mul(12.Z, 2.Z^^100) == // r-value, r-value
+           mul(2.Z^^100, 12.Z));  // r-value, r-value
 }
 
 /** Get absolute value of `x`.
