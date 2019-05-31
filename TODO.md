@@ -9,12 +9,6 @@
 - Disallow construction and assignment from floating point? Check with other GMP
   interfaces and std.bigint.
 
-- Delayed evaluation via expression templates is in development. Evaluation can
-  kick in automatically for r-value parameters (when `!__traits(isRef, param)`
-  when param is passed as `(T)(auto ref const T
-  param)`). See
-  [this thread](http://forum.dlang.org/post/boorcxnmtatrncrclimp@forum.dlang.org).
-
 - Copy-on-write (COW) `RefCounted` data store. Optionally with specialized
   heap-allocator for `MpZ` type (16-bytes).
 
@@ -39,8 +33,13 @@
   and [Rust wrappers such as rust-gmp](https://github.com/thestinger/rust-gmp)
   to see that no optimization has been overseen
 
-- Lazy evaluation
-  via [expression templates](https://en.wikipedia.org/wiki/Expression_templates)
+- Delayed evaluation via expression templates is in development. Evaluation can
+kick in automatically for r-value parameters (`!__traits(isRef, param)` when
+param is passed as `(T)(auto ref const T param)`). See [this
+thread](http://forum.dlang.org/post/boorcxnmtatrncrclimp@forum.dlang.org). Lazy
+evaluation via [expression
+templates](https://en.wikipedia.org/wiki/Expression_templates)
+  
   - `x = -x`        => Assign(x, Neg(x)) => `x.negate()` (if compiler doesn't already rewrite this)
   - `x *= -1`       => `mpz_neg(x, x)` => `x.negate()`
   - `x -= 2*x`      => `mpz_neg(x, x)` => `x.negate()`
@@ -57,6 +56,7 @@
   allocated small value.
 
 - Don't use
+
   - `gmp_randinit` (not thread-safe, obsolete)
   - `mpz_random` (not thread-safe, obsolete)
   - `mpz_random2` (not thread-safe, obsolete)
