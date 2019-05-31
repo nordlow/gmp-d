@@ -1,7 +1,6 @@
 # TODO list (in order of priority)
 
-- Support bitwise shift operators
-          <<      >>      >>>
+- Support right shift operators `>>` and `>>>`.
 
 - _ccc Make _ccc two => uint _initCCC and uint _opCCC, mutatingCallCount return
   their sum. Use these counters to make more precise asserts on how assignments
