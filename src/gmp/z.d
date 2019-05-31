@@ -315,43 +315,7 @@ private struct _MpZ(bool copyable = false)
     if (isLazyMpZExpr!Expr)
     {
         version(LDC) pragma(inline, true);
-        static      if (isInstanceOf!(AddExpr, Expr))
-        {
-            rhs.evalTo(this);
-        }
-        else static if (isInstanceOf!(SubExpr, Expr))
-        {
-            __gmpz_sub(this._ptr,
-                       rhs.e1.eval()._ptr,
-                       rhs.e2.eval()._ptr); version(ccc) { ++_ccc; }
-        }
-        else static if (isInstanceOf!(MulExpr, Expr))
-        {
-            __gmpz_mul(this._ptr,
-                       rhs.e1.eval()._ptr,
-                       rhs.e2.eval()._ptr); version(ccc) { ++_ccc; }
-        }
-        else static if (isInstanceOf!(DivExpr, Expr))
-        {
-            __gmpz_tdiv_q(this._ptr,
-                          rhs.e1.eval()._ptr,
-                          rhs.e2.eval()._ptr); version(ccc) { ++_ccc; }
-        }
-        else static if (isInstanceOf!(ModExpr, Expr))
-        {
-            __gmpz_tdiv_r(this._ptr,
-                          rhs.e1.eval()._ptr,
-                          rhs.e2.eval()._ptr); version(ccc) { ++_ccc; }
-        }
-        else static if (isInstanceOf!(NegExpr, Expr))
-        {
-            __gmpz_neg(this._ptr,
-                       rhs.e1.eval()._ptr); version(ccc) { ++_ccc; }
-        }
-        else
-        {
-            this = rhs.eval();     // evaluate and move
-        }
+        rhs.evalTo(this);
         return this;
     }
     /// ditto
@@ -3205,12 +3169,17 @@ if (isMpZExpr!T1 &&
 {
     T1 e1;                      // first term
     T2 e2;                      // second term
-    MpZ eval() const @trusted
+    MpZ eval() const @trusted   // TODO move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
-        __gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
+        evalTo(y);
         return y;
+    }
+    void evalTo(ref MpZ y) const @trusted
+    {
+        version(LDC) pragma(inline, true);
+        __gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
     }
 }
 version(unittest) static assert(isMpZExpr!(SubExpr!(MpZ, MpZ)));
@@ -3230,12 +3199,17 @@ if (isMpZExpr!F1 &&
 {
     F1 e1;                      // first factor
     F2 e2;                      // second factor
-    MpZ eval() const @trusted
+    MpZ eval() const @trusted   // TODO move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
-        __gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
+        evalTo(y);
         return y;
+    }
+    void evalTo(ref MpZ y) const @trusted
+    {
+        version(LDC) pragma(inline, true);
+        __gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
     }
 }
 version(unittest) static assert(isMpZExpr!(MulExpr!(MpZ, MpZ)));
@@ -3256,12 +3230,17 @@ if (isMpZExpr!P &&
 {
     P e1;                       // divisor
     Q e2;                       // dividend
-    MpZ eval() const @trusted
+    MpZ eval() const @trusted   // TODO move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
-        __gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
+        evalTo(y);
         return y;
+    }
+    void evalTo(ref MpZ y) const @trusted
+    {
+        version(LDC) pragma(inline, true);
+        __gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
     }
 }
 version(unittest) static assert(isMpZExpr!(DivExpr!(MpZ, MpZ)));
@@ -3285,12 +3264,17 @@ if (isMpZExpr!P &&
 {
     P e1;                       // divisor
     Q e2;                       // dividend
-    MpZ eval() const @trusted
+    MpZ eval() const @trusted   // TODO move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
-        __gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
+        evalTo(y);
         return y;
+    }
+    void evalTo(ref MpZ y) const @trusted
+    {
+        version(LDC) pragma(inline, true);
+        __gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
     }
 }
 version(unittest) static assert(isMpZExpr!(ModExpr!(MpZ, MpZ)));
@@ -3314,12 +3298,17 @@ if (isMpZExpr!P &&
 {
     P e1;                       // base
     Q e2;                       // exponent
-    MpZ eval() const @trusted
+    MpZ eval() const @trusted   // TODO move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
-        __gmpz_pow_ui(y._ptr, e1.eval()._ptr, e2); version(ccc) ++y._ccc;
+        evalTo(y);
         return y;
+    }
+    void evalTo(ref MpZ y) const @trusted
+    {
+        version(LDC) pragma(inline, true);
+        __gmpz_pow_ui(y._ptr, e1.eval()._ptr, e2); version(ccc) ++y._ccc;
     }
 }
 version(unittest) static assert(isMpZExpr!(PowUExpr!(MpZ, ulong)));
@@ -3338,12 +3327,17 @@ if (isMpZExpr!P &&
     P base;                     // base
     Q exp;                      // exponent
     M mod;                      // modulo
-    MpZ eval() const @trusted
+    MpZ eval() const @trusted   // TODO move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
-        __gmpz_powm_ui(y._ptr, base.eval()._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
+        evalTo(y);
         return y;
+    }
+    void evalTo(ref MpZ y) const @trusted
+    {
+        version(LDC) pragma(inline, true);
+        __gmpz_powm_ui(y._ptr, base.eval()._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
     }
 }
 version(unittest) static assert(isMpZExpr!(PowMUExpr!(MpZ, ulong, MpZ)));
@@ -3358,12 +3352,17 @@ private struct NegExpr(A)
 if (isMpZExpr!A)
 {
     A e1;
-    MpZ eval() const @trusted
+    MpZ eval() const @trusted   // TODO move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
-        __gmpz_neg(y._ptr, e1.eval()._ptr); version(ccc) ++y._ccc;
+        evalTo(y);
         return y;
+    }
+    void evalTo(ref MpZ y) const @trusted
+    {
+        version(LDC) pragma(inline, true);
+        __gmpz_neg(y._ptr, e1.eval()._ptr); version(ccc) ++y._ccc;
     }
 }
 version(unittest) static assert(isMpZExpr!(NegExpr!(MpZ)));
