@@ -3138,7 +3138,7 @@ if (isMpZExpr!T1 &&
 version(unittest) static assert(isMpZExpr!(AddExpr!(MpZ, MpZ)));
 
 /// Instantiator for `AddExpr`.
-AddExpr!(T1, T2) addExpr(T1, T2)(T1 t1, T2 t2)
+AddExpr!(T1, T2) makeAdd(T1, T2)(T1 t1, T2 t2)
 if (isMpZExpr!T1 &&
     isMpZExpr!T2)
 {
