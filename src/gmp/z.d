@@ -317,9 +317,7 @@ private struct _MpZ(bool copyable = false)
         version(LDC) pragma(inline, true);
         static      if (isInstanceOf!(AddExpr, Expr))
         {
-            __gmpz_add(this._ptr,
-                       rhs.e1.eval()._ptr,
-                       rhs.e2.eval()._ptr); version(ccc) { ++_ccc; }
+            rhs.evalTo(this);
         }
         else static if (isInstanceOf!(SubExpr, Expr))
         {
@@ -3164,8 +3162,13 @@ if (isMpZExpr!T1 &&
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
-        __gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
+        evalTo(y);
         return y;
+    }
+    void evalTo(ref MpZ y) const @trusted
+    {
+        version(LDC) pragma(inline, true);
+        __gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
     }
 }
 version(unittest) static assert(isMpZExpr!(AddExpr!(MpZ, MpZ)));
