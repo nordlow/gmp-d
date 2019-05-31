@@ -9,8 +9,6 @@
 - Disallow construction and assignment from floating point? Check with other GMP
   interfaces and std.bigint.
 
-- Should `in` operator be used for anything good?
-
 - Delayed evaluation via expression templates is in development. Evaluation can
   kick in automatically for r-value parameters (when `!__traits(isRef, param)`
   when param is passed as `(T)(auto ref const T
