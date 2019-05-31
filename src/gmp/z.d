@@ -3137,16 +3137,6 @@ if (isMpZExpr!T1 &&
 }
 version(unittest) static assert(isMpZExpr!(AddExpr!(MpZ, MpZ)));
 
-/// Instantiator for `AddExpr`.
-AddExpr!(T1, T2) makeAdd(T1, T2)(T1 t1, T2 t2)
-if (isMpZExpr!T1 &&
-    isMpZExpr!T2)
-{
-    pragma(inline, true);
-    // TODO don't eval certain type combinations of t1 and t2
-    return AddExpr!(T1, T2)(t1.eval(), t2.eval());
-}
-
 @safe @nogc unittest
 {
     assert(AddExpr!(Z, Z)(3.Z, 4.Z).eval() == 3 + 4);
