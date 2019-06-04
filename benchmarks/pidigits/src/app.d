@@ -12,7 +12,7 @@ alias Z = MpZ;
 /** LFT. */
 struct LFT
 {
-@safe pure @nogc:
+@safe pure nothrow @nogc:
 public:
     // Replace static init of data members
     void init()
@@ -35,7 +35,7 @@ public:
     {
         tmp0 = q * x + r;
         tmp1 = tmp0 / t;
-        return cast(uint)tmp1;
+        return cast(typeof(return))tmp1;
     }
 
     void produce(uint n)
