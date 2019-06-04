@@ -48,30 +48,43 @@ class LFT
     }
 };
 
-void main(string[] args)
+int main(string[] args)
 {
-    // const std::size_t TOTAL_DIGITS = std::atol(argv[1]);
+    import std.stdio:  write, writeln;
+    import std.conv : to;
+    
+    if (args.length <= 1)
+    {
+        writeln("Usage: N");
+        return 1;
+    }
+    const size_t total_digits = args[1].to!size_t;
 
-    // LFT lft;
-    // std::size_t n_digits = 0;
-    // while (n_digits < TOTAL_DIGITS) {
-    //     std::size_t i = 0;
-    //     while (i < 10 and n_digits < TOTAL_DIGITS) {
-    //         lft.next();
-    //         if (lft.q > lft.r) continue;
+    LFT lft;
+    size_t n_digits = 0;
+    while (n_digits < total_digits)
+    {
+        size_t i = 0;
+        while (i < 10 && n_digits < total_digits)
+        {
+            lft.next();
+            if (lft.q > lft.r) continue;
 
-    //         auto digit = lft.extract(3);
-    //         if (digit == lft.extract(4)) {
-    //             std::cout << digit;
-    //             lft.produce(digit);
-    //             ++i;
-    //             ++n_digits;
-    //         }
-    //     }
+            auto digit = lft.extract(3);
+            if (digit == lft.extract(4))
+            {
+                write(digit);
+                lft.produce(digit);
+                ++i;
+                ++n_digits;
+            }
+        }
 
-    //     // Pad digits with extra spaces if TOTAL_DIGITS was not a
-    //     // multiple of 10.
-    //     for (; i < 10; ++i) std::cout << ' ';
-    //     std::cout << "\t:" << n_digits << '\n';
-    // }
+        // Pad digits with extra spaces if total_digits was not a
+        // multiple of 10.
+        for (; i < 10; ++i) write(' ');
+        write("\t:", n_digits, '\n');
+    }
+
+    return 0;
 }
