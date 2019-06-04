@@ -5,9 +5,6 @@
 
 import gmp;
 
-import std.stdio:  write, writeln;
-import std.conv : to;
-
 @safe:
 
 alias Z = MpZ;
@@ -60,6 +57,9 @@ private:
 
 int main(string[] args)
 {
+    import std.stdio:  write, writeln;
+    import std.conv : to;
+
     if (args.length <= 1)
     {
         writeln("Usage: N");
