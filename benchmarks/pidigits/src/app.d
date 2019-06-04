@@ -12,18 +12,11 @@ import std.conv : to;
 
 alias Z = MpZ;
 
+/** LFT. */
 struct LFT
 {
 @safe pure @nogc:
 public:
-    Z q;
-    Z r;
-    Z t;
-    uint k;
-
-    Z tmp0;
-    Z tmp1;
-    
     // Replace static init of data members
     void init()
     {
@@ -53,7 +46,17 @@ public:
         q = 10 * q;
         r = 10 * (r - n * t);
     }
-};
+
+private:
+    Z q;
+    Z r;
+    Z t;
+    uint k;
+
+    // temporaries
+    Z tmp0;
+    Z tmp1;
+}
 
 int main(string[] args)
 {
@@ -89,7 +92,10 @@ int main(string[] args)
 
         // Pad digits with extra spaces if total_digits was not a
         // multiple of 10.
-        for (; i < 10; ++i) write(' ');
+        for (; i < 10; ++i)
+        {
+            write(' ');
+        }
         write("\t:", n_digits, '\n');
     }
 
