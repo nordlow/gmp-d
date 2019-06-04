@@ -1,14 +1,21 @@
+/** Compute digits of pi.
+ *
+ * See_Also: https://benchmarksgame-team.pages.debian.net/benchmarksgame/program/pidigits-gpp-4.html
+ */
+
 import gmp;
+
+import std.stdio:  write, writeln;
+import std.conv : to;
 
 @safe:
 
 alias Z = MpZ;
 
-class LFT
+struct LFT
 {
-@safe pure nothrow @nogc:
-
-    public:
+@safe pure @nogc:
+public:
     Z q;
     Z r;
     Z t;
@@ -50,17 +57,16 @@ class LFT
 
 int main(string[] args)
 {
-    import std.stdio:  write, writeln;
-    import std.conv : to;
-    
     if (args.length <= 1)
     {
         writeln("Usage: N");
         return 1;
     }
+
     const size_t total_digits = args[1].to!size_t;
 
     LFT lft;
+    lft.init();
     size_t n_digits = 0;
     while (n_digits < total_digits)
     {
@@ -68,7 +74,8 @@ int main(string[] args)
         while (i < 10 && n_digits < total_digits)
         {
             lft.next();
-            if (lft.q > lft.r) continue;
+            if (lft.q > lft.r)
+                continue;
 
             auto digit = lft.extract(3);
             if (digit == lft.extract(4))
