@@ -58,6 +58,23 @@ private:
     bool _isInitialized = false;
 }
 
+// TODO:
+// struct PiDigits
+// {
+// @safe pure nothrow @nogc:
+// public:
+//     enum empty = false;         // infinite number of digits
+//     uint front()
+//     {
+//     }
+//     void popFront()
+//     {
+//         lft.next();
+//     }
+// private:
+//     LFT lft;
+// }
+
 int main(string[] args)
 {
     import std.stdio : write, writeln;
