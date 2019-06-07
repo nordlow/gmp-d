@@ -190,6 +190,9 @@ private struct _MpZ(bool copyable = false)
     this(T)(T value) @trusted
     if (isArithmetic!T)
     {
+        // TODO add support for static initialization
+        // if (!__ctfe)
+        // {
         pragma(inline, true);
         version(ccc) { ++_ccc; }
         static      if (isUnsigned!T)
@@ -198,6 +201,18 @@ private struct _MpZ(bool copyable = false)
             __gmpz_init_set_d(_ptr, value);
         else                    // isSigned integral
             __gmpz_init_set_si(_ptr, value);
+        // }
+        // else
+        // {
+        //     if (value == 0)
+        //     {
+        //         reinterpret_to_size_if_sizeof_and_zero();
+        //     }
+        //     else
+        //     {
+        //         assert(0, "Cannot set non-zero value at ctfe");
+        //     }
+        // }
     }
 
     /** Construct from `value` in base `base`.
