@@ -21,10 +21,12 @@ public:
         r = 0;
         t = 1;
         k = 0;
+        _isInitialized = true;
     }
 
     void next()
     {
+        if (!_isInitialized) { init(); }
         ++k;
         r = (2 * k + 1) * (2 * q + r);
         t = (2 * k + 1) * t;
@@ -45,14 +47,15 @@ public:
     }
 
 private:
-    Z q;
-    Z r;
-    Z t;
-    uint k;
-
     // temporaries
     Z tmp0;
     Z tmp1;
+
+    Z q;
+    Z r;
+    Z t;
+    uint k = 0;
+    bool _isInitialized = false;
 }
 
 int main(string[] args)
@@ -69,7 +72,6 @@ int main(string[] args)
     const size_t total_digits = args[1].to!size_t;
 
     LFT lft;
-    lft.init();
     size_t n_digits = 0;
     while (n_digits < total_digits)
     {
