@@ -69,7 +69,7 @@ int main(string[] args)
         return 1;
     }
 
-    const size_t total_digits = args[1].to!size_t;
+    const total_digits = args[1].to!size_t;
 
     LFT lft;
     size_t n_digits = 0;
