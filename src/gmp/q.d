@@ -394,7 +394,6 @@ private:
 
     version(ccc)
     {
-
         /** Number of calls made to `__gmpq`--functions that construct or changes
             this value. Used to verify correct lowering and evaluation of template
             expressions.
@@ -671,9 +670,9 @@ alias inv = inverse;
 
 version(unittest)
 {
+    // version = ccc;              // do C mutation call count
     alias Z = MpZ;
     alias Q = MpQ;
-    version = ccc;              // do C mutation call count
     static assert(!isMpZExpr!int);
     import std.meta : AliasSeq;
 }
