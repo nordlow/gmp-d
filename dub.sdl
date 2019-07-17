@@ -29,6 +29,12 @@ buildType "unittest" {
          dflags "-fsanitize=address" platform="posix-ldc" # test build uses LDC's sanitizer by default
 }
 
+buildType "unittest-ccc" {          
+         buildOptions "unittests" "debugMode" "debugInfo"
+         dflags "-fsanitize=address" platform="posix-ldc" # test build uses LDC's sanitizer by default
+         dflags "-version=ccc"
+}
+
 buildType "release-unittest" {
          buildOptions "releaseMode" "optimize" "inline" # TODO -march=native -ffast-math
          dflags "-unittest"
