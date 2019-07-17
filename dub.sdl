@@ -33,7 +33,7 @@ buildType "unittest" {
 buildType "unittest-ccc" {          
          buildOptions "unittests" "debugMode" "debugInfo"
          dflags "-fsanitize=address" platform="posix-ldc" # test build uses LDC's sanitizer by default
-         dflags "-version=ccc"
+         # TODO dflags "-d-version=ccc"
 }
 
 buildType "release-unittest" {
