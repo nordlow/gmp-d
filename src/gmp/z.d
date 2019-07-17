@@ -3429,7 +3429,6 @@ version(unittest)
 {
     alias Z = MpZ;
     debug import core.stdc.stdio : printf;
-    // version = ccc;              // do C mutation call count
     static assert(!isMpZExpr!int);
     import std.meta : AliasSeq;
 }
