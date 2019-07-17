@@ -29,6 +29,7 @@ buildType "unittest" {
          dflags "-fsanitize=address" platform="posix-ldc" # test build uses LDC's sanitizer by default
 }
 
+# TODO this doesn't work
 buildType "unittest-ccc" {          
          buildOptions "unittests" "debugMode" "debugInfo"
          dflags "-fsanitize=address" platform="posix-ldc" # test build uses LDC's sanitizer by default
