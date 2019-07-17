@@ -3427,6 +3427,7 @@ if (isIntegral!T)
 
 version(unittest)
 {
+    // version = ccc;              // do C mutation call count
     alias Z = MpZ;
     debug import core.stdc.stdio : printf;
     static assert(!isMpZExpr!int);
