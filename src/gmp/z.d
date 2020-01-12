@@ -373,7 +373,7 @@ private struct _MpZ(bool copyable = false)
     }
 
     /// Destruct `this`.
-    ~this() @trusted
+    ~this() @trusted @nogc
     {
         pragma(inline, true);
         if (_z._mp_d)
@@ -1551,23 +1551,23 @@ _MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
             if (x.limbCount > y.limbCount) // larger r-value `x`
             {
                 zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-                __gmpz_add(zp._ptr, x._ptr, y._ptr); 
+                __gmpz_add(zp._ptr, x._ptr, y._ptr);
             }
             else                    // larger r-value `y`
             {
                 zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-                __gmpz_add(zp._ptr, x._ptr, y._ptr); 
+                __gmpz_add(zp._ptr, x._ptr, y._ptr);
             }
         }
         else static if (!__traits(isRef, x)) // r-value `x`
         {
             zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-            __gmpz_add(zp._ptr, x._ptr, y._ptr); 
+            __gmpz_add(zp._ptr, x._ptr, y._ptr);
         }
         else static if (!__traits(isRef, y)) // r-value `y`
         {
             zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-            __gmpz_add(zp._ptr, x._ptr, y._ptr); 
+            __gmpz_add(zp._ptr, x._ptr, y._ptr);
         }
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO shouldn't have to call `move` here
@@ -1609,23 +1609,23 @@ _MpZ!copyable sub(bool copyable)(auto ref const _MpZ!copyable x,
             if (x.limbCount > y.limbCount) // larger r-value `x`
             {
                 zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-                __gmpz_sub(zp._ptr, x._ptr, y._ptr); 
+                __gmpz_sub(zp._ptr, x._ptr, y._ptr);
             }
             else                    // larger r-value `y`
             {
                 zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-                __gmpz_sub(zp._ptr, x._ptr, y._ptr); 
+                __gmpz_sub(zp._ptr, x._ptr, y._ptr);
             }
         }
         else static if (!__traits(isRef, x)) // r-value `x`
         {
             zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-            __gmpz_sub(zp._ptr, x._ptr, y._ptr); 
+            __gmpz_sub(zp._ptr, x._ptr, y._ptr);
         }
         else static if (!__traits(isRef, y)) // r-value `y`
         {
             zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-            __gmpz_sub(zp._ptr, x._ptr, y._ptr); 
+            __gmpz_sub(zp._ptr, x._ptr, y._ptr);
         }
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO shouldn't have to call `move` here
@@ -1667,23 +1667,23 @@ _MpZ!copyable mul(bool copyable)(auto ref const _MpZ!copyable x,
             if (x.limbCount > y.limbCount) // larger r-value `x`
             {
                 zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-                __gmpz_mul(zp._ptr, x._ptr, y._ptr); 
+                __gmpz_mul(zp._ptr, x._ptr, y._ptr);
             }
             else                    // larger r-value `y`
             {
                 zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-                __gmpz_mul(zp._ptr, x._ptr, y._ptr); 
+                __gmpz_mul(zp._ptr, x._ptr, y._ptr);
             }
         }
         else static if (!__traits(isRef, x)) // r-value `x`
         {
             zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-            __gmpz_mul(zp._ptr, x._ptr, y._ptr); 
+            __gmpz_mul(zp._ptr, x._ptr, y._ptr);
         }
         else static if (!__traits(isRef, y)) // r-value `y`
         {
             zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-            __gmpz_mul(zp._ptr, x._ptr, y._ptr); 
+            __gmpz_mul(zp._ptr, x._ptr, y._ptr);
         }
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO shouldn't have to call `move` here
@@ -1807,23 +1807,23 @@ _MpZ!copyable gcd(bool copyable)(auto ref const _MpZ!copyable x,
             if (x.limbCount > y.limbCount) // larger r-value `x`
             {
                 zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-                __gmpz_gcd(zp._ptr, x._ptr, y._ptr); 
+                __gmpz_gcd(zp._ptr, x._ptr, y._ptr);
             }
             else                    // larger r-value `y`
             {
                 zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-                __gmpz_gcd(zp._ptr, x._ptr, y._ptr); 
+                __gmpz_gcd(zp._ptr, x._ptr, y._ptr);
             }
         }
         else static if (!__traits(isRef, x)) // r-value `x`
         {
             zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-            __gmpz_gcd(zp._ptr, x._ptr, y._ptr); 
+            __gmpz_gcd(zp._ptr, x._ptr, y._ptr);
         }
         else static if (!__traits(isRef, y)) // r-value `y`
         {
             zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-            __gmpz_gcd(zp._ptr, x._ptr, y._ptr); 
+            __gmpz_gcd(zp._ptr, x._ptr, y._ptr);
         }
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO shouldn't have to call `move` here
@@ -1869,23 +1869,23 @@ _MpZ!copyable lcm(bool copyable)(auto ref const _MpZ!copyable x,
             if (x.limbCount > y.limbCount) // larger r-value `x`
             {
                 zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-                __gmpz_lcm(zp._ptr, x._ptr, y._ptr); 
+                __gmpz_lcm(zp._ptr, x._ptr, y._ptr);
             }
             else                    // larger r-value `y`
             {
                 zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-                __gmpz_lcm(zp._ptr, x._ptr, y._ptr); 
+                __gmpz_lcm(zp._ptr, x._ptr, y._ptr);
             }
         }
         else static if (!__traits(isRef, x)) // r-value `x`
         {
             zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-            __gmpz_lcm(zp._ptr, x._ptr, y._ptr); 
+            __gmpz_lcm(zp._ptr, x._ptr, y._ptr);
         }
         else static if (!__traits(isRef, y)) // r-value `y`
         {
             zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-            __gmpz_lcm(zp._ptr, x._ptr, y._ptr); 
+            __gmpz_lcm(zp._ptr, x._ptr, y._ptr);
         }
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO shouldn't have to call `move` here
@@ -2822,7 +2822,7 @@ unittest
     assert(Z.mersennePrime(15UL) == 2^^15 - 1);
 }
 
-/// left shift 
+/// left shift
 @safe @nogc unittest
 {
     assert(1.Z << 1.Z == 2^^1);

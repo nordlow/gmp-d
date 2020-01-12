@@ -138,7 +138,7 @@ pragma(inline, true):
     }
 
     /// Destruct `this`.
-    ~this() @trusted
+    ~this() @trusted @nogc
     {
         assert(_ptr, "Pointer is null");
         __gmpq_clear(_ptr); version(ccc) ++_ccc;
