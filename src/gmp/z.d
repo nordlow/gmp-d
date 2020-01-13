@@ -3432,10 +3432,7 @@ version(unittest)
     debug import core.stdc.stdio : printf;
     static assert(!isMpZExpr!int);
     import std.meta : AliasSeq;
-}
 
-version(unittest)
-{
     alias CZ = _MpZ!true;
 }
 
