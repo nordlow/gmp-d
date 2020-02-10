@@ -2,7 +2,7 @@
 module gmp.z;
 
 import core.lifetime : move, moveEmplace;
-import std.traits : isInstanceOf, Unsigned, Unqual, isIntegral, isUnsigned; // used by expression templates
+import std.traits : Unsigned, Unqual, isIntegral, isUnsigned; // used by expression templates
 import gmp.traits;
 
 /// Call unittests taking long to execute.
