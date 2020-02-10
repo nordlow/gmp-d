@@ -39,7 +39,7 @@ param is passed as `(T)(auto ref const T param)`). See [this
 thread](http://forum.dlang.org/post/boorcxnmtatrncrclimp@forum.dlang.org). Lazy
 evaluation via [expression
 templates](https://en.wikipedia.org/wiki/Expression_templates)
-  
+
   - `x = -x`        => Assign(x, Neg(x)) => `x.negate()` (if compiler doesn't already rewrite this)
   - `x *= -1`       => `mpz_neg(x, x)` => `x.negate()`
   - `x -= 2*x`      => `mpz_neg(x, x)` => `x.negate()`
@@ -74,4 +74,4 @@ templates](https://en.wikipedia.org/wiki/Expression_templates)
   - `mpq_clears` (va_list wrapper)
   - `mpq_swap` (no better than D's own `std.algorithm.swap`)
 
-- [Code generation](http://forum.dlang.org/post/wyduglxwbxmfcgwtczra@forum.dlang.org) via something like
+- [Code generation](http://forum.dlang.org/post/wyduglxwbxmfcgwtczra@forum.dlang.org)
