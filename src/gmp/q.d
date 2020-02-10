@@ -64,7 +64,7 @@ pragma(inline, true):
     /** Construct from floating-point `value`.
      */
     this(P)(P value) @safe
-        if (isFloating!P)
+    if (isFloating!P)
     {
         initialize();
         this = value;           // reuse opAssign
@@ -77,8 +77,8 @@ pragma(inline, true):
      */
     this(P, Q)(P pValue, Q qValue,
                bool canonicalizeFlag = false) @trusted
-        if (isIntegral!P &&
-            isIntegral!Q)
+    if (isIntegral!P &&
+        isIntegral!Q)
     {
         initialize();
 
@@ -108,7 +108,7 @@ pragma(inline, true):
     /** Construct from floating-point `value`.
      */
     ref MpQ opAssign(P)(P value) @trusted return scope
-        if (isFloating!P)
+    if (isFloating!P)
     {
         version(DigitalMars) pragma(inline, false);
         version(ccc) ++_ccc;
@@ -118,7 +118,7 @@ pragma(inline, true):
 
     /** Assign from integer `value`. */
     ref MpQ opAssign(P)(P value) @trusted return scope
-        if (isIntegral!P)
+    if (isIntegral!P)
     {
         version(DigitalMars) pragma(inline, false);
         version(ccc) ++_ccc;
@@ -156,7 +156,7 @@ pragma(inline, true):
     }
     /// ditto
     int opEquals(T)(T rhs) const @safe
-        if (isIntegral!T)
+    if (isIntegral!T)
     {
         if (rhs == 0)
         {
@@ -188,7 +188,7 @@ pragma(inline, true):
     }
     /// ditto
     int opCmp(T)(T rhs) const @trusted
-        if (isIntegral!T)
+    if (isIntegral!T)
     {
         if (rhs == 0)
         {
@@ -238,7 +238,7 @@ pragma(inline, true):
 
     /// Cast to arithmetic type `T`.
     T opCast(T)() const @trusted /*TODO scope*/
-        if (isFloating!T)
+    if (isFloating!T)
     {
         return cast(T)__gmpq_get_d(_ptr);
     }
@@ -456,19 +456,19 @@ alias inv = inverse;
 /// construction and assignment
 @safe @nogc unittest
 {
-    scope Q x = null;
+    Q x = null;
     assert(x.numerator == 0);
     assert(x.denominator == 1);
 
-    scope const Q y = Q(11, 13UL);
+    const Q y = Q(11, 13UL);
     assert(y.numerator == 11);
     assert(y.denominator == 13);
 
-    scope immutable Q z = Q(7UL, 13UL);
+    const Q z = Q(7UL, 13UL);
     assert(z.numerator == 7);
     assert(z.denominator == 13);
 
-    scope Q w = 0.25;           // construct from `double`
+    Q w = 0.25;                 // construct from `double`
     assert(w.numerator == 1);
     assert(w.denominator == 4);
 
