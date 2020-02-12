@@ -1468,11 +1468,10 @@ private:
 
 /** Non-copyable MpZ.
  *
- * For reference counting semantics, use `RefCounted` as
+ * For reference counting semantics, use `std.typecons.RefCounted` as
  *
  * import std.typecons : RefCounted;
- * alias RcMpZ = RefCounted!MpZ;
- * RcMpZ x;
+ * alias RcZ = RefCounted!MpZ;
  */
 alias MpZ = _MpZ!false;
 
