@@ -68,13 +68,13 @@ copying. Instead use `f(move(z))` or `f(z.move)` (from `std.algorithm.mutation`)
 to pass by move or `f(z.dup)` to pass by explicit copy (via `MpZ`'s member
 function `.dup`).
 
-### Reference semantics
+### Reference semantics using `RefCounted`
 
-If you want to pass by reference use
+If you want to pass by reference use, for instance,
 
 ```D
 import std.typecons : RefCounted;
-RefCounted!MpZ
+alias RcMpZ = RefCounted!MpZ;
 ```
 
 ### Copy semantics
