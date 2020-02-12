@@ -59,13 +59,25 @@ unittest
 }
 ```
 
-## Features
+## Value passing
+
+### Move semantics (default)
 
 Copy construction is disabled by default (for now) to prevent inadvertent
 copying. Instead use `f(move(z))` or `f(z.move)` (from `std.algorithm.mutation`)
 to pass by move or `f(z.dup)` to pass by value (via `.dup` member function).
 
-If you really need to have copy construction you can use `CopyableMpZ`.
+### Reference semantics
+
+If you want to pass by reference use `RefCounted!MpZ` (from
+`std.typecons.RefCounted`).
+
+### Copy semantics
+
+If you really need to have copy construction when passing parameters in function
+calls and assignments you can use `CopyableMpZ`.
+
+## Mappings to GNU MP C library
 
 Implementation is optimized through
 
