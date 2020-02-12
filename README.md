@@ -65,7 +65,8 @@ unittest
 
 Copy construction is disabled by default (for now) to prevent inadvertent
 copying. Instead use `f(move(z))` or `f(z.move)` (from `std.algorithm.mutation`)
-to pass by move or `f(z.dup)` to pass by explicit copy (via `.dup` member function).
+to pass by move or `f(z.dup)` to pass by explicit copy (via `MpZ`'s member
+function `.dup`).
 
 ### Reference semantics
 
