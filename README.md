@@ -70,8 +70,12 @@ function `.dup`).
 
 ### Reference semantics
 
-If you want to pass by reference use `RefCounted!MpZ` (from
-`std.typecons.RefCounted`).
+If you want to pass by reference use
+
+```D
+import std.typecons : RefCounted;
+RefCounted!MpZ
+```
 
 ### Copy semantics
 
