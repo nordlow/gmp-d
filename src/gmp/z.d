@@ -2177,6 +2177,7 @@ unittest
     assert(storage2 == expected);
 }
 
+///
 unittest
 {
     auto prime = 33391.Z;
@@ -2835,7 +2836,7 @@ unittest
     assert(1.Z << 63U == 2UL^^63);
 }
 
-/// Phobos unittests
+/// verify compliance with Phobos' `BigInt`
 @safe @nogc unittest
 {
     alias bigInt = mpz;
@@ -3058,7 +3059,7 @@ unittest
     }
 }
 
-// Fermats Little Theorem
+/// Fermats Little Theorem
 @safe @nogc unittest
 {
     if (unittestLong) // compile but not run unless flagged for because running is slow
