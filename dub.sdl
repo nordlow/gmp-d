@@ -10,6 +10,7 @@ copyright "Per Nordlöw"
 
 dflags "-vcolumns" "-dip25" "-dip1000"
 dflags "-preview=intpromote" "-preview=dtorfields" "-preview=markdown"
+dflags "-preview=in" platform="dmd"
 
 libs "gmp" "c"
 
