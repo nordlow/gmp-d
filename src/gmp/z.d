@@ -2125,7 +2125,7 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
     Z x = null;
     Z y = null;
     assert(x == y);
-    assert(x is y);             // TODO this behaviour recently changed. is this correct?
+    assert(x is y);    // TODO this behaviour recently changed. is this correct?
 }
 
 ///
