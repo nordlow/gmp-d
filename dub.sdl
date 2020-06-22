@@ -8,7 +8,7 @@ copyright "Per Nordlöw"
 
 # dependency "libgmp" version="~>1.0.0"
 
-dflags "-vcolumns" "-dip25" "-dip1000"
+dflags "-vcolumns" "-dip25" "-dip1000" "-dip1008"
 dflags "-preview=intpromote" "-preview=dtorfields" "-preview=markdown"
 dflags "-preview=in" platform="dmd"
 
