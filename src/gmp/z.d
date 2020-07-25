@@ -44,7 +44,7 @@ enum WordOrder
  */
 private struct _MpZ(bool copyable = false)
 {
-    pure nothrow:
+pure nothrow:
 
     /// Convert to `string` in base `base`.
     string toString(uint base = defaultBase,
@@ -160,7 +160,7 @@ private struct _MpZ(bool copyable = false)
         return serialize(new Word[count], order, Word.sizeof, endian, nails);
     }
 
-    @nogc:
+@nogc:
 
     /** No default construction for now, because `mpz_init` initialize
         `__mpz_struct`-fields to non-zero values.
