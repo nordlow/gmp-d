@@ -1,12 +1,12 @@
 /// Multiple precision integers (Z).
 module gmp.z;
 
-import core.lifetime : move, moveEmplace;
+import core.lifetime : move;
 import std.traits : Unsigned, Unqual, isIntegral, isUnsigned; // used by expression templates
 import gmp.traits;
 
 /// Call unittests taking long to execute.
-enum unittestLong = false;
+// version = unittestLong;
 
 /// Is `true` if type `T` can be evaluated to a `MpZ` value.
 enum isMpZExpr(T) = (is(Unqual!(typeof(T.eval())) == MpZ)); // which returns an `MpZ`
@@ -292,6 +292,7 @@ private struct _MpZ(bool copyable = false)
         // /// Construct copy of `value`.
         // this(_MpZ value) @trusted
         // {
+        // import core.lifetime : moveEmplace;
         //     moveEmplace(value, this); // fast
         // }
     }
@@ -3062,7 +3063,7 @@ unittest
 /// Fermats Little Theorem
 @safe @nogc unittest
 {
-    if (unittestLong) // compile but not run unless flagged for because running is slow
+    version (unittestLong)
     {
         /*
           Fermats little theorem: a ^ p ≡ a (mod p) ∀ prime p check Fermats
@@ -3094,7 +3095,7 @@ pure @nogc unittest
     enum LIMIT = 144 + 1;
     enum POWER = 5;
 
-    if (unittestLong) // compile but not run unless flagged for because running is slow
+    version (unittestLong)
     {
         bool found = false;
         Z r1 = 0;
