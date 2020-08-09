@@ -33,7 +33,7 @@ public:
         q = q * k;
     }
 
-    uint extract(uint x)        // TODO `const` 
+    uint extract(uint x)        // TODO: `const`
     {
         tmp0 = q * x + r;
         tmp1 = tmp0 / t;

@@ -34,7 +34,7 @@ enum WordOrder
 }
 
 
-// TODO use these imports instead of the ones below
+// TODO: use these imports instead of the ones below
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
 
@@ -165,7 +165,7 @@ pure nothrow:
     /** No default construction for now, because `mpz_init` initialize
         `__mpz_struct`-fields to non-zero values.
 
-        TODO Allow default construction by delaying call to initialize().
+        TODO: Allow default construction by delaying call to initialize().
     */
     // @disable this();
 
@@ -173,7 +173,7 @@ pure nothrow:
     this(typeof(null)) @trusted
     {
         pragma(inline, true);
-        initialize();             // TODO is there a faster way?
+        initialize();             // TODO: is there a faster way?
         assert(this == _MpZ.init); // if this is same as default
     }
 
@@ -182,7 +182,7 @@ pure nothrow:
     if (isLazyMpZExpr!Expr)
     {
         version(LDC) pragma(inline, true);
-        // TODO ok to just assume zero-initialized contents at `_z` before...
+        // TODO: ok to just assume zero-initialized contents at `_z` before...
         this = expr;            // ...calling this.opAssign ?x
     }
 
@@ -190,7 +190,7 @@ pure nothrow:
     this(T)(T value) @trusted
     if (isArithmetic!T)
     {
-        // TODO add support for static initialization
+        // TODO: add support for static initialization
         // if (!__ctfe)
         // {
         pragma(inline, true);
@@ -219,7 +219,7 @@ pure nothrow:
      *
      * If `base` is 0 it's guessed from contents of `value`.
      */
-    this(scope const(char)[] value, uint base = 0) @trusted // TODO Use Optional/Nullable when value is nan, or inf
+    this(scope const(char)[] value, uint base = 0) @trusted // TODO: Use Optional/Nullable when value is nan, or inf
     {
         assert(base == 0 || (base >= 2 && base <= 62));
         char* stringz = _allocStringzCopyOf(value);
@@ -276,7 +276,7 @@ pure nothrow:
             pragma(inline, true);
             if (_z._mp_d)
             {
-                // TODO this might be made faster
+                // TODO: this might be made faster
                 __mpz_struct _z_copy = _z;
                 __gmpz_init_set(&_z_copy, _ptr); version(ccc) { ++_ccc; }
                 _z = _z_copy;
@@ -409,7 +409,7 @@ pure nothrow:
         }
         else static if (isFloating!Rhs)
         {
-            return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO correct to do this cast here?
+            return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO: correct to do this cast here?
         }
         else                    // isSigned integral
         {
@@ -482,7 +482,7 @@ pure nothrow:
     long toLong() const @trusted
     {
         version(LDC) pragma(inline, true);
-        // TODO can probably be optimized
+        // TODO: can probably be optimized
         if (this <= long.min)
         {
             return long.min;
@@ -503,7 +503,7 @@ pure nothrow:
     int toInt() const @trusted
     {
         version(LDC) pragma(inline, true);
-        // TODO can probably be optimized
+        // TODO: can probably be optimized
         if (this <= int.min)
         {
             return int.min;
@@ -572,7 +572,7 @@ pure nothrow:
             {
                 static assert(false);
             }
-            return move(*mut_rhs); // TODO shouldn't have to call `move` here
+            return move(*mut_rhs); // TODO: shouldn't have to call `move` here
         }
         else
         {
@@ -683,7 +683,7 @@ pure nothrow:
         version(ccc) ++y._ccc;
         static      if (s == "+")
         {
-            if (rhs < 0)        // TODO handle `rhs == rhs.min`
+            if (rhs < 0)        // TODO: handle `rhs == rhs.min`
             {
                 immutable ulong pos_rhs = -rhs; // make it positive
                 __gmpz_sub_ui(y._ptr, _ptr, pos_rhs);
@@ -695,7 +695,7 @@ pure nothrow:
         }
         else static if (s == "-")
         {
-            if (rhs < 0)        // TODO handle `rhs == rhs.min`
+            if (rhs < 0)        // TODO: handle `rhs == rhs.min`
             {
                 __gmpz_add_ui(y._ptr, _ptr, -rhs); // x - (-y) == x + y
             }
@@ -711,7 +711,7 @@ pure nothrow:
         else static if (s == "/")
         {
             assert(rhs != 0, "Divison by zero");
-            if (rhs < 0)        // TODO handle `rhs == rhs.min`
+            if (rhs < 0)        // TODO: handle `rhs == rhs.min`
             {
                 immutable ulong pos_rhs = -rhs; // make it positive
                 __gmpz_tdiv_q_ui(y._ptr, _ptr, pos_rhs);
@@ -724,7 +724,7 @@ pure nothrow:
         }
         else static if (s == "^^")
         {
-            assert(rhs >= 0, "TODO Negative power exponent needs MpQ return");
+            assert(rhs >= 0, "TODO: Negative power exponent needs MpQ return");
             __gmpz_pow_ui(y._ptr, _ptr, rhs);
         }
         else
@@ -745,7 +745,7 @@ pure nothrow:
         version(ccc) ++y._ccc;
         static if (isSigned!Rhs)
         {
-            if (rhs < 0)        // TODO handle `rhs == rhs.min`
+            if (rhs < 0)        // TODO: handle `rhs == rhs.min`
             {
                 immutable ulong pos_rhs = -cast(int)rhs; // make it positive
                 return cast(typeof(return))-__gmpz_tdiv_r_ui(y._ptr, _ptr, pos_rhs);
@@ -811,7 +811,7 @@ pure nothrow:
         {
             typeof(return) y = null;
             version(ccc) ++y._ccc;
-            if (lhs < 0)        // TODO handle `lhs == lhs.min`
+            if (lhs < 0)        // TODO: handle `lhs == lhs.min`
             {
                 immutable ulong pos_rhs = -lhs; // make it positive
                 __gmpz_add_ui(y._ptr, _ptr, pos_rhs);
@@ -843,7 +843,7 @@ pure nothrow:
         isIntegral!Lhs)
     {
         version(LDC) pragma(inline, true);
-        _MpZ y = null; // TODO avoid if !__traits(isRef, this)
+        _MpZ y = null; // TODO: avoid if !__traits(isRef, this)
         version(ccc) ++y._ccc;
         assert(this != 0, "Divison by zero");
         __gmpz_tdiv_q(y._ptr, _MpZ(lhs)._ptr, _ptr);
@@ -983,7 +983,7 @@ pure nothrow:
         version(LDC) pragma(inline, true);
         static      if (s == "+")
         {
-            if (rhs < 0)        // TODO handle `rhs == rhs.min`
+            if (rhs < 0)        // TODO: handle `rhs == rhs.min`
             {
                 assert(rhs != rhs.min);
                 immutable ulong pos_rhs = -rhs; // make it positive
@@ -996,7 +996,7 @@ pure nothrow:
         }
         else static if (s == "-")
         {
-            if (rhs < 0)        // TODO handle `rhs == rhs.min`
+            if (rhs < 0)        // TODO: handle `rhs == rhs.min`
             {
                 assert(rhs != rhs.min);
 
@@ -1022,7 +1022,7 @@ pure nothrow:
         else static if (s == "/")
         {
             assert(rhs != 0, "Divison by zero");
-            if (rhs < 0)        // TODO handle `rhs == rhs.min`
+            if (rhs < 0)        // TODO: handle `rhs == rhs.min`
             {
                 immutable ulong pos_rhs = -rhs; // make it positive
                 __gmpz_tdiv_q_ui(_ptr, _ptr, pos_rhs); version(ccc) { ++_ccc; }
@@ -1161,7 +1161,7 @@ pure nothrow:
 
         static if (isSigned!Exp)
         {
-            assert(exp >= 0, "Negative exponent"); // TODO return mpq?
+            assert(exp >= 0, "Negative exponent"); // TODO: return mpq?
             immutable uexp = cast(ulong)exp;
         }
         else
@@ -1264,7 +1264,7 @@ pure nothrow:
     {
         pragma(inline, true);
         if (isZero) { return 0; } // default-constructed `this`
-        return __gmpz_popcount(this._ptr); // TODO use core.bitop `popcnt` inline here instead?
+        return __gmpz_popcount(this._ptr); // TODO: use core.bitop `popcnt` inline here instead?
     }
     alias countOnes = populationCount;
 
@@ -1361,14 +1361,14 @@ pure nothrow:
     @property size_t uintLength() const
     {
         pragma(inline, true);
-        assert(false, "TODO use mpz_size");
+        assert(false, "TODO: use mpz_size");
     }
 
     /// Number of significant `ulong`s used for storing `this`.
     @property size_t uintLong() const
     {
         pragma(inline, true);
-        assert(false, "TODO use mpz_size");
+        assert(false, "TODO: use mpz_size");
     }
 
     /// Get number of limbs in internal representation.
@@ -1570,7 +1570,7 @@ _MpZ!copyable add(bool copyable)(auto ref const _MpZ!copyable x,
             __gmpz_add(zp._ptr, x._ptr, y._ptr);
         }
         version(ccc) ++zp._ccc;
-        return move(*zp);    // TODO shouldn't have to call `move` here
+        return move(*zp);    // TODO: shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`, no reuse in output
     {
@@ -1628,7 +1628,7 @@ _MpZ!copyable sub(bool copyable)(auto ref const _MpZ!copyable x,
             __gmpz_sub(zp._ptr, x._ptr, y._ptr);
         }
         version(ccc) ++zp._ccc;
-        return move(*zp);    // TODO shouldn't have to call `move` here
+        return move(*zp);    // TODO: shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`, no reuse in output
     {
@@ -1686,7 +1686,7 @@ _MpZ!copyable mul(bool copyable)(auto ref const _MpZ!copyable x,
             __gmpz_mul(zp._ptr, x._ptr, y._ptr);
         }
         version(ccc) ++zp._ccc;
-        return move(*zp);    // TODO shouldn't have to call `move` here
+        return move(*zp);    // TODO: shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`, no reuse in output
     {
@@ -1726,7 +1726,7 @@ _MpZ!copyable abs(bool copyable)(auto ref const _MpZ!copyable x) @trusted @nogc
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
         zp.absolute(); version(ccc) ++zp._ccc;
-        return move(*zp);    // TODO shouldn't have to call `move` here
+        return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
 
@@ -1747,7 +1747,7 @@ _MpZ!copyable onesComplement(bool copyable)(auto ref const _MpZ!copyable x) @tru
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
         zp.onesComplement(); version(ccc) ++zp._ccc;
-        return move(*zp);    // TODO shouldn't have to call `move` here
+        return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
 
@@ -1788,7 +1788,7 @@ _MpZ!copyable nextPrime(bool copyable)(auto ref const _MpZ!copyable x) @trusted 
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
         __gmpz_nextprime(zp._ptr, x._ptr); version(ccc) ++zp._ccc;
-        return move(*zp);    // TODO shouldn't have to call `move` here
+        return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
 
@@ -1826,7 +1826,7 @@ _MpZ!copyable gcd(bool copyable)(auto ref const _MpZ!copyable x,
             __gmpz_gcd(zp._ptr, x._ptr, y._ptr);
         }
         version(ccc) ++zp._ccc;
-        return move(*zp);    // TODO shouldn't have to call `move` here
+        return move(*zp);    // TODO: shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`, no reuse in output
     {
@@ -1850,7 +1850,7 @@ _MpZ!copyable gcd(bool copyable)(auto ref const _MpZ!copyable x,
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
         const z_ui = __gmpz_gcd_ui(zp._ptr, x._ptr, y); version(ccc) ++zp._ccc;
-        return move(*zp);    // TODO shouldn't have to call `move` here
+        return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
 
@@ -1888,7 +1888,7 @@ _MpZ!copyable lcm(bool copyable)(auto ref const _MpZ!copyable x,
             __gmpz_lcm(zp._ptr, x._ptr, y._ptr);
         }
         version(ccc) ++zp._ccc;
-        return move(*zp);    // TODO shouldn't have to call `move` here
+        return move(*zp);    // TODO: shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`, no reuse in output
     {
@@ -1912,7 +1912,7 @@ _MpZ!copyable lcm(bool copyable)(auto ref const _MpZ!copyable x,
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
         __gmpz_lcm_ui(zp._ptr, x._ptr, y); version(ccc) ++zp._ccc;
-        return move(*zp);    // TODO shouldn't have to call `move` here
+        return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
 
@@ -1926,7 +1926,7 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
 {
     version(LDC) pragma(inline, true);
     assert(mod != 0, "Zero modulus");
-    typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
+    typeof(return) y = 0; // result, TODO: reuse `exp` or `mod` if any is an r-value
     assert(exp >= 0, "Negative exponent");
     __gmpz_powm(y._ptr, base._ptr, exp._ptr, mod._ptr); version(ccc) ++y._ccc;
     return y;
@@ -1938,7 +1938,7 @@ _MpZ!copyable powm(bool copyable)(auto ref const _MpZ!copyable base,
 {
     version(LDC) pragma(inline, true);
     assert(mod != 0, "Zero modulus");
-    typeof(return) y = 0;       // result, TODO reuse `exp` or `mod` if any is an r-value
+    typeof(return) y = 0;       // result, TODO: reuse `exp` or `mod` if any is an r-value
     __gmpz_powm_ui(y._ptr, base._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
     return y;
 }
@@ -1958,18 +1958,18 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
         typeof(return)* mut_base = (cast(typeof(return)*)(&base)); // @trusted because `MpZ` has no aliased indirections
         auto success = __gmpz_invert(mut_base._ptr, base._ptr, mod._ptr); version(ccc) ++y._ccc;
         assert(success >= 0, "Cannot invert");
-        return move(*mut_base);    // TODO shouldn't have to call `move` here
+        return move(*mut_base);    // TODO: shouldn't have to call `move` here
     }
     else static if (!__traits(isRef, mod)) // r-value `mod`
     {
         typeof(return)* mut_mod = (cast(typeof(return)*)(&mod)); // @trusted because `MpZ` has no aliased indirections
         auto success = __gmpz_invert(mut_mod._ptr, base._ptr, mod._ptr); version(ccc) ++y._ccc;
         assert(success >= 0, "Cannot invert");
-        return move(*mut_mod);  // TODO shouldn't have to call `move` here
+        return move(*mut_mod);  // TODO: shouldn't have to call `move` here
     }
     else                        // l-value `base` and l-value `mod`
     {
-        typeof(return) y = 0; // result, TODO reuse `exp` or `mod` if any is an r-value
+        typeof(return) y = 0; // result, TODO: reuse `exp` or `mod` if any is an r-value
         auto success = __gmpz_invert(y._ptr, base._ptr, mod._ptr); version(ccc) ++y._ccc;
         assert(success >= 0, "Cannot invert");
         return y;
@@ -1982,7 +1982,7 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
     Z x;
     Z y;
     assert(x == y);
-    assert(x is y);             // TODO is this correct behaviour?
+    assert(x is y);             // TODO: is this correct behaviour?
     x = y;
     y = x;
 
@@ -2066,7 +2066,7 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
     assert(w is Z.init);        // should be unchanged
 
     assert(w^^10 == 0);
-    assert(w^^0 == 1);          // TODO correct?
+    assert(w^^0 == 1);          // TODO: correct?
 
     // change it and check its contents
     w = 42;
@@ -2126,7 +2126,7 @@ _MpZ!copyable invert(bool copyable)(auto ref const _MpZ!copyable base,
     Z x = null;
     Z y = null;
     assert(x == y);
-    assert(x is y);    // TODO this behaviour recently changed. is this correct?
+    assert(x is y);    // TODO: this behaviour recently changed. is this correct?
 }
 
 ///
@@ -2584,10 +2584,10 @@ unittest
     assert(-28.Z  %  3 == 1);  // dividend sign doesn't affect remainder
 
     //
-    assert( 28.Z  % -3.Z == 1);  // TODO should be -1
-    assert(-28.Z  %  3.Z == -1);  // TODO should be 1
-    assert( 28  % -3.Z == 1);      // TODO should be -1
-    assert(-28  %  3.Z == -1);     // TODO should be 1
+    assert( 28.Z  % -3.Z == 1);  // TODO: should be -1
+    assert(-28.Z  %  3.Z == -1);  // TODO: should be 1
+    assert( 28  % -3.Z == 1);      // TODO: should be -1
+    assert(-28  %  3.Z == -1);     // TODO: should be 1
 
     // modulo/remainder
 
@@ -2939,8 +2939,8 @@ unittest
 
         static assert(is(typeof(x % l)  == long));
         static assert(is(typeof(x % i)  == int));
-        // TODO static assert(is(typeof(x % s)  == short));
-        // TODO static assert(is(typeof(x % b)  == byte));
+        // TODO: static assert(is(typeof(x % s)  == short));
+        // TODO: static assert(is(typeof(x % b)  == byte));
 
         assert(x % ul == 500);
         assert(x % ui == 500);
@@ -3175,7 +3175,7 @@ if (isMpZExpr!T1 &&
 {
     T1 e1;                      // first term
     T2 e2;                      // second term
-    MpZ eval() const @trusted   // TODO move to common place
+    MpZ eval() const @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
@@ -3205,7 +3205,7 @@ if (isMpZExpr!F1 &&
 {
     F1 e1;                      // first factor
     F2 e2;                      // second factor
-    MpZ eval() const @trusted   // TODO move to common place
+    MpZ eval() const @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
@@ -3236,7 +3236,7 @@ if (isMpZExpr!P &&
 {
     P e1;                       // divisor
     Q e2;                       // dividend
-    MpZ eval() const @trusted   // TODO move to common place
+    MpZ eval() const @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
@@ -3270,7 +3270,7 @@ if (isMpZExpr!P &&
 {
     P e1;                       // divisor
     Q e2;                       // dividend
-    MpZ eval() const @trusted   // TODO move to common place
+    MpZ eval() const @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
@@ -3304,7 +3304,7 @@ if (isMpZExpr!P &&
 {
     P e1;                       // base
     Q e2;                       // exponent
-    MpZ eval() const @trusted   // TODO move to common place
+    MpZ eval() const @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
@@ -3333,7 +3333,7 @@ if (isMpZExpr!P &&
     P base;                     // base
     Q exp;                      // exponent
     M mod;                      // modulo
-    MpZ eval() const @trusted   // TODO move to common place
+    MpZ eval() const @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
@@ -3358,7 +3358,7 @@ private struct NegExpr(A)
 if (isMpZExpr!A)
 {
     A e1;
-    MpZ eval() const @trusted   // TODO move to common place
+    MpZ eval() const @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
@@ -3393,7 +3393,7 @@ if (isIntegral!T)
 /// as hash table key
 @safe unittest
 {
-    // TODO disabled until non-copyable types work in AA's
+    // TODO: disabled until non-copyable types work in AA's
     // string[Z] aa;
     // aa[123.Z] = "abc";
     // aa[456.Z] = "def";
@@ -3440,7 +3440,7 @@ version(unittest)
 // C API
 extern(C) pragma(inline, false)
 {
-    alias __mp_limb_t = ulong;    // see `mp_limb_t` gmp.h. TODO detect when it is `uint` instead
+    alias __mp_limb_t = ulong;    // see `mp_limb_t` gmp.h. TODO: detect when it is `uint` instead
     struct __mpz_struct
     {
         int _mp_alloc;		/* Number of *limbs* allocated and pointed to by
@@ -3565,7 +3565,7 @@ extern(C) pragma(inline, false)
 
     mp_bitcnt_t __gmpz_popcount (mpz_srcptr);
 
-    // TODO wrap:
+    // TODO: wrap:
     void __gmpz_root (mpz_ptr, mpz_srcptr, ulong);
     void __gmpz_rootrem (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
 
