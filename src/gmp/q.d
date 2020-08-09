@@ -1,7 +1,6 @@
 /// Multiple precision rational numbers (Q).
 module gmp.q;
 
-import core.lifetime : move;
 import gmp.traits;
 import gmp.z;
 
@@ -35,7 +34,7 @@ struct MpQ
 
 pragma(inline, true):
 
-    // TODO toRCString wrapped in UniqueRange
+    // TODO: toRCString wrapped in UniqueRange
 
     /// Returns: A unique hash of the `MpQ` value suitable for use in a hash table.
     size_t toHash() const
@@ -48,7 +47,7 @@ pragma(inline, true):
     /** No default construction for now, because `mpq_init` initialize
         `__mpq_struct`-fields to non-zero values.
 
-        TODO Allow default construction by delaying call to initialize().
+        TODO: Allow default construction by delaying call to initialize().
     */
     @disable this();
 
@@ -184,7 +183,7 @@ pragma(inline, true):
             return sgn;         // optimization
         }
         return __gmpq_cmp_z(_ptr,
-                            cast(const(__mpz_struct)*)&rhs); // TODO wrap cast?
+                            cast(const(__mpz_struct)*)&rhs); // TODO: wrap cast?
     }
     /// ditto
     int opCmp(T)(T rhs) const @trusted
@@ -230,14 +229,14 @@ pragma(inline, true):
     }
 
     /// Returns: the fractional part of `this`.
-    // TODO activate when sub(MpQ, MpZ) has been added
+    // TODO: activate when sub(MpQ, MpZ) has been added
     // @property MpQ fractionPart()
     // {
     //     return this - integerPart;
     // }
 
     /// Cast to arithmetic type `T`.
-    T opCast(T)() const @trusted /*TODO scope*/
+    T opCast(T)() const @trusted /*TODO: scope*/
     if (isFloating!T)
     {
         return cast(T)__gmpq_get_d(_ptr);
@@ -311,7 +310,8 @@ pragma(inline, true):
             {
                 static assert(false);
             }
-            return move(*mut_rhs); // TODO shouldn't have to call `move` here
+            import core.lifetime : move;
+            return move(*mut_rhs); // TODO: shouldn't have to call `move` here
         }
         else
         {
@@ -352,7 +352,7 @@ pragma(inline, true):
     //     }
     //     else
     //     {
-    //         MpQ y = null; // TODO avoid if !__traits(isRef, this)
+    //         MpQ y = null; // TODO: avoid if !__traits(isRef, this)
     //         version(ccc) ++y._ccc;
     //         assert(this != 0, "Divison by zero");
     //         denominator *= lhs;
@@ -430,7 +430,8 @@ MpQ abs()(auto ref const MpQ x) @trusted
     {
         MpQ* mut_x = (cast(MpQ*)(&x)); // @trusted because `MpQ` has no aliased indirections
         mut_x.absolute();
-        return move(*mut_x);    // TODO shouldn't have to call `move` here
+        import core.lifetime : move;
+        return move(*mut_x);    // TODO: shouldn't have to call `move` here
     }
 }
 
@@ -448,7 +449,8 @@ MpQ inverse()(auto ref const MpQ x) @trusted
     {
         MpQ* mut_x = (cast(MpQ*)(&x)); // @trusted because `MpQ` has no aliased indirections
         mut_x.invert();
-        return move(*mut_x);    // TODO shouldn't have to call `move` here
+        import core.lifetime : move;
+        return move(*mut_x);    // TODO: shouldn't have to call `move` here
     }
 }
 alias inv = inverse;
@@ -564,23 +566,23 @@ alias inv = inverse;
     Q x = Q(5, 2);
 
     assert(x.integerPart == 2);
-    // TODO assert(x.fractionalPart == Q(1, 2));
+    // TODO: assert(x.fractionalPart == Q(1, 2));
 
     x = Q(7, 2);
     assert(x.integerPart == 3);
-    // TODO assert(x.fractionalPart == Q(1, 2));
+    // TODO: assert(x.fractionalPart == Q(1, 2));
 
     x = Q(10, 2);
     assert(x.integerPart == 5);
-    // TODO assert(x.fractionalPart == 0);
+    // TODO: assert(x.fractionalPart == 0);
 
     x = Q(11, 3);
     assert(x.integerPart == 3);
-    // TODO assert(x.fractionalPart == Q(2, 3));
+    // TODO: assert(x.fractionalPart == Q(2, 3));
 
     x = Q(12, 2);
     assert(x.integerPart == 6);
-    // TODO assert(x.fractionalPart == 0);
+    // TODO: assert(x.fractionalPart == 0);
 }
 
 /// casting
@@ -665,7 +667,7 @@ alias inv = inverse;
     assert(Q(2, 3) / Q(2, 3) == 1);
     assert(Q(2, 3) / Q(3, 2) == Q(4, 9));
     assert(Q(3, 2) / Q(2, 3) == Q(9, 4));
-    // TODO assert(1 / Q(2, 3) == Q(3, 2));
+    // TODO: assert(1 / Q(2, 3) == Q(3, 2));
 }
 
 version(unittest)
