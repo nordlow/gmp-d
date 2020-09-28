@@ -4,6 +4,8 @@ module gmp.q;
 import gmp.traits;
 import gmp.z;
 
+@safe:
+
 /** Arbitrary (multi) precision rational number (Q).
     Wrapper for GNU MP (GMP)'s type `mpq_t` and functions `__gmpq_.*`.
  */
@@ -12,35 +14,32 @@ struct MpQ
     pure nothrow:
 
     /// Convert to `string` in base `base`.
-    string toString(uint base = defaultBase,
-                    bool upperCaseDigits = false) const @trusted
+    string toString(in uint base = defaultBase,
+                    in bool upperCaseDigits = false) const
     {
         assert((base >= -2 && base <= -36) ||
                (base >= 2 && base <= 62));
-        assert(false, "TODO");
+        // TODO: use on allocation only
+        return (numerator.toString(base) ~
+                "/" ~
+                denominator.toString(base));
     }
 
     /** Convert in base `base` into `chars` of length `length`.
      *
      * Returns: char[] which must be freed manually with `pureFree`.
      */
-    char[] toChars(uint base = defaultBase,
-                   bool upperCaseDigits = false) const @system @nogc
+    char[] toChars(in uint base = defaultBase,
+                   in bool upperCaseDigits = false) const @system @nogc
     {
         assert((base >= -2 && base <= -36) ||
                (base >= 2 && base <= 62));
-        assert(false, "TODO");
+        assert(false, "TODO: use on allocation only");
     }
 
 pragma(inline, true):
 
     // TODO: toRCString wrapped in UniqueRange
-
-    /// Returns: A unique hash of the `MpQ` value suitable for use in a hash table.
-    size_t toHash() const
-    {
-        assert(false, "TODO");
-    }
 
     @nogc:
 
@@ -62,7 +61,7 @@ pragma(inline, true):
 
     /** Construct from floating-point `value`.
      */
-    this(P)(P value) @safe
+    this(P)(in P value) @safe
     if (isFloating!P)
     {
         initialize();
@@ -75,7 +74,7 @@ pragma(inline, true):
         storage of integers as rations with denominator being 1.
      */
     this(P, Q)(P pValue, Q qValue,
-               bool canonicalizeFlag = false) @trusted
+               in bool canonicalizeFlag = false) @trusted
     if (isIntegral!P &&
         isIntegral!Q)
     {
