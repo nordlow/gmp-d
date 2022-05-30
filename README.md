@@ -67,16 +67,18 @@ Copy construction is disabled by default to prevent inadvertent copying. Instead
 use `f(move(z))` or `f(z.move)` (from `std.algorithm.mutation`) to pass by move
 or `f(z.dup)` to pass by explicit copy (via `MpZ`'s member function `.dup`).
 
-### Reference semantics using `RefCounted` mimicing Phobos’ `BigInt`
+### Reference semantics using `RefCounted`
 
-If you want to pass by reference use, for instance,
+If you instead want reference semantics use, for instance,
 
 ```D
 import std.typecons : RefCounted;
 alias RcMpZ = RefCounted!MpZ;
 ```
 
-making RcMpZ a drop-in-replacement for Phobos’ `std.bigint.BigInt`.
+. For a drop-in-replacement for Phobos’ `std.bigint.BigInt` this reference
+semantics needs to be adjusted to do copy-on-write (CoW) as described at
+https://dlang.org/phobos/std_bigint.html#.BigInt.
 
 ### Copy semantics
 
