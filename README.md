@@ -1,10 +1,10 @@
 # gmp-d
 
 D-language high-level wrapper for [GNU MP (GMP) library](https://gmplib.org/)
-that aims to
-be [mostly compatible](https://github.com/nordlow/gmp-d/blob/master/src/gmp/z.d#L2030)
-with `std.bigint.BigInt` (copy construction excluded) and `@safe pure nothrow
-@nogc` except when converting to `string`.
+that aims to be [mostly
+compatible](https://github.com/nordlow/gmp-d/blob/master/src/gmp/z.d#L2030) with
+`std.bigint.BigInt` and `@safe pure nothrow @nogc` except when converting to
+`string`.
 
 ## Basics
 
