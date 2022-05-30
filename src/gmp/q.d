@@ -105,7 +105,7 @@ pragma(inline, true):
 
     /** Construct from floating-point `value`.
      */
-    ref MpQ opAssign(P)(P value) @trusted return scope
+    ref MpQ opAssign(P)(P value) @trusted scope return
     if (isFloating!P)
     {
         version(DigitalMars) pragma(inline, false);
@@ -115,7 +115,7 @@ pragma(inline, true):
     }
 
     /** Assign from integer `value`. */
-    ref MpQ opAssign(P)(P value) @trusted return scope
+    ref MpQ opAssign(P)(P value) @trusted scope return
     if (isIntegral!P)
     {
         version(DigitalMars) pragma(inline, false);
@@ -210,13 +210,13 @@ pragma(inline, true):
     }
 
     /// Returns: numerator reference of `this`.
-    @property ref inout(MpZ) numerator() @trusted inout return scope
+    @property ref inout(MpZ) numerator() @trusted inout scope return
     {
         return *(cast(inout(MpZ)*)_num_ptr);
     }
 
     /// Returns: denominator reference of `this`.
-    @property ref inout(MpZ) denominator() @trusted inout return scope
+    @property ref inout(MpZ) denominator() @trusted inout scope return
     {
         return *(cast(inout(MpZ)*)_den_ptr);
     }
