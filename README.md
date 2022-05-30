@@ -61,14 +61,13 @@ unittest
 
 ## Value passing
 
-### Move semantics (default)
+### Value semantics with explicit copying and move (default)
 
-Copy construction is disabled by default (for now) to prevent inadvertent
-copying. Instead use `f(move(z))` or `f(z.move)` (from `std.algorithm.mutation`)
-to pass by move or `f(z.dup)` to pass by explicit copy (via `MpZ`'s member
-function `.dup`).
+Copy construction is disabled by default to prevent inadvertent copying. Instead
+use `f(move(z))` or `f(z.move)` (from `std.algorithm.mutation`) to pass by move
+or `f(z.dup)` to pass by explicit copy (via `MpZ`'s member function `.dup`).
 
-### Reference semantics using `RefCounted`
+### Reference semantics using `RefCounted` mimicing Phobos’ `BigInt`
 
 If you want to pass by reference use, for instance,
 
@@ -77,10 +76,18 @@ import std.typecons : RefCounted;
 alias RcMpZ = RefCounted!MpZ;
 ```
 
+making RcMpZ a drop-in-replacement for Phobos’ `std.bigint.BigInt`.
+
 ### Copy semantics
 
-If you really need to have copy construction when passing parameters in function
-calls and assignments you can use `CopyableMpZ`.
+If you want copy construction when passing parameters in function calls and
+assignments you can use `gmp.z.CopyableMpZ` defined as
+
+```d
+alias CopyableMpZ = _MpZ!true;
+```
+
+.
 
 ## Mappings to GNU MP C library
 
