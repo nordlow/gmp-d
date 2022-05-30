@@ -39,7 +39,7 @@ enum Copy
 {
 	explicit,				///< Copying only explicitly via `.dup` (Rust-style)
 	implicit,				///< Copying (C++-style)
-	onWrite					///< Copy-on-write (CoW) (Swift-style). TODO: use
+	onWriteARC				///< Copy-on-write (CoW) automatic reference counting (ARC) (Swift-style). TODO: use
 }
 
 // TODO: use these imports instead of the ones below
