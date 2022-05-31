@@ -1630,14 +1630,14 @@ _Z!(copy) add(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y)
 ///
 @safe nothrow @nogc unittest
 {
-    Z x = 2.Z^^100;
-    Z y = 12;
+    const Z x = Z(2)^^100;
+    const Z y = 12;
     assert(add(x, Z(12)) ==       // l-value, r-value
            add(Z(12), x));        // r-value, l-value
     assert(add(x, y) ==           // l-value, l-value
-           add(2.Z^^100, 12.Z));  // r-value, r-value
-    assert(add(12.Z, 2.Z^^100) == // r-value, r-value
-           add(2.Z^^100, 12.Z));  // r-value, r-value
+           add(Z(2)^^100, Z(12)));  // r-value, r-value
+    assert(add(Z(12), Z(2)^^100) == // r-value, r-value
+           add(Z(2)^^100, Z(12)));  // r-value, r-value
 }
 
 /** Get difference of `x` and `y` (`x` - `y`).
@@ -3489,8 +3489,8 @@ version(unittest)
     debug import core.stdc.stdio : printf;
     static assert(!isMpZExpr!int);
     import std.meta : AliasSeq;
-
     alias CZ = _Z!(Copy.implicit);
+    alias RZ = _Z!(Copy.onWrite);
 }
 
 // C API
