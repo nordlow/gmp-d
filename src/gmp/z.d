@@ -106,11 +106,13 @@ pure nothrow:
 		return chars;
 	}
 
-	void toString(W)(ref W appender) const @trusted @nogc
+	void toString(W)(ref W appender,
+					 in uint base = defaultBase,
+					 in bool upperCaseDigits = false) const @trusted @nogc
 	{
         import core.memory : pureFree;
         if (isZero) { return appender.put('0'); }
-		auto chars = toChars();
+		auto chars = toChars(base, upperCaseDigits);
 		scope(exit) pureFree(chars.ptr);
 		appender.put(chars);
 	}
