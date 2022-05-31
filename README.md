@@ -67,7 +67,7 @@ Use `Z` (`CopyableMpZ`), for a drop-in-replacement for Phobos’
 `std.bigint.BigInt`. For reference see
 https://dlang.org/phobos/std_bigint.html#.BigInt.
 
-### Value semantics with explicit copying and move (default)
+### Value semantics with explicit copying and move
 
 For `MpZ`, copy construction is disabled by default to prevent inadvertent
 copying. Instead use `f(move(z))` or `f(z.move)` (from `std.algorithm.mutation`)
