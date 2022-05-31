@@ -315,6 +315,8 @@ pure nothrow:
         version(LDC) pragma(inline, true);
         typeof(return) y = void;
         __gmpz_init_set(y._ptr, _ptr); version(ccc) ++y._ccc;
+		static if (copy == Copy.onWrite)
+			y._refCountCopies = 0;
         return y;
     }
 
