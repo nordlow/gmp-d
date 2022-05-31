@@ -61,40 +61,11 @@ pure nothrow:
 		   +2 <= base && base <= +62)
     {
         if (isZero) { return `0`; }
-
-        immutable size = sizeInBase(base); // NOTE: one too much for some values
-
-        string str = new string(size + 1); // one extra for minus sign
-        __gmpz_get_str(cast(char*)str.ptr, base, _ptr); // fill it
-
-        // skip trailing garbage
-        import std.ascii : isAlphaNum;
-        while (str.length &&
-               !str[$ - 1].isAlphaNum)
-        {
-            str = str[0 .. $ - 1]; // skip last
-        }
-
-        if (upperCaseDigits)
-        {
-            foreach (ref e; cast(char[])str)
-            {
-                import std.ascii : isLower, toUpper;
-                if (e.isLower)
-                {
-                    e = e.toUpper;
-                }
-            }
-        }
-
-        return str;
+        const size = sizeInBase(base); // NOTE: one too much for some values
+        char[] str = new char[](size + 1); // one extra for minus sign
+        __gmpz_get_str(str.ptr, base, _ptr); // fill it
+		return fillChars(str, base, upperCaseDigits);
     }
-
-	version(none)				// TODO: activate
-	void toString(W)(ref W appender)
-	{
-		appender.put();
-	}
 
     /** Convert in base `base` into `chars` of length `length`.
      *
@@ -106,41 +77,43 @@ pure nothrow:
 		   +2 <= base && base <= +62)
     {
         import core.memory : pureMalloc;
-
         if (isZero)
         {
             char[] chars = (cast(char*)pureMalloc(1))[0 .. 1];
             chars[0] = '0';
             return chars;
         }
-
-        immutable size = sizeInBase(base); // NOTE: one too much for some values
-
+        const size = sizeInBase(base); // NOTE: one too much for some values
         char[] chars = (cast(char*)pureMalloc(size + 1))[0 .. size + 1]; // one extra for minus sign
-        __gmpz_get_str(chars.ptr, base, _ptr); // fill it
+		return fillChars(chars, base, upperCaseDigits);
+    }
 
-        // skip trailing garbage
-        import std.ascii : isAlphaNum;
+    private char[] fillChars(char[] chars,
+							 in uint base = defaultBase,
+							 in bool upperCaseDigits = false) const @system @nogc
+		in(-2 <= base && base <= -36 ||
+		   +2 <= base && base <= +62)
+    {
+        __gmpz_get_str(chars.ptr, base, _ptr); // fill it
+        import std.ascii : isAlphaNum, isLower, toUpper;
         while (chars.length &&
                !chars[$ - 1].isAlphaNum)
-        {
-            chars = chars[0 .. $ - 1]; // skip last
-        }
-
+            chars = chars[0 .. $ - 1]; // skip trailing garbage
         if (upperCaseDigits)
-        {
             foreach (ref e; chars)
-            {
-                import std.ascii : isLower, toUpper;
                 if (e.isLower)
-                {
                     e = e.toUpper;
-                }
-            }
-        }
+		return chars;
+	}
 
-        return chars;
-    }
+	void toString(W)(ref W appender) const @trusted @nogc
+	{
+        import core.memory : pureFree;
+        if (isZero) { return appender.put('0'); }
+		auto chars = toChars();
+		appender.put(chars);
+		scope(exit) pureFree(chars.ptr);
+	}
 
     /// Get the unique hash of the `_Z` value suitable for use in a hash table.
     size_t toHash() const @trusted
@@ -148,9 +121,7 @@ pure nothrow:
         import core.internal.hash : hashOf;
         typeof(return) hash = limbCount;
         foreach (immutable i; 0 .. limbCount)
-        {
             hash ^= _limbs[i].hashOf;
-        }
         return hash;
     }
 
