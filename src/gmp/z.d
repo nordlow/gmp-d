@@ -1481,6 +1481,8 @@ alias MpZ = _Z!(false);
 /** Copyable MpZ. */
 alias CopyableMpZ = _Z!(true);
 
+alias Z = CopyableMpZ;
+
 version(unittest) static assert(isMpZExpr!(MpZ));
 
 version(benchmark)
@@ -3443,7 +3445,6 @@ if (isIntegral!T)
 version(unittest)
 {
     // version = ccc;              // do C mutation call count
-    alias Z = MpZ;
     debug import core.stdc.stdio : printf;
     static assert(!isMpZExpr!int);
     import std.meta : AliasSeq;
