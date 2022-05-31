@@ -105,11 +105,10 @@ pure nothrow:
 	void toString(Writer)(ref Writer writer, // `mir.appender` compliant
 						  in uint base = defaultBase,
 						  in bool upperCaseDigits = false) const @trusted @nogc
-        if (is(typeof(writer.put(char.init))) ||
-			is(typeof(writer.put((const(char)[]).init))))
+        if (is(typeof(writer.put((const(char)[]).init))))
 	{
         import core.memory : pureFree;
-        if (isZero) { return writer.put('0'); }
+        if (isZero) { return writer.put("0"); }
 		auto chars = toChars(base, upperCaseDigits);
 		scope(exit) pureFree(chars.ptr);
 		writer.put(chars);
