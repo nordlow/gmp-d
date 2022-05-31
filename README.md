@@ -61,18 +61,18 @@ unittest
 
 ## Value passing
 
-### Value semantics with copy-on-write a la Phobos’ `std.bigint.BigInt`
-
-Use `Z` (`CopyableMpZ`), for a drop-in-replacement for Phobos’
-`std.bigint.BigInt`. For reference see
-https://dlang.org/phobos/std_bigint.html#.BigInt.
-
 ### Value semantics with explicit copying and move
 
 For `MpZ`, copy construction is disabled by default to prevent inadvertent
 copying. Instead use `f(move(z))` or `f(z.move)` (from `std.algorithm.mutation`)
 to pass by move or `f(z.dup)` to pass by explicit copy (via `MpZ`'s member
 function `.dup`).
+
+### Value semantics with copy-on-write a la Phobos’ `std.bigint.BigInt`
+
+Use `Z` (`CopyableMpZ`), for a drop-in-replacement for Phobos’
+`std.bigint.BigInt`. For reference see
+https://dlang.org/phobos/std_bigint.html#.BigInt.
 
 ## Mappings to GNU MP C library
 
