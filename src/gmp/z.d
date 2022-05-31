@@ -33,15 +33,6 @@ enum WordOrder
     leastSignificantWordFirst,
 }
 
-/** Copy Semantics for assignment and parameter passing.
- */
-enum Copy
-{
-	explicit,				///< Copying only explicitly via `.dup` (Rust-style)
-	implicit,				///< Copying (C++-style)
-	onWrite	///< Copy-on-write (CoW) automatic reference counting (ARC) (Swift-style). TODO: use
-}
-
 // TODO: use these imports instead of the ones below
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
@@ -49,8 +40,13 @@ enum Copy
 /** Arbitrary (multi) precision signed integer (Z).
  *
  * Wrapper for GNU MP (GMP)'s type `mpz_t` and functions `__gmpz_.*`.
+ *
+ * If `cow` is `false` copying (via assignment and parameter passing by value)
+ * is only possible explicitly via `.dup` (Rust-style) otherwise copying is
+ * automatic and does copy-on-write (CoW) of the internal data via reference
+ * counting (ARC) (Swift-style).
  */
-private struct _Z(Copy copy)
+private struct _Z(bool cow)
 {
 pure nothrow:
 
@@ -253,35 +249,20 @@ pure nothrow:
         return typeof(this).pow(2UL, p) - 1;
     }
 
-    static if (copy == Copy.implicit)
-    {
-        /// Construct copy of `value`.
-        this(this) @trusted
-        {
-            pragma(inline, true);
-            if (_z._mp_d)
-            {
-                // TODO: this might be made faster
-                __mpz_struct _z_copy = _z;
-                __gmpz_init_set(&_z_copy, _ptr); version(ccc) { ++_ccc; }
-                _z = _z_copy;
-            }
-        }
+	// /// Construct copy of `value`.
+	// this(ref const _Z value) @trusted
+	// {
+	//     __gmpz_init_set(_ptr, value._ptr); version(ccc) { ++_ccc; }
+	// }
 
-        // /// Construct copy of `value`.
-        // this(ref const _Z value) @trusted
-        // {
-        //     __gmpz_init_set(_ptr, value._ptr); version(ccc) { ++_ccc; }
-        // }
+	// /// Construct copy of `value`.
+	// this(_Z value) @trusted
+	// {
+	// import core.lifetime : moveEmplace;
+	//     moveEmplace(value, this); // fast
+	// }
 
-        // /// Construct copy of `value`.
-        // this(_Z value) @trusted
-        // {
-        // import core.lifetime : moveEmplace;
-        //     moveEmplace(value, this); // fast
-        // }
-    }
-	else static if (copy == Copy.onWrite)
+	static if (cow)
     {
 		void selfdupIfAliased() scope pure nothrow @nogc @safe {
             pragma(inline, true);
@@ -294,12 +275,10 @@ pure nothrow:
 			_refCountCopies += 1;
         }
 	}
-    else static if (copy == Copy.explicit)
+    else
     {
         @disable this(this);
     }
-    else
-		static assert(0);
 
     /// Swap content of `this` with `rhs`.
     void swap()(ref _Z rhs) scope pure nothrow @nogc @safe
@@ -315,7 +294,7 @@ pure nothrow:
         version(LDC) pragma(inline, true);
         typeof(return) y = void;
         __gmpz_init_set(y._ptr, _ptr); version(ccc) ++y._ccc;
-		static if (copy == Copy.onWrite)
+		static if (cow)
 			y._refCountCopies = 0;
         return y;
     }
@@ -341,7 +320,7 @@ pure nothrow:
     {
         version(LDC) pragma(inline, true);
         assertInitialized();
-		static if (copy == Copy.onWrite) selfdupIfAliased();
+		static if (cow) selfdupIfAliased();
         static if      (isUnsigned!T)
         {
             __gmpz_set_ui(_ptr, rhs);
@@ -368,7 +347,7 @@ pure nothrow:
     ref _Z fromString(scope const(char)[] rhs, uint base = 0) @trusted return
     {
         assert(base == 0 || (base >= 2 && base <= 62));
-		static if (copy == Copy.onWrite) selfdupIfAliased();
+		static if (cow) selfdupIfAliased();
         char* stringz = _allocStringzCopyOf(rhs);
         immutable int status = __gmpz_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
         qualifiedFree(stringz);
@@ -382,7 +361,7 @@ pure nothrow:
         version(LDC) pragma(inline, true);
         if (_z._mp_d)
         {
-			static if (copy == Copy.onWrite)
+			static if (cow)
 				if (_refCountCopies >= 1)
 				{
 					_z._mp_d = null;    // prevent GC from scanning this memory
@@ -1093,7 +1072,7 @@ pure nothrow:
      */
     void negate() @safe
     {
-		static if (copy == Copy.onWrite) selfdupIfAliased();
+		static if (cow) selfdupIfAliased();
         pragma(inline, true);
         _z._mp_size = -_z._mp_size; // fast C macro `mpz_neg` in gmp.h
     }
@@ -1106,7 +1085,7 @@ pure nothrow:
     {
         version(LDC) pragma(inline, true);
         if (isZero) { return; } // `__gmpz_abs` cannot handle default-constructed `this`
-		static if (copy == Copy.onWrite) selfdupIfAliased();
+		static if (cow) selfdupIfAliased();
         __gmpz_abs(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
 
@@ -1118,7 +1097,7 @@ pure nothrow:
     {
         version(LDC) pragma(inline, true);
         if (isZero) { return; } // `__gmpz_co` cannot handle default-constructed `this`
-		static if (copy == Copy.onWrite) selfdupIfAliased();
+		static if (cow) selfdupIfAliased();
         __gmpz_com(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
 
@@ -1127,7 +1106,7 @@ pure nothrow:
     if (s == "++")
     {
         version(LDC) pragma(inline, true);
-		static if (copy == Copy.onWrite) selfdupIfAliased();
+		static if (cow) selfdupIfAliased();
         if (isDefaultConstructed) // `__gmpz_add_ui` cannot handle default-constructed `this`
         {
             __gmpz_init_set_si(_ptr, 1);
@@ -1144,7 +1123,7 @@ pure nothrow:
     if (s == "--")
     {
         version(LDC) pragma(inline, true);
-		static if (copy == Copy.onWrite) selfdupIfAliased();
+		static if (cow) selfdupIfAliased();
         if (isDefaultConstructed) // `__gmpz_sub_ui` cannot handle default-constructed `this`
         {
             __gmpz_init_set_si(_ptr, -1);
@@ -1162,7 +1141,7 @@ pure nothrow:
         isIntegral!Exp)
     {
         version(LDC) pragma(inline, true);
-		static if (copy == Copy.onWrite) selfdupIfAliased();
+		static if (cow) selfdupIfAliased();
         static if (isSigned!Base)
         {
             immutable bool negate = base < 0;
@@ -1287,7 +1266,7 @@ pure nothrow:
     void setBit(mp_bitcnt_t bitIndex) @trusted
     {
         pragma(inline, true);
-		static if (copy == Copy.onWrite) selfdupIfAliased();
+		static if (cow) selfdupIfAliased();
         __gmpz_setbit(_ptr, bitIndex);
     }
 
@@ -1295,7 +1274,7 @@ pure nothrow:
     void clearBit(mp_bitcnt_t bitIndex) @trusted
     {
         pragma(inline, true);
-		static if (copy == Copy.onWrite) selfdupIfAliased();
+		static if (cow) selfdupIfAliased();
         __gmpz_clrbit(_ptr, bitIndex);
     }
 
@@ -1303,7 +1282,7 @@ pure nothrow:
     void complementBit(mp_bitcnt_t bitIndex) @trusted
     {
         pragma(inline, true);
-		static if (copy == Copy.onWrite) selfdupIfAliased();
+		static if (cow) selfdupIfAliased();
         __gmpz_combit(_ptr, bitIndex);
     }
 
@@ -1443,7 +1422,7 @@ private:
         return &_z;
     }
 
-	static if (copy == Copy.onWrite)
+	static if (cow)
 	{
 		private __mpz_struct _z; // internal libgmp C struct
 		private size_t _refCountCopies; ///< Number of copies.
@@ -1492,17 +1471,17 @@ private:
     }
 }
 
-/** Non-copyable MpZ.
+/** MpZ with explicit copying via `.dup`.
  *
  * For reference counting semantics, use `std.typecons.RefCounted` as
  *
  * import std.typecons : RefCounted;
  * alias RcZ = RefCounted!MpZ;
  */
-alias MpZ = _Z!(Copy.explicit);
+alias MpZ = _Z!(false);
 
 /** Copyable MpZ. */
-alias CopyableMpZ = _Z!(Copy.onWrite);
+alias CopyableMpZ = _Z!(true);
 
 version(unittest) static assert(isMpZExpr!(MpZ));
 
@@ -1523,14 +1502,14 @@ version(benchmark)
 pure nothrow:
 
 /** Instantiator for `MpZ`. */
-_Z!(copy) mpz(Copy copy = Copy.explicit, Args...)(Args args) @safe
+_Z!(cow) mpz(bool cow = false, Args...)(Args args) @safe
 {
     version(LDC) pragma(inline, true);
     return typeof(return)(args);
 }
 
 /// Swap contents of `x` with contents of `y`.
-void swap(Copy copy)(ref _Z!(copy) x, ref _Z!(copy) y)
+void swap(bool cow)(ref _Z!(cow) x, ref _Z!(cow) y)
 {
     pragma(inline, true);
     import std.algorithm.mutation : swap;
@@ -1538,14 +1517,14 @@ void swap(Copy copy)(ref _Z!(copy) x, ref _Z!(copy) y)
 }
 
 /// Get `x` as a `string` in decimal base.
-string toDecimalString(Copy copy)(auto ref const _Z!(copy) x) // for `std.bigint.BigInt` compatibility
+string toDecimalString(bool cow)(auto ref const _Z!(cow) x) // for `std.bigint.BigInt` compatibility
 {
     version(LDC) pragma(inline, true);
     return x.toString(10);
 }
 
 /// Get `x` as a uppercased `string` in hexadecimal base without any base prefix (0x).
-string toHexadecimalString(Copy copy)(auto ref const _Z!(copy) x)
+string toHexadecimalString(bool cow)(auto ref const _Z!(cow) x)
 {
     version(LDC) pragma(inline, true);
     return x.toString(16, true);
@@ -1555,7 +1534,7 @@ string toHexadecimalString(Copy copy)(auto ref const _Z!(copy) x)
 alias toHex = toHexadecimalString;
 
 /// Get the absolute value of `x` converted to the corresponding unsigned type.
-Unsigned!T absUnsign(T, Copy copy)(auto ref const _Z!(copy) x) // for `std.bigint.BigInt` compatibility
+Unsigned!T absUnsign(T, bool cow)(auto ref const _Z!(cow) x) // for `std.bigint.BigInt` compatibility
 if (isIntegral!T)
 {
     version(LDC) pragma(inline, true);
@@ -1564,7 +1543,7 @@ if (isIntegral!T)
 
 /** Get sum of `x` and `y` (`x` + `y`).
  */
-_Z!(copy) add(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y) @trusted
+_Z!(cow) add(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @trusted
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -1596,7 +1575,7 @@ _Z!(copy) add(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y)
 			static assert(0);
 		}
 		__gmpz_add(zp._ptr, x._ptr, y._ptr);
-		static if (copy == Copy.onWrite) zp.selfdupIfAliased();
+		static if (cow) zp.selfdupIfAliased();
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
@@ -1623,7 +1602,7 @@ _Z!(copy) add(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y)
 
 /** Get difference of `x` and `y` (`x` - `y`).
  */
-_Z!(copy) sub(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y) @trusted
+_Z!(cow) sub(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @trusted
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -1654,7 +1633,7 @@ _Z!(copy) sub(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y)
 		{
 			static assert(0);
 		}
-		static if (copy == Copy.onWrite) zp.selfdupIfAliased();
+		static if (cow) zp.selfdupIfAliased();
 		__gmpz_sub(zp._ptr, x._ptr, y._ptr);
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
@@ -1682,7 +1661,7 @@ _Z!(copy) sub(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y)
 
 /** Get product of `x` and `y` (`x` + `y`).
  */
-_Z!(copy) mul(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y) @trusted
+_Z!(cow) mul(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @trusted
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -1713,7 +1692,7 @@ _Z!(copy) mul(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y)
 		{
 			static assert(0);
 		}
-		static if (copy == Copy.onWrite) zp.selfdupIfAliased();
+		static if (cow) zp.selfdupIfAliased();
 		__gmpz_mul(zp._ptr, x._ptr, y._ptr);
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
@@ -1743,7 +1722,7 @@ _Z!(copy) mul(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y)
  *
  * Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
  */
-_Z!(copy) abs(Copy copy)(auto ref const _Z!(copy) x) @trusted @nogc
+_Z!(cow) abs(bool cow)(auto ref const _Z!(cow) x) @trusted @nogc
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -1755,7 +1734,7 @@ _Z!(copy) abs(Copy copy)(auto ref const _Z!(copy) x) @trusted @nogc
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-		static if (copy == Copy.onWrite) zp.selfdupIfAliased();
+		static if (cow) zp.selfdupIfAliased();
         zp.absolute(); version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
@@ -1765,7 +1744,7 @@ _Z!(copy) abs(Copy copy)(auto ref const _Z!(copy) x) @trusted @nogc
  *
  * Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
  */
-_Z!(copy) onesComplement(Copy copy)(auto ref const _Z!(copy) x) @trusted @nogc
+_Z!(cow) onesComplement(bool cow)(auto ref const _Z!(cow) x) @trusted @nogc
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -1783,19 +1762,19 @@ _Z!(copy) onesComplement(Copy copy)(auto ref const _Z!(copy) x) @trusted @nogc
 }
 
 /// Comparison of the absolute values of `x` and `y`.
-int cmpabs(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y) @trusted @nogc
+int cmpabs(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @trusted @nogc
 {
     version(LDC) pragma(inline, true);
     return __gmpz_cmpabs(x._ptr, y._ptr);
 }
 /// ditto
-int cmpabs(Copy copy)(auto ref const _Z!(copy) x, double y) @trusted @nogc
+int cmpabs(bool cow)(auto ref const _Z!(cow) x, double y) @trusted @nogc
 {
     version(LDC) pragma(inline, true);
     return __gmpz_cmpabs_d(x._ptr, y);
 }
 /// ditto
-int cmpabs(Copy copy)(auto ref const _Z!(copy) x, ulong y) @trusted @nogc
+int cmpabs(bool cow)(auto ref const _Z!(cow) x, ulong y) @trusted @nogc
 {
     version(LDC) pragma(inline, true);
     return __gmpz_cmpabs_ui(x._ptr, y);
@@ -1805,27 +1784,27 @@ int cmpabs(Copy copy)(auto ref const _Z!(copy) x, ulong y) @trusted @nogc
  *
  * Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
  */
-_Z!(copy) nextPrime(Copy copy)(auto ref const _Z!(copy) x) @trusted @nogc
+_Z!(cow) nextPrime(bool cow)(auto ref const _Z!(cow) x) @trusted @nogc
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) y = null; // must use temporary
-		static if (copy == Copy.onWrite) y.selfdupIfAliased();
+		static if (cow) y.selfdupIfAliased();
         __gmpz_nextprime(y._ptr, x._ptr); version(ccc) ++y._ccc;
         return y;
     }
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-		static if (copy == Copy.onWrite) zp.selfdupIfAliased();
+		static if (cow) zp.selfdupIfAliased();
         __gmpz_nextprime(zp._ptr, x._ptr); version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
 
 /// Get greatest common divisor (gcd) of `x` and `y`.
-_Z!(copy) gcd(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y) @trusted @nogc
+_Z!(cow) gcd(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @trusted @nogc
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -1856,7 +1835,7 @@ _Z!(copy) gcd(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y)
 		{
 			static assert(0);
 		}
-		static if (copy == Copy.onWrite) zp.selfdupIfAliased();
+		static if (cow) zp.selfdupIfAliased();
 		__gmpz_gcd(zp._ptr, x._ptr, y._ptr);
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
@@ -1869,7 +1848,7 @@ _Z!(copy) gcd(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y)
     }
 }
 /// ditto
-_Z!(copy) gcd(Copy copy)(auto ref const _Z!(copy) x, ulong y) @trusted @nogc
+_Z!(cow) gcd(bool cow)(auto ref const _Z!(cow) x, ulong y) @trusted @nogc
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -1881,14 +1860,14 @@ _Z!(copy) gcd(Copy copy)(auto ref const _Z!(copy) x, ulong y) @trusted @nogc
     else
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-		static if (copy == Copy.onWrite) zp.selfdupIfAliased();
+		static if (cow) zp.selfdupIfAliased();
 		const z_ui = __gmpz_gcd_ui(zp._ptr, x._ptr, y); version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
 
 /// Get least common multiple (lcm) of `x` and `y`.
-_Z!(copy) lcm(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y) @trusted @nogc
+_Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @trusted @nogc
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -1919,7 +1898,7 @@ _Z!(copy) lcm(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y)
 		{
 			static assert(0);
 		}
-		static if (copy == Copy.onWrite) zp.selfdupIfAliased();
+		static if (cow) zp.selfdupIfAliased();
 		__gmpz_lcm(zp._ptr, x._ptr, y._ptr);
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
@@ -1932,7 +1911,7 @@ _Z!(copy) lcm(Copy copy)(auto ref const _Z!(copy) x, auto ref const _Z!(copy) y)
     }
 }
 /// ditto
-_Z!(copy) lcm(Copy copy)(auto ref const _Z!(copy) x, ulong y) @trusted @nogc
+_Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, ulong y) @trusted @nogc
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -1944,7 +1923,7 @@ _Z!(copy) lcm(Copy copy)(auto ref const _Z!(copy) x, ulong y) @trusted @nogc
     else
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        static if (copy == Copy.onWrite) zp.selfdupIfAliased();
+        static if (cow) zp.selfdupIfAliased();
 		__gmpz_lcm_ui(zp._ptr, x._ptr, y); version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
@@ -1954,23 +1933,23 @@ _Z!(copy) lcm(Copy copy)(auto ref const _Z!(copy) x, ulong y) @trusted @nogc
  *
  * Parameter `exp` must be positive.
  */
-_Z!(copy) powm(Copy copy)(auto ref const _Z!(copy) base, auto ref const _Z!(copy) exp, auto ref const _Z!(copy) mod) @trusted
+_Z!(cow) powm(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) exp, auto ref const _Z!(cow) mod) @trusted
 {
     version(LDC) pragma(inline, true);
     assert(mod != 0, "Zero modulus");
     typeof(return) y = 0; // result, TODO: reuse `exp` or `mod` if any is an r-value
     assert(exp >= 0, "Negative exponent");
-	static if (copy == Copy.onWrite) y.selfdupIfAliased();
+	static if (cow) y.selfdupIfAliased();
     __gmpz_powm(y._ptr, base._ptr, exp._ptr, mod._ptr); version(ccc) ++y._ccc;
     return y;
 }
 /// ditto
-_Z!(copy) powm(Copy copy)(auto ref const _Z!(copy) base, ulong exp, auto ref const _Z!(copy) mod) @trusted
+_Z!(cow) powm(bool cow)(auto ref const _Z!(cow) base, ulong exp, auto ref const _Z!(cow) mod) @trusted
 {
     version(LDC) pragma(inline, true);
     assert(mod != 0, "Zero modulus");
     typeof(return) y = 0;       // result, TODO: reuse `exp` or `mod` if any is an r-value
-	static if (copy == Copy.onWrite) y.selfdupIfAliased();
+	static if (cow) y.selfdupIfAliased();
 	__gmpz_powm_ui(y._ptr, base._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
     return y;
 }
@@ -1982,7 +1961,7 @@ alias powmod = powm;
  *
  * Parameter `mod` must be positive.
  */
-_Z!(copy) invert(Copy copy)(auto ref const _Z!(copy) base, auto ref const _Z!(copy) mod) @trusted
+_Z!(cow) invert(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) mod) @trusted
 {
     version(LDC) pragma(inline, true);
     assert(base != 0, "Zero base");
@@ -1990,7 +1969,7 @@ _Z!(copy) invert(Copy copy)(auto ref const _Z!(copy) base, auto ref const _Z!(co
     static if (!__traits(isRef, base)) // r-value `base`
     {
         typeof(return)* mut_base = (cast(typeof(return)*)(&base)); // @trusted because `MpZ` has no aliased indirections
-        static if (copy == Copy.onWrite) y.selfdupIfAliased();
+        static if (cow) y.selfdupIfAliased();
 		auto success = __gmpz_invert(mut_base._ptr, base._ptr, mod._ptr); version(ccc) ++y._ccc;
         assert(success >= 0, "Cannot invert");
         return move(*mut_base);    // TODO: shouldn't have to call `move` here
@@ -1998,7 +1977,7 @@ _Z!(copy) invert(Copy copy)(auto ref const _Z!(copy) base, auto ref const _Z!(co
     else static if (!__traits(isRef, mod)) // r-value `mod`
     {
         typeof(return)* mut_mod = (cast(typeof(return)*)(&mod)); // @trusted because `MpZ` has no aliased indirections
-        static if (copy == Copy.onWrite) y.selfdupIfAliased();
+        static if (cow) y.selfdupIfAliased();
 		auto success = __gmpz_invert(mut_mod._ptr, base._ptr, mod._ptr); version(ccc) ++y._ccc;
         assert(success >= 0, "Cannot invert");
         return move(*mut_mod);  // TODO: shouldn't have to call `move` here
@@ -2006,7 +1985,7 @@ _Z!(copy) invert(Copy copy)(auto ref const _Z!(copy) base, auto ref const _Z!(co
     else                        // l-value `base` and l-value `mod`
     {
         typeof(return) y = 0; // result, TODO: reuse `exp` or `mod` if any is an r-value
-        static if (copy == Copy.onWrite) y.selfdupIfAliased();
+        static if (cow) y.selfdupIfAliased();
 		auto success = __gmpz_invert(y._ptr, base._ptr, mod._ptr); version(ccc) ++y._ccc;
         assert(success >= 0, "Cannot invert");
         return y;
@@ -3471,7 +3450,7 @@ version(unittest)
     static assert(!isMpZExpr!int);
     import std.meta : AliasSeq;
     alias CZ = CopyableMpZ;
-    alias RZ = _Z!(Copy.onWrite);
+    alias RZ = _Z!(true);
 }
 
 // C API
