@@ -379,9 +379,15 @@ pure nothrow:
     /// Destruct `this`.
     ~this() @trusted @nogc
     {
-        pragma(inline, true);
+        version(LDC) pragma(inline, true);
         if (_z._mp_d)
         {
+			static if (copy == Copy.onWrite)
+				if (_refCountCopies >= 1)
+				{
+					_z._mp_d = null;    // prevent GC from scanning this memory
+					return;
+				}
             __gmpz_clear(_ptr); version(ccc) { ++_ccc; }
             _z._mp_d = null;    // prevent GC from scanning this memory
         }
@@ -1496,7 +1502,7 @@ private:
 alias MpZ = _Z!(Copy.explicit);
 
 /** Copyable MpZ. */
-alias CopyableMpZ = _Z!(Copy.implicit);
+alias CopyableMpZ = _Z!(Copy.onWrite);
 
 version(unittest) static assert(isMpZExpr!(MpZ));
 
