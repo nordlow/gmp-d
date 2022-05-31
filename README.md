@@ -61,35 +61,18 @@ unittest
 
 ## Value passing
 
-### Value semantics with explicit copying and move (default)
+### Value semantics with copy-on-write a la Phobos’ `std.bigint.BigInt`
 
-Copy construction is disabled by default to prevent inadvertent copying. Instead
-use `f(move(z))` or `f(z.move)` (from `std.algorithm.mutation`) to pass by move
-or `f(z.dup)` to pass by explicit copy (via `MpZ`'s member function `.dup`).
-
-### Reference semantics using `RefCounted`
-
-If you instead want reference semantics use, for instance,
-
-```D
-import std.typecons : RefCounted;
-alias RcMpZ = RefCounted!MpZ;
-```
-
-. For a drop-in-replacement for Phobos’ `std.bigint.BigInt` this reference
-semantics needs to be adjusted to do copy-on-write (CoW) as described at
+Use `Z` (`CopyableMpZ`), for a drop-in-replacement for Phobos’
+`std.bigint.BigInt`. For reference see
 https://dlang.org/phobos/std_bigint.html#.BigInt.
 
-### Copy semantics
+### Value semantics with explicit copying and move (default)
 
-If you want copy construction when passing parameters in function calls and
-assignments you can use `gmp.z.CopyableMpZ` defined as
-
-```d
-alias CopyableMpZ = _MpZ!true;
-```
-
-.
+For `MpZ`, copy construction is disabled by default to prevent inadvertent
+copying. Instead use `f(move(z))` or `f(z.move)` (from `std.algorithm.mutation`)
+to pass by move or `f(z.dup)` to pass by explicit copy (via `MpZ`'s member
+function `.dup`).
 
 ## Mappings to GNU MP C library
 
