@@ -205,9 +205,16 @@ pure nothrow:
     this(scope const(char)[] value, uint base = 0) @trusted // TODO: Use Optional/Nullable when value is nan, or inf
     {
         assert(base == 0 || (base >= 2 && base <= 62));
+		if (base == 16)
+		{
+			import std.algorithm.searching : startsWith;
+			if (value.startsWith("0x") ||
+				value.startsWith("0X"))
+				value = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
+		}
         char* stringz = _allocStringzCopyOf(value);
+		scope(exit) qualifiedFree(stringz);
         immutable int status = __gmpz_init_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
-        qualifiedFree(stringz);
         assert(status == 0, "Parameter `value` does not contain an integer");
     }
 
