@@ -1473,10 +1473,8 @@ private:
 
 /** MpZ with explicit copying via `.dup`.
  *
- * For reference counting semantics, use `std.typecons.RefCounted` as
- *
- * import std.typecons : RefCounted;
- * alias RcZ = RefCounted!MpZ;
+ * For copyable using copy-on-write automatic reference counting semantics, use
+ * `CopyableMpZ`.
  */
 alias MpZ = _Z!(false);
 
