@@ -3462,7 +3462,7 @@ version(unittest)
     debug import core.stdc.stdio : printf;
     static assert(!isMpZExpr!int);
     import std.meta : AliasSeq;
-    alias CZ = _Z!(Copy.implicit);
+    alias CZ = CopyableMpZ;
     alias RZ = _Z!(Copy.onWrite);
 }
 
