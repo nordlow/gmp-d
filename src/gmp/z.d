@@ -1517,7 +1517,7 @@ version(benchmark)
 pure nothrow:
 
 /** Instantiator for `MpZ`. */
-_Z!(cow) mpz(bool cow = false, Args...)(Args args) @safe
+_Z!(cow) mpz(bool cow = true, Args...)(Args args) @safe
 {
     version(LDC) pragma(inline, true);
     return typeof(return)(args);
