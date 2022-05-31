@@ -308,8 +308,7 @@ pure nothrow:
         version(LDC) pragma(inline, true);
         typeof(return) y = void;
         __gmpz_init_set(y._ptr, _ptr); version(ccc) ++y._ccc;
-		static if (cow)
-			y._refCountCopies = 0;
+		static if (cow) { y._refCountCopies = 0; }
         return y;
     }
 
@@ -334,7 +333,7 @@ pure nothrow:
     {
         version(LDC) pragma(inline, true);
         assertInitialized();
-		static if (cow) selfdupIfAliased();
+		static if (cow) { selfdupIfAliased(); }
         static if      (isUnsigned!T)
         {
             __gmpz_set_ui(_ptr, rhs);
@@ -361,7 +360,7 @@ pure nothrow:
     ref _Z fromString(scope const(char)[] rhs, uint base = 0) @trusted return
     {
         assert(base == 0 || (base >= 2 && base <= 62));
-		static if (cow) selfdupIfAliased();
+		static if (cow) { selfdupIfAliased(); }
         char* stringz = _allocStringzCopyOf(rhs);
         immutable int status = __gmpz_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
         qualifiedFree(stringz);
@@ -376,11 +375,13 @@ pure nothrow:
         if (_z._mp_d)
         {
 			static if (cow)
+			{
 				if (_refCountCopies >= 1)
 				{
 					_z._mp_d = null;    // prevent GC from scanning this memory
 					return;
 				}
+			}
             __gmpz_clear(_ptr); version(ccc) { ++_ccc; }
             _z._mp_d = null;    // prevent GC from scanning this memory
         }
@@ -1086,7 +1087,7 @@ pure nothrow:
      */
     void negate() @safe
     {
-		static if (cow) selfdupIfAliased();
+		static if (cow) { selfdupIfAliased(); }
         pragma(inline, true);
         _z._mp_size = -_z._mp_size; // fast C macro `mpz_neg` in gmp.h
     }
@@ -1099,7 +1100,7 @@ pure nothrow:
     {
         version(LDC) pragma(inline, true);
         if (isZero) { return; } // `__gmpz_abs` cannot handle default-constructed `this`
-		static if (cow) selfdupIfAliased();
+		static if (cow) { selfdupIfAliased(); }
         __gmpz_abs(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
 
@@ -1111,7 +1112,7 @@ pure nothrow:
     {
         version(LDC) pragma(inline, true);
         if (isZero) { return; } // `__gmpz_co` cannot handle default-constructed `this`
-		static if (cow) selfdupIfAliased();
+		static if (cow) { selfdupIfAliased(); }
         __gmpz_com(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
 
@@ -1120,7 +1121,7 @@ pure nothrow:
     if (s == "++")
     {
         version(LDC) pragma(inline, true);
-		static if (cow) selfdupIfAliased();
+		static if (cow) { selfdupIfAliased(); }
         if (isDefaultConstructed) // `__gmpz_add_ui` cannot handle default-constructed `this`
         {
             __gmpz_init_set_si(_ptr, 1);
@@ -1137,7 +1138,7 @@ pure nothrow:
     if (s == "--")
     {
         version(LDC) pragma(inline, true);
-		static if (cow) selfdupIfAliased();
+		static if (cow) { selfdupIfAliased(); }
         if (isDefaultConstructed) // `__gmpz_sub_ui` cannot handle default-constructed `this`
         {
             __gmpz_init_set_si(_ptr, -1);
@@ -1279,7 +1280,7 @@ pure nothrow:
     void setBit(mp_bitcnt_t bitIndex) @trusted
     {
         pragma(inline, true);
-		static if (cow) selfdupIfAliased();
+		static if (cow) { selfdupIfAliased(); }
         __gmpz_setbit(_ptr, bitIndex);
     }
 
@@ -1287,7 +1288,7 @@ pure nothrow:
     void clearBit(mp_bitcnt_t bitIndex) @trusted
     {
         pragma(inline, true);
-		static if (cow) selfdupIfAliased();
+		static if (cow) { selfdupIfAliased(); }
         __gmpz_clrbit(_ptr, bitIndex);
     }
 
@@ -1295,7 +1296,7 @@ pure nothrow:
     void complementBit(mp_bitcnt_t bitIndex) @trusted
     {
         pragma(inline, true);
-		static if (cow) selfdupIfAliased();
+		static if (cow) { selfdupIfAliased(); }
         __gmpz_combit(_ptr, bitIndex);
     }
 
@@ -1587,7 +1588,7 @@ _Z!(cow) add(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @tr
 			static assert(0);
 		}
 		__gmpz_add(zp._ptr, x._ptr, y._ptr);
-		static if (cow) zp.selfdupIfAliased();
+		static if (cow) { zp.selfdupIfAliased(); }
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
@@ -1645,7 +1646,7 @@ _Z!(cow) sub(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @tr
 		{
 			static assert(0);
 		}
-		static if (cow) zp.selfdupIfAliased();
+		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_sub(zp._ptr, x._ptr, y._ptr);
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
@@ -1704,7 +1705,7 @@ _Z!(cow) mul(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @tr
 		{
 			static assert(0);
 		}
-		static if (cow) zp.selfdupIfAliased();
+		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_mul(zp._ptr, x._ptr, y._ptr);
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
@@ -1746,7 +1747,7 @@ _Z!(cow) abs(bool cow)(auto ref const _Z!(cow) x) @trusted @nogc
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-		static if (cow) zp.selfdupIfAliased();
+		static if (cow) { zp.selfdupIfAliased(); }
         zp.absolute(); version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
@@ -1802,14 +1803,14 @@ _Z!(cow) nextPrime(bool cow)(auto ref const _Z!(cow) x) @trusted @nogc
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) y = null; // must use temporary
-		static if (cow) y.selfdupIfAliased();
+		static if (cow) { y.selfdupIfAliased(); }
         __gmpz_nextprime(y._ptr, x._ptr); version(ccc) ++y._ccc;
         return y;
     }
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-		static if (cow) zp.selfdupIfAliased();
+		static if (cow) { zp.selfdupIfAliased(); }
         __gmpz_nextprime(zp._ptr, x._ptr); version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
@@ -1847,7 +1848,7 @@ _Z!(cow) gcd(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @tr
 		{
 			static assert(0);
 		}
-		static if (cow) zp.selfdupIfAliased();
+		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_gcd(zp._ptr, x._ptr, y._ptr);
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
@@ -1872,7 +1873,7 @@ _Z!(cow) gcd(bool cow)(auto ref const _Z!(cow) x, ulong y) @trusted @nogc
     else
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-		static if (cow) zp.selfdupIfAliased();
+		static if (cow) { zp.selfdupIfAliased(); }
 		const z_ui = __gmpz_gcd_ui(zp._ptr, x._ptr, y); version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
@@ -1910,7 +1911,7 @@ _Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @tr
 		{
 			static assert(0);
 		}
-		static if (cow) zp.selfdupIfAliased();
+		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_lcm(zp._ptr, x._ptr, y._ptr);
         version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
@@ -1935,7 +1936,7 @@ _Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, ulong y) @trusted @nogc
     else
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        static if (cow) zp.selfdupIfAliased();
+        static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_lcm_ui(zp._ptr, x._ptr, y); version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
@@ -1951,7 +1952,7 @@ _Z!(cow) powm(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) ex
     assert(mod != 0, "Zero modulus");
     typeof(return) y = 0; // result, TODO: reuse `exp` or `mod` if any is an r-value
     assert(exp >= 0, "Negative exponent");
-	static if (cow) y.selfdupIfAliased();
+	static if (cow) { y.selfdupIfAliased(); }
     __gmpz_powm(y._ptr, base._ptr, exp._ptr, mod._ptr); version(ccc) ++y._ccc;
     return y;
 }
@@ -1961,7 +1962,7 @@ _Z!(cow) powm(bool cow)(auto ref const _Z!(cow) base, ulong exp, auto ref const 
     version(LDC) pragma(inline, true);
     assert(mod != 0, "Zero modulus");
     typeof(return) y = 0;       // result, TODO: reuse `exp` or `mod` if any is an r-value
-	static if (cow) y.selfdupIfAliased();
+	static if (cow) { y.selfdupIfAliased(); }
 	__gmpz_powm_ui(y._ptr, base._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
     return y;
 }
@@ -1981,7 +1982,7 @@ _Z!(cow) invert(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) 
     static if (!__traits(isRef, base)) // r-value `base`
     {
         typeof(return)* mut_base = (cast(typeof(return)*)(&base)); // @trusted because `MpZ` has no aliased indirections
-        static if (cow) mut_base.selfdupIfAliased();
+        static if (cow) { mut_base.selfdupIfAliased(); }
 		auto success = __gmpz_invert(mut_base._ptr, base._ptr, mod._ptr); version(ccc) ++y._ccc;
         assert(success >= 0, "Cannot invert");
         return move(*mut_base);    // TODO: shouldn't have to call `move` here
@@ -1989,7 +1990,7 @@ _Z!(cow) invert(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) 
     else static if (!__traits(isRef, mod)) // r-value `mod`
     {
         typeof(return)* mut_mod = (cast(typeof(return)*)(&mod)); // @trusted because `MpZ` has no aliased indirections
-        static if (cow) mut_mod.selfdupIfAliased();
+        static if (cow) { mut_mod.selfdupIfAliased(); }
 		auto success = __gmpz_invert(mut_mod._ptr, base._ptr, mod._ptr); version(ccc) ++y._ccc;
         assert(success >= 0, "Cannot invert");
         return move(*mut_mod);  // TODO: shouldn't have to call `move` here
@@ -1997,7 +1998,7 @@ _Z!(cow) invert(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) 
     else                        // l-value `base` and l-value `mod`
     {
         typeof(return) y = 0; // result, TODO: reuse `exp` or `mod` if any is an r-value
-        static if (cow) y.selfdupIfAliased();
+        static if (cow) { y.selfdupIfAliased(); }
 		auto success = __gmpz_invert(y._ptr, base._ptr, mod._ptr); version(ccc) ++y._ccc;
         assert(success >= 0, "Cannot invert");
         return y;
