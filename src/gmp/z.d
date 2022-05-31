@@ -111,8 +111,8 @@ pure nothrow:
         import core.memory : pureFree;
         if (isZero) { return appender.put('0'); }
 		auto chars = toChars();
-		appender.put(chars);
 		scope(exit) pureFree(chars.ptr);
+		appender.put(chars);
 	}
 
     /// Get the unique hash of the `_Z` value suitable for use in a hash table.
