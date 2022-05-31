@@ -2031,11 +2031,11 @@ _Z!(copy) invert(Copy copy)(auto ref const _Z!(copy) base, auto ref const _Z!(co
 /// @nogc to ASCII generation
 @trusted nothrow unittest
 {
+    import core.memory : pureFree;
     Z w;
     auto chars = w.toChars;
+	scope(exit) pureFree(chars.ptr);
     assert(chars == `0`);
-    import core.memory : pureFree;
-    pureFree(chars.ptr);
 }
 
 /// operate on default-constructed instances
