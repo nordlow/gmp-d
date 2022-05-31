@@ -6,11 +6,10 @@ authors "Per Nordlöw"
 license "BSL-1.0"
 copyright "Per Nordlöw"
 
-# dependency "libgmp" version="~>1.0.0"
+# TODO: dependency "libgmp" version="~>1.0.0"
 
-dflags "-vcolumns" "-dip25" "-dip1000" "-dip1008"
-dflags "-preview=dtorfields" "-preview=markdown"
-dflags "-preview=in" platform="dmd"
+dflags "-vcolumns"
+# dflags "-preview=dtorfields" "-preview=markdown" "-preview=in"
 
 libs "gmp" "c"
 
