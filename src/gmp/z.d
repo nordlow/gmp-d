@@ -9,7 +9,8 @@ import gmp.traits;
 // version = unittestLong;
 
 /// Is `true` if type `T` can be evaluated to a `MpZ` value.
-enum isMpZExpr(T) = (is(Unqual!(typeof(T.eval())) == MpZ)); // which returns an `MpZ`
+enum isMpZExpr(T) = (is(Unqual!(typeof(T.eval())) == MpZ) ||
+					 is(Unqual!(typeof(T.eval())) == CopyableMpZ)); // which returns an `MpZ`
 /// Is `true` if type `T` is lazy (not yet evaluated) `MpZ`-expression.
 enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct value
                          isMpZExpr!T);
@@ -209,6 +210,11 @@ pure nothrow:
         qualifiedFree(stringz);
         assert(status == 0, "Parameter `value` does not contain an integer");
     }
+
+	static typeof(this) fromHexString(scope const(char)[] value) @safe pure nothrow @nogc
+	{
+		return typeof(return)(value, 16);
+	}
 
     /** Constucts number from serialized binary array.
      *
@@ -1142,7 +1148,6 @@ pure nothrow:
         isIntegral!Exp)
     {
         version(LDC) pragma(inline, true);
-		static if (cow) selfdupIfAliased();
         static if (isSigned!Base)
         {
             immutable bool negate = base < 0;
@@ -1972,7 +1977,7 @@ _Z!(cow) invert(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) 
     static if (!__traits(isRef, base)) // r-value `base`
     {
         typeof(return)* mut_base = (cast(typeof(return)*)(&base)); // @trusted because `MpZ` has no aliased indirections
-        static if (cow) y.selfdupIfAliased();
+        static if (cow) mut_base.selfdupIfAliased();
 		auto success = __gmpz_invert(mut_base._ptr, base._ptr, mod._ptr); version(ccc) ++y._ccc;
         assert(success >= 0, "Cannot invert");
         return move(*mut_base);    // TODO: shouldn't have to call `move` here
@@ -1980,7 +1985,7 @@ _Z!(cow) invert(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) 
     else static if (!__traits(isRef, mod)) // r-value `mod`
     {
         typeof(return)* mut_mod = (cast(typeof(return)*)(&mod)); // @trusted because `MpZ` has no aliased indirections
-        static if (cow) y.selfdupIfAliased();
+        static if (cow) mut_mod.selfdupIfAliased();
 		auto success = __gmpz_invert(mut_mod._ptr, base._ptr, mod._ptr); version(ccc) ++y._ccc;
         assert(success >= 0, "Cannot invert");
         return move(*mut_mod);  // TODO: shouldn't have to call `move` here
@@ -2374,6 +2379,10 @@ unittest
 
     assert(`0x10`.Z == 16);
     assert(`0X10`.Z == 16);
+    assert(Z(`10`, 16) == 16);
+    assert(Z.fromHexString(`10`) == 16);
+    assert(Z.fromHexString(`0x10`) == 16);
+    assert(Z.fromHexString(`0X10`) == 16);
 
     // decimal
 
@@ -3151,167 +3160,157 @@ pure @nogc unittest
 /// expression template types
 
 /// `MpZ`-`MpZ` adding expression.
-private struct AddExpr(T1, T2)
-if (isMpZExpr!T1 &&
-    isMpZExpr!T2)
+private struct AddExpr(bool copy)
 {
-    T1 e1;                      // first term
-    T2 e2;                      // second term
-    MpZ eval() const @trusted
+    _Z!(copy) e1;				// first term
+    _Z!(copy) e2;				// second term
+    _Z!(copy) eval() const @trusted
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref MpZ y) const @trusted
+    void evalTo(ref _Z!(copy) y) const @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
     }
 }
-version(unittest) static assert(isMpZExpr!(AddExpr!(MpZ, MpZ)));
+version(unittest) static assert(isMpZExpr!(AddExpr!(true)));
 
 @safe @nogc unittest
 {
-    assert(AddExpr!(Z, Z)(3.Z, 4.Z).eval() == 3 + 4);
+    assert(AddExpr!(true)(3.Z, 4.Z).eval() == 3 + 4);
 
-    const Z x = AddExpr!(Z, Z)(3.Z, 4.Z);
+    const Z x = AddExpr!(true)(3.Z, 4.Z);
     version(ccc) assert(x.mutatingCallCount == 1); // lower to `mpz_add`
     assert(x == 7);
 
     Z y = null;
-    y = AddExpr!(Z, Z)(3.Z, 4.Z);
+    y = AddExpr!(true)(3.Z, 4.Z);
     version(ccc) assert(y.mutatingCallCount == 2); // lowers to `mpz_init`, `mpz_add`
     assert(y == 7);
 
 }
 
 /// `MpZ`-`MpZ` subtraction expression.
-private struct SubExpr(T1, T2)
-if (isMpZExpr!T1 &&
-    isMpZExpr!T2)
+private struct SubExpr(bool copy)
 {
-    T1 e1;                      // first term
-    T2 e2;                      // second term
-    MpZ eval() const @trusted   // TODO: move to common place
+    _Z!(copy) e1;                      // first term
+    _Z!(copy) e2;                      // second term
+    _Z!(copy) eval() const @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref MpZ y) const @trusted
+    void evalTo(ref _Z!(copy) y) const @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
     }
 }
-version(unittest) static assert(isMpZExpr!(SubExpr!(MpZ, MpZ)));
+version(unittest) static assert(isMpZExpr!(SubExpr!(true)));
 
 @safe @nogc unittest
 {
-    assert(SubExpr!(Z, Z)(3.Z, 4.Z).eval() == 3 - 4);
-    const Z x = SubExpr!(Z, Z)(3.Z, 4.Z);
+    assert(SubExpr!(true)(3.Z, 4.Z).eval() == 3 - 4);
+    const Z x = SubExpr!(true)(3.Z, 4.Z);
     version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_sub`
     assert(x == -1);
 }
 
 /// `MpZ`-`MpZ` multiplication expression.
-private struct MulExpr(F1, F2)
-if (isMpZExpr!F1 &&
-    isMpZExpr!F2)
+private struct MulExpr(bool copy)
 {
-    F1 e1;                      // first factor
-    F2 e2;                      // second factor
-    MpZ eval() const @trusted   // TODO: move to common place
+    _Z!(copy) e1;				// first factor
+    _Z!(copy) e2;				// second factor
+    _Z!(copy) eval() const @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref MpZ y) const @trusted
+    void evalTo(ref _Z!(copy) y) const @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
     }
 }
-version(unittest) static assert(isMpZExpr!(MulExpr!(MpZ, MpZ)));
+version(unittest) static assert(isMpZExpr!(MulExpr!(true)));
 
 @safe @nogc unittest
 {
-    assert(MulExpr!(Z, Z)(3.Z, 4.Z).eval() == 3 * 4);
+    assert(MulExpr!(true)(3.Z, 4.Z).eval() == 3 * 4);
 
-    const Z x = MulExpr!(Z, Z)(3.Z, 4.Z);
+    const Z x = MulExpr!(true)(3.Z, 4.Z);
     assert(x == 12);
     version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_mul`
 }
 
 /// `MpZ`-`MpZ` division expression.
-private struct DivExpr(P, Q)
-if (isMpZExpr!P &&
-    isMpZExpr!Q)
+private struct DivExpr(bool copy)
 {
-    P e1;                       // divisor
-    Q e2;                       // dividend
-    MpZ eval() const @trusted   // TODO: move to common place
+    _Z!(copy) e1;				// divisor
+    _Z!(copy) e2;				// dividend
+    _Z!(copy) eval() const @trusted	// TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref MpZ y) const @trusted
+    void evalTo(ref _Z!(copy) y) const @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
     }
 }
-version(unittest) static assert(isMpZExpr!(DivExpr!(MpZ, MpZ)));
+version(unittest) static assert(isMpZExpr!(DivExpr!(true)));
 
 @safe @nogc unittest
 {
-    assert(DivExpr!(Z, Z)(27.Z, 3.Z).eval() == 27 / 3);
-    assert(DivExpr!(Z, Z)(28.Z, 3.Z).eval() == 28 / 3);
-    assert(DivExpr!(Z, Z)(29.Z, 3.Z).eval() == 29 / 3);
-    assert(DivExpr!(Z, Z)(30.Z, 3.Z).eval() == 30 / 3);
+    assert(DivExpr!(true)(27.Z, 3.Z).eval() == 27 / 3);
+    assert(DivExpr!(true)(28.Z, 3.Z).eval() == 28 / 3);
+    assert(DivExpr!(true)(29.Z, 3.Z).eval() == 29 / 3);
+    assert(DivExpr!(true)(30.Z, 3.Z).eval() == 30 / 3);
 
-    const Z x = DivExpr!(Z, Z)(28.Z, 3.Z);
+    const Z x = DivExpr!(true)(28.Z, 3.Z);
     assert(x == 9);
     version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_tdiv_q`
 }
 
 /// `MpZ`-`MpZ` modulus expression.
-private struct ModExpr(P, Q)
-if (isMpZExpr!P &&
-    isMpZExpr!Q)
+private struct ModExpr(bool copy)
 {
-    P e1;                       // divisor
-    Q e2;                       // dividend
-    MpZ eval() const @trusted   // TODO: move to common place
+    _Z!(copy) e1;				// divisor
+    _Z!(copy) e2;				// dividend
+    _Z!(copy) eval() const @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref MpZ y) const @trusted
+    void evalTo(ref _Z!(copy) y) const @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
     }
 }
-version(unittest) static assert(isMpZExpr!(ModExpr!(MpZ, MpZ)));
+version(unittest) static assert(isMpZExpr!(ModExpr!(true)));
 
 @safe @nogc unittest
 {
-    assert(ModExpr!(Z, Z)(27.Z, 3.Z).eval() == 27 % 3);
-    assert(ModExpr!(Z, Z)(28.Z, 3.Z).eval() == 28 % 3);
-    assert(ModExpr!(Z, Z)(29.Z, 3.Z).eval() == 29 % 3);
-    assert(ModExpr!(Z, Z)(30.Z, 3.Z).eval() == 30 % 3);
+    assert(ModExpr!(true)(27.Z, 3.Z).eval() == 27 % 3);
+    assert(ModExpr!(true)(28.Z, 3.Z).eval() == 28 % 3);
+    assert(ModExpr!(true)(29.Z, 3.Z).eval() == 29 % 3);
+    assert(ModExpr!(true)(30.Z, 3.Z).eval() == 30 % 3);
 
-    const Z x = ModExpr!(Z, Z)(29.Z, 3.Z);
+    const Z x = ModExpr!(true)(29.Z, 3.Z);
     assert(x == 2);
     version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_tdiv_r`
 }
@@ -3373,30 +3372,29 @@ version(unittest) static assert(isMpZExpr!(PowMUExpr!(MpZ, ulong, MpZ)));
 }
 
 /// `MpZ` negation expression.
-private struct NegExpr(A)
-if (isMpZExpr!A)
+private struct NegExpr(bool copy)
 {
-    A e1;
-    MpZ eval() const @trusted   // TODO: move to common place
+    _Z!(copy) e1;
+    _Z!(copy) eval() const @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref MpZ y) const @trusted
+    void evalTo(ref _Z!(copy) y) const @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_neg(y._ptr, e1.eval()._ptr); version(ccc) ++y._ccc;
     }
 }
-version(unittest) static assert(isMpZExpr!(NegExpr!(MpZ)));
+version(unittest) static assert(isMpZExpr!(NegExpr!(true)));
 
 @safe @nogc unittest
 {
-    assert(NegExpr!(Z)(27.Z).eval() == -27);
+    assert(NegExpr!(true)(27.Z).eval() == -27);
 
-    const Z x = NegExpr!(Z)(27.Z);
+    const Z x = NegExpr!(true)(27.Z);
     version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_neg`
     assert(x == -27);
 }
