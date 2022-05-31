@@ -1484,10 +1484,6 @@ private:
     }
 }
 
-/** Arbitrary precision integer (BigInt) with copy-on-write (CoW) automatic
- * reference counting (ARC). */
-alias Z = CopyableMpZ;
-
 /** Arbitrary precision integer (BigInt) with explicit copying via `.dup`.
  *
  * For copyable using copy-on-write automatic reference counting semantics, use
@@ -1495,7 +1491,8 @@ alias Z = CopyableMpZ;
  */
 alias MpZ = _Z!(false);
 
-/** Copyable MpZ. */
+/** Arbitrary precision integer (BigInt) with copy-on-write (CoW) automatic
+ * reference counting (ARC). */
 alias CopyableMpZ = _Z!(true);
 
 version(unittest) static assert(isMpZExpr!(MpZ));
