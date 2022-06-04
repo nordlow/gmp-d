@@ -14,9 +14,6 @@ stackSize before standard allocation via malloc, realloc, free kicks in.
 - Disallow construction and assignment from floating point? Check with other GMP
   interfaces and std.bigint.
 
-- Copy-on-write (COW) `RefCounted` data store. Optionally with specialized
-  heap-allocator for `MpZ` type (16-bytes).
-
 - Use https://github.com/andrew-m-h/libgmp/tree/master/source/deimos/gmp instead of my own extern(C) definitions
 
 - Define `mp{z,q,f}` C-function wrappers callable with refs to D-wrapper structs
