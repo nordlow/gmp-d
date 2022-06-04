@@ -32,7 +32,7 @@ stackSize before standard allocation via malloc, realloc, free kicks in.
 
 - Compare implementation with official C++ wrapper
   ([gmpxx](/usr/include/gmpxx.h))
-  and [Rust wrappers such as rust-gmp](https://github.com/thestinger/rust-gmp)
+  and [Rust wrappers such as rust-gmp](https://crates.io/crates/rust-gmp)
   to see that no optimization has been overseen
 
 - Delayed evaluation via expression templates is in development. Evaluation can
