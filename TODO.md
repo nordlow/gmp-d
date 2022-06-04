@@ -1,5 +1,10 @@
 # TODO list (in order of priority)
 
+- Support custom allocation using https://gmplib.org/manual/Custom-Allocation
+
+For instance of `MpZ!(stackSize)` will provide stack-based allocation up to
+stackSize before standard allocation via malloc, realloc, free kicks in.
+
 - Support right shift operators `>>` and `>>>`.
 
 - _ccc Make _ccc two => uint _initCCC and uint _opCCC, mutatingCallCount return
