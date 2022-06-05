@@ -91,10 +91,12 @@ pure:
 		return typeof(return)(value, 16);
 	}
 
-	static typeof(this) fromHexString(string value)() pure @trusted
+	static typeof(this) fromHexString(string value)() pure @trusted // `value` is guaranteed to be null-terminated
 	{
-        immutable int status = __gmpz_init_set_str(_ptr, value, base); version(ccc) { ++_ccc; }
+		typeof(return) result = void;
+        immutable int status = __gmpz_init_set_str(result._ptr, value.ptr, 16); version(ccc) { ++_ccc; }
         enforce(status == 0, "Parameter `value` does not contain an integer");
+		return result;
 	}
 
 nothrow:
@@ -2415,6 +2417,7 @@ unittest
     assert(Z.fromHexString(`10`) == 16);
     assert(Z.fromHexString(`0x10`) == 16);
     assert(Z.fromHexString(`0X10`) == 16);
+    assert(Z.fromHexString!(`10`) == 16);
 
     // decimal
 
