@@ -73,6 +73,11 @@ pure:
         enforce(status == 0, "Parameter `value` does not contain an integer");
     }
 
+	static typeof(this) fromBinaryString(scope const(char)[] value) pure @safe
+	{
+		return typeof(return)(value, 2);
+	}
+
 	static typeof(this) fromHexString(scope const(char)[] value) pure @safe
 	{
 		return typeof(return)(value, 16);
