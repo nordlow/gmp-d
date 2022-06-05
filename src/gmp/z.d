@@ -72,7 +72,7 @@ pure:
         enforce(status == 0, "Parameter `value` does not contain an integer");
     }
 
-	static typeof(this) fromHexString(scope const(char)[] value) @safe pure
+	static typeof(this) fromHexString(scope const(char)[] value) pure @safe
 	{
 		return typeof(return)(value, 16);
 	}
@@ -133,7 +133,7 @@ nothrow:
 
 	void toString(Writer)(ref Writer writer, // `mir.appender` compliant
 						  in uint base = defaultBase,
-						  in bool upperCaseDigits = false) const @trusted @nogc
+						  in bool upperCaseDigits = false) const @nogc @trusted
         if (is(typeof(writer.put((const(char)[]).init))))
 	{
         import core.memory : pureFree;
@@ -316,14 +316,14 @@ nothrow:
     }
 
     /// Assign from `rhs`.
-    ref _Z opAssign()(auto ref const _Z rhs) @trusted scope return
+    ref _Z opAssign()(auto ref const _Z rhs) scope return @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_set(_ptr, rhs._ptr); version(ccc) { ++_ccc; }
         return this;
     }
     /// ditto
-    ref _Z opAssign(Expr)(auto ref Expr rhs) @trusted scope return
+    ref _Z opAssign(Expr)(auto ref Expr rhs) scope return @trusted
     if (isLazyMpZExpr!Expr)
     {
         version(LDC) pragma(inline, true);
@@ -331,7 +331,7 @@ nothrow:
         return this;
     }
     /// ditto
-    ref _Z opAssign(T)(T rhs) @trusted scope return
+    ref _Z opAssign(T)(T rhs) scope return @trusted
     if (isArithmetic!T)
     {
         version(LDC) pragma(inline, true);
@@ -360,7 +360,7 @@ nothrow:
     /** Assign `this` from `string` `rhs` interpreted in base `base`.
         If `base` is 0 it's guessed from contents of `value`.
     */
-    ref _Z fromString(scope const(char)[] rhs, uint base = 0) @trusted return
+    ref _Z fromString(scope const(char)[] rhs, uint base = 0) scope return @trusted
     {
         assert(base == 0 || (base >= 2 && base <= 62));
 		static if (cow) { selfdupIfAliased(); }
@@ -372,7 +372,7 @@ nothrow:
     }
 
     /// Destruct `this`.
-    ~this() @trusted @nogc
+    ~this() @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         if (_z._mp_d)
@@ -881,7 +881,7 @@ nothrow:
     }
 
     /// Operate-assign to `this` from `rhs`.
-    ref _Z opOpAssign(string s)(auto ref const _Z rhs) @trusted scope return
+    ref _Z opOpAssign(string s)(auto ref const _Z rhs) scope return @trusted
     if ((s == "+" || s == "-" ||
          s == "*" || s == "/" || s == "%" ||
          s == "&" || s == "|" || s == "^"))
@@ -943,7 +943,7 @@ nothrow:
     }
 
     /// ditto
-    ref _Z opOpAssign(string s, Rhs)(Rhs rhs) @trusted scope return
+    ref _Z opOpAssign(string s, Rhs)(Rhs rhs) scope return @trusted
     if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
         isUnsigned!Rhs)
     {
@@ -982,7 +982,7 @@ nothrow:
     }
 
     /// ditto
-    ref _Z opOpAssign(string s, Rhs)(Rhs rhs) @trusted scope return
+    ref _Z opOpAssign(string s, Rhs)(Rhs rhs) scope return @trusted
     if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
         isSigned!Rhs)
     {
@@ -1120,7 +1120,7 @@ nothrow:
     }
 
     /// Increase `this` by one.
-    ref _Z opUnary(string s)() @trusted scope return
+    ref _Z opUnary(string s)() scope return @trusted
     if (s == "++")
     {
         version(LDC) pragma(inline, true);
@@ -1137,7 +1137,7 @@ nothrow:
     }
 
     /// Decrease `this` by one.
-    ref _Z opUnary(string s)() @trusted scope return
+    ref _Z opUnary(string s)() scope return @trusted
     if (s == "--")
     {
         version(LDC) pragma(inline, true);
@@ -1463,7 +1463,7 @@ private:
     }
 
     /// @nogc-variant of `toStringz` with heap allocation of null-terminated C-string `stringz`.
-    char* _allocStringzCopyOf(in char[] value) @trusted @nogc
+    char* _allocStringzCopyOf(in char[] value) @nogc @trusted
     {
         import core.memory : pureMalloc;
         char* stringz = cast(char*)pureMalloc(value.length + 1); // maximum this many characters
@@ -3442,7 +3442,7 @@ if (isIntegral!T)
 }
 
 /// to string conversion
-@safe pure nothrow unittest
+pure @safe nothrow unittest
 {
     for (int i = -100; i < 100; ++i)
     {
