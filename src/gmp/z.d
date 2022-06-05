@@ -51,6 +51,7 @@ enum WordOrder
 private struct _Z(bool cow)
 {
 pure:
+    private enum smallBufSize = 1024;
     /** Construct from `value` in base `base`.
 
 		If `base` is 0 it's guessed from contents of `value`.
@@ -59,6 +60,9 @@ pure:
         in(base == 0 ||
 		   (+2 <= base && base <= +62))
     {
+		import std.algorithm.searching : canFind;
+		import std.stdio;
+		debug writeln("value1:", value);
 		if (value.length >= 2 &&
 			value[0] == '0' &&
 			((base == 16 &&
@@ -73,10 +77,27 @@ pure:
 		{
 			value = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
 		}
-		enum smallBufSize = 1024;
+		debug writeln("value2:", value);
 		char[smallBufSize] buf;
-        char* stringz = _allocStringzCopyOf(value); // TODO: append inline trailing zero if possible otherwise make this stack allocated
-		scope(exit) qualifiedFree(stringz);
+		char* stringz;
+		if (value.length + 1 <= smallBufSize &&
+			value[0] != '-' &&	 // TODO: enable support for this
+			!value.canFind('_')) // TODO: enable support for this
+		{
+			buf[0 .. value.length] = value;
+			buf[value.length] = '\0'; // null terminator
+			stringz = buf.ptr;
+		}
+		else
+		{
+			stringz = _allocStringzCopyOf(value); // TODO: append inline trailing zero if possible otherwise make this stack allocated
+		}
+		scope(exit)
+		{
+			if (stringz != buf.ptr)
+				qualifiedFree(stringz);
+		}
+		debug writeln("string:", stringz[0..value.length + 1]);
         immutable int status = __gmpz_init_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
         enforce(status == 0, "Parameter `value` does not contain an integer");
     }
