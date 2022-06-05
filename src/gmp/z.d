@@ -59,13 +59,13 @@ pure:
         in(base == 0 ||
 		   (+2 <= base && base <= +62))
     {
-		if (base == 16)
+		if (base == 16 &&
+			value.length >= 2 &&
+			value[0] == '0' &&
+			(value[1] == 'x' ||
+			 value[1] == 'X'))
 		{
-			if (value.length >= 2 &&
-				value[0] == '0' &&
-				(value[1] == 'x' ||
-				 value[1] == 'X'))
-				value = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
+			value = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
 		}
         char* stringz = _allocStringzCopyOf(value); // TODO: append inline trailing zero if possible otherwise make this stack allocated
 		scope(exit) qualifiedFree(stringz);
