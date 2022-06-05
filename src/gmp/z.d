@@ -51,7 +51,8 @@ enum WordOrder
 private struct _Z(bool cow)
 {
 pure:
-    /** Needed below because GNU MP must construct from null-terminated strings
+    /** Needed below because `mpz_init_set_str` is currently the only way to
+	 * construct from an array of characters.
 	 */
     private enum smallBufSize = 1024;
 
