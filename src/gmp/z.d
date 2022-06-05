@@ -17,7 +17,7 @@ enum isLazyMpZExpr(T) = (!is(Unqual!T == MpZ) &&            // exclude direct va
                          isMpZExpr!T);
 
 /** WordEndianess of serialization in `MpZ.serialize` and
- * unserialization-construction from integer array.
+	unserialization-construction from integer array.
  */
 enum WordEndianess
 {
@@ -27,7 +27,7 @@ enum WordEndianess
 }
 
 /** Word-order of serialization in `MpZ.serialize` and
- * unserialization-construction from integer array.
+	unserialization-construction from integer array.
  */
 enum WordOrder
 {
@@ -40,21 +40,21 @@ enum WordOrder
 // import deimos.gmp.integer;
 
 /** Arbitrary (multi) precision signed integer (Z).
- *
- * Wrapper for GNU MP (GMP)'s type `mpz_t` and functions `__gmpz_.*`.
- *
- * If `cow` is `false` copying (via assignment and parameter passing by value)
- * is only possible explicitly via `.dup` (Rust-style) otherwise copying is
- * automatic and does copy-on-write (CoW) of the internal data via reference
- * counting (ARC) (Swift-style).
+
+	Wrapper for GNU MP (GMP)'s type `mpz_t` and functions `__gmpz_.*`.
+
+	If `cow` is `false` copying (via assignment and parameter passing by value)
+	is only possible explicitly via `.dup` (Rust-style) otherwise copying is
+	automatic and does copy-on-write (CoW) of the internal data via reference
+	counting (ARC) (Swift-style).
  */
 private struct _Z(bool cow)
 {
 pure:
     /** Construct from `value` in base `base`.
-     *
-     * If `base` is 0 it's guessed from contents of `value`.
-     */
+
+		If `base` is 0 it's guessed from contents of `value`.
+	*/
     this(scope const(char)[] value, uint base = 0) @trusted // TODO: Use Optional/Nullable when value is nan, or inf
         in(base == 0 ||
 		   (+2 <= base && base <= +62))
@@ -93,9 +93,9 @@ nothrow:
     }
 
     /** Convert in base `base` into `chars` of length `length`.
-     *
-     * Returns: char[] which must be freed manually with `pureFree`.
-     */
+
+		Returns: char[] which must be freed manually with `pureFree`.
+	*/
     char[] toChars(in uint base = defaultBase,
                    in bool upperCaseDigits = false) const @system @nogc
 		in(-2 <= base && base <= -36 ||
@@ -154,15 +154,15 @@ nothrow:
     }
 
     /** Serialize `this` into a new GC-allocated slice of words, each word of
-     * type `Word`.
-     *
-     * It's format defined by:
-     * - `order`: the most significant word `first` or `last` for least significant first
-     * - `endian` can be `bigEndian`, `littleEndian` or `host` default
-     * - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
-     *
-     * Returns: a new GC-allocated slice containing the words produced.
-     */
+		type `Word`.
+
+		It's format defined by:
+		- `order`: the most significant word `first` or `last` for least significant first
+		- `endian` can be `bigEndian`, `littleEndian` or `host` default
+		- the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
+
+		Returns: a new GC-allocated slice containing the words produced.
+	*/
     Word[] serialize(Word)(WordOrder order, WordEndianess endian, size_t nails) const @trusted
     if (isUnsigned!Word)
     {
@@ -227,14 +227,14 @@ nothrow:
     }
 
     /** Constucts number from serialized binary array.
-     *
-     * Arguments:
-     * - `rop` : array of unsinged values
-     * - `order`: the most significant word `first` or `last` for least significant first
-     * - `size` in bytes of each word
-     * - `endian` can be `bigEndian`, `littleEndian` or `host` default
-     * - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
-     */
+
+		Arguments:
+		- `rop` : array of unsinged values
+		- `order`: the most significant word `first` or `last` for least significant first
+		- `size` in bytes of each word
+		- `endian` can be `bigEndian`, `littleEndian` or `host` default
+		- the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
+	*/
     this(T)(const T[] rop, WordOrder order, size_t size, WordEndianess endian, size_t nails)
     if (isUnsigned!T)
     {
@@ -482,9 +482,8 @@ nothrow:
         }
     }
 
-    /** Get the value of this as a `long`, or +/- `long.max` if outside
-     * the representable range.
-     */
+    /** Get the value of this as a `long`, or +/- `long.max` if outside the
+		representable range. */
     long toLong() const @trusted
     {
         version(LDC) pragma(inline, true);
@@ -504,8 +503,8 @@ nothrow:
     }
 
     /** Get the value of this as a `int`, or +/- `int.max` if outside the
-     * representable range.
-     */
+		representable range.
+	*/
     int toInt() const @trusted
     {
         version(LDC) pragma(inline, true);
@@ -1085,9 +1084,9 @@ nothrow:
     }
 
     /** Negate `this` in-place.
-     *
-     * Returns: `void` to make it obvious that `this` is mutated.
-     */
+
+		Returns: `void` to make it obvious that `this` is mutated.
+	*/
     void negate() @safe
     {
 		static if (cow) { selfdupIfAliased(); }
@@ -1096,9 +1095,9 @@ nothrow:
     }
 
     /** Make `this` the absolute value of itself in-place.
-     *
-     * Returns: `void` to make it obvious that `this` is mutated.
-     */
+
+		Returns: `void` to make it obvious that `this` is mutated.
+	*/
     void absolute() @trusted
     {
         version(LDC) pragma(inline, true);
@@ -1108,9 +1107,9 @@ nothrow:
     }
 
     /** Make `this` the one's complement value of itself in-place.
-     *
-     * Returns: `void` to make it obvious that `this` is mutated.
-     */
+
+		Returns: `void` to make it obvious that `this` is mutated.
+	*/
     void onesComplement() @trusted
     {
         version(LDC) pragma(inline, true);
@@ -1205,16 +1204,16 @@ nothrow:
     }
 
     /** Serialize `this` into an existing pre-allocated slice of words `words`,
-     * each word of type `Word`.
-     *
-     * It's format defined by:
-     * - `order`: the most significant word `first` or `last` for least significant first
-     * - `size` in bytes of each word
-     * - `endian` can be `bigEndian`, `littleEndian` or `host` default
-     * - the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
-     *
-     * Returns: a (sub-)slice of `words` containing only the words produced.
-     */
+		each word of type `Word`.
+
+		It's format defined by:
+		- `order`: the most significant word `first` or `last` for least significant first
+		- `size` in bytes of each word
+		- `endian` can be `bigEndian`, `littleEndian` or `host` default
+		- the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
+
+		Returns: a (sub-)slice of `words` containing only the words produced.
+	*/
     Word[] serialize(Word)(return scope Word[] words,
                            WordOrder order, size_t size, WordEndianess endian, size_t nails) const @trusted
     if (isUnsigned!Word)
@@ -1266,11 +1265,11 @@ nothrow:
     }
 
     /** Get population count of `this`.
-     *
-     * If
-     * - `this` >= 0, number of 1 bits in the binary representation
-     * - otherwise, ???
-     */
+
+		If
+		- `this` >= 0, number of 1 bits in the binary representation
+	    - otherwise, ???
+	*/
     @property mp_bitcnt_t populationCount() const @trusted
     {
         pragma(inline, true);
@@ -1361,9 +1360,10 @@ nothrow:
     }
 
     /** Returns: sign as either
-     * - -1 (`this` < 0),
-     * -  0 (`this` == 0), or
-     * - +1 (`this` > 0).
+
+      - -1 (`this` < 0),
+	  -  0 (`this` == 0), or
+	  - +1 (`this` > 0).
      */
     @property int sgn() const @safe
     {
@@ -1489,14 +1489,15 @@ private:
 }
 
 /** Arbitrary precision integer (BigInt) with explicit copying via `.dup`.
- *
- * For copyable using copy-on-write automatic reference counting semantics, use
- * `CopyableMpZ`.
- */
+
+	For copyable using copy-on-write automatic reference counting semantics, use
+	`CopyableMpZ`.
+*/
 alias MpZ = _Z!(false);
 
 /** Arbitrary precision integer (BigInt) with copy-on-write (CoW) automatic
- * reference counting (ARC) API-compatible with `std.bigint`. */
+	reference counting (ARC) API-compatible with `std.bigint`.
+*/
 alias CopyableMpZ = _Z!(true);
 
 version(unittest) static assert(isMpZExpr!(MpZ));
@@ -1735,9 +1736,9 @@ _Z!(cow) mul(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) not
 }
 
 /** Get absolute value of `x`.
- *
- * Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
- */
+
+	Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
+*/
 _Z!(cow) abs(bool cow)(auto ref const _Z!(cow) x) @trusted nothrow @nogc
 {
     version(LDC) pragma(inline, true);
@@ -1757,9 +1758,9 @@ _Z!(cow) abs(bool cow)(auto ref const _Z!(cow) x) @trusted nothrow @nogc
 }
 
 /** Get one's complement of value of `x`.
- *
- * Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
- */
+
+	Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
+*/
 _Z!(cow) onesComplement(bool cow)(auto ref const _Z!(cow) x) @trusted nothrow @nogc
 {
     version(LDC) pragma(inline, true);
@@ -1797,9 +1798,9 @@ int cmpabs(bool cow)(auto ref const _Z!(cow) x, ulong y) nothrow @nogc @trusted
 }
 
 /** Get next prime greater than `x`.
- *
- * Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
- */
+
+	Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
+*/
 _Z!(cow) nextPrime(bool cow)(auto ref const _Z!(cow) x) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
@@ -1946,9 +1947,9 @@ _Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, ulong y) nothrow @nogc @truste
 }
 
 /** Get `base` ^^ `exp` (modulo `mod`).
- *
- * Parameter `exp` must be positive.
- */
+
+	Parameter `exp` must be positive.
+*/
 _Z!(cow) powm(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) exp, auto ref const _Z!(cow) mod) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
@@ -1974,9 +1975,9 @@ _Z!(cow) powm(bool cow)(auto ref const _Z!(cow) base, ulong exp, auto ref const 
 alias powmod = powm;
 
 /** Get `base` ^^ `-1` (modulo `mod`).
- *
- * Parameter `mod` must be positive.
- */
+
+	Parameter `mod` must be positive.
+*/
 _Z!(cow) invert(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) mod) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
