@@ -61,9 +61,10 @@ pure:
     {
 		if (base == 16)
 		{
-			import std.algorithm.searching : startsWith;
-			if (value.startsWith("0x") ||
-				value.startsWith("0X"))
+			if (value.length >= 2 &&
+				value[0] == '0' &&
+				(value[1] == 'x' ||
+				 value[1] == 'X'))
 				value = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
 		}
         char* stringz = _allocStringzCopyOf(value);
