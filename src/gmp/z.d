@@ -59,11 +59,14 @@ pure:
         in(base == 0 ||
 		   (+2 <= base && base <= +62))
     {
-		if (base == 16 &&
-			value.length >= 2 &&
+		if (value.length >= 2 &&
 			value[0] == '0' &&
-			(value[1] == 'x' ||
-			 value[1] == 'X'))
+			((base == 16 &&
+			  (value[1] == 'x' ||
+			   value[1] == 'X')) ||
+			 (base == 2 &&
+			  (value[1] == 'b' ||
+			   value[1] == 'B'))))
 		{
 			value = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
 		}
