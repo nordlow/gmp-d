@@ -88,6 +88,13 @@ pure:
 
 	static typeof(this) fromHexString(scope const(char)[] value) pure @safe
 	{
+		if (value.length >= 2 &&
+			(value[0] == '0' &&
+			 (value[1] == 'x' ||
+			   value[1] == 'X')))
+		{
+			value = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
+		}
 		return typeof(return)(value, 16);
 	}
 
