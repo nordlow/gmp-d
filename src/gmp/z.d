@@ -66,10 +66,15 @@ pure:
 			   value[1] == 'X')) ||
 			 (base == 2 &&
 			  (value[1] == 'b' ||
-			   value[1] == 'B'))))
+			   value[1] == 'B')) ||
+			 (base == 8 &&
+			  (value[1] == 'o' ||
+			   value[1] == 'O'))))
 		{
 			value = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
 		}
+		enum smallBufSize = 1024;
+		char[smallBufSize] buf;
         char* stringz = _allocStringzCopyOf(value); // TODO: append inline trailing zero if possible otherwise make this stack allocated
 		scope(exit) qualifiedFree(stringz);
         immutable int status = __gmpz_init_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
@@ -84,6 +89,12 @@ pure:
 	static typeof(this) fromHexString(scope const(char)[] value) pure @safe
 	{
 		return typeof(return)(value, 16);
+	}
+
+	static typeof(this) fromHexString(string value)() pure @trusted
+	{
+        immutable int status = __gmpz_init_set_str(_ptr, value, base); version(ccc) { ++_ccc; }
+        enforce(status == 0, "Parameter `value` does not contain an integer");
 	}
 
 nothrow:
