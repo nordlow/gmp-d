@@ -51,7 +51,10 @@ enum WordOrder
 private struct _Z(bool cow)
 {
 pure:
+    /** Needed below because GNU MP must construct from null-terminated strings
+	 */
     private enum smallBufSize = 1024;
+
     /** Construct from `value` in base `base`.
 
 		If `base` is 0 it's guessed from contents of `value`.
@@ -61,8 +64,8 @@ pure:
 		   (+2 <= base && base <= +62))
     {
 		import std.algorithm.searching : canFind;
-		import std.stdio;
-		debug writeln("value1:", value);
+		// debug import std.stdio;
+		// debug writeln("value1:", value);
 		if (value.length >= 2 &&
 			value[0] == '0' &&
 			((base == 16 &&
@@ -77,7 +80,7 @@ pure:
 		{
 			value = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
 		}
-		debug writeln("value2:", value);
+		// debug writeln("value2:", value);
 		char[smallBufSize] buf;
 		char* stringz;
 		if (value.length + 1 <= smallBufSize &&
@@ -97,7 +100,7 @@ pure:
 			if (stringz != buf.ptr)
 				qualifiedFree(stringz);
 		}
-		debug writeln("string:", stringz[0..value.length + 1]);
+		// debug writeln("string:", stringz[0..value.length + 1]);
         immutable int status = __gmpz_init_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
         enforce(status == 0, "Parameter `value` does not contain an integer");
     }
