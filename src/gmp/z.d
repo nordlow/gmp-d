@@ -67,7 +67,7 @@ pure:
 				 value[1] == 'X'))
 				value = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
 		}
-        char* stringz = _allocStringzCopyOf(value);
+        char* stringz = _allocStringzCopyOf(value); // TODO: append inline trailing zero if possible otherwise make this stack allocated
 		scope(exit) qualifiedFree(stringz);
         immutable int status = __gmpz_init_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
         enforce(status == 0, "Parameter `value` does not contain an integer");
