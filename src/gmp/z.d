@@ -97,11 +97,11 @@ pure:
 				   (value[0] == '0' &&
 					(value[1] == 'x' ||
 					 value[1] == 'X')))
-			enum value2 = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
+			enum adjustedValue = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
 		else
-			enum value2 = value;
+			enum adjustedValue = value;
 		typeof(return) result = void;
-        immutable int status = __gmpz_init_set_str(result._ptr, value2.ptr, 16); version(ccc) { ++_ccc; }
+        immutable int status = __gmpz_init_set_str(result._ptr, adjustedValue.ptr, 16); version(ccc) { ++_ccc; }
         enforce(status == 0, "Parameter `value` does not contain an integer");
 		return result;
 	}
