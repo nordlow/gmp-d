@@ -7,7 +7,8 @@ import gmp.z;
 @safe:
 
 /** Arbitrary (multi) precision rational number (Q).
-    Wrapper for GNU MP (GMP)'s type `mpq_t` and functions `__gmpq_.*`.
+ *
+ * Wrapper for GNU MP (GMP)'s type `mpq_t` and functions `__gmpq_.*`.
  */
 struct MpQ
 {
@@ -44,10 +45,10 @@ pragma(inline, true):
     @nogc:
 
     /** No default construction for now, because `mpq_init` initialize
-        `__mpq_struct`-fields to non-zero values.
-
-        TODO: Allow default construction by delaying call to initialize().
-    */
+	 * `__mpq_struct`-fields to non-zero values.
+	 *
+	 * TODO: Allow default construction by delaying call to initialize().
+	 */
     @disable this();
 
     /// No copy construction.
@@ -69,9 +70,9 @@ pragma(inline, true):
     }
 
     /** Construct from `pValue` / `qValue`.
-
-        Note that `qValue` must be explicitly given, to prevent accidental
-        storage of integers as rations with denominator being 1.
+	 *
+	 * Note that `qValue` must be explicitly given, to prevent accidental
+	 * storage of integers as rations with denominator being 1.
      */
     this(P, Q)(P pValue, Q qValue,
                in bool canonicalizeFlag = false) @trusted
@@ -242,8 +243,9 @@ pragma(inline, true):
     }
 
     /** Invert `this` in-place.
-        Returns: `void` to make it obvious that `this` is mutated.
-    */
+	 *
+	 * Returns: `void` to make it obvious that `this` is mutated.
+	 */
     void invert() @trusted
     {
         version(DigitalMars) pragma(inline, false);
@@ -273,8 +275,9 @@ pragma(inline, true):
     }
 
     /** Make `this` the absolute value of itself in-place.
-        Returns: `void` to make it obvious that `this` is mutated.
-    */
+	 *
+	 * Returns: `void` to make it obvious that `this` is mutated.
+	 */
     void absolute() @safe
     {
         numerator.absolute();
@@ -393,15 +396,19 @@ private:
 
     version(ccc)
     {
-        /** Number of calls made to `__gmpq`--functions that construct or changes
-            this value. Used to verify correct lowering and evaluation of template
-            expressions.
-
-            For instance the `x` in `x = y + z` should be assigned only once inside
-            a call to `mpq_add`.
-        */
+        /** Number of calls made to `__gmpq`--functions that construct or
+		 * changes this value. Used to verify correct lowering and evaluation of
+		 * template expressions.
+		 *
+		 * For instance the `x` in `x = y + z` should be assigned only once
+		 * inside a call to `mpq_add`.
+		 */
         @property size_t mutatingCallCount() const @safe { return _ccc; }
-        size_t _ccc;  // C mutation call count. number of calls to C GMP function calls that mutate this object
+
+		/** C mutation call count. Number of calls to C GMP function calls that
+		 * mutate this object.
+		 */
+        size_t _ccc;
     }
 }
 
