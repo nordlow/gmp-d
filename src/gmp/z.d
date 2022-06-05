@@ -203,8 +203,9 @@ pure nothrow:
      * If `base` is 0 it's guessed from contents of `value`.
      */
     this(scope const(char)[] value, uint base = 0) @trusted // TODO: Use Optional/Nullable when value is nan, or inf
+        in(base == 0 ||
+		   (+2 <= base && base <= +62))
     {
-        assert(base == 0 || (base >= 2 && base <= 62));
 		if (base == 16)
 		{
 			import std.algorithm.searching : startsWith;
