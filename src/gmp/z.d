@@ -1,6 +1,7 @@
 /// Multiple precision integers (Z).
 module gmp.z;
 
+import std.exception : enforce;
 import core.lifetime : move;
 import std.traits : Unsigned, Unqual, isIntegral, isUnsigned; // used by expression templates
 import gmp.traits;
@@ -49,7 +50,34 @@ enum WordOrder
  */
 private struct _Z(bool cow)
 {
-pure nothrow:
+pure:
+    /** Construct from `value` in base `base`.
+     *
+     * If `base` is 0 it's guessed from contents of `value`.
+     */
+    this(scope const(char)[] value, uint base = 0) @trusted // TODO: Use Optional/Nullable when value is nan, or inf
+        in(base == 0 ||
+		   (+2 <= base && base <= +62))
+    {
+		if (base == 16)
+		{
+			import std.algorithm.searching : startsWith;
+			if (value.startsWith("0x") ||
+				value.startsWith("0X"))
+				value = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
+		}
+        char* stringz = _allocStringzCopyOf(value);
+		scope(exit) qualifiedFree(stringz);
+        immutable int status = __gmpz_init_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
+        enforce(status == 0, "Parameter `value` does not contain an integer");
+    }
+
+	static typeof(this) fromHexString(scope const(char)[] value) @safe pure
+	{
+		return typeof(return)(value, 16);
+	}
+
+nothrow:
 
     /// Convert to `string` in base `base`.
     string toString(in uint base = defaultBase,
@@ -197,32 +225,6 @@ pure nothrow:
         //     }
         // }
     }
-
-    /** Construct from `value` in base `base`.
-     *
-     * If `base` is 0 it's guessed from contents of `value`.
-     */
-    this(scope const(char)[] value, uint base = 0) @trusted // TODO: Use Optional/Nullable when value is nan, or inf
-        in(base == 0 ||
-		   (+2 <= base && base <= +62))
-    {
-		if (base == 16)
-		{
-			import std.algorithm.searching : startsWith;
-			if (value.startsWith("0x") ||
-				value.startsWith("0X"))
-				value = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
-		}
-        char* stringz = _allocStringzCopyOf(value);
-		scope(exit) qualifiedFree(stringz);
-        immutable int status = __gmpz_init_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
-        assert(status == 0, "Parameter `value` does not contain an integer");
-    }
-
-	static typeof(this) fromHexString(scope const(char)[] value) @safe pure nothrow @nogc
-	{
-		return typeof(return)(value, 16);
-	}
 
     /** Constucts number from serialized binary array.
      *
@@ -1513,7 +1515,7 @@ version(benchmark)
     writeln("Took:", results[0]);
 }
 
-pure nothrow:
+pure:
 
 /** Instantiator for `MpZ`. */
 _Z!(cow) mpz(bool cow = true, Args...)(Args args) @safe
@@ -1523,7 +1525,7 @@ _Z!(cow) mpz(bool cow = true, Args...)(Args args) @safe
 }
 
 /// Swap contents of `x` with contents of `y`.
-void swap(bool cow)(ref _Z!(cow) x, ref _Z!(cow) y)
+void swap(bool cow)(ref _Z!(cow) x, ref _Z!(cow) y) nothrow
 {
     pragma(inline, true);
     import std.algorithm.mutation : swap;
@@ -1531,14 +1533,14 @@ void swap(bool cow)(ref _Z!(cow) x, ref _Z!(cow) y)
 }
 
 /// Get `x` as a `string` in decimal base.
-string toDecimalString(bool cow)(auto ref const _Z!(cow) x) // for `std.bigint.BigInt` compatibility
+string toDecimalString(bool cow)(auto ref const _Z!(cow) x) nothrow // for `std.bigint.BigInt` compatibility
 {
     version(LDC) pragma(inline, true);
     return x.toString(10);
 }
 
 /// Get `x` as a uppercased `string` in hexadecimal base without any base prefix (0x).
-string toHexadecimalString(bool cow)(auto ref const _Z!(cow) x)
+string toHexadecimalString(bool cow)(auto ref const _Z!(cow) x) nothrow
 {
     version(LDC) pragma(inline, true);
     return x.toString(16, true);
@@ -1548,7 +1550,7 @@ string toHexadecimalString(bool cow)(auto ref const _Z!(cow) x)
 alias toHex = toHexadecimalString;
 
 /// Get the absolute value of `x` converted to the corresponding unsigned type.
-Unsigned!T absUnsign(T, bool cow)(auto ref const _Z!(cow) x) // for `std.bigint.BigInt` compatibility
+Unsigned!T absUnsign(T, bool cow)(auto ref const _Z!(cow) x) nothrow // for `std.bigint.BigInt` compatibility
 if (isIntegral!T)
 {
     version(LDC) pragma(inline, true);
@@ -1557,7 +1559,7 @@ if (isIntegral!T)
 
 /** Get sum of `x` and `y` (`x` + `y`).
  */
-_Z!(cow) add(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @trusted
+_Z!(cow) add(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) nothrow @trusted
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -1616,7 +1618,7 @@ _Z!(cow) add(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @tr
 
 /** Get difference of `x` and `y` (`x` - `y`).
  */
-_Z!(cow) sub(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @trusted
+_Z!(cow) sub(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) nothrow @trusted
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -1675,7 +1677,7 @@ _Z!(cow) sub(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @tr
 
 /** Get product of `x` and `y` (`x` + `y`).
  */
-_Z!(cow) mul(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @trusted
+_Z!(cow) mul(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) nothrow @trusted
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -1736,7 +1738,7 @@ _Z!(cow) mul(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @tr
  *
  * Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
  */
-_Z!(cow) abs(bool cow)(auto ref const _Z!(cow) x) @trusted @nogc
+_Z!(cow) abs(bool cow)(auto ref const _Z!(cow) x) @trusted nothrow @nogc
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -1758,7 +1760,7 @@ _Z!(cow) abs(bool cow)(auto ref const _Z!(cow) x) @trusted @nogc
  *
  * Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
  */
-_Z!(cow) onesComplement(bool cow)(auto ref const _Z!(cow) x) @trusted @nogc
+_Z!(cow) onesComplement(bool cow)(auto ref const _Z!(cow) x) @trusted nothrow @nogc
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -1776,19 +1778,19 @@ _Z!(cow) onesComplement(bool cow)(auto ref const _Z!(cow) x) @trusted @nogc
 }
 
 /// Comparison of the absolute values of `x` and `y`.
-int cmpabs(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @trusted @nogc
+int cmpabs(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     return __gmpz_cmpabs(x._ptr, y._ptr);
 }
 /// ditto
-int cmpabs(bool cow)(auto ref const _Z!(cow) x, double y) @trusted @nogc
+int cmpabs(bool cow)(auto ref const _Z!(cow) x, double y) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     return __gmpz_cmpabs_d(x._ptr, y);
 }
 /// ditto
-int cmpabs(bool cow)(auto ref const _Z!(cow) x, ulong y) @trusted @nogc
+int cmpabs(bool cow)(auto ref const _Z!(cow) x, ulong y) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     return __gmpz_cmpabs_ui(x._ptr, y);
@@ -1798,7 +1800,7 @@ int cmpabs(bool cow)(auto ref const _Z!(cow) x, ulong y) @trusted @nogc
  *
  * Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
  */
-_Z!(cow) nextPrime(bool cow)(auto ref const _Z!(cow) x) @trusted @nogc
+_Z!(cow) nextPrime(bool cow)(auto ref const _Z!(cow) x) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -1818,7 +1820,7 @@ _Z!(cow) nextPrime(bool cow)(auto ref const _Z!(cow) x) @trusted @nogc
 }
 
 /// Get greatest common divisor (gcd) of `x` and `y`.
-_Z!(cow) gcd(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @trusted @nogc
+_Z!(cow) gcd(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -1862,7 +1864,7 @@ _Z!(cow) gcd(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @tr
     }
 }
 /// ditto
-_Z!(cow) gcd(bool cow)(auto ref const _Z!(cow) x, ulong y) @trusted @nogc
+_Z!(cow) gcd(bool cow)(auto ref const _Z!(cow) x, ulong y) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -1881,7 +1883,7 @@ _Z!(cow) gcd(bool cow)(auto ref const _Z!(cow) x, ulong y) @trusted @nogc
 }
 
 /// Get least common multiple (lcm) of `x` and `y`.
-_Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @trusted @nogc
+_Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -1925,7 +1927,7 @@ _Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) @tr
     }
 }
 /// ditto
-_Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, ulong y) @trusted @nogc
+_Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, ulong y) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -1947,7 +1949,7 @@ _Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, ulong y) @trusted @nogc
  *
  * Parameter `exp` must be positive.
  */
-_Z!(cow) powm(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) exp, auto ref const _Z!(cow) mod) @trusted
+_Z!(cow) powm(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) exp, auto ref const _Z!(cow) mod) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     assert(mod != 0, "Zero modulus");
@@ -1958,7 +1960,7 @@ _Z!(cow) powm(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) ex
     return y;
 }
 /// ditto
-_Z!(cow) powm(bool cow)(auto ref const _Z!(cow) base, ulong exp, auto ref const _Z!(cow) mod) @trusted
+_Z!(cow) powm(bool cow)(auto ref const _Z!(cow) base, ulong exp, auto ref const _Z!(cow) mod) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     assert(mod != 0, "Zero modulus");
@@ -1975,7 +1977,7 @@ alias powmod = powm;
  *
  * Parameter `mod` must be positive.
  */
-_Z!(cow) invert(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) mod) @trusted
+_Z!(cow) invert(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) mod) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     assert(base != 0, "Zero base");
@@ -2263,7 +2265,7 @@ unittest
 }
 
 ///
-@safe @nogc unittest
+@safe unittest
 {
     const _ = (cast(uint)42).Z;
     const a = 42.Z;
@@ -2872,7 +2874,7 @@ unittest
 }
 
 /// verify compliance with Phobos' `BigInt`
-@safe @nogc unittest
+@safe unittest
 {
     alias bigInt = mpz;
     alias BigInt = Z;     // Phobos naming convention
@@ -3170,14 +3172,14 @@ private struct AddExpr(bool copy)
 {
     _Z!(copy) e1;				// first term
     _Z!(copy) e2;				// second term
-    _Z!(copy) eval() const @trusted
+    _Z!(copy) eval() const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(copy) y) const @trusted
+    void evalTo(ref _Z!(copy) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
@@ -3205,14 +3207,14 @@ private struct SubExpr(bool copy)
 {
     _Z!(copy) e1;                      // first term
     _Z!(copy) e2;                      // second term
-    _Z!(copy) eval() const @trusted   // TODO: move to common place
+    _Z!(copy) eval() const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(copy) y) const @trusted
+    void evalTo(ref _Z!(copy) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
@@ -3233,14 +3235,14 @@ private struct MulExpr(bool copy)
 {
     _Z!(copy) e1;				// first factor
     _Z!(copy) e2;				// second factor
-    _Z!(copy) eval() const @trusted   // TODO: move to common place
+    _Z!(copy) eval() const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(copy) y) const @trusted
+    void evalTo(ref _Z!(copy) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
@@ -3262,14 +3264,14 @@ private struct DivExpr(bool copy)
 {
     _Z!(copy) e1;				// divisor
     _Z!(copy) e2;				// dividend
-    _Z!(copy) eval() const @trusted	// TODO: move to common place
+    _Z!(copy) eval() const nothrow @nogc @trusted	// TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(copy) y) const @trusted
+    void evalTo(ref _Z!(copy) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
@@ -3294,14 +3296,14 @@ private struct ModExpr(bool copy)
 {
     _Z!(copy) e1;				// divisor
     _Z!(copy) e2;				// dividend
-    _Z!(copy) eval() const @trusted   // TODO: move to common place
+    _Z!(copy) eval() const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(copy) y) const @trusted
+    void evalTo(ref _Z!(copy) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
@@ -3328,14 +3330,14 @@ if (isMpZExpr!P &&
 {
     P e1;                       // base
     Q e2;                       // exponent
-    MpZ eval() const @trusted   // TODO: move to common place
+    MpZ eval() const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref MpZ y) const @trusted
+    void evalTo(ref MpZ y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_pow_ui(y._ptr, e1.eval()._ptr, e2); version(ccc) ++y._ccc;
@@ -3357,14 +3359,14 @@ if (isMpZExpr!P &&
     P base;                     // base
     Q exp;                      // exponent
     M mod;                      // modulo
-    MpZ eval() const @trusted   // TODO: move to common place
+    MpZ eval() const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref MpZ y) const @trusted
+    void evalTo(ref MpZ y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_powm_ui(y._ptr, base.eval()._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
@@ -3381,14 +3383,14 @@ version(unittest) static assert(isMpZExpr!(PowMUExpr!(MpZ, ulong, MpZ)));
 private struct NegExpr(bool copy)
 {
     _Z!(copy) e1;
-    _Z!(copy) eval() const @trusted   // TODO: move to common place
+    _Z!(copy) eval() const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(copy) y) const @trusted
+    void evalTo(ref _Z!(copy) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_neg(y._ptr, e1.eval()._ptr); version(ccc) ++y._ccc;
