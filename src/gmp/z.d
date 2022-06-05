@@ -2387,6 +2387,9 @@ unittest
 
     assert(`0b11`.Z == 3);
     assert(`0B11`.Z == 3);
+    assert(Z.fromBinaryString(`11`) == 3);
+    assert(Z.fromBinaryString(`0b11`) == 3);
+    assert(Z.fromBinaryString(`0B11`) == 3);
 
     // octal
 
