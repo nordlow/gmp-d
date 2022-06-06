@@ -3467,7 +3467,10 @@ version(unittest) static assert(isMpZExpr!(NegExpr!(false)));
     assert(x == -27);
 }
 
-/// `MpZ` square root expression.
+/** `MpZ` square root expression.
+
+	See: https://gmplib.org/manual/Integer-Roots
+ */
 private struct SqrtExpr(bool copy)
 {
     _Z!(copy) e1;
