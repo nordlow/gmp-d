@@ -3229,18 +3229,18 @@ pure @nogc unittest
 /// expression template types
 
 /// `MpZ`-`MpZ` adding expression.
-private struct AddExpr(bool copy)
+private struct AddExpr(bool cow)
 {
-    _Z!(copy) e1;				// first term
-    _Z!(copy) e2;				// second term
-    _Z!(copy) eval() const nothrow @nogc @trusted
+    _Z!(cow) e1;				// first term
+    _Z!(cow) e2;				// second term
+    _Z!(cow) eval() const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(copy) y) const nothrow @nogc @trusted
+    void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
@@ -3264,18 +3264,18 @@ version(unittest) static assert(isMpZExpr!(AddExpr!(true)));
 }
 
 /// `MpZ`-`MpZ` subtraction expression.
-private struct SubExpr(bool copy)
+private struct SubExpr(bool cow)
 {
-    _Z!(copy) e1;                      // first term
-    _Z!(copy) e2;                      // second term
-    _Z!(copy) eval() const nothrow @nogc @trusted   // TODO: move to common place
+    _Z!(cow) e1;                      // first term
+    _Z!(cow) e2;                      // second term
+    _Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(copy) y) const nothrow @nogc @trusted
+    void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
@@ -3292,18 +3292,18 @@ version(unittest) static assert(isMpZExpr!(SubExpr!(false)));
 }
 
 /// `MpZ`-`MpZ` multiplication expression.
-private struct MulExpr(bool copy)
+private struct MulExpr(bool cow)
 {
-    _Z!(copy) e1;				// first factor
-    _Z!(copy) e2;				// second factor
-    _Z!(copy) eval() const nothrow @nogc @trusted   // TODO: move to common place
+    _Z!(cow) e1;				// first factor
+    _Z!(cow) e2;				// second factor
+    _Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(copy) y) const nothrow @nogc @trusted
+    void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
@@ -3321,18 +3321,18 @@ version(unittest) static assert(isMpZExpr!(MulExpr!(false)));
 }
 
 /// `MpZ`-`MpZ` division expression.
-private struct DivExpr(bool copy)
+private struct DivExpr(bool cow)
 {
-    _Z!(copy) e1;				// divisor
-    _Z!(copy) e2;				// dividend
-    _Z!(copy) eval() const nothrow @nogc @trusted	// TODO: move to common place
+    _Z!(cow) e1;				// divisor
+    _Z!(cow) e2;				// dividend
+    _Z!(cow) eval() const nothrow @nogc @trusted	// TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(copy) y) const nothrow @nogc @trusted
+    void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
@@ -3353,18 +3353,18 @@ version(unittest) static assert(isMpZExpr!(DivExpr!(false)));
 }
 
 /// `MpZ`-`MpZ` modulus expression.
-private struct ModExpr(bool copy)
+private struct ModExpr(bool cow)
 {
-    _Z!(copy) e1;				// divisor
-    _Z!(copy) e2;				// dividend
-    _Z!(copy) eval() const nothrow @nogc @trusted   // TODO: move to common place
+    _Z!(cow) e1;				// divisor
+    _Z!(cow) e2;				// dividend
+    _Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(copy) y) const nothrow @nogc @trusted
+    void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
@@ -3441,17 +3441,17 @@ version(unittest) static assert(isMpZExpr!(PowMUExpr!(MpZ, ulong, MpZ)));
 }
 
 /// `MpZ` negation expression.
-private struct NegExpr(bool copy)
+private struct NegExpr(bool cow)
 {
-    _Z!(copy) e1;
-    _Z!(copy) eval() const nothrow @nogc @trusted   // TODO: move to common place
+    _Z!(cow) e1;
+    _Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(copy) y) const nothrow @nogc @trusted
+    void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_neg(y._ptr, e1.eval()._ptr); version(ccc) ++y._ccc;
@@ -3471,17 +3471,17 @@ version(unittest) static assert(isMpZExpr!(NegExpr!(false)));
 
 	See: https://gmplib.org/manual/Integer-Roots
  */
-private struct SqrtExpr(bool copy)
+private struct SqrtExpr(bool cow)
 {
-    _Z!(copy) e1;
-    _Z!(copy) eval() const nothrow @nogc @trusted   // TODO: move to common place
+    _Z!(cow) e1;
+    _Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(copy) y) const nothrow @nogc @trusted
+    void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_sqrt(y._ptr, e1.eval()._ptr); version(ccc) ++y._ccc;
