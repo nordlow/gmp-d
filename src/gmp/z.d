@@ -3467,7 +3467,7 @@ version(unittest) static assert(isMpZExpr!(NegExpr!(false)));
     assert(x == -27);
 }
 
-/// `MpZ` sqrtation expression.
+/// `MpZ` square root expression.
 private struct SqrtExpr(bool copy)
 {
     _Z!(copy) e1;
