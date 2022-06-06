@@ -47,7 +47,8 @@ templates](https://en.wikipedia.org/wiki/Expression_templates)
   - `x -= 2*x`      => `mpz_neg(x, x)` => `x.negate()`
   - `x = y + z`     => `mpz_add(x, y, z)`
   - `z = a*x + b*y` => `mpz_add(x, y, z)`
-  - `x = x + y * z` => `mpz_addmul(x, y, z)`
+  - `x = x + y * z` => `mpz_addmul(x, y, z)` or `mpz_addmul_ui(x, y, z)`
+  - `x = x - y * z` => `mpz_submul(x, y, z)` or `mpz_submul_ui(x, y, z)`
   - `x = x ^ y % z` => `mpz_powm(x, x, y, z)`
   - lots more...
   - `toString`, `opCast` should probably evaluate and cache result
