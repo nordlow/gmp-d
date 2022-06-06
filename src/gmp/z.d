@@ -1164,12 +1164,24 @@ nothrow:
 
 		Returns: `void` to make it obvious that `this` is mutated.
 	*/
-    void onesComplement() @trusted
+    void onesComplementSelf() @trusted
     {
         version(LDC) pragma(inline, true);
         if (isZero) { return; } // `__gmpz_co` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
         __gmpz_com(_ptr, _ptr); version(ccc) { ++_ccc; }
+    }
+
+    /** Make `this` the square root of itself in-place.
+
+		Returns: `void` to make it obvious that `this` is mutated.
+	*/
+    void sqrtSelf() @trusted
+    {
+        version(LDC) pragma(inline, true);
+        if (isZero) { return; } // `__gmpz_co` cannot handle default-constructed `this`
+		static if (cow) { selfdupIfAliased(); }
+        __gmpz_sqrt(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
 
     /// Increase `this` by one.
@@ -1811,7 +1823,7 @@ _Z!(cow) abs(bool cow)(auto ref const _Z!(cow) x) @trusted nothrow @nogc
     }
 }
 
-/** Get one's complement of value of `x`.
+/** Get one's complement of `x`.
 
 	Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
 */
@@ -1827,7 +1839,30 @@ _Z!(cow) onesComplement(bool cow)(auto ref const _Z!(cow) x) @trusted nothrow @n
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        zp.onesComplement(); version(ccc) ++zp._ccc;
+        zp.onesComplementSelf(); version(ccc) ++zp._ccc;
+        return move(*zp);    // TODO: shouldn't have to call `move` here
+    }
+}
+
+/** Get truncated integer part of the square root of `x`.
+
+	Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
+
+	See: https://gmplib.org/manual/Integer-Roots
+*/
+_Z!(cow) sqrt(bool cow)(auto ref const _Z!(cow) x) @trusted nothrow @nogc
+{
+    version(LDC) pragma(inline, true);
+    static if (__traits(isRef, x)) // l-value `x`
+    {
+        typeof(return) y = null; // must use temporary
+        __gmpz_sqrt(y._ptr, x._ptr); version(ccc) ++y._ccc;
+        return y;
+    }
+    else                        // r-value `x`
+    {
+        typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        zp.sqrtSelf(); version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
