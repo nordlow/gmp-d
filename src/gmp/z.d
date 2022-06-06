@@ -3462,10 +3462,35 @@ version(unittest) static assert(isMpZExpr!(NegExpr!(false)));
 @safe @nogc unittest
 {
     assert(NegExpr!(false)(27.Z).eval() == -27);
-
     const Z x = NegExpr!(false)(27.Z);
     version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_neg`
     assert(x == -27);
+}
+
+/// `MpZ` sqrtation expression.
+private struct SqrtExpr(bool copy)
+{
+    _Z!(copy) e1;
+    _Z!(copy) eval() const nothrow @nogc @trusted   // TODO: move to common place
+    {
+        version(LDC) pragma(inline, true);
+        typeof(return) y = null;
+        evalTo(y);
+        return y;
+    }
+    void evalTo(ref _Z!(copy) y) const nothrow @nogc @trusted
+    {
+        version(LDC) pragma(inline, true);
+        __gmpz_sqrt(y._ptr, e1.eval()._ptr); version(ccc) ++y._ccc;
+    }
+}
+version(unittest) static assert(isMpZExpr!(SqrtExpr!(false)));
+
+@safe @nogc unittest
+{
+	foreach (const n; 16 .. 25)
+		assert(SqrtExpr!(false)(n.Z).eval() == 4);
+	assert(SqrtExpr!(false)(25.Z).eval() == 5);
 }
 
 // Copied from `std.numeric` to prevent unnecessary Phobos deps.
