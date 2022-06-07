@@ -1184,7 +1184,7 @@ nothrow:
 
     /** Make `this` the `n`:th root of itself in-place.
 
-		Returns: `void` to make it obvious that `this` is mutated.
+		Returns: `true` if computation was exact.
 	*/
     bool rootSelf(ulong n) @trusted
     {
@@ -1193,6 +1193,20 @@ nothrow:
 		static if (cow) { selfdupIfAliased(); }
         const status = __gmpz_root(_ptr, _ptr, n); version(ccc) { ++_ccc; }
 		return status != 0;
+    }
+
+    /** Make `this` the `n`:th root of itself in-place along with its remainder returned.
+
+		Returns: `rem` to the remainder, u-root ^^ `n`.
+	*/
+    _Z rootremSelf(ulong n) @trusted
+    {
+        version(LDC) pragma(inline, true);
+        if (isZero) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
+		static if (cow) { selfdupIfAliased(); }
+		_Z rem;
+        __gmpz_rootrem(_ptr, _ptr, rem._ptr, n); version(ccc) { ++_ccc; }
+		return move(rem);
     }
 
     /// Increase `this` by one.
