@@ -1182,6 +1182,19 @@ nothrow:
         __gmpz_sqrt(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
 
+    /** Make `this` the `n`:th root of itself in-place.
+
+		Returns: `void` to make it obvious that `this` is mutated.
+	*/
+    bool rootSelf(ulong n) @trusted
+    {
+        version(LDC) pragma(inline, true);
+        if (isZero) { return true; } // `__gmpz_co` cannot handle default-constructed `this`
+		static if (cow) { selfdupIfAliased(); }
+        const status = __gmpz_root(_ptr, _ptr, n); version(ccc) { ++_ccc; }
+		return status != 0;
+    }
+
     /// Increase `this` by one.
     ref _Z opUnary(string s)() scope return @trusted
     if (s == "++")
@@ -1866,6 +1879,27 @@ _Z!(cow) sqrt(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
     }
 }
 
+/** Get truncated integer part of the `n`:th root of `x`.
+
+	See: https://gmplib.org/manual/Integer-Roots
+*/
+_Z!(cow) root(bool cow)(auto ref scope const _Z!(cow) x, ulong n) @trusted nothrow @nogc
+{
+    version(LDC) pragma(inline, true);
+    static if (__traits(isRef, x)) // l-value `x`
+    {
+        typeof(return) y = null; // must use temporary
+        __gmpz_root(y._ptr, x._ptr, n); version(ccc) ++y._ccc;
+        return y;
+    }
+    else                        // r-value `x`
+    {
+        typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        zp.rootSelf(n); version(ccc) ++zp._ccc;
+        return move(*zp);    // TODO: shouldn't have to call `move` here
+    }
+}
+
 /// Comparison of the absolute values of `x` and `y`.
 int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @nogc @trusted
 {
@@ -2187,6 +2221,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
     assert(w is Z.init);        // should be unchanged
 
 	assert(16.Z.sqrt == 4);
+	assert(27.Z.root(3) == 3);
 
     assert(w^^10 == 0);
     assert(w^^0 == 1);          // TODO: correct?
@@ -3736,7 +3771,7 @@ extern(C) pragma(inline, false)
     mp_bitcnt_t __gmpz_popcount (mpz_srcptr);
 
     // TODO: wrap:
-    void __gmpz_root (mpz_ptr, mpz_srcptr, ulong);
+    int __gmpz_root (mpz_ptr, mpz_srcptr, ulong);
     void __gmpz_rootrem (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
 
     void __gmpz_sqrt (mpz_ptr, mpz_srcptr);
