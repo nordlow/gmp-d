@@ -2318,6 +2318,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 	testSqrt(8, 2);
 	testSqrt(9, 3);
 	testSqrt(16, 4);
+
 	{ bool isExact; assert(root(16.Z, 2, isExact) == 4 && isExact); }
 	{ bool isExact; assert(root(17.Z, 2, isExact) == 4 && !isExact); }
 	{ bool isExact; assert(root(27.Z, 3, isExact) == 3 && isExact); }
