@@ -1459,14 +1459,14 @@ nothrow:
 private:
 
     /** Initialize internal struct. */
-    void initialize() // cannot be called `init` as that will override builtin type property
+    void initialize() @system // cannot be called `init` as that will override builtin type property
     {
         pragma(inline, true);
         __gmpz_init(_ptr); version(ccc) { ++_ccc; }
     }
 
     /** Initialize internal struct if needed. */
-    void assertInitialized()
+    void assertInitialized() @system
     {
         pragma(inline, true);
         if (isDefaultConstructed)
@@ -1825,7 +1825,7 @@ _Z!(cow) abs(bool cow)(auto ref const _Z!(cow) x) @trusted nothrow @nogc
 
 	Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
 */
-_Z!(cow) onesComplement(bool cow)(auto ref const _Z!(cow) x) @trusted nothrow @nogc
+_Z!(cow) onesComplement(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -2640,6 +2640,24 @@ unittest
     assert(onesComplement(-43.Z) == 42);
     assert(com(n) == 42);
     assert(com(-43.Z) == 42);
+
+	/*TODO: figure out why this call doesn’t trigger a warn-unused warning when
+	 * the functions below returning `S` above does */
+	onesComplement(42.Z);
+	static if (false) {
+		struct S(T) {
+			T x;
+			T* xp;						// this prevents diagnostics
+		}
+		static S!int f()() @safe pure nothrow @nogc { return typeof(return).init; }
+		static S!int g()(scope S!int x) @safe pure nothrow @nogc { return x; }
+		static const(S!int) h1()(scope const(S!int) x) @safe pure nothrow @nogc { return x; }
+		static S!int h2()(scope const(S!int) x) @safe pure nothrow @nogc { return typeof(return).init; }
+		g(S!int(32));
+		f();
+		h1(S!int(32));
+		h2(S!int(32));
+	}
 
     // addition
 
