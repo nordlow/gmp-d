@@ -1889,7 +1889,8 @@ _Z!(cow) root(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out bool isExa
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) y = null; // must use temporary
-        __gmpz_root(y._ptr, x._ptr, n); version(ccc) ++y._ccc;
+        const status = __gmpz_root(y._ptr, x._ptr, n); version(ccc) ++y._ccc;
+		isExact = status != 0;
         return y;
     }
     else                        // r-value `x`
