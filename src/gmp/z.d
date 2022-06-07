@@ -2261,13 +2261,13 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 	{
 		Z rem;
 		Z u = 16;
-		const r = u.rootrem(2, rem);
+		const r = u.rootrem(2, rem); // l-value first-parameter
 		assert(r == 4);
 		assert(rem == 0);
 	}
 	{
 		Z rem;
-		const r = 16.Z.rootrem(2, rem);
+		const r = 16.Z.rootrem(2, rem); // r-value first-parameter
 		assert(r == 4);
 		assert(rem == 0);
 	}
