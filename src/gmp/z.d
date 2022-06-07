@@ -2258,18 +2258,21 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 	{ bool isExact; assert(27.Z.root(3, isExact) == 3 && isExact); }
 	{ bool isExact; assert(28.Z.root(3, isExact) == 3 && !isExact); }
 
+	foreach (const ui; 16 .. 20)
 	{
-		Z u = 16;
-		Z rem;
-		const r = u.rootrem(2, rem); // l-value first-parameter
-		assert(r == 4);
-		assert(rem == 0);
-	}
-	{
-		Z rem;
-		const r = 16.Z.rootrem(2, rem); // r-value first-parameter
-		assert(r == 4);
-		assert(rem == 0);
+		{
+			Z u = ui;
+			Z rem;
+			const r = u.rootrem(2, rem); // l-value first-parameter
+			assert(r == 4);
+			assert(rem == ui - 16);
+		}
+		{
+			Z rem;
+			const r = ui.Z.rootrem(2, rem); // r-value first-parameter
+			assert(r == 4);
+			assert(rem == ui - 16);
+		}
 	}
 
     assert(w^^10 == 0);
