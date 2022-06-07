@@ -1883,7 +1883,7 @@ _Z!(cow) sqrt(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 
 	See: https://gmplib.org/manual/Integer-Roots
 */
-_Z!(cow) root(bool cow)(auto ref scope const _Z!(cow) x, ulong n) @trusted nothrow @nogc
+_Z!(cow) root(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out bool isExact) @trusted nothrow @nogc
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -1895,7 +1895,7 @@ _Z!(cow) root(bool cow)(auto ref scope const _Z!(cow) x, ulong n) @trusted nothr
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        zp.rootSelf(n); version(ccc) ++zp._ccc;
+        isExact = zp.rootSelf(n); version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
@@ -2221,7 +2221,10 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
     assert(w is Z.init);        // should be unchanged
 
 	assert(16.Z.sqrt == 4);
-	assert(27.Z.root(3) == 3);
+	{ bool isExact; assert(16.Z.root(2, isExact) == 4 && isExact); }
+	{ bool isExact; assert(17.Z.root(2, isExact) == 4 && !isExact); }
+	{ bool isExact; assert(27.Z.root(3, isExact) == 3 && isExact); }
+	{ bool isExact; assert(28.Z.root(3, isExact) == 3 && !isExact); }
 
     assert(w^^10 == 0);
     assert(w^^0 == 1);          // TODO: correct?
