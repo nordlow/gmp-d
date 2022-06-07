@@ -2259,8 +2259,8 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 	{ bool isExact; assert(28.Z.root(3, isExact) == 3 && !isExact); }
 
 	{
-		Z rem;
 		Z u = 16;
+		Z rem;
 		const r = u.rootrem(2, rem); // l-value first-parameter
 		assert(r == 4);
 		assert(rem == 0);
