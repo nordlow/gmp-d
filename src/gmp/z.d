@@ -2308,6 +2308,14 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 		assert(sqrt(x)== q);	// l-value first-parameter
 		assert(sqrt(p.Z) == q);	// r-value first-parameter
 	}
+	testSqrt(1, 1);
+	testSqrt(2, 1);
+	testSqrt(3, 1);
+	testSqrt(4, 2);
+	testSqrt(5, 2);
+	testSqrt(6, 2);
+	testSqrt(7, 2);
+	testSqrt(8, 2);
 	testSqrt(9, 3);
 	testSqrt(16, 4);
 	{ bool isExact; assert(root(16.Z, 2, isExact) == 4 && isExact); }
