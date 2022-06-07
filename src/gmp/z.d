@@ -367,7 +367,7 @@ nothrow:
     }
 
     /// Assign from `rhs`.
-    ref _Z opAssign()(auto ref const _Z rhs) scope return @trusted
+    ref _Z opAssign()(auto ref scope const _Z rhs) scope return @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_set(_ptr, rhs._ptr); version(ccc) { ++_ccc; }
@@ -442,7 +442,7 @@ nothrow:
     }
 
     /// Returns: `true` iff `this` equals `rhs`.
-    bool opEquals()(auto ref const _Z rhs) const @trusted
+    bool opEquals()(auto ref scope const _Z rhs) const @trusted
     {
         version(LDC) pragma(inline, true);
         if (_ptr == rhs._ptr)   // fast equality
@@ -475,7 +475,7 @@ nothrow:
     }
 
     /// Compare `this` to `rhs`.
-    int opCmp()(auto ref const _Z rhs) const @trusted
+    int opCmp()(auto ref scope const _Z rhs) const @trusted
     {
         version(LDC) pragma(inline, true);
         if (rhs == 0)
@@ -575,7 +575,7 @@ nothrow:
     }
 
     /** Get `this` `s` `rhs`. */
-    _Z opBinary(string s)(auto ref const _Z rhs) const @trusted // direct value
+    _Z opBinary(string s)(auto ref scope const _Z rhs) const @trusted // direct value
     if ((s == "+" || s == "-" ||
          s == "*" || s == "/" || s == "%" ||
          s == "&" || s == "|" || s == "^" ||
@@ -931,7 +931,7 @@ nothrow:
     }
 
     /// Operate-assign to `this` from `rhs`.
-    ref _Z opOpAssign(string s)(auto ref const _Z rhs) scope return @trusted
+    ref _Z opOpAssign(string s)(auto ref scope const _Z rhs) scope return @trusted
     if ((s == "+" || s == "-" ||
          s == "*" || s == "/" || s == "%" ||
          s == "&" || s == "|" || s == "^"))
@@ -1107,7 +1107,7 @@ nothrow:
     }
 
     /// Returns: `this`.
-    ref inout(_Z) opUnary(string s)() inout
+    ref inout(_Z) opUnary(string s)() inout scope return
     if (s == "+")
     {
         pragma(inline, true);
@@ -1479,7 +1479,7 @@ private:
     enum defaultBase = 10;
 
     /// Returns: evaluation of `this` expression which in this is a no-op.
-    ref inout(_Z) eval() @safe inout return
+    ref inout(_Z) eval() @safe inout scope return
     {
         pragma(inline, true);
         return this;
@@ -1598,14 +1598,14 @@ void swap(bool cow)(ref _Z!(cow) x, ref _Z!(cow) y) nothrow
 }
 
 /// Get `x` as a `string` in decimal base.
-string toDecimalString(bool cow)(auto ref const _Z!(cow) x) nothrow // for `std.bigint.BigInt` compatibility
+string toDecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow // for `std.bigint.BigInt` compatibility
 {
     version(LDC) pragma(inline, true);
     return x.toString(10);
 }
 
 /// Get `x` as a uppercased `string` in hexadecimal base without any base prefix (0x).
-string toHexadecimalString(bool cow)(auto ref const _Z!(cow) x) nothrow
+string toHexadecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow
 {
     version(LDC) pragma(inline, true);
     return x.toString(16, true);
@@ -1615,7 +1615,7 @@ string toHexadecimalString(bool cow)(auto ref const _Z!(cow) x) nothrow
 alias toHex = toHexadecimalString;
 
 /// Get the absolute value of `x` converted to the corresponding unsigned type.
-Unsigned!T absUnsign(T, bool cow)(auto ref const _Z!(cow) x) nothrow // for `std.bigint.BigInt` compatibility
+Unsigned!T absUnsign(T, bool cow)(auto ref scope const _Z!(cow) x) nothrow // for `std.bigint.BigInt` compatibility
 if (isIntegral!T)
 {
     version(LDC) pragma(inline, true);
@@ -1624,7 +1624,7 @@ if (isIntegral!T)
 
 /** Get sum of `x` and `y` (`x` + `y`).
  */
-_Z!(cow) add(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) nothrow @trusted
+_Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -1683,7 +1683,7 @@ _Z!(cow) add(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) not
 
 /** Get difference of `x` and `y` (`x` - `y`).
  */
-_Z!(cow) sub(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) nothrow @trusted
+_Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -1742,7 +1742,7 @@ _Z!(cow) sub(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) not
 
 /** Get product of `x` and `y` (`x` + `y`).
  */
-_Z!(cow) mul(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) nothrow @trusted
+_Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -1803,7 +1803,7 @@ _Z!(cow) mul(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) not
 
 	Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
 */
-_Z!(cow) abs(bool cow)(auto ref const _Z!(cow) x) @trusted nothrow @nogc
+_Z!(cow) abs(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -1849,7 +1849,7 @@ alias com = onesComplement;
 
 	See: https://gmplib.org/manual/Integer-Roots
 */
-_Z!(cow) sqrt(bool cow)(auto ref const _Z!(cow) x) @trusted nothrow @nogc
+_Z!(cow) sqrt(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -1867,19 +1867,19 @@ _Z!(cow) sqrt(bool cow)(auto ref const _Z!(cow) x) @trusted nothrow @nogc
 }
 
 /// Comparison of the absolute values of `x` and `y`.
-int cmpabs(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) nothrow @nogc @trusted
+int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     return __gmpz_cmpabs(x._ptr, y._ptr);
 }
 /// ditto
-int cmpabs(bool cow)(auto ref const _Z!(cow) x, double y) nothrow @nogc @trusted
+int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, double y) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     return __gmpz_cmpabs_d(x._ptr, y);
 }
 /// ditto
-int cmpabs(bool cow)(auto ref const _Z!(cow) x, ulong y) nothrow @nogc @trusted
+int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     return __gmpz_cmpabs_ui(x._ptr, y);
@@ -1889,7 +1889,7 @@ int cmpabs(bool cow)(auto ref const _Z!(cow) x, ulong y) nothrow @nogc @trusted
 
 	Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
 */
-_Z!(cow) nextPrime(bool cow)(auto ref const _Z!(cow) x) nothrow @nogc @trusted
+_Z!(cow) nextPrime(bool cow)(auto ref scope const _Z!(cow) x) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -1909,7 +1909,7 @@ _Z!(cow) nextPrime(bool cow)(auto ref const _Z!(cow) x) nothrow @nogc @trusted
 }
 
 /// Get greatest common divisor (gcd) of `x` and `y`.
-_Z!(cow) gcd(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) nothrow @nogc @trusted
+_Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -1953,7 +1953,7 @@ _Z!(cow) gcd(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) not
     }
 }
 /// ditto
-_Z!(cow) gcd(bool cow)(auto ref const _Z!(cow) x, ulong y) nothrow @nogc @trusted
+_Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -1972,7 +1972,7 @@ _Z!(cow) gcd(bool cow)(auto ref const _Z!(cow) x, ulong y) nothrow @nogc @truste
 }
 
 /// Get least common multiple (lcm) of `x` and `y`.
-_Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) nothrow @nogc @trusted
+_Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     static if (!__traits(isRef, x) || // r-value `x`
@@ -2016,7 +2016,7 @@ _Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, auto ref const _Z!(cow) y) not
     }
 }
 /// ditto
-_Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, ulong y) nothrow @nogc @trusted
+_Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     static if (__traits(isRef, x)) // l-value `x`
@@ -2038,7 +2038,7 @@ _Z!(cow) lcm(bool cow)(auto ref const _Z!(cow) x, ulong y) nothrow @nogc @truste
 
 	Parameter `exp` must be positive.
 */
-_Z!(cow) powm(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) exp, auto ref const _Z!(cow) mod) nothrow @nogc @trusted
+_Z!(cow) powm(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope const _Z!(cow) exp, auto ref scope const _Z!(cow) mod) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     assert(mod != 0, "Zero modulus");
@@ -2049,7 +2049,7 @@ _Z!(cow) powm(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) ex
     return y;
 }
 /// ditto
-_Z!(cow) powm(bool cow)(auto ref const _Z!(cow) base, ulong exp, auto ref const _Z!(cow) mod) nothrow @nogc @trusted
+_Z!(cow) powm(bool cow)(auto ref scope const _Z!(cow) base, ulong exp, auto ref scope const _Z!(cow) mod) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     assert(mod != 0, "Zero modulus");
@@ -2066,7 +2066,7 @@ alias powmod = powm;
 
 	Parameter `mod` must be positive.
 */
-_Z!(cow) invert(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) mod) nothrow @nogc @trusted
+_Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope const _Z!(cow) mod) nothrow @nogc @trusted
 {
     version(LDC) pragma(inline, true);
     assert(base != 0, "Zero base");
