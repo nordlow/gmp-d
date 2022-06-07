@@ -3001,6 +3001,7 @@ unittest
 	foreach (const p; 1 .. 10)
 	{
 		assert((p^^2).Z.isPerfectSquare);
+		assert(!(p^^2 + 1).Z.isPerfectSquare);
 		foreach (const q; 2 .. 5)
 		{
 			import std.stdio;
