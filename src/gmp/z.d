@@ -3774,14 +3774,12 @@ extern(C) pragma(inline, false)
 
     mp_bitcnt_t __gmpz_popcount (mpz_srcptr);
 
-    // TODO: wrap:
-    int __gmpz_root (mpz_ptr, mpz_srcptr, ulong);
-    void __gmpz_rootrem (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
-
+    int  __gmpz_root (mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_rootrem (mpz_ptr, mpz_ptr, mpz_srcptr, ulong); // TODO: wrap
     void __gmpz_sqrt (mpz_ptr, mpz_srcptr);
-    void __gmpz_sqrtrem (mpz_ptr, mpz_ptr, mpz_srcptr);
-
-    void __gmpz_perfect_power_p (mpz_ptr, mpz_srcptr);
+    void __gmpz_sqrtrem (mpz_ptr, mpz_ptr, mpz_srcptr);	// TODO: wrap
+    void __gmpz_perfect_power_p (mpz_ptr, mpz_srcptr); // TODO: wrap
+    void __gmpz_perfect_square_p (mpz_srcptr);		   // TODO: wrap
 }
 
 pragma(lib, "gmp");
