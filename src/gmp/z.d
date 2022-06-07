@@ -3319,7 +3319,7 @@ pure @nogc unittest
                               (Z(c) ^^ POWER) +
                               (Z(d) ^^ POWER));
                         Z rem = 0;
-                        __gmpz_rootrem(r1._ptr, rem._ptr, r1._ptr, POWER); version(ccc) ++r1._ccc;
+                        __gmpz_rootrem(r1._ptr, rem._ptr, r1._ptr, POWER); version(ccc) ++r1._ccc; // TODO: replace with call to D wrapper
                         if (rem == 0UL)
                         {
                             debug printf("Counter Example Found: %lu^5 + %lu^5 + %lu^5 + %lu^5 = %lu^5\n",
