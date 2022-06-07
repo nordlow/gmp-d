@@ -1450,6 +1450,25 @@ nothrow:
         return !isNegative;     // fast
     }
 
+	/** Check if `this` is a perfect power, i.e., if there exist integers A and
+	 * B, with B>1, such that `this` equals A raised to the power B.
+	 */
+    @property bool isPerfectPower() const @trusted
+    {
+        pragma(inline, true);
+		return __gmpz_perfect_power_p(_ptr) != 0;
+    }
+
+	/** Return non-zero if `this` is a perfect square, i.e., if the square root
+	 * of op is an integer. Under this definition both 0 and 1 are considered to
+	 * be perfect squares.
+	 */
+    @property bool isPerfectSquare() const @trusted
+    {
+        pragma(inline, true);
+		return __gmpz_perfect_square_p(_ptr) != 0;
+    }
+
     /** Returns: sign as either
 
       - -1 (`this` < 0),
@@ -2979,6 +2998,17 @@ unittest
     assert(2.Z.isPositive);
     assert(3.Z.isPositive);
 
+	foreach (const p; 1 .. 10)
+	{
+		assert((p^^2).Z.isPerfectSquare);
+		foreach (const q; 2 .. 5)
+		{
+			import std.stdio;
+			debug writeln("p:", p, " q:", q);
+			assert((p^^q).Z.isPerfectPower);
+		}
+	}
+
     assert((-1).Z.isNegative);
     assert((-2).Z.isNegative);
     assert((-3).Z.isNegative);
@@ -3826,8 +3856,8 @@ extern(C) pragma(inline, false)
     void __gmpz_rootrem (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
     void __gmpz_sqrt (mpz_ptr, mpz_srcptr);
     void __gmpz_sqrtrem (mpz_ptr, mpz_ptr, mpz_srcptr);	// TODO: wrap
-    void __gmpz_perfect_power_p (mpz_ptr, mpz_srcptr); // TODO: wrap
-    void __gmpz_perfect_square_p (mpz_srcptr);		   // TODO: wrap
+    int __gmpz_perfect_power_p (mpz_srcptr);
+    int __gmpz_perfect_square_p (mpz_srcptr);
 }
 
 pragma(lib, "gmp");
