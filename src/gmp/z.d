@@ -1209,6 +1209,21 @@ nothrow:
 		return move(rem);
     }
 
+    /** Make `this` the square root of itself in-place along with its remainder
+		returned.
+
+		Returns: `rem` to the remainder.
+	*/
+    _Z sqrtremSelf() @trusted
+    {
+        version(LDC) pragma(inline, true);
+        if (isZero) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
+		static if (cow) { selfdupIfAliased(); }
+		_Z rem;
+        __gmpz_sqrtrem(_ptr, rem._ptr, _ptr); version(ccc) { ++_ccc; }
+		return move(rem);
+    }
+
     /// Increase `this` by one.
     ref _Z opUnary(string s)() scope return @trusted
     if (s == "++")
@@ -1912,6 +1927,23 @@ _Z!(cow) sqrt(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
     }
 }
 
+_Z!(cow) sqrtrem(bool cow)(auto ref scope const _Z!(cow) x, out scope _Z!(cow) rem) @trusted nothrow @nogc
+{
+    version(LDC) pragma(inline, true);
+    static if (__traits(isRef, x)) // l-value `x`
+    {
+        typeof(return) y = null; // must use temporary
+        __gmpz_sqrtrem(y._ptr, rem._ptr, x._ptr); version(ccc) ++y._ccc;
+        return y;
+    }
+    else                        // r-value `x`
+    {
+        typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        rem = zp.sqrtremSelf(); version(ccc) ++zp._ccc;
+		return move(*zp);
+    }
+}
+
 /** Get truncated integer part of the `n`:th root of `x`.
 
 	See: https://gmplib.org/manual/Integer-Roots
@@ -2271,24 +2303,47 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
     w.onesComplementSelf();
     assert(w is Z.init);        // should be unchanged
 
-	assert(16.Z.sqrt == 4);
-	{ bool isExact; assert(16.Z.root(2, isExact) == 4 && isExact); }
-	{ bool isExact; assert(17.Z.root(2, isExact) == 4 && !isExact); }
-	{ bool isExact; assert(27.Z.root(3, isExact) == 3 && isExact); }
-	{ bool isExact; assert(28.Z.root(3, isExact) == 3 && !isExact); }
+	static void testSqrt(ulong p, ulong q) @safe pure nothrow @nogc {
+		const x = p.Z;
+		assert(sqrt(x)== q);	// l-value first-parameter
+		assert(sqrt(p.Z) == q);	// r-value first-parameter
+	}
+	testSqrt(9, 3);
+	testSqrt(16, 4);
+	{ bool isExact; assert(root(16.Z, 2, isExact) == 4 && isExact); }
+	{ bool isExact; assert(root(17.Z, 2, isExact) == 4 && !isExact); }
+	{ bool isExact; assert(root(27.Z, 3, isExact) == 3 && isExact); }
+	{ bool isExact; assert(root(28.Z, 3, isExact) == 3 && !isExact); }
 
 	foreach (const ui; 16 .. 20)
 	{
 		{
 			Z u = ui;
 			Z rem;
-			const r = u.rootrem(2, rem); // l-value first-parameter
+			const r = rootrem(u, 2, rem); // l-value first-parameter
 			assert(r == 4);
 			assert(rem == ui - 16);
 		}
 		{
 			Z rem;
-			const r = ui.Z.rootrem(2, rem); // r-value first-parameter
+			const r = rootrem(ui.Z, 2, rem); // r-value first-parameter
+			assert(r == 4);
+			assert(rem == ui - 16);
+		}
+	}
+
+	foreach (const ui; 16 .. 20)
+	{
+		{
+			Z u = ui;
+			Z rem;
+			const r = sqrtrem(u, rem); // l-value first-parameter
+			assert(r == 4);
+			assert(rem == ui - 16);
+		}
+		{
+			Z rem;
+			const r = sqrtrem(ui.Z, rem); // r-value first-parameter
 			assert(r == 4);
 			assert(rem == ui - 16);
 		}
@@ -3852,7 +3907,7 @@ extern(C) pragma(inline, false)
     int  __gmpz_root (mpz_ptr, mpz_srcptr, ulong);
     void __gmpz_rootrem (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
     void __gmpz_sqrt (mpz_ptr, mpz_srcptr);
-    void __gmpz_sqrtrem (mpz_ptr, mpz_ptr, mpz_srcptr);	// TODO: wrap
+    void __gmpz_sqrtrem (mpz_ptr, mpz_ptr, mpz_srcptr);
     int __gmpz_perfect_power_p (mpz_srcptr);
     int __gmpz_perfect_square_p (mpz_srcptr);
 }
