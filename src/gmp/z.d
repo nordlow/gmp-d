@@ -1205,7 +1205,7 @@ nothrow:
         if (isZero) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
 		_Z rem;
-        __gmpz_rootrem(_ptr, _ptr, rem._ptr, n); version(ccc) { ++_ccc; }
+        __gmpz_rootrem(_ptr, rem._ptr, _ptr, n); version(ccc) { ++_ccc; }
 		return move(rem);
     }
 
@@ -1915,6 +1915,23 @@ _Z!(cow) root(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out bool isExa
     }
 }
 
+_Z!(cow) rootrem(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out scope _Z!(cow) rem) @trusted nothrow @nogc
+{
+    version(LDC) pragma(inline, true);
+    static if (__traits(isRef, x)) // l-value `x`
+    {
+        typeof(return) y = null; // must use temporary
+        __gmpz_rootrem(y._ptr, rem._ptr, x._ptr, n); version(ccc) ++y._ccc;
+        return y;
+    }
+    else                        // r-value `x`
+    {
+        typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
+        rem = zp.rootremSelf(n); version(ccc) ++zp._ccc;
+		return move(*zp);
+    }
+}
+
 /// Comparison of the absolute values of `x` and `y`.
 int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @nogc @trusted
 {
@@ -2240,6 +2257,20 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 	{ bool isExact; assert(17.Z.root(2, isExact) == 4 && !isExact); }
 	{ bool isExact; assert(27.Z.root(3, isExact) == 3 && isExact); }
 	{ bool isExact; assert(28.Z.root(3, isExact) == 3 && !isExact); }
+
+	{
+		Z rem;
+		Z u = 16;
+		const r = u.rootrem(2, rem);
+		assert(r == 4);
+		assert(rem == 0);
+	}
+	{
+		Z rem;
+		const r = 16.Z.rootrem(2, rem);
+		assert(r == 4);
+		assert(rem == 0);
+	}
 
     assert(w^^10 == 0);
     assert(w^^0 == 1);          // TODO: correct?
