@@ -1,6 +1,7 @@
 /// Multiple precision integers (Z).
 module gmp.z;
 
+debug import std.stdio : writeln;
 import std.exception : enforce;
 import core.lifetime : move;
 import std.traits : Unsigned, Unqual, isIntegral, isUnsigned; // used by expression templates
@@ -65,8 +66,6 @@ pure:
 		   (+2 <= base && base <= +62))
     {
 		import std.algorithm.searching : canFind;
-		// debug import std.stdio;
-		// debug writeln("value1:", value);
 		if (value.length >= 2 &&
 			value[0] == '0' &&
 			((base == 16 &&
@@ -81,7 +80,6 @@ pure:
 		{
 			value = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
 		}
-		// debug writeln("value2:", value);
 		char[smallBufSize] buf;
 		char* stringz;
 		if (value.length + 1 <= smallBufSize &&
@@ -101,7 +99,6 @@ pure:
 			if (stringz != buf.ptr)
 				qualifiedFree(stringz);
 		}
-		// debug writeln("string:", stringz[0..value.length + 1]);
         immutable int status = __gmpz_init_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
         enforce(status == 0, "Parameter `value` does not contain an integer");
     }
@@ -1159,6 +1156,7 @@ nothrow:
 		static if (cow) { selfdupIfAliased(); }
         __gmpz_abs(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
+	alias absSelf = absolute;
 
     /** Make `this` the one's complement value of itself in-place.
 
@@ -1167,7 +1165,7 @@ nothrow:
     void onesComplementSelf() @trusted
     {
         version(LDC) pragma(inline, true);
-        if (isZero) { return; } // `__gmpz_co` cannot handle default-constructed `this`
+        if (isZero) { return; } // `__gmpz_com` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
         __gmpz_com(_ptr, _ptr); version(ccc) { ++_ccc; }
     }
@@ -1843,6 +1841,7 @@ _Z!(cow) onesComplement(bool cow)(auto ref const _Z!(cow) x) @trusted nothrow @n
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
+alias com = onesComplement;
 
 /** Get truncated integer part of the square root of `x`.
 
@@ -2101,8 +2100,8 @@ _Z!(cow) invert(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) 
 /// default construction
 @safe nothrow @nogc unittest
 {
-    Z x;
-    Z y;
+    Z x = null;
+    Z y = null;
     assert(x == y);
     assert(x is y);             // TODO: is this correct behaviour?
     x = y;
@@ -2117,7 +2116,7 @@ _Z!(cow) invert(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) 
     assert(Z.init.dup !is Z.init);
     assert(Z.init.dup !is Z.init.dup);
 
-    Z w;
+    Z w = null;
     w = 42;
 }
 
@@ -2125,7 +2124,7 @@ _Z!(cow) invert(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) 
 @trusted nothrow unittest
 {
     import core.memory : pureFree;
-    Z w;
+    Z w = null;
     auto chars = w.toChars;
 	scope(exit) pureFree(chars.ptr);
     assert(chars == `0`);
@@ -2182,10 +2181,12 @@ _Z!(cow) invert(bool cow)(auto ref const _Z!(cow) base, auto ref const _Z!(cow) 
     w.absolute();
     assert(w is Z.init);        // should be unchanged
 
-    w.onesComplement();
+    w.onesComplementSelf();
     assert(w is Z.init);        // should be unchanged
-    w.onesComplement();
+    w.onesComplementSelf();
     assert(w is Z.init);        // should be unchanged
+
+	assert(16.Z.sqrt == 4);
 
     assert(w^^10 == 0);
     assert(w^^0 == 1);          // TODO: correct?
@@ -2633,10 +2634,12 @@ unittest
     n.absolute();
     assert(n == 42);
 
-    n.onesComplement();
+    n.onesComplementSelf();
     assert(n == -43);
     assert(onesComplement(n) == 42);
     assert(onesComplement(-43.Z) == 42);
+    assert(com(n) == 42);
+    assert(com(-43.Z) == 42);
 
     // addition
 
