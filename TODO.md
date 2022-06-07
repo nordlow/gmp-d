@@ -1,5 +1,8 @@
 # TODO list (in order of priority)
 
+- Change `scope` to `scope return` or `return scope` for Z parameters whose
+  pointers might be copied to a field in the return Z.
+
 - Investigate why `"-checkaction=context"` together with `"-preview=dip1000"` in
   `dflags` of dub buildType unittest fails in `_d_assert_fail` by adding calls
   to
