@@ -1,5 +1,9 @@
 # TODO list (in order of priority)
 
+- Figure out why statements consisting of a single call to a strongly pure
+  function discardig return values, such as `onesComplement(42.Z);`, doesn’t
+  trigger a warn-unused.
+
 - Support custom allocation using https://gmplib.org/manual/Custom-Allocation
 
 For instance of `MpZ!(stackSize)` will provide stack-based allocation up to
