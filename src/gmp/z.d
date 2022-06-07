@@ -3003,11 +3003,7 @@ unittest
 		assert((p^^2).Z.isPerfectSquare);
 		assert(!(p^^2 + 1).Z.isPerfectSquare);
 		foreach (const q; 2 .. 5)
-		{
-			import std.stdio;
-			debug writeln("p:", p, " q:", q);
 			assert((p^^q).Z.isPerfectPower);
-		}
 	}
 
     assert((-1).Z.isNegative);
