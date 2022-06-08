@@ -113,21 +113,6 @@ pure:
 		return typeof(return)(value, 16);
 	}
 
-	static typeof(this) fromHexString(string value)() pure @trusted // `value` is guaranteed to be null-terminated
-	{
-		static if (value.length >= 2 &&
-				   (value[0] == '0' &&
-					(value[1] == 'x' ||
-					 value[1] == 'X')))
-			enum adjustedValue = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
-		else
-			enum adjustedValue = value;
-		typeof(return) result = void;
-        immutable int status = __gmpz_init_set_str(result._ptr, adjustedValue.ptr, 16); version(ccc) { ++_ccc; }
-        enforce(status == 0, "Parameter `value` does not contain an integer");
-		return result;
-	}
-
 nothrow:
 
     /// Convert to `string` in base `base`.
@@ -170,7 +155,7 @@ nothrow:
 		in(-2 <= base && base <= -36 ||
 		   +2 <= base && base <= +62)
     {
-        __gmpz_get_str(chars.ptr, base, _ptr); // fill it
+		__gmpz_get_str(chars.ptr, base, _ptr); // fill it
         import std.ascii : isAlphaNum, isLower, toUpper;
         while (chars.length &&
                !chars[$ - 1].isAlphaNum)
@@ -2655,9 +2640,6 @@ unittest
     assert(Z.fromHexString(`10`) == 16);
     assert(Z.fromHexString(`0x10`) == 16);
     assert(Z.fromHexString(`0X10`) == 16);
-    assert(Z.fromHexString!(`10`) == 16);
-    assert(Z.fromHexString!(`0x10`) == 16);
-    assert(Z.fromHexString!(`0X10`) == 16);
 
     // decimal
 
