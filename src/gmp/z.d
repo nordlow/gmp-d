@@ -65,7 +65,6 @@ pure:
         in(base == 0 ||
 		   (+2 <= base && base <= +62))
     {
-		import std.algorithm.searching : canFind;
 		if (value.length >= 2 &&
 			value[0] == '0' &&
 			((base == 16 &&
@@ -82,6 +81,7 @@ pure:
 		}
 		char[smallBufSize] buf;
 		char* stringz;
+		import std.algorithm.searching : canFind;
 		if (value.length + 1 <= smallBufSize &&
 			value[0] != '-' &&	 // TODO: enable support for this
 			!value.canFind('_')) // TODO: enable support for this
