@@ -83,8 +83,8 @@ pure:
 		char* stringz;
 		import std.algorithm.searching : canFind;
 		if (value.length + 1 <= smallBufSize &&
-			value[0] != '-' &&	 // TODO: enable support for this
-			!value.canFind('_')) // TODO: enable support for this
+			value[0] != '-' &&	 // TODO: support minus sign
+			!value.canFind('_')) // TODO: support underscore
 		{
 			buf[0 .. value.length] = value;
 			buf[value.length] = '\0'; // null terminator
