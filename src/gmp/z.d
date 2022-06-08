@@ -130,7 +130,8 @@ nothrow:
 
     /** Convert in base `base` into `chars` of length `length`.
 
-		Returns: char[] which must be freed manually with `pureFree`.
+		Returns: char[] which must be freed manually with `pureFree` thereby
+		making this `@system`.
 	*/
     char[] toChars(in uint base = defaultBase,
                    in bool upperCaseDigits = false) const @system @nogc
