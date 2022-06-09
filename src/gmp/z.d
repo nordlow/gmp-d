@@ -51,6 +51,21 @@ enum WordOrder
  */
 private struct _Z(bool cow)
 {
+    /// Put `string` to sink in base `base`.
+    void toString(scope void delegate(scope const(char)[]) @safe sink,
+				  in uint base = defaultBase,
+				  in bool upperCaseDigits = false) const @trusted
+		in(-2 <= base && base <= -36 ||
+		   +2 <= base && base <= +62)
+    {
+        import core.memory : pureMalloc;
+        if (isZero) { sink(`0`); }
+        const size = sizeInBase(base); // NOTE: one too much for some values
+        scope char[] str = (cast(char*)pureMalloc(size + 1))[0 .. size + 1]; // one extra for minus sign
+		scope(exit) qualifiedFree(str.ptr);
+		sink(fillChars(str, base, upperCaseDigits));
+    }
+
 pure:
     /** Needed below because `mpz_init_set_str` is currently the only way to
 	 * construct from an array of characters.
