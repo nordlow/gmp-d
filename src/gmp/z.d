@@ -356,6 +356,7 @@ nothrow:
     ref _Z opAssign()(auto ref scope const _Z rhs) scope return @trusted
     {
         version(LDC) pragma(inline, true);
+		static if (cow) { selfdupIfAliased(); }
         __gmpz_set(_ptr, rhs._ptr); version(ccc) { ++_ccc; }
         return this;
     }
