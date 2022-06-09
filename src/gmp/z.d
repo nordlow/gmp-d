@@ -376,21 +376,13 @@ nothrow:
         assertInitialized();
 		static if (cow) { selfdupIfAliased(); }
         static if      (isUnsigned!T)
-        {
             __gmpz_set_ui(_ptr, rhs);
-        }
         else static if (isFloating!T)
-        {
             __gmpz_set_d(_ptr, rhs);
-        }
         else static if (isSigned!T)
-        {
             __gmpz_set_si(_ptr, rhs);
-        }
         else
-        {
             static assert(false);
-        }
         version(ccc) { ++_ccc; }
         return this;
     }
