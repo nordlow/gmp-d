@@ -382,7 +382,7 @@ nothrow:
         else static if (isSigned!T)
             __gmpz_set_si(_ptr, rhs);
         else
-            static assert(false);
+            static assert(0);
 
         return this;
     }
@@ -529,17 +529,11 @@ nothrow:
         {
             _Z* mut_rhs = (cast(_Z*)(&rhs)); // @trusted because `_Z` has no aliased indirections
             static      if (s == "+")
-            {
                 __gmpz_add(mut_rhs._ptr, _ptr, rhs._ptr);
-            }
             else static if (s == "-")
-            {
                 __gmpz_sub(mut_rhs._ptr, _ptr, rhs._ptr);
-            }
             else static if (s == "*")
-            {
                 __gmpz_mul(mut_rhs._ptr, _ptr, rhs._ptr);
-            }
             else static if (s == "/")
             {
                 assert(rhs != 0, "Divison by zero");
@@ -551,43 +545,29 @@ nothrow:
                 __gmpz_tdiv_r(mut_rhs._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "&")
-            {
                 __gmpz_and(mut_rhs._ptr, _ptr, rhs._ptr);
-            }
             else static if (s == "|")
-            {
                 __gmpz_ior(mut_rhs._ptr, _ptr, rhs._ptr);
-            }
             else static if (s == "^")
-            {
                 __gmpz_xor(mut_rhs._ptr, _ptr, rhs._ptr);
-            }
             else static if (s == "<<")
             {
                 const rhs_ulong = cast(ulong)rhs;
                 __gmpz_mul_2exp(mut_rhs._ptr, _ptr, rhs_ulong);
             }
             else
-            {
-                static assert(false);
-            }
+                static assert(0);
             return move(*mut_rhs); // TODO: shouldn't have to call `move` here
         }
         else
         {
             typeof(return) y = null;
             static      if (s == "+")
-            {
                 __gmpz_add(y._ptr, _ptr, rhs._ptr);
-            }
             else static if (s == "-")
-            {
                 __gmpz_sub(y._ptr, _ptr, rhs._ptr);
-            }
             else static if (s == "*")
-            {
                 __gmpz_mul(y._ptr, _ptr, rhs._ptr);
-            }
             else static if (s == "/")
             {
                 assert(rhs != 0, "Divison by zero");
@@ -599,26 +579,18 @@ nothrow:
                 __gmpz_tdiv_r(y._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "&")
-            {
                 __gmpz_and(y._ptr, _ptr, rhs._ptr);
-            }
             else static if (s == "|")
-            {
                 __gmpz_ior(y._ptr, _ptr, rhs._ptr);
-            }
             else static if (s == "^")
-            {
                 __gmpz_xor(y._ptr, _ptr, rhs._ptr);
-            }
             else static if (s == "<<")
             {
                 const rhs_ulong = cast(ulong)rhs;
                 __gmpz_mul_2exp(y._ptr, _ptr, rhs_ulong);
             }
             else
-            {
-                static assert(false);
-            }
+                static assert(0);
             return y;
         }
     }
@@ -641,34 +613,22 @@ nothrow:
         typeof(return) y = null;
 
         static      if (s == "+")
-        {
             __gmpz_add_ui(y._ptr, _ptr, rhs);
-        }
         else static if (s == "-")
-        {
             __gmpz_sub_ui(y._ptr, _ptr, rhs);
-        }
         else static if (s == "*")
-        {
             __gmpz_mul_ui(y._ptr, _ptr, rhs);
-        }
         else static if (s == "/")
         {
             assert(rhs != 0, "Divison by zero");
             __gmpz_tdiv_q_ui(y._ptr, _ptr, rhs);
         }
         else static if (s == "^^")
-        {
             __gmpz_pow_ui(y._ptr, _ptr, rhs);
-        }
         else static if (s == "<<")
-        {
             __gmpz_mul_2exp(y._ptr, _ptr, rhs);
-        }
         else
-        {
-            static assert(false);
-        }
+            static assert(0);
         return y;
     }
 
@@ -719,9 +679,7 @@ nothrow:
             __gmpz_pow_ui(y._ptr, _ptr, rhs);
         }
         else
-        {
-            static assert(false);
-        }
+            static assert(0);
         return y;
     }
 
@@ -747,7 +705,7 @@ nothrow:
         else static if (isUnsigned!Rhs)
             return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
         else
-            static assert(false);
+            static assert(0);
     }
 
     /// Get an unsigned type `lhs` divided by `this`.
@@ -770,7 +728,7 @@ nothrow:
             __gmpz_tdiv_r(y._ptr, _Z(lhs)._ptr, _ptr); // convert `lhs` to _Z
         }
         else
-            static assert(false);
+            static assert(0);
         return y;
     }
 
@@ -808,7 +766,7 @@ nothrow:
             return y;
         }
         else
-            static assert(false);
+            static assert(0);
     }
 
     /// Dividend propagates quotient type to signed.
@@ -829,7 +787,7 @@ nothrow:
             return cast(Signed!(typeof(return)))y;
         }
         else
-            static assert(false);
+            static assert(0);
     }
 
     /// Exponentation.
@@ -852,21 +810,15 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
         static      if (s == "+")
-        {
             __gmpz_add(_ptr, _ptr, rhs._ptr);
-        }
         else static if (s == "-")
-        {
             __gmpz_sub(_ptr, _ptr, rhs._ptr);
-        }
         else static if (s == "*")
         {
             if (rhs == -1)
                 negate();
             else
-            {
                 __gmpz_mul(_ptr, _ptr, rhs._ptr);
-            }
         }
         else static if (s == "/")
         {
@@ -874,9 +826,7 @@ nothrow:
             if (rhs == -1)
                 negate();
             else
-            {
                 __gmpz_tdiv_q(_ptr, _ptr, rhs._ptr);
-            }
         }
         else static if (s == "%")
         {
@@ -884,19 +834,13 @@ nothrow:
             __gmpz_tdiv_r(_ptr, _ptr, rhs._ptr);
         }
         else static if (s == "&")
-        {
             __gmpz_and(_ptr, _ptr, rhs._ptr);
-        }
         else static if (s == "|")
-        {
             __gmpz_ior(_ptr, _ptr, rhs._ptr);
-        }
         else static if (s == "^")
-        {
             __gmpz_xor(_ptr, _ptr, rhs._ptr);
-        }
         else
-            static assert(false);
+            static assert(0);
         return this;
     }
 
@@ -907,17 +851,11 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
         static      if (s == "+")
-        {
             __gmpz_add_ui(_ptr, _ptr, rhs);
-        }
         else static if (s == "-")
-        {
             __gmpz_sub_ui(_ptr, _ptr, rhs);
-        }
         else static if (s == "*")
-        {
             __gmpz_mul_ui(_ptr, _ptr, rhs);
-        }
         else static if (s == "/")
         {
             assert(rhs != 0, "Divison by zero");
@@ -929,13 +867,9 @@ nothrow:
             __gmpz_tdiv_r_ui(_ptr, _ptr, rhs);
         }
         else static if (s == "^^")
-        {
             __gmpz_pow_ui(_ptr, _ptr, rhs);
-        }
         else
-        {
-            static assert(false);
-        }
+            static assert(0);
         return this;
     }
 
@@ -954,9 +888,7 @@ nothrow:
                 __gmpz_sub_ui(_ptr, _ptr, pos_rhs);
             }
             else
-            {
                 __gmpz_add_ui(_ptr, _ptr, rhs);
-            }
         }
         else static if (s == "-")
         {
@@ -968,20 +900,14 @@ nothrow:
                 __gmpz_add_ui(_ptr, _ptr, pos_rhs);
             }
             else
-            {
                 __gmpz_sub_ui(_ptr, _ptr, rhs);
-            }
         }
         else static if (s == "*")
         {
             if (rhs == -1)
-            {
                 negate();       // optimization
-            }
             else
-            {
                 __gmpz_mul_si(_ptr, _ptr, rhs);
-            }
         }
         else static if (s == "/")
         {
@@ -993,9 +919,7 @@ nothrow:
                 negate();
             }
             else
-            {
                 __gmpz_tdiv_q_ui(_ptr, _ptr, rhs);
-            }
         }
         else static if (s == "%")
         {
@@ -1008,9 +932,7 @@ nothrow:
             __gmpz_pow_ui(_ptr, _ptr, rhs);
         }
         else
-        {
-            static assert(false);
-        }
+            static assert(0);
         return this;
     }
 
@@ -1139,13 +1061,9 @@ nothrow:
         version(LDC) pragma(inline, true);
 		static if (cow) { selfdupIfAliased(); }
         if (isDefaultConstructed) // `__gmpz_add_ui` cannot handle default-constructed `this`
-        {
             __gmpz_init_set_si(_ptr, 1);
-        }
         else
-        {
             __gmpz_add_ui(_ptr, _ptr, 1);
-        }
         return this;
     }
 
@@ -1156,13 +1074,9 @@ nothrow:
         version(LDC) pragma(inline, true);
 		static if (cow) { selfdupIfAliased(); }
         if (isDefaultConstructed) // `__gmpz_sub_ui` cannot handle default-constructed `this`
-        {
             __gmpz_init_set_si(_ptr, -1);
-        }
         else
-        {
             __gmpz_sub_ui(_ptr, _ptr, 1);
-        }
         return this;
     }
 
@@ -1189,16 +1103,13 @@ nothrow:
             immutable uexp = cast(ulong)exp;
         }
         else
-        {
             immutable uexp = exp;
-        }
 
         typeof(return) y = null;
         __gmpz_ui_pow_ui(y._ptr, ubase, uexp);
-        if (negate && exp & 1)  // if negative odd exponent
-        {
+        if (negate &&
+			exp & 1)  // if negative odd exponent
             y.negate();
-        }
 
         return y;
     }
@@ -1208,13 +1119,9 @@ nothrow:
     {
         pragma(inline, true);
         if (isZero)
-        {
             return 1;
-        }
         else
-        {
             return __gmpz_sizeinbase(_ptr, base);
-        }
     }
 
     /** Serialize `this` into an existing pre-allocated slice of words `words`,
@@ -1439,9 +1346,7 @@ private:
     {
         pragma(inline, true);
         if (isDefaultConstructed)
-        {
             __gmpz_init(_ptr);
-        }
     }
 
     /// Default conversion base.
@@ -1605,13 +1510,9 @@ _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
                    !__traits(isRef, y))   // r-value `y`
         {
             if (x.limbCount > y.limbCount) // larger r-value `x`
-            {
                 zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-            }
             else                    // larger r-value `y`
-            {
                 zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-            }
         }
         else static if (!__traits(isRef, x)) // r-value `x`
         {
@@ -1622,9 +1523,7 @@ _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
             zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
         }
 		else
-		{
 			static assert(0);
-		}
 		__gmpz_add(zp._ptr, x._ptr, y._ptr);
 		static if (cow) { zp.selfdupIfAliased(); }
         return move(*zp);    // TODO: shouldn't have to call `move` here
@@ -1663,13 +1562,9 @@ _Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
                    !__traits(isRef, y))   // r-value `y`
         {
             if (x.limbCount > y.limbCount) // larger r-value `x`
-            {
                 zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-            }
             else                    // larger r-value `y`
-            {
                 zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-            }
         }
         else static if (!__traits(isRef, x)) // r-value `x`
         {
@@ -1680,9 +1575,7 @@ _Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
             zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
         }
 		else
-		{
 			static assert(0);
-		}
 		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_sub(zp._ptr, x._ptr, y._ptr);
         return move(*zp);    // TODO: shouldn't have to call `move` here
@@ -1738,9 +1631,7 @@ _Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
             zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
         }
 		else
-		{
 			static assert(0);
-		}
 		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_mul(zp._ptr, x._ptr, y._ptr);
         return move(*zp);    // TODO: shouldn't have to call `move` here
@@ -1943,13 +1834,9 @@ _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
                    !__traits(isRef, y))   // r-value `y`
         {
             if (x.limbCount > y.limbCount) // larger r-value `x`
-            {
                 zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-            }
             else                    // larger r-value `y`
-            {
                 zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-            }
         }
         else static if (!__traits(isRef, x)) // r-value `x`
         {
@@ -1960,9 +1847,7 @@ _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
             zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
         }
 		else
-		{
 			static assert(0);
-		}
 		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_gcd(zp._ptr, x._ptr, y._ptr);
 
@@ -2006,13 +1891,9 @@ _Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
                    !__traits(isRef, y))   // r-value `y`
         {
             if (x.limbCount > y.limbCount) // larger r-value `x`
-            {
                 zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-            }
             else                    // larger r-value `y`
-            {
                 zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-            }
         }
         else static if (!__traits(isRef, x)) // r-value `x`
         {
@@ -2023,9 +1904,7 @@ _Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
             zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
         }
 		else
-		{
 			static assert(0);
-		}
 		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_lcm(zp._ptr, x._ptr, y._ptr);
 
