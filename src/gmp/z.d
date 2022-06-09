@@ -519,10 +519,10 @@ nothrow:
 
     /** Get `this` `s` `rhs`. */
     _Z opBinary(string s)(auto ref scope const _Z rhs) const @trusted // direct value
-    if ((s == "+" || s == "-" ||
-         s == "*" || s == "/" || s == "%" ||
-         s == "&" || s == "|" || s == "^" ||
-         s == "<<"))            // left shift
+        if ((s == "+" || s == "-" ||
+			 s == "*" || s == "/" || s == "%" ||
+			 s == "&" || s == "|" || s == "^" ||
+			 s == "<<"))            // left shift
     {
         version(LDC) pragma(inline, true);
         static if (!__traits(isRef, rhs)) // r-value `rhs`
