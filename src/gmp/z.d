@@ -436,21 +436,13 @@ nothrow:
     {
         pragma(inline, true)
         if (rhs == 0)
-        {
             return isZero;      // optimization
-        }
         static      if (isUnsigned!Rhs)
-        {
             return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
-        }
         else static if (isFloating!Rhs)
-        {
             return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO: correct to do this cast here?
-        }
         else                    // isSigned integral
-        {
             return __gmpz_cmp_si(_ptr, cast(long)rhs) == 0;
-        }
     }
 
     /// Compare `this` to `rhs`.
@@ -458,9 +450,7 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
         if (rhs == 0)
-        {
             return sgn();       // optimization
-        }
         return __gmpz_cmp(_ptr, rhs._ptr);
     }
     /// ditto
@@ -469,21 +459,13 @@ nothrow:
     {
         pragma(inline, true);
         if (rhs == 0)
-        {
             return sgn();       // optimization
-        }
         static      if (isUnsigned!T)
-        {
             return __gmpz_cmp_ui(_ptr, rhs);
-        }
         else static if (isFloating!T)
-        {
             return __gmpz_cmp_d(_ptr, rhs);
-        }
         else                    // isSigned integral
-        {
             return __gmpz_cmp_si(_ptr, rhs);
-        }
     }
 
     /// Cast to `bool`.
@@ -499,17 +481,11 @@ nothrow:
     {
         pragma(inline, true);
         static      if (isUnsigned!T)
-        {
             return cast(T)__gmpz_get_ui(_ptr);
-        }
         else static if (isFloating!T)
-        {
             return cast(T)__gmpz_get_d(_ptr);
-        }
         else                    // isSigned integral
-        {
             return cast(T)__gmpz_get_si(_ptr);
-        }
     }
 
     /** Get the value of this as a `long`, or +/- `long.max` if outside the
@@ -519,17 +495,11 @@ nothrow:
         version(LDC) pragma(inline, true);
         // TODO: can probably be optimized
         if (this <= long.min)
-        {
             return long.min;
-        }
         else if (this >= long.max)
-        {
             return long.max;
-        }
         else
-        {
             return cast(long)__gmpz_get_si(_ptr);
-        }
     }
 
     /** Get the value of this as a `int`, or +/- `int.max` if outside the
@@ -540,17 +510,11 @@ nothrow:
         version(LDC) pragma(inline, true);
         // TODO: can probably be optimized
         if (this <= int.min)
-        {
             return int.min;
-        }
         else if (this >= int.max)
-        {
             return int.max;
-        }
         else
-        {
             return cast(int)__gmpz_get_si(_ptr);
-        }
     }
 
     /** Get `this` `s` `rhs`. */
