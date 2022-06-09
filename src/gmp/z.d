@@ -99,7 +99,7 @@ pure:
 			if (stringz != buf.ptr)
 				qualifiedFree(stringz);
 		}
-        immutable int status = __gmpz_init_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
+        immutable int status = __gmpz_init_set_str(_ptr, stringz, base);
         enforce(status == 0, "Parameter `value` does not contain an integer");
     }
 
@@ -242,7 +242,7 @@ nothrow:
         // if (!__ctfe)
         // {
         pragma(inline, true);
-        version(ccc) { ++_ccc; }
+
         static      if (isUnsigned!T)
             __gmpz_init_set_ui(_ptr, value);
         else static if (isFloating!T)
@@ -306,7 +306,7 @@ nothrow:
 	// /// Construct copy of `value`.
 	// this(ref const _Z value) @trusted
 	// {
-	//     __gmpz_init_set(_ptr, value._ptr); version(ccc) { ++_ccc; }
+	//     __gmpz_init_set(_ptr, value._ptr);
 	// }
 
 	// /// Construct copy of `value`.
@@ -339,7 +339,7 @@ nothrow:
     {
         pragma(inline, true);
         import std.algorithm.mutation : swap;
-        swap(this, rhs); // faster than __gmpz_swap(_ptr, rhs._ptr); version(ccc) { ++_ccc; }
+        swap(this, rhs); // faster than __gmpz_swap(_ptr, rhs._ptr);
     }
 
     /// (Duplicate) Copy `this`.
@@ -347,7 +347,7 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = void;
-        __gmpz_init_set(y._ptr, _ptr); version(ccc) ++y._ccc;
+        __gmpz_init_set(y._ptr, _ptr);
 		static if (cow) { y._refCountCopies = 0; }
         return y;
     }
@@ -357,7 +357,7 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
 		static if (cow) { selfdupIfAliased(); }
-        __gmpz_set(_ptr, rhs._ptr); version(ccc) { ++_ccc; }
+        __gmpz_set(_ptr, rhs._ptr);
         return this;
     }
     /// ditto
@@ -383,7 +383,7 @@ nothrow:
             __gmpz_set_si(_ptr, rhs);
         else
             static assert(false);
-        version(ccc) { ++_ccc; }
+
         return this;
     }
 
@@ -395,7 +395,7 @@ nothrow:
         assert(base == 0 || (base >= 2 && base <= 62));
 		static if (cow) { selfdupIfAliased(); }
         char* stringz = _allocStringzCopyOf(rhs);
-        immutable int status = __gmpz_set_str(_ptr, stringz, base); version(ccc) { ++_ccc; }
+        immutable int status = __gmpz_set_str(_ptr, stringz, base);
         qualifiedFree(stringz);
         assert(status == 0, "Parameter `rhs` does not contain an integer");
         return this;
@@ -415,7 +415,7 @@ nothrow:
 					return;
 				}
 			}
-            __gmpz_clear(_ptr); version(ccc) { ++_ccc; }
+            __gmpz_clear(_ptr);
             _z._mp_d = null;    // prevent GC from scanning this memory
         }
     }
@@ -530,42 +530,42 @@ nothrow:
             _Z* mut_rhs = (cast(_Z*)(&rhs)); // @trusted because `_Z` has no aliased indirections
             static      if (s == "+")
             {
-                __gmpz_add(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+                __gmpz_add(mut_rhs._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "-")
             {
-                __gmpz_sub(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+                __gmpz_sub(mut_rhs._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "*")
             {
-                __gmpz_mul(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+                __gmpz_mul(mut_rhs._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "/")
             {
                 assert(rhs != 0, "Divison by zero");
-                __gmpz_tdiv_q(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+                __gmpz_tdiv_q(mut_rhs._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "%")
             {
                 assert(rhs != 0, "Divison by zero");
-                __gmpz_tdiv_r(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+                __gmpz_tdiv_r(mut_rhs._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "&")
             {
-                __gmpz_and(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+                __gmpz_and(mut_rhs._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "|")
             {
-                __gmpz_ior(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+                __gmpz_ior(mut_rhs._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "^")
             {
-                __gmpz_xor(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+                __gmpz_xor(mut_rhs._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "<<")
             {
                 const rhs_ulong = cast(ulong)rhs;
-                __gmpz_mul_2exp(mut_rhs._ptr, _ptr, rhs_ulong); version(ccc) ++mut_rhs._ccc;
+                __gmpz_mul_2exp(mut_rhs._ptr, _ptr, rhs_ulong);
             }
             else
             {
@@ -578,42 +578,42 @@ nothrow:
             typeof(return) y = null;
             static      if (s == "+")
             {
-                __gmpz_add(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+                __gmpz_add(y._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "-")
             {
-                __gmpz_sub(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+                __gmpz_sub(y._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "*")
             {
-                __gmpz_mul(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+                __gmpz_mul(y._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "/")
             {
                 assert(rhs != 0, "Divison by zero");
-                __gmpz_tdiv_q(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+                __gmpz_tdiv_q(y._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "%")
             {
                 assert(rhs != 0, "Divison by zero");
-                __gmpz_tdiv_r(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+                __gmpz_tdiv_r(y._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "&")
             {
-                __gmpz_and(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+                __gmpz_and(y._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "|")
             {
-                __gmpz_ior(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+                __gmpz_ior(y._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "^")
             {
-                __gmpz_xor(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+                __gmpz_xor(y._ptr, _ptr, rhs._ptr);
             }
             else static if (s == "<<")
             {
                 const rhs_ulong = cast(ulong)rhs;
-                __gmpz_mul_2exp(y._ptr, _ptr, rhs_ulong); version(ccc) ++y._ccc;
+                __gmpz_mul_2exp(y._ptr, _ptr, rhs_ulong);
             }
             else
             {
@@ -639,7 +639,7 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
-        version(ccc) ++y._ccc;
+
         static      if (s == "+")
         {
             __gmpz_add_ui(y._ptr, _ptr, rhs);
@@ -663,7 +663,7 @@ nothrow:
         }
         else static if (s == "<<")
         {
-            __gmpz_mul_2exp(y._ptr, _ptr, rhs); version(ccc) ++rhs._ccc;
+            __gmpz_mul_2exp(y._ptr, _ptr, rhs);
         }
         else
         {
@@ -679,7 +679,7 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
-        version(ccc) ++y._ccc;
+
         static      if (s == "+")
         {
             if (rhs < 0)        // TODO: handle `rhs == rhs.min`
@@ -688,20 +688,14 @@ nothrow:
                 __gmpz_sub_ui(y._ptr, _ptr, pos_rhs);
             }
             else
-            {
                 __gmpz_add_ui(y._ptr, _ptr, rhs);
-            }
         }
         else static if (s == "-")
         {
             if (rhs < 0)        // TODO: handle `rhs == rhs.min`
-            {
                 __gmpz_add_ui(y._ptr, _ptr, -rhs); // x - (-y) == x + y
-            }
             else
-            {
                 __gmpz_sub_ui(y._ptr, _ptr, rhs); // rhs is positive
-            }
         }
         else static if (s == "*")
         {
@@ -717,9 +711,7 @@ nothrow:
                 y.negate();     // negate result
             }
             else
-            {
                 __gmpz_tdiv_q_ui(y._ptr, _ptr, rhs);
-            }
         }
         else static if (s == "^^")
         {
@@ -741,7 +733,7 @@ nothrow:
         version(LDC) pragma(inline, true);
         assert(rhs != 0, "Divison by zero");
         _Z y = null;
-        version(ccc) ++y._ccc;
+
         static if (isSigned!Rhs)
         {
             if (rhs < 0)        // TODO: handle `rhs == rhs.min`
@@ -750,18 +742,12 @@ nothrow:
                 return cast(typeof(return))-__gmpz_tdiv_r_ui(y._ptr, _ptr, pos_rhs);
             }
             else
-            {
                 return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
-            }
         }
         else static if (isUnsigned!Rhs)
-        {
             return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
-        }
         else
-        {
             static assert(false);
-        }
     }
 
     /// Get an unsigned type `lhs` divided by `this`.
@@ -771,28 +757,20 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
-        version(ccc) ++y._ccc;
+
         static      if (s == "+")
-        {
             __gmpz_add_ui(y._ptr, _ptr, lhs); // commutative
-        }
         else static if (s == "-")
-        {
             __gmpz_ui_sub(y._ptr, lhs, _ptr);
-        }
         else static if (s == "*")
-        {
             __gmpz_mul_ui(y._ptr, _ptr, lhs); // commutative
-        }
         else static if (s == "%")
         {
             assert(this != 0, "Divison by zero");
             __gmpz_tdiv_r(y._ptr, _Z(lhs)._ptr, _ptr); // convert `lhs` to _Z
         }
         else
-        {
             static assert(false);
-        }
         return y;
     }
 
@@ -802,38 +780,35 @@ nothrow:
         isSigned!Lhs)
     {
         version(LDC) pragma(inline, true);
-        static if (s == "+" || s == "*")
+        static if (s == "+" ||
+				   s == "*")
         {
             return opBinary!s(lhs); // commutative reuse
         }
         else static if (s == "-")
         {
             typeof(return) y = null;
-            version(ccc) ++y._ccc;
+
             if (lhs < 0)        // TODO: handle `lhs == lhs.min`
             {
                 immutable ulong pos_rhs = -lhs; // make it positive
                 __gmpz_add_ui(y._ptr, _ptr, pos_rhs);
             }
             else
-            {
                 __gmpz_sub_ui(y._ptr, _ptr, lhs);
-            }
             y.negate();
             return y;
         }
         else static if (s == "%")
         {
             typeof(return) y = null;
-            version(ccc) ++y._ccc;
+
             assert(this != 0, "Divison by zero");
             __gmpz_tdiv_r(y._ptr, _Z(lhs)._ptr, _ptr); // convert `lhs` to _Z
             return y;
         }
         else
-        {
             static assert(false);
-        }
     }
 
     /// Dividend propagates quotient type to signed.
@@ -843,22 +818,18 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
         _Z y = null; // TODO: avoid if !__traits(isRef, this)
-        version(ccc) ++y._ccc;
+
         assert(this != 0, "Divison by zero");
         __gmpz_tdiv_q(y._ptr, _Z(lhs)._ptr, _ptr);
         static      if (isSigned!Lhs)
-        {
             return cast(typeof(return))y;
-        }
         else static if (isUnsigned!Lhs)
         {
             import std.traits : Signed;
             return cast(Signed!(typeof(return)))y;
         }
         else
-        {
             static assert(false);
-        }
     }
 
     /// Exponentation.
@@ -882,56 +853,50 @@ nothrow:
         version(LDC) pragma(inline, true);
         static      if (s == "+")
         {
-            __gmpz_add(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
+            __gmpz_add(_ptr, _ptr, rhs._ptr);
         }
         else static if (s == "-")
         {
-            __gmpz_sub(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
+            __gmpz_sub(_ptr, _ptr, rhs._ptr);
         }
         else static if (s == "*")
         {
             if (rhs == -1)
-            {
                 negate();
-            }
             else
             {
-                __gmpz_mul(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
+                __gmpz_mul(_ptr, _ptr, rhs._ptr);
             }
         }
         else static if (s == "/")
         {
             assert(rhs != 0, "Divison by zero");
             if (rhs == -1)
-            {
                 negate();
-            }
             else
             {
-                __gmpz_tdiv_q(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
+                __gmpz_tdiv_q(_ptr, _ptr, rhs._ptr);
             }
         }
         else static if (s == "%")
         {
             assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_r(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
+            __gmpz_tdiv_r(_ptr, _ptr, rhs._ptr);
         }
         else static if (s == "&")
         {
-            __gmpz_and(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
+            __gmpz_and(_ptr, _ptr, rhs._ptr);
         }
         else static if (s == "|")
         {
-            __gmpz_ior(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
+            __gmpz_ior(_ptr, _ptr, rhs._ptr);
         }
         else static if (s == "^")
         {
-            __gmpz_xor(_ptr, _ptr, rhs._ptr); version(ccc) { ++_ccc; }
+            __gmpz_xor(_ptr, _ptr, rhs._ptr);
         }
         else
-        {
             static assert(false);
-        }
         return this;
     }
 
@@ -943,29 +908,29 @@ nothrow:
         version(LDC) pragma(inline, true);
         static      if (s == "+")
         {
-            __gmpz_add_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_add_ui(_ptr, _ptr, rhs);
         }
         else static if (s == "-")
         {
-            __gmpz_sub_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_sub_ui(_ptr, _ptr, rhs);
         }
         else static if (s == "*")
         {
-            __gmpz_mul_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_mul_ui(_ptr, _ptr, rhs);
         }
         else static if (s == "/")
         {
             assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_q_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_tdiv_q_ui(_ptr, _ptr, rhs);
         }
         else static if (s == "%")
         {
             assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs);
         }
         else static if (s == "^^")
         {
-            __gmpz_pow_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_pow_ui(_ptr, _ptr, rhs);
         }
         else
         {
@@ -986,11 +951,11 @@ nothrow:
             {
                 assert(rhs != rhs.min);
                 immutable ulong pos_rhs = -rhs; // make it positive
-                __gmpz_sub_ui(_ptr, _ptr, pos_rhs); version(ccc) { ++_ccc; }
+                __gmpz_sub_ui(_ptr, _ptr, pos_rhs);
             }
             else
             {
-                __gmpz_add_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+                __gmpz_add_ui(_ptr, _ptr, rhs);
             }
         }
         else static if (s == "-")
@@ -1000,11 +965,11 @@ nothrow:
                 assert(rhs != rhs.min);
 
                 immutable ulong pos_rhs = -rhs; // make it positive
-                __gmpz_add_ui(_ptr, _ptr, pos_rhs); version(ccc) { ++_ccc; }
+                __gmpz_add_ui(_ptr, _ptr, pos_rhs);
             }
             else
             {
-                __gmpz_sub_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+                __gmpz_sub_ui(_ptr, _ptr, rhs);
             }
         }
         else static if (s == "*")
@@ -1015,7 +980,7 @@ nothrow:
             }
             else
             {
-                __gmpz_mul_si(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+                __gmpz_mul_si(_ptr, _ptr, rhs);
             }
         }
         else static if (s == "/")
@@ -1024,23 +989,23 @@ nothrow:
             if (rhs < 0)        // TODO: handle `rhs == rhs.min`
             {
                 immutable ulong pos_rhs = -rhs; // make it positive
-                __gmpz_tdiv_q_ui(_ptr, _ptr, pos_rhs); version(ccc) { ++_ccc; }
+                __gmpz_tdiv_q_ui(_ptr, _ptr, pos_rhs);
                 negate();
             }
             else
             {
-                __gmpz_tdiv_q_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+                __gmpz_tdiv_q_ui(_ptr, _ptr, rhs);
             }
         }
         else static if (s == "%")
         {
             assert(rhs != 0, "Divison by zero");
-            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_tdiv_r_ui(_ptr, _ptr, rhs);
         }
         else static if (s == "^^")
         {
             assert(rhs >= 0, "Negative exponent");
-            __gmpz_pow_ui(_ptr, _ptr, rhs); version(ccc) { ++_ccc; }
+            __gmpz_pow_ui(_ptr, _ptr, rhs);
         }
         else
         {
@@ -1097,7 +1062,7 @@ nothrow:
         version(LDC) pragma(inline, true);
         if (isZero) { return; } // `__gmpz_abs` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
-        __gmpz_abs(_ptr, _ptr); version(ccc) { ++_ccc; }
+        __gmpz_abs(_ptr, _ptr);
     }
 	alias absSelf = absolute;
 
@@ -1110,7 +1075,7 @@ nothrow:
         version(LDC) pragma(inline, true);
         if (isZero) { return; } // `__gmpz_com` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
-        __gmpz_com(_ptr, _ptr); version(ccc) { ++_ccc; }
+        __gmpz_com(_ptr, _ptr);
     }
 
     /** Make `this` the square root of itself in-place.
@@ -1122,7 +1087,7 @@ nothrow:
         version(LDC) pragma(inline, true);
         if (isZero) { return; } // `__gmpz_co` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
-        __gmpz_sqrt(_ptr, _ptr); version(ccc) { ++_ccc; }
+        __gmpz_sqrt(_ptr, _ptr);
     }
 
     /** Make `this` the `n`:th root of itself in-place.
@@ -1134,7 +1099,7 @@ nothrow:
         version(LDC) pragma(inline, true);
         if (isZero) { return true; } // `__gmpz_co` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
-        const status = __gmpz_root(_ptr, _ptr, n); version(ccc) { ++_ccc; }
+        const status = __gmpz_root(_ptr, _ptr, n);
 		return status != 0;
     }
 
@@ -1148,7 +1113,7 @@ nothrow:
         if (isZero) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
 		_Z rem;
-        __gmpz_rootrem(_ptr, rem._ptr, _ptr, n); version(ccc) { ++_ccc; }
+        __gmpz_rootrem(_ptr, rem._ptr, _ptr, n);
 		return move(rem);
     }
 
@@ -1163,7 +1128,7 @@ nothrow:
         if (isZero) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
 		_Z rem;
-        __gmpz_sqrtrem(_ptr, rem._ptr, _ptr); version(ccc) { ++_ccc; }
+        __gmpz_sqrtrem(_ptr, rem._ptr, _ptr);
 		return move(rem);
     }
 
@@ -1179,7 +1144,7 @@ nothrow:
         }
         else
         {
-            __gmpz_add_ui(_ptr, _ptr, 1); version(ccc) { ++_ccc; }
+            __gmpz_add_ui(_ptr, _ptr, 1);
         }
         return this;
     }
@@ -1196,7 +1161,7 @@ nothrow:
         }
         else
         {
-            __gmpz_sub_ui(_ptr, _ptr, 1); version(ccc) { ++_ccc; }
+            __gmpz_sub_ui(_ptr, _ptr, 1);
         }
         return this;
     }
@@ -1229,7 +1194,7 @@ nothrow:
         }
 
         typeof(return) y = null;
-        __gmpz_ui_pow_ui(y._ptr, ubase, uexp); version(ccc) ++y._ccc;
+        __gmpz_ui_pow_ui(y._ptr, ubase, uexp);
         if (negate && exp & 1)  // if negative odd exponent
         {
             y.negate();
@@ -1466,7 +1431,7 @@ private:
     void initialize() @system // cannot be called `init` as that will override builtin type property
     {
         pragma(inline, true);
-        __gmpz_init(_ptr); version(ccc) { ++_ccc; }
+        __gmpz_init(_ptr);
     }
 
     /** Initialize internal struct if needed. */
@@ -1475,7 +1440,7 @@ private:
         pragma(inline, true);
         if (isDefaultConstructed)
         {
-            __gmpz_init(_ptr); version(ccc) { ++_ccc; }
+            __gmpz_init(_ptr);
         }
     }
 
@@ -1517,6 +1482,7 @@ private:
 		private __mpz_struct _z; // internal libgmp C struct
 	}
 
+	version(none)
     version(ccc)
     {
         /** Number of calls made to `__gmpz`--functions that construct or changes
@@ -1661,13 +1627,12 @@ _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 		}
 		__gmpz_add(zp._ptr, x._ptr, y._ptr);
 		static if (cow) { zp.selfdupIfAliased(); }
-        version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`, no reuse in output
     {
         typeof(return) z = null;
-        __gmpz_add(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
+        __gmpz_add(z._ptr, x._ptr, y._ptr);
         return z;
     }
 }
@@ -1720,13 +1685,12 @@ _Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 		}
 		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_sub(zp._ptr, x._ptr, y._ptr);
-        version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`, no reuse in output
     {
         typeof(return) z = null;
-        __gmpz_sub(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
+        __gmpz_sub(z._ptr, x._ptr, y._ptr);
         return z;
     }
 }
@@ -1779,13 +1743,12 @@ _Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 		}
 		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_mul(zp._ptr, x._ptr, y._ptr);
-        version(ccc) ++zp._ccc;
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`, no reuse in output
     {
         typeof(return) z = null;
-        __gmpz_mul(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
+        __gmpz_mul(z._ptr, x._ptr, y._ptr);
         return z;
     }
 }
@@ -1813,14 +1776,14 @@ _Z!(cow) abs(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) y = null; // must use temporary
-        __gmpz_abs(y._ptr, x._ptr); version(ccc) ++y._ccc;
+        __gmpz_abs(y._ptr, x._ptr);
         return y;
     }
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { zp.selfdupIfAliased(); }
-        zp.absolute(); version(ccc) ++zp._ccc;
+        zp.absolute();
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
@@ -1835,13 +1798,13 @@ _Z!(cow) onesComplement(bool cow)(auto ref scope const _Z!(cow) x) @trusted noth
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) y = null; // must use temporary
-        __gmpz_com(y._ptr, x._ptr); version(ccc) ++y._ccc;
+        __gmpz_com(y._ptr, x._ptr);
         return y;
     }
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        zp.onesComplementSelf(); version(ccc) ++zp._ccc;
+        zp.onesComplementSelf();
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
@@ -1859,13 +1822,13 @@ _Z!(cow) sqrt(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) y = null; // must use temporary
-        __gmpz_sqrt(y._ptr, x._ptr); version(ccc) ++y._ccc;
+        __gmpz_sqrt(y._ptr, x._ptr);
         return y;
     }
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        zp.sqrtSelf(); version(ccc) ++zp._ccc;
+        zp.sqrtSelf();
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
@@ -1876,13 +1839,13 @@ _Z!(cow) sqrtrem(bool cow)(auto ref scope const _Z!(cow) x, out scope _Z!(cow) r
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) y = null; // must use temporary
-        __gmpz_sqrtrem(y._ptr, rem._ptr, x._ptr); version(ccc) ++y._ccc;
+        __gmpz_sqrtrem(y._ptr, rem._ptr, x._ptr);
         return y;
     }
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        rem = zp.sqrtremSelf(); version(ccc) ++zp._ccc;
+        rem = zp.sqrtremSelf();
 		return move(*zp);
     }
 }
@@ -1897,14 +1860,14 @@ _Z!(cow) root(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out bool isExa
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) y = null; // must use temporary
-        const status = __gmpz_root(y._ptr, x._ptr, n); version(ccc) ++y._ccc;
+        const status = __gmpz_root(y._ptr, x._ptr, n);
 		isExact = status != 0;
         return y;
     }
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        isExact = zp.rootSelf(n); version(ccc) ++zp._ccc;
+        isExact = zp.rootSelf(n);
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
@@ -1915,13 +1878,13 @@ _Z!(cow) rootrem(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out scope _
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) y = null; // must use temporary
-        __gmpz_rootrem(y._ptr, rem._ptr, x._ptr, n); version(ccc) ++y._ccc;
+        __gmpz_rootrem(y._ptr, rem._ptr, x._ptr, n);
         return y;
     }
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-        rem = zp.rootremSelf(n); version(ccc) ++zp._ccc;
+        rem = zp.rootremSelf(n);
 		return move(*zp);
     }
 }
@@ -1956,14 +1919,14 @@ _Z!(cow) nextPrime(bool cow)(auto ref scope const _Z!(cow) x) nothrow @nogc @tru
     {
         typeof(return) y = null; // must use temporary
 		static if (cow) { y.selfdupIfAliased(); }
-        __gmpz_nextprime(y._ptr, x._ptr); version(ccc) ++y._ccc;
+        __gmpz_nextprime(y._ptr, x._ptr);
         return y;
     }
     else                        // r-value `x`
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { zp.selfdupIfAliased(); }
-        __gmpz_nextprime(zp._ptr, x._ptr); version(ccc) ++zp._ccc;
+        __gmpz_nextprime(zp._ptr, x._ptr);
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
@@ -2002,13 +1965,13 @@ _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 		}
 		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_gcd(zp._ptr, x._ptr, y._ptr);
-        version(ccc) ++zp._ccc;
+
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`, no reuse in output
     {
         typeof(return) z = null;
-        __gmpz_gcd(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
+        __gmpz_gcd(z._ptr, x._ptr, y._ptr);
         return z;
     }
 }
@@ -2019,14 +1982,14 @@ _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @
     static if (__traits(isRef, x)) // l-value `x`
     {
         typeof(return) z = null;
-        const z_ui = __gmpz_gcd_ui(z._ptr, x._ptr, y); version(ccc) ++z._ccc;
+        const z_ui = __gmpz_gcd_ui(z._ptr, x._ptr, y);
         return z;
     }
     else
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { zp.selfdupIfAliased(); }
-		const z_ui = __gmpz_gcd_ui(zp._ptr, x._ptr, y); version(ccc) ++zp._ccc;
+		const z_ui = __gmpz_gcd_ui(zp._ptr, x._ptr, y);
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
@@ -2065,13 +2028,13 @@ _Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 		}
 		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_lcm(zp._ptr, x._ptr, y._ptr);
-        version(ccc) ++zp._ccc;
+
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
     else                        // l-value `x` and `y`, no reuse in output
     {
         typeof(return) z = null;
-        __gmpz_lcm(z._ptr, x._ptr, y._ptr); version(ccc) ++z._ccc;
+        __gmpz_lcm(z._ptr, x._ptr, y._ptr);
         return z;
     }
 }
@@ -2089,7 +2052,7 @@ _Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @
     {
         typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
         static if (cow) { zp.selfdupIfAliased(); }
-		__gmpz_lcm_ui(zp._ptr, x._ptr, y); version(ccc) ++zp._ccc;
+		__gmpz_lcm_ui(zp._ptr, x._ptr, y);
         return move(*zp);    // TODO: shouldn't have to call `move` here
     }
 }
@@ -2105,7 +2068,7 @@ _Z!(cow) powm(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope const
     typeof(return) y = 0; // result, TODO: reuse `exp` or `mod` if any is an r-value
     assert(exp >= 0, "Negative exponent");
 	static if (cow) { y.selfdupIfAliased(); }
-    __gmpz_powm(y._ptr, base._ptr, exp._ptr, mod._ptr); version(ccc) ++y._ccc;
+    __gmpz_powm(y._ptr, base._ptr, exp._ptr, mod._ptr);
     return y;
 }
 /// ditto
@@ -2115,7 +2078,7 @@ _Z!(cow) powm(bool cow)(auto ref scope const _Z!(cow) base, ulong exp, auto ref 
     assert(mod != 0, "Zero modulus");
     typeof(return) y = 0;       // result, TODO: reuse `exp` or `mod` if any is an r-value
 	static if (cow) { y.selfdupIfAliased(); }
-	__gmpz_powm_ui(y._ptr, base._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
+	__gmpz_powm_ui(y._ptr, base._ptr, exp, mod._ptr);
     return y;
 }
 
@@ -2135,7 +2098,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
     {
         typeof(return)* mut_base = (cast(typeof(return)*)(&base)); // @trusted because `MpZ` has no aliased indirections
         static if (cow) { mut_base.selfdupIfAliased(); }
-		auto success = __gmpz_invert(mut_base._ptr, base._ptr, mod._ptr); version(ccc) ++y._ccc;
+		auto success = __gmpz_invert(mut_base._ptr, base._ptr, mod._ptr);
         assert(success >= 0, "Cannot invert");
         return move(*mut_base);    // TODO: shouldn't have to call `move` here
     }
@@ -2143,7 +2106,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
     {
         typeof(return)* mut_mod = (cast(typeof(return)*)(&mod)); // @trusted because `MpZ` has no aliased indirections
         static if (cow) { mut_mod.selfdupIfAliased(); }
-		auto success = __gmpz_invert(mut_mod._ptr, base._ptr, mod._ptr); version(ccc) ++y._ccc;
+		auto success = __gmpz_invert(mut_mod._ptr, base._ptr, mod._ptr);
         assert(success >= 0, "Cannot invert");
         return move(*mut_mod);  // TODO: shouldn't have to call `move` here
     }
@@ -2151,7 +2114,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
     {
         typeof(return) y = 0; // result, TODO: reuse `exp` or `mod` if any is an r-value
         static if (cow) { y.selfdupIfAliased(); }
-		auto success = __gmpz_invert(y._ptr, base._ptr, mod._ptr); version(ccc) ++y._ccc;
+		auto success = __gmpz_invert(y._ptr, base._ptr, mod._ptr);
         assert(success >= 0, "Cannot invert");
         return y;
     }
@@ -2439,31 +2402,26 @@ unittest
     Z a = 42;
     {
         Z b = a + 1.Z;              // r-value `rhs`
-        version(ccc) assert(b.mutatingCallCount == 2);
         assert(b == 43);
     }
 
     {
         Z b = a - 1.Z;              // r-value `rhs`
-        version(ccc) assert(b.mutatingCallCount == 2);
         assert(b == 41);
     }
 
     {
         Z b = a * 2.Z;              // r-value `rhs`
-        version(ccc) assert(b.mutatingCallCount == 2);
         assert(b == 84);
     }
 
     {
         Z b = a / 2.Z;              // r-value `rhs`
-        version(ccc) assert(b.mutatingCallCount == 2);
         assert(b == 21);
     }
 
     {
         Z b = a % 10.Z;              // r-value `rhs`
-        version(ccc) assert(b.mutatingCallCount == 2);
         assert(b == 2);
     }
 }
@@ -3384,7 +3342,7 @@ pure @nogc unittest
                               (Z(c) ^^ POWER) +
                               (Z(d) ^^ POWER));
                         Z rem = 0;
-                        __gmpz_rootrem(r1._ptr, rem._ptr, r1._ptr, POWER); version(ccc) ++r1._ccc; // TODO: replace with call to D wrapper
+                        __gmpz_rootrem(r1._ptr, rem._ptr, r1._ptr, POWER); // TODO: replace with call to D wrapper
                         if (rem == 0UL)
                         {
                             debug printf("Counter Example Found: %lu^5 + %lu^5 + %lu^5 + %lu^5 = %lu^5\n",
@@ -3417,7 +3375,7 @@ private struct AddExpr(bool cow)
     void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
-        __gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
+        __gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
     }
 }
 version(unittest) static assert(isMpZExpr!(AddExpr!(true)));
@@ -3427,12 +3385,10 @@ version(unittest) static assert(isMpZExpr!(AddExpr!(true)));
     assert(AddExpr!(false)(3.Z, 4.Z).eval() == 3 + 4);
 
     const Z x = AddExpr!(false)(3.Z, 4.Z);
-    version(ccc) assert(x.mutatingCallCount == 1); // lower to `mpz_add`
     assert(x == 7);
 
     Z y = null;
     y = AddExpr!(false)(3.Z, 4.Z);
-    version(ccc) assert(y.mutatingCallCount == 2); // lowers to `mpz_init`, `mpz_add`
     assert(y == 7);
 
 }
@@ -3452,7 +3408,7 @@ private struct SubExpr(bool cow)
     void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
-        __gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
+        __gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
     }
 }
 version(unittest) static assert(isMpZExpr!(SubExpr!(false)));
@@ -3461,7 +3417,6 @@ version(unittest) static assert(isMpZExpr!(SubExpr!(false)));
 {
     assert(SubExpr!(false)(3.Z, 4.Z).eval() == 3 - 4);
     const Z x = SubExpr!(false)(3.Z, 4.Z);
-    version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_sub`
     assert(x == -1);
 }
 
@@ -3480,7 +3435,7 @@ private struct MulExpr(bool cow)
     void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
-        __gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
+        __gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
     }
 }
 version(unittest) static assert(isMpZExpr!(MulExpr!(false)));
@@ -3491,7 +3446,6 @@ version(unittest) static assert(isMpZExpr!(MulExpr!(false)));
 
     const Z x = MulExpr!(false)(3.Z, 4.Z);
     assert(x == 12);
-    version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_mul`
 }
 
 /// `MpZ`-`MpZ` division expression.
@@ -3509,7 +3463,7 @@ private struct DivExpr(bool cow)
     void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
-        __gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
+        __gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
     }
 }
 version(unittest) static assert(isMpZExpr!(DivExpr!(false)));
@@ -3523,7 +3477,6 @@ version(unittest) static assert(isMpZExpr!(DivExpr!(false)));
 
     const Z x = DivExpr!(false)(28.Z, 3.Z);
     assert(x == 9);
-    version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_tdiv_q`
 }
 
 /// `MpZ`-`MpZ` modulus expression.
@@ -3541,7 +3494,7 @@ private struct ModExpr(bool cow)
     void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
-        __gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr); version(ccc) ++y._ccc;
+        __gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
     }
 }
 version(unittest) static assert(isMpZExpr!(ModExpr!(false)));
@@ -3555,7 +3508,6 @@ version(unittest) static assert(isMpZExpr!(ModExpr!(false)));
 
     const Z x = ModExpr!(false)(29.Z, 3.Z);
     assert(x == 2);
-    version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_tdiv_r`
 }
 
 /// `MpZ`-`ulong` power expression.
@@ -3575,7 +3527,7 @@ if (isMpZExpr!P &&
     void evalTo(ref MpZ y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
-        __gmpz_pow_ui(y._ptr, e1.eval()._ptr, e2); version(ccc) ++y._ccc;
+        __gmpz_pow_ui(y._ptr, e1.eval()._ptr, e2);
     }
 }
 version(unittest) static assert(isMpZExpr!(PowUExpr!(MpZ, ulong)));
@@ -3604,7 +3556,7 @@ if (isMpZExpr!P &&
     void evalTo(ref MpZ y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
-        __gmpz_powm_ui(y._ptr, base.eval()._ptr, exp, mod._ptr); version(ccc) ++y._ccc;
+        __gmpz_powm_ui(y._ptr, base.eval()._ptr, exp, mod._ptr);
     }
 }
 version(unittest) static assert(isMpZExpr!(PowMUExpr!(MpZ, ulong, MpZ)));
@@ -3628,7 +3580,7 @@ private struct NegExpr(bool cow)
     void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
-        __gmpz_neg(y._ptr, e1.eval()._ptr); version(ccc) ++y._ccc;
+        __gmpz_neg(y._ptr, e1.eval()._ptr);
     }
 }
 version(unittest) static assert(isMpZExpr!(NegExpr!(false)));
@@ -3637,7 +3589,6 @@ version(unittest) static assert(isMpZExpr!(NegExpr!(false)));
 {
     assert(NegExpr!(false)(27.Z).eval() == -27);
     const Z x = NegExpr!(false)(27.Z);
-    version(ccc) assert(x.mutatingCallCount == 1); // lowers to `mpz_neg`
     assert(x == -27);
 }
 
@@ -3658,7 +3609,7 @@ private struct SqrtExpr(bool cow)
     void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
-        __gmpz_sqrt(y._ptr, e1.eval()._ptr); version(ccc) ++y._ccc;
+        __gmpz_sqrt(y._ptr, e1.eval()._ptr);
     }
 }
 version(unittest) static assert(isMpZExpr!(SqrtExpr!(false)));
