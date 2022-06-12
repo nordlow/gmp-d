@@ -486,7 +486,7 @@ nothrow:
     }
 
     /// Cast to `bool`.
-    bool opCast(T : bool)() const scope
+    bool opCast(T : bool)() scope const
     {
         pragma(inline, true);
         return !isZero;
