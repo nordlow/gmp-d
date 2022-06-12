@@ -2870,12 +2870,15 @@ unittest
     assert(1.Z.isPositive);
     assert(2.Z.isPositive);
     assert(3.Z.isPositive);
-    // TODO: assert(1.Z.isNegative);
-    // TODO: assert(2.Z.isNegative);
-    // TODO: assert(3.Z.isNegative);
 	// TODO: assert(!(-1.Z.isPositive));
 	// TODO: assert(!(-2.Z.isPositive));
-	// TODO: assert(!(-3).Z.isPositive);
+	// TODO: assert(!(-3.Z.isPositive));
+	// TODO: assert(-1.Z.isNegative);
+	// TODO: assert(-2.Z.isNegative);
+	// TODO: assert(-3.Z.isNegative);
+	// TODO: assert(!(1.Z.isNegative));
+	// TODO: assert(!(2.Z.isNegative));
+	// TODO: assert(!(3.Z.isNegative));
 
 	foreach (const p; 1 .. 10)
 	{
