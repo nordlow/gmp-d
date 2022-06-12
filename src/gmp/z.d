@@ -36,6 +36,15 @@ enum WordOrder
     leastSignificantWordFirst,
 }
 
+/** Rounding used in division variants `cdiv`, `fdiv` and `tdiv`.
+ */
+enum Rounding
+{
+	ceiling,					///< Used by functions named `..._cdiv_...`
+	floor,						///< Used by functions named `..._fdiv_...`
+	truncate					///< Used by functions named `..._tdiv_...`
+}
+
 // TODO: use these imports instead of the ones below
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
