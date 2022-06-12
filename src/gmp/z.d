@@ -142,7 +142,7 @@ nothrow:
 
     /// Convert to `string` in base `base`.
     string toString(in uint base = defaultBase,
-                    in bool upperCaseDigits = false) const @trusted
+                    in bool upperCaseDigits = false) scope const @trusted
 		in(-2 <= base && base <= -36 ||
 		   +2 <= base && base <= +62)
     {
@@ -160,7 +160,7 @@ nothrow:
 		making this `@system`.
 	*/
     char[] toChars(in uint base = defaultBase,
-                   in bool upperCaseDigits = false) const @system @nogc
+                   in bool upperCaseDigits = false) scope const @system @nogc
 		in(-2 <= base && base <= -36 ||
 		   +2 <= base && base <= +62)
     {
@@ -371,7 +371,7 @@ nothrow:
     }
 
     /// (Duplicate) Copy `this`.
-    _Z dup() const scope pure nothrow @trusted
+    _Z dup() scope const pure nothrow @trusted
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = void;
@@ -425,7 +425,7 @@ nothrow:
     }
 
     /// Destruct `this`.
-    ~this() @nogc @trusted
+    ~this() scope @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         if (_z._mp_d)
@@ -486,14 +486,14 @@ nothrow:
     }
 
     /// Cast to `bool`.
-    bool opCast(T : bool)() const
+    bool opCast(T : bool)() const scope
     {
         pragma(inline, true);
         return !isZero;
     }
 
     /// Cast to arithmetic type `T`.
-    T opCast(T)() const @trusted
+    T opCast(T)() scope const @trusted
     if (isArithmetic!T)
     {
         pragma(inline, true);
@@ -504,7 +504,7 @@ nothrow:
 
     /** Get the value of this as a `long`, or +/- `long.max` if outside the
 		representable range. */
-    long toLong() const @trusted
+    long toLong() scope const @trusted
     {
         version(LDC) pragma(inline, true);
         // TODO: can probably be optimized
@@ -1501,14 +1501,14 @@ void swap(bool cow)(ref _Z!(cow) x, ref _Z!(cow) y) nothrow
 }
 
 /// Get `x` as a `string` in decimal base.
-string toDecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow // for `std.bigint.BigInt` compatibility
+string toDecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe // for `std.bigint.BigInt` compatibility
 {
     version(LDC) pragma(inline, true);
     return x.toString(10);
 }
 
 /// Get `x` as a uppercased `string` in hexadecimal base without any base prefix (0x).
-string toHexadecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow
+string toHexadecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe
 {
     version(LDC) pragma(inline, true);
     return x.toString(16, true);
@@ -1518,7 +1518,7 @@ string toHexadecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow
 alias toHex = toHexadecimalString;
 
 /// Get the absolute value of `x` converted to the corresponding unsigned type.
-Unsigned!T absUnsign(T, bool cow)(auto ref scope const _Z!(cow) x) nothrow // for `std.bigint.BigInt` compatibility
+Unsigned!T absUnsign(T, bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe // for `std.bigint.BigInt` compatibility
 if (isIntegral!T)
 {
     version(LDC) pragma(inline, true);
@@ -3555,7 +3555,7 @@ version(unittest) static assert(isMpZExpr!(SqrtExpr!(false)));
 }
 
 // Copied from `std.numeric` to prevent unnecessary Phobos deps.
-private T _integralAbs(T)(T x)
+private T _integralAbs(T)(scope const T x) @safe
 if (isIntegral!T)
 {
     pragma(inline, true);
