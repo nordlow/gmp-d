@@ -1292,7 +1292,7 @@ nothrow:
     @property bool isPositive() const @safe
     {
         pragma(inline, true);
-        return _z._mp_size >= 0; // fast
+		return _z._mp_size >= 0; // fast
     }
 
 	/** Check if `this` is a perfect power, i.e., if there exist integers A and
@@ -2870,6 +2870,9 @@ unittest
     assert(1.Z.isPositive);
     assert(2.Z.isPositive);
     assert(3.Z.isPositive);
+	// TODO: assert(!(-1.Z.isPositive));
+	// TODO: assert(!(-2.Z.isPositive));
+	// TODO: assert(!(-3).Z.isPositive);
 
 	foreach (const p; 1 .. 10)
 	{
