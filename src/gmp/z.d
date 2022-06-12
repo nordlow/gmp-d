@@ -63,7 +63,7 @@ private struct _Z(bool cow)
     /// Put `string` to sink in base `base`.
     void toString(scope void delegate(scope const(char)[]) @safe sink,
 				  in uint base = defaultBase,
-				  in bool upperCaseDigits = false) const @trusted
+				  in bool upperCaseDigits = false) scope const @trusted
 		in(-2 <= base && base <= -36 ||
 		   +2 <= base && base <= +62)
     {
@@ -86,7 +86,7 @@ pure:
 
 		If `base` is 0 it's guessed from contents of `value`.
 	*/
-    this(scope const(char)[] value, uint base = 0) @trusted // TODO: Use Optional/Nullable when value is nan, or inf
+    this(scope const(char)[] value, uint base = 0) scope @trusted // TODO: Use Optional/Nullable when value is nan, or inf
         in(base == 0 ||
 		   (+2 <= base && base <= +62))
     {
@@ -182,7 +182,7 @@ nothrow:
 
     private char[] fillChars(char[] chars,
 							 in uint base = defaultBase,
-							 in bool upperCaseDigits = false) const @system @nogc
+							 in bool upperCaseDigits = false) scope const @system @nogc
 		in(-2 <= base && base <= -36 ||
 		   +2 <= base && base <= +62)
     {
@@ -200,7 +200,7 @@ nothrow:
 
 	void toString(Writer)(ref Writer writer, // `mir.appender` compliant
 						  in uint base = defaultBase,
-						  in bool upperCaseDigits = false) const @nogc @trusted
+						  in bool upperCaseDigits = false) scope const @nogc @trusted
         if (is(typeof(writer.put((const(char)[]).init))))
 	{
         import core.memory : pureFree;
@@ -212,7 +212,7 @@ nothrow:
 	}
 
     /// Get the unique hash of the `_Z` value suitable for use in a hash table.
-    size_t toHash() const @trusted
+    size_t toHash() scope const @trusted
     {
         import core.internal.hash : hashOf;
         typeof(return) hash = limbCount;
@@ -231,7 +231,7 @@ nothrow:
 
 		Returns: a new GC-allocated slice containing the words produced.
 	*/
-    Word[] serialize(Word)(WordOrder order, WordEndianess endian, size_t nails) const @trusted
+    Word[] serialize(Word)(WordOrder order, WordEndianess endian, size_t nails) scope const @trusted
     if (isUnsigned!Word)
     {
         auto numb = 8 * Word.sizeof - nails;
@@ -249,7 +249,7 @@ nothrow:
     // @disable this();
 
     /// Construct empty (undefined) from explicit `null`.
-    this(typeof(null)) @trusted
+    this(typeof(null)) scope @trusted
     {
         pragma(inline, true);
         initialize();             // TODO: is there a faster way?
@@ -257,7 +257,7 @@ nothrow:
     }
 
     /// Construct from expression `expr`.
-    this(Expr)(Expr expr)
+	this(Expr)(Expr expr) scope
     if (isLazyMpZExpr!Expr)
     {
         version(LDC) pragma(inline, true);
@@ -266,7 +266,7 @@ nothrow:
     }
 
     /** Construct from `value`. */
-    this(T)(T value) @trusted
+    this(T)(T value) scope @trusted
     if (isArithmetic!T)
     {
         // TODO: add support for static initialization
@@ -300,7 +300,7 @@ nothrow:
 		- `endian` can be `bigEndian`, `littleEndian` or `host` default
 		- the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
 	*/
-    this(T)(const T[] rop, WordOrder order, size_t size, WordEndianess endian, size_t nails)
+    this(T)(const T[] rop, WordOrder order, size_t size, WordEndianess endian, size_t nails) scope
     if (isUnsigned!T)
     {
 
@@ -444,7 +444,7 @@ nothrow:
     }
 
     /// Returns: `true` iff `this` equals `rhs`.
-    bool opEquals()(auto ref scope const _Z rhs) const @trusted
+    bool opEquals()(auto ref scope const _Z rhs) scope const @trusted
     {
         version(LDC) pragma(inline, true);
         if (_ptr == rhs._ptr)   // fast equality
@@ -452,7 +452,7 @@ nothrow:
         return __gmpz_cmp(_ptr, rhs._ptr) == 0;
     }
     /// ditto
-    bool opEquals(Rhs)(Rhs rhs) const @trusted
+    bool opEquals(Rhs)(Rhs rhs) scope const @trusted
     if (isArithmetic!Rhs)
     {
 		version(LDC) pragma(inline, true);
@@ -466,7 +466,7 @@ nothrow:
     }
 
     /// Compare `this` to `rhs`.
-    int opCmp()(auto ref scope const _Z rhs) const @trusted
+    int opCmp()(auto ref scope const _Z rhs) scope const @trusted
     {
         version(LDC) pragma(inline, true);
         if (rhs == 0)
@@ -474,7 +474,7 @@ nothrow:
         return __gmpz_cmp(_ptr, rhs._ptr);
     }
     /// ditto
-    int opCmp(T)(T rhs) const @trusted
+    int opCmp(T)(T rhs) scope const @trusted
     if (isArithmetic!T)
     {
         pragma(inline, true);
@@ -519,7 +519,7 @@ nothrow:
     /** Get the value of this as a `int`, or +/- `int.max` if outside the
 		representable range.
 	*/
-    int toInt() const @trusted
+    int toInt() scope const @trusted
     {
         version(LDC) pragma(inline, true);
         // TODO: can probably be optimized
@@ -532,7 +532,7 @@ nothrow:
     }
 
     /** Get `this` `s` `rhs`. */
-    _Z opBinary(string s)(auto ref scope const _Z rhs) const @trusted // direct value
+    _Z opBinary(string s)(auto ref scope const _Z rhs) scope const @trusted // direct value
         if ((s == "+" || s == "-" ||
 			 s == "*" || s == "/" || s == "%" ||
 			 s == "&" || s == "|" || s == "^" ||
@@ -594,7 +594,7 @@ nothrow:
     }
 
     /// ditto
-    _Z opBinary(string s, Rhs)(auto ref const Rhs rhs) const
+    _Z opBinary(string s, Rhs)(auto ref const Rhs rhs) scope const
     if (isLazyMpZExpr!Rhs && // lazy value
         (s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
     {
@@ -603,7 +603,7 @@ nothrow:
     }
 
     /// ditto
-    _Z opBinary(string s, Rhs)(Rhs rhs) const @trusted
+    _Z opBinary(string s, Rhs)(Rhs rhs) scope const @trusted
     if ((s == "+" || s == "-" || s == "*" || s == "/" /* || s == "%"*/ || s == "^^" || s == "<<") &&
         isUnsigned!Rhs)
     {
@@ -630,7 +630,7 @@ nothrow:
     }
 
     /// ditto
-    _Z opBinary(string s, Rhs)(Rhs rhs) const @trusted
+    _Z opBinary(string s, Rhs)(Rhs rhs) scope const @trusted
     if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
         isSigned!Rhs)
     {
@@ -681,7 +681,7 @@ nothrow:
     }
 
     /// Remainer propagates modulus type.
-    Unqual!Rhs opBinary(string s, Rhs)(Rhs rhs) const @trusted
+    Unqual!Rhs opBinary(string s, Rhs)(Rhs rhs) scope const @trusted
     if ((s == "%") &&
         isIntegral!Rhs)
     {
@@ -706,7 +706,7 @@ nothrow:
     }
 
     /// Get an unsigned type `lhs` divided by `this`.
-    _Z opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
+    _Z opBinaryRight(string s, Lhs)(Lhs lhs) scope const @trusted
     if ((s == "+" || s == "-" || s == "*" || s == "%") &&
         isUnsigned!Lhs)
     {
@@ -730,7 +730,7 @@ nothrow:
     }
 
     /// Get a signed type `lhs` divided by `this`.
-    _Z opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
+    _Z opBinaryRight(string s, Lhs)(Lhs lhs) scope const @trusted
     if ((s == "+" || s == "-" || s == "*" || s == "%") &&
         isSigned!Lhs)
     {
@@ -767,7 +767,7 @@ nothrow:
     }
 
     /// Dividend propagates quotient type to signed.
-    Unqual!Lhs opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
+    Unqual!Lhs opBinaryRight(string s, Lhs)(Lhs lhs) scope const @trusted
     if ((s == "/") &&
         isIntegral!Lhs)
     {
@@ -788,7 +788,7 @@ nothrow:
     }
 
     /// Exponentation.
-    _Z opBinaryRight(string s, Base)(Base base) const
+    _Z opBinaryRight(string s, Base)(Base base) scope const
     if ((s == "^^") &&
         isIntegral!Base)
     {
@@ -942,7 +942,7 @@ nothrow:
     }
 
     /// Negation of `this`.
-    _Z opUnary(string s)() const
+    _Z opUnary(string s)() scope const
     if (s == "-")
     {
         version(LDC) pragma(inline, true);
@@ -952,7 +952,7 @@ nothrow:
     }
 
     /// Negation of `this`.
-    _Z unaryMinus() const @safe
+    _Z unaryMinus() scope const @safe
     {
         version(LDC) pragma(inline, true);
         // pragma(msg, "memberFun:", __traits(isRef, this) ? "ref" : "non-ref", " this");
@@ -1117,7 +1117,7 @@ nothrow:
     }
 
     /// Get number of digits in base `base`.
-    size_t sizeInBase(uint base) const @trusted
+    size_t sizeInBase(uint base) scope const @trusted
     {
         pragma(inline, true);
         if (isZero ||
@@ -1139,7 +1139,7 @@ nothrow:
 		Returns: a (sub-)slice of `words` containing only the words produced.
 	*/
     Word[] serialize(Word)(return scope Word[] words,
-                           WordOrder order, size_t size, WordEndianess endian, size_t nails) const @trusted
+                           WordOrder order, size_t size, WordEndianess endian, size_t nails) scope const @trusted
     if (isUnsigned!Word)
     {
         assert(words, "Words is empty");
@@ -1174,7 +1174,7 @@ nothrow:
 
 
     /// Returns: `true` iff `this` fits in a `T`.
-    bool fitsIn(T)() const @trusted
+    bool fitsIn(T)() scope const @trusted
     if (isIntegral!T)
     {
         pragma(inline, true);
@@ -1195,7 +1195,7 @@ nothrow:
 		- `this` >= 0, number of 1 bits in the binary representation
 	    - otherwise, ???
 	*/
-    @property mp_bitcnt_t populationCount() const @trusted
+    @property mp_bitcnt_t populationCount() scope const @trusted
     {
         version(LDC) pragma(inline, true);
         if (isZero) { return 0; } // default-constructed `this`
@@ -1229,7 +1229,7 @@ nothrow:
     }
 
     /// Test/Get bit at 0-offset index `bitIndex`.
-    bool testBit(mp_bitcnt_t bitIndex) const @trusted
+    bool testBit(mp_bitcnt_t bitIndex) scope const @trusted
     {
         pragma(inline, true);
         return __gmpz_tstbit(_ptr, bitIndex) != 0;
@@ -1243,21 +1243,21 @@ nothrow:
         handle the case when the membere `_mp_alloc` is zero and, in turn,
         `_mp_d` is `null`.
      */
-    @property bool isDefaultConstructed() const @safe
+    @property bool isDefaultConstructed() scope const @safe
     {
         pragma(inline, true);
         return _z._mp_alloc == 0; // fast, actually enough to just test this
     }
 
     /// Check if `this` is zero (either via default-construction or `__gmpz_...`-operations).
-    @property bool isZero() const @safe
+    @property bool isZero() scope const @safe
     {
         pragma(inline, true);
         return _z._mp_size == 0; // fast
     }
 
     /// Check if `this` is one.
-    @property bool isOne() const @safe
+    @property bool isOne() scope const @safe
     {
         pragma(inline, true);
 		/* NOTE: cannot use _z._mp_d !is null && _z._mp_d[0] == 1 because that’s
@@ -1267,7 +1267,7 @@ nothrow:
     }
 
     /// Check if `this` is odd.
-    @property bool isOdd() const @safe
+    @property bool isOdd() scope const @safe
     {
         pragma(inline, true);
         return ((_z._mp_alloc != 0) && // this is needed for default (zero) initialized `__mpz_structs`
@@ -1275,21 +1275,21 @@ nothrow:
     }
 
     /// Check if `this` is odd.
-    @property bool isEven() const @safe
+    @property bool isEven() scope const @safe
     {
         pragma(inline, true);
         return !isOdd;            // fast C macro `mpz_even_p` in gmp.h
     }
 
     /// Check if `this` is negative.
-    @property bool isNegative() const @safe
+    @property bool isNegative() scope const @safe
     {
         pragma(inline, true);
         return _z._mp_size < 0; // fast
     }
 
     /// Check if `this` is positive.
-    @property bool isPositive() const @safe
+    @property bool isPositive() scope const @safe
     {
         pragma(inline, true);
 		return _z._mp_size >= 0; // fast
@@ -1298,7 +1298,7 @@ nothrow:
 	/** Check if `this` is a perfect power, i.e., if there exist integers A and
 	 * B, with B>1, such that `this` equals A raised to the power B.
 	 */
-    @property bool isPerfectPower() const @trusted
+    @property bool isPerfectPower() scope const @trusted
     {
         pragma(inline, true);
 		return __gmpz_perfect_power_p(_ptr) != 0;
@@ -1308,21 +1308,21 @@ nothrow:
 	 * of op is an integer. Under this definition both 0 and 1 are considered to
 	 * be perfect squares.
 	 */
-    @property bool isPerfectSquare() const @trusted
+    @property bool isPerfectSquare() scope const @trusted
     {
         pragma(inline, true);
 		return __gmpz_perfect_square_p(_ptr) != 0;
     }
 
     /// Returns: `true` iff `this` is exactly divisible by `rhs`.
-    @property bool isDivisibleBy()(auto ref scope const _Z rhs) const @trusted
+    @property bool isDivisibleBy()(auto ref scope const _Z rhs) scope const @trusted
     {
         version(LDC) pragma(inline, true);
 		if (rhs.isOne) { return true; }
 		return __gmpz_divisible_p(_ptr, rhs._ptr) != 0;
     }
 	/// ditto
-    @property bool isDivisibleBy(Rhs)(auto ref scope const Rhs rhs) const @trusted
+    @property bool isDivisibleBy(Rhs)(auto ref scope const Rhs rhs) scope const @trusted
 	if (isUnsigned!Rhs)
     {
         version(LDC) pragma(inline, true);
@@ -1336,28 +1336,28 @@ nothrow:
 	  -  0 (`this` == 0), or
 	  - +1 (`this` > 0).
      */
-    @property int sgn() const @safe
+    @property int sgn() scope const @safe
     {
         pragma(inline, true);
         return _z._mp_size < 0 ? -1 : _z._mp_size > 0; // fast C macro `mpz_sgn` in gmp.h
     }
 
     /// Number of significant `uint`s used for storing `this`.
-    @property size_t uintLength() const
+    @property size_t uintLength() scope const
     {
         pragma(inline, true);
         assert(false, "TODO: use mpz_size");
     }
 
     /// Number of significant `ulong`s used for storing `this`.
-    @property size_t uintLong() const
+    @property size_t uintLong() scope const
     {
         pragma(inline, true);
         assert(false, "TODO: use mpz_size");
     }
 
     /// Get number of limbs in internal representation.
-    @property uint limbCount() const @safe
+    @property uint limbCount() scope const @safe
     {
         pragma(inline, true);
         return _integralAbs(_z._mp_size);
@@ -1428,7 +1428,7 @@ private:
             For instance the `x` in `x = y + z` should be assigned only once inside
             a call to `mpz_add`.
         */
-        @property size_t mutatingCallCount() const @safe { return _ccc; }
+        @property size_t mutatingCallCount() scope const @safe { return _ccc; }
         size_t _ccc;  // C mutation call count. number of calls to C GMP function calls that mutate this object
     }
 
@@ -3310,14 +3310,14 @@ private struct AddExpr(bool cow)
 {
     _Z!(cow) e1;				// first term
     _Z!(cow) e2;				// second term
-    _Z!(cow) eval() const nothrow @nogc @trusted
+    _Z!(cow) eval() scope const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
+    void evalTo(ref _Z!(cow) y) scope const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
@@ -3343,14 +3343,14 @@ private struct SubExpr(bool cow)
 {
     _Z!(cow) e1;                      // first term
     _Z!(cow) e2;                      // second term
-    _Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
+    _Z!(cow) eval() scope const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
+    void evalTo(ref _Z!(cow) y) scope const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
@@ -3370,14 +3370,14 @@ private struct MulExpr(bool cow)
 {
     _Z!(cow) e1;				// first factor
     _Z!(cow) e2;				// second factor
-    _Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
+    _Z!(cow) eval() scope const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
+    void evalTo(ref _Z!(cow) y) scope const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
@@ -3398,14 +3398,14 @@ private struct DivExpr(bool cow)
 {
     _Z!(cow) e1;				// divisor
     _Z!(cow) e2;				// dividend
-    _Z!(cow) eval() const nothrow @nogc @trusted	// TODO: move to common place
+    _Z!(cow) eval() scope const nothrow @nogc @trusted	// TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
+    void evalTo(ref _Z!(cow) y) scope const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
@@ -3429,14 +3429,14 @@ private struct ModExpr(bool cow)
 {
     _Z!(cow) e1;				// divisor
     _Z!(cow) e2;				// dividend
-    _Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
+    _Z!(cow) eval() scope const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
+    void evalTo(ref _Z!(cow) y) scope const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
@@ -3462,14 +3462,14 @@ if (isMpZExpr!P &&
 {
     P e1;                       // base
     Q e2;                       // exponent
-    MpZ eval() const nothrow @nogc @trusted   // TODO: move to common place
+    MpZ eval() scope const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref MpZ y) const nothrow @nogc @trusted
+    void evalTo(ref MpZ y) scope const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_pow_ui(y._ptr, e1.eval()._ptr, e2);
@@ -3491,14 +3491,14 @@ if (isMpZExpr!P &&
     P base;                     // base
     Q exp;                      // exponent
     M mod;                      // modulo
-    MpZ eval() const nothrow @nogc @trusted   // TODO: move to common place
+    MpZ eval() scope const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref MpZ y) const nothrow @nogc @trusted
+    void evalTo(ref MpZ y) scope const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_powm_ui(y._ptr, base.eval()._ptr, exp, mod._ptr);
@@ -3515,14 +3515,14 @@ version(unittest) static assert(isMpZExpr!(PowMUExpr!(MpZ, ulong, MpZ)));
 private struct NegExpr(bool cow)
 {
     _Z!(cow) e1;
-    _Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
+    _Z!(cow) eval() scope const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
+    void evalTo(ref _Z!(cow) y) scope const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_neg(y._ptr, e1.eval()._ptr);
@@ -3544,14 +3544,14 @@ version(unittest) static assert(isMpZExpr!(NegExpr!(false)));
 private struct SqrtExpr(bool cow)
 {
     _Z!(cow) e1;
-    _Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
+    _Z!(cow) eval() scope const nothrow @nogc @trusted   // TODO: move to common place
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
         evalTo(y);
         return y;
     }
-    void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
+    void evalTo(ref _Z!(cow) y) scope const nothrow @nogc @trusted
     {
         version(LDC) pragma(inline, true);
         __gmpz_sqrt(y._ptr, e1.eval()._ptr);

@@ -16,7 +16,7 @@ struct MpQ
 
     /// Convert to `string` in base `base`.
     string toString(in uint base = defaultBase,
-                    in bool upperCaseDigits = false) const
+                    in bool upperCaseDigits = false) scope const
     {
         assert((base >= -2 && base <= -36) ||
                (base >= 2 && base <= 62));
@@ -31,7 +31,7 @@ struct MpQ
      * Returns: char[] which must be freed manually with `pureFree`.
      */
     char[] toChars(in uint base = defaultBase,
-                   in bool upperCaseDigits = false) const @system @nogc
+                   in bool upperCaseDigits = false) scope const @system @nogc
     {
         assert((base >= -2 && base <= -36) ||
                (base >= 2 && base <= 62));
@@ -42,7 +42,7 @@ pragma(inline, true):
 
     // TODO: toRCString wrapped in UniqueRange
 
-    @nogc:
+@nogc:
 
     /** No default construction for now, because `mpq_init` initialize
 	 * `__mpq_struct`-fields to non-zero values.
@@ -63,7 +63,7 @@ pragma(inline, true):
     /** Construct from floating-point `value`.
      */
     this(P)(in P value) @safe
-    if (isFloating!P)
+        if (isFloating!P)
     {
         initialize();
         this = value;           // reuse opAssign
@@ -74,11 +74,12 @@ pragma(inline, true):
 	 * Note that `qValue` must be explicitly given, to prevent accidental
 	 * storage of integers as rations with denominator being 1.
      */
-    this(P, Q)(P pValue, Q qValue,
-               in bool canonicalizeFlag = false) @trusted
-    if (isIntegral!P &&
-        isIntegral!Q)
+    this(P, Q)(P pValue, Q qValue, in bool canonicalizeFlag = false) @trusted
+        if (isIntegral!P &&
+			isIntegral!Q)
     {
+        pragma(inline, false);
+
         initialize();
 
         static if (isSigned!Q)
@@ -98,7 +99,7 @@ pragma(inline, true):
     /** Construct from floating-point `value`.
      */
     ref MpQ opAssign(P)(P value) @trusted scope return
-    if (isFloating!P)
+        if (isFloating!P)
     {
         version(DigitalMars) pragma(inline, false);
         __gmpq_set_d(_ptr, value);
@@ -107,7 +108,7 @@ pragma(inline, true):
 
     /** Assign from integer `value`. */
     ref MpQ opAssign(P)(P value) @trusted scope return
-    if (isIntegral!P)
+        if (isIntegral!P)
     {
         version(DigitalMars) pragma(inline, false);
 
@@ -120,20 +121,20 @@ pragma(inline, true):
     }
 
     /** Canonicalize `this`. */
-    void canonicalize() @trusted
+    void canonicalize() scope @trusted
     {
         __gmpq_canonicalize(_ptr);
     }
 
     /// Destruct `this`.
-    ~this() @trusted @nogc
+    ~this() scope @trusted @nogc
     {
         assert(_ptr, "Pointer is null");
         __gmpq_clear(_ptr);
     }
 
     /// Returns: `true` iff `this` equals `rhs`.
-    bool opEquals()(auto ref const MpQ rhs) const @trusted
+    bool opEquals()(auto ref const MpQ rhs) scope const @trusted
     {
         version(DigitalMars) pragma(inline, false);
         if (_ptr == rhs._ptr)   // fast equality
@@ -141,8 +142,8 @@ pragma(inline, true):
         return __gmpq_equal(_ptr, rhs._ptr) != 0;
     }
     /// ditto
-    int opEquals(T)(T rhs) const @safe
-    if (isIntegral!T)
+    int opEquals(T)(T rhs) scope const @safe
+        if (isIntegral!T)
     {
         if (rhs == 0)
             return numerator.isZero; // optimization
@@ -150,7 +151,7 @@ pragma(inline, true):
     }
 
     /// Compare `this` to `rhs`.
-    int opCmp()(auto ref const MpQ rhs) const @trusted
+    int opCmp()(auto ref const MpQ rhs) scope const @trusted
     {
         version(DigitalMars) pragma(inline, false);
         if (rhs.numerator == 0)
@@ -158,7 +159,7 @@ pragma(inline, true):
         return __gmpq_cmp(_ptr, rhs._ptr);
     }
     /// Compare `this` to `rhs`.
-    int opCmp()(auto ref const MpZ rhs) const @trusted
+    int opCmp()(auto ref const MpZ rhs) scope const @trusted
     {
         version(DigitalMars) pragma(inline, false);
         if (rhs == 0)
@@ -167,8 +168,8 @@ pragma(inline, true):
                             cast(const(__mpz_struct)*)&rhs); // TODO: wrap cast?
     }
     /// ditto
-    int opCmp(T)(T rhs) const @trusted
-    if (isIntegral!T)
+    int opCmp(T)(T rhs) scope const @trusted
+        if (isIntegral!T)
     {
         if (rhs == 0)
             return sgn;         // optimization
@@ -179,40 +180,40 @@ pragma(inline, true):
     }
 
     /// Get the hash suitable for use in a hash table.
-    size_t toHash() const @safe
+    size_t toHash() scope const @safe
     {
         return (numerator.toHash ^
                 denominator.toHash);
     }
 
     /// Returns: numerator reference of `this`.
-    @property ref inout(MpZ) numerator() @trusted inout scope return
+    ref inout(MpZ) numerator() @trusted inout scope return @property
     {
         return *(cast(inout(MpZ)*)_num_ptr);
     }
 
     /// Returns: denominator reference of `this`.
-    @property ref inout(MpZ) denominator() @trusted inout scope return
+    ref inout(MpZ) denominator() @trusted inout scope return @property
     {
         return *(cast(inout(MpZ)*)_den_ptr);
     }
 
     /// Returns: the integer part of `this`, with any remainder truncated.
-    @property MpZ integerPart() @safe
+    MpZ integerPart() @safe @property
     {
         return numerator / denominator;
     }
 
     /// Returns: the fractional part of `this`.
     // TODO: activate when sub(MpQ, MpZ) has been added
-    // @property MpQ fractionPart()
+    // MpQ fractionPart() @property
     // {
     //     return this - integerPart;
     // }
 
     /// Cast to arithmetic type `T`.
-    T opCast(T)() const @trusted /*TODO: scope*/
-    if (isFloating!T)
+    T opCast(T)() scope const @trusted /*TODO: scope*/
+		if (isFloating!T)
     {
         return cast(T)__gmpq_get_d(_ptr);
     }
@@ -241,7 +242,7 @@ pragma(inline, true):
         -  0 (`this` == 0), or
         - +1 (`this` > 0).
     */
-    @property int sgn() const @safe
+    int sgn() scope const @safe @property
     {
         assert(denominator >= 1);
         return numerator.sgn;   // sign always stored in numerator so reuse fast
@@ -251,12 +252,12 @@ pragma(inline, true):
 	 *
 	 * Returns: `void` to make it obvious that `this` is mutated.
 	 */
-    void absolute() @safe
+    void absolute() @safe @property
     {
         numerator.absolute();
     }
 
-    MpQ opBinary(string s)(auto ref const MpQ rhs) const @trusted // direct value
+    MpQ opBinary(string s)(auto ref const MpQ rhs) scope const @trusted // direct value
         if ((s == "+" || s == "-" ||
              s == "*" || s == "/"))
     {
@@ -301,7 +302,7 @@ pragma(inline, true):
     }
 
     // /// Divided integral with `this`.
-    // Unqual!Lhs opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
+    // Unqual!Lhs opBinaryRight(string s, Lhs)(Lhs lhs) scope const @trusted
     //     if ((s == "/") &&
     //         isIntegral!Lhs)
     // {
@@ -331,19 +332,19 @@ private:
     }
 
     /// Returns: pointer to internal rational C struct.
-    inout(__mpq_struct)* _ptr() inout return @system
+    inout(__mpq_struct)* _ptr() inout return @system @property
     {
         return &_q;
     }
 
     /// Returns: pointer to internal numerator C struct.
-    inout(__mpz_struct)* _num_ptr() inout return @system
+    inout(__mpz_struct)* _num_ptr() inout return @system @property
     {
         return cast(typeof(return))&_q._mp_num;
     }
 
     /// Returns: pointer to internal denominator C struct.
-    inout(__mpz_struct)* _den_ptr() inout return @system
+    inout(__mpz_struct)* _den_ptr() inout return @system @property
     {
         return cast(typeof(return))&_q._mp_den;
     }
@@ -359,7 +360,7 @@ private:
 		 * For instance the `x` in `x = y + z` should be assigned only once
 		 * inside a call to `mpq_add`.
 		 */
-        @property size_t mutatingCallCount() const @safe { return _ccc; }
+        size_t mutatingCallCount() scope const @safe { return _ccc; } @property
 
 		/** C mutation call count. Number of calls to C GMP function calls that
 		 * mutate this object.
