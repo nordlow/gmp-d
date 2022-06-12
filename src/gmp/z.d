@@ -544,7 +544,10 @@ nothrow:
             else static if (s == "%")
             {
                 assert(rhs != 0, "Divison by zero");
-                __gmpz_tdiv_r(mut_rhs._ptr, _ptr, rhs._ptr);
+				const neg = rhs.isNegative;
+                __gmpz_mod(mut_rhs._ptr, _ptr, rhs._ptr);
+				if (neg)
+					mut_rhs.negate();
             }
             else static if (s == "&") __gmpz_and(mut_rhs._ptr, _ptr, rhs._ptr);
             else static if (s == "|") __gmpz_ior(mut_rhs._ptr, _ptr, rhs._ptr);
@@ -567,7 +570,10 @@ nothrow:
             else static if (s == "%")
             {
                 assert(rhs != 0, "Divison by zero");
-                __gmpz_tdiv_r(y._ptr, _ptr, rhs._ptr);
+				const neg = rhs.isNegative;
+                __gmpz_mod(y._ptr, _ptr, rhs._ptr);
+				if (neg)
+					y.negate();
             }
             else static if (s == "&") __gmpz_and(y._ptr, _ptr, rhs._ptr);
             else static if (s == "|") __gmpz_ior(y._ptr, _ptr, rhs._ptr);
@@ -2667,11 +2673,10 @@ unittest
     assert( 28.Z  % -3 == -1); // negative divisor gives negative remainder according to https://en.wikipedia.org/wiki/Remainder
     assert(-28.Z  %  3 == 1);  // dividend sign doesn't affect remainder
 
-    //
-    assert( 28.Z  % -3.Z == 1);  // TODO: should be -1
-    assert(-28.Z  %  3.Z == -1);  // TODO: should be 1
-    assert( 28  % -3.Z == 1);      // TODO: should be -1
-    assert(-28  %  3.Z == -1);     // TODO: should be 1
+    assert( 28.Z  % -3.Z == -1);
+    assert(-28.Z  %  3.Z == 2);
+    assert( 28  % -3.Z == 1);
+    assert(-28  %  3.Z == -1);
 
     // modulo/remainder
 
