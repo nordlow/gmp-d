@@ -1260,6 +1260,10 @@ nothrow:
     @property bool isOne() const @safe
     {
         pragma(inline, true);
+		/* NOTE: cannot use
+		   _z._mp_d !is null && _z._mp_d[0] == 1
+		   because that’s true for -1
+		*/
         return _z._mp_size == 1 && _z._mp_d[0] == 1; // fast
     }
 
