@@ -1366,14 +1366,14 @@ nothrow:
 private:
 
     /** Initialize internal struct. */
-    void initialize() @system // cannot be called `init` as that will override builtin type property
+    void initialize() scope @system // cannot be called `init` as that will override builtin type property
     {
         pragma(inline, true);
         __gmpz_init(_ptr);
     }
 
     /** Initialize internal struct if needed. */
-    void assertInitialized() @system
+    void assertInitialized() scope @system
     {
         pragma(inline, true);
         if (isDefaultConstructed)
@@ -1384,7 +1384,7 @@ private:
     enum defaultBase = 10;
 
     /// Returns: evaluation of `this` expression which in this is a no-op.
-    ref inout(_Z) eval() @safe inout scope return
+    ref inout(_Z) eval() inout scope return @safe
     {
         pragma(inline, true);
         return this;
@@ -1394,7 +1394,7 @@ private:
     alias Limb = __mp_limb_t;   // GNU MP alias
 
     /** Returns: limbs. */
-    inout(Limb)[] _limbs() inout return @system
+    inout(Limb)[] _limbs() scope inout return @system
     {
         pragma(inline, true);
         // import std.math : abs;
@@ -1402,7 +1402,7 @@ private:
     }
 
     /// Returns: pointer to internal C struct.
-    inout(__mpz_struct)* _ptr() inout return @system
+    inout(__mpz_struct)* _ptr() inout scope return @system
     {
         pragma(inline, true);
         return &_z;
@@ -1433,7 +1433,7 @@ private:
     }
 
     /// @nogc-variant of `toStringz` with heap allocation of null-terminated C-string `stringz`.
-    char* _allocStringzCopyOf(in char[] value) @nogc @trusted
+    static char* _allocStringzCopyOf(in char[] value) @nogc @trusted
     {
         import core.memory : pureMalloc;
         char* stringz = cast(char*)pureMalloc(value.length + 1); // maximum this many characters
