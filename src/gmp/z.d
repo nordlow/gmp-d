@@ -1292,7 +1292,7 @@ nothrow:
     @property bool isPositive() const @safe
     {
         pragma(inline, true);
-        return !isNegative;     // fast
+        return _z._mp_size >= 0; // fast
     }
 
 	/** Check if `this` is a perfect power, i.e., if there exist integers A and
