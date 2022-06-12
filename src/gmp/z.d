@@ -1287,6 +1287,20 @@ nothrow:
 		return __gmpz_perfect_square_p(_ptr) != 0;
     }
 
+    /// Returns: `true` iff `this` is exactly divisible by `rhs`.
+    @property bool isDivisibleBy()(auto ref scope const _Z rhs) const @trusted
+    {
+        version(LDC) pragma(inline, true);
+		return __gmpz_divisible_p(_ptr, rhs._ptr) != 0;
+    }
+	/// ditto
+    @property bool isDivisibleBy(Rhs)(auto ref scope const Rhs rhs) const @trusted
+	if (isUnsigned!Rhs)
+    {
+        version(LDC) pragma(inline, true);
+		return __gmpz_divisible_ui_p(_ptr, rhs) != 0;
+    }
+
     /** Returns: sign as either
 
       - -1 (`this` < 0),
@@ -2836,6 +2850,20 @@ unittest
 			assert((p^^q).Z.isPerfectPower);
 	}
 
+	foreach (const d; 1UL .. 10UL)
+	{
+		assert( d.Z.isDivisibleBy(d));
+		assert( d.Z.isDivisibleBy(d.Z));
+		assert(!d.Z.isDivisibleBy(d + 1));
+		assert(!d.Z.isDivisibleBy((d + 1).Z));
+	}
+	assert( 1.Z.isDivisibleBy(1.Z));
+	assert( 2.Z.isDivisibleBy(1.Z));
+	assert(!1.Z.isDivisibleBy(2.Z));
+	assert(!3.Z.isDivisibleBy(2.Z));
+	assert( 100.Z.isDivisibleBy(10.Z));
+	assert( 100.Z.isDivisibleBy(10UL));
+
     assert((-1).Z.isNegative);
     assert((-2).Z.isNegative);
     assert((-3).Z.isNegative);
@@ -3679,6 +3707,9 @@ extern(C) pragma(inline, false)
     void __gmpz_sqrtrem(mpz_ptr, mpz_ptr, mpz_srcptr);
     int __gmpz_perfect_power_p(mpz_srcptr);
     int __gmpz_perfect_square_p(mpz_srcptr);
+
+	int __gmpz_divisible_p(mpz_srcptr, mpz_srcptr);
+	int __gmpz_divisible_ui_p(mpz_srcptr, ulong);
 }
 
 pragma(lib, "gmp");
