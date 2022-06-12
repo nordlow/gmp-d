@@ -81,27 +81,18 @@ pragma(inline, true):
     {
         initialize();
 
-        version(ccc) ++_ccc;
-
         static if (isSigned!Q)
-        {
             assert(qValue >= 1, "Negative denominator");
-        }
 
         // dln("qValue:", qValue);
 
         static      if (isUnsigned!P)
-        {
-            // dln("unsigned pValue:", pValue);
             __gmpq_set_ui(_ptr, pValue, qValue);
-        }
         else                    // signed integral
-        {
-            // dln("signed pValue:", pValue);
             __gmpq_set_si(_ptr, pValue, qValue);
-        }
 
-        if (canonicalizeFlag) { canonicalize(); }
+        if (canonicalizeFlag)
+			canonicalize();
     }
 
     /** Construct from floating-point `value`.
@@ -110,7 +101,6 @@ pragma(inline, true):
     if (isFloating!P)
     {
         version(DigitalMars) pragma(inline, false);
-        version(ccc) ++_ccc;
         __gmpq_set_d(_ptr, value);
         return this;
     }
@@ -120,7 +110,6 @@ pragma(inline, true):
     if (isIntegral!P)
     {
         version(DigitalMars) pragma(inline, false);
-        version(ccc) ++_ccc;
 
         static      if (isUnsigned!P)
             __gmpq_set_ui(_ptr, value, 1);
@@ -133,14 +122,14 @@ pragma(inline, true):
     /** Canonicalize `this`. */
     void canonicalize() @trusted
     {
-        __gmpq_canonicalize(_ptr); version(ccc) ++_ccc;
+        __gmpq_canonicalize(_ptr);
     }
 
     /// Destruct `this`.
     ~this() @trusted @nogc
     {
         assert(_ptr, "Pointer is null");
-        __gmpq_clear(_ptr); version(ccc) ++_ccc;
+        __gmpq_clear(_ptr);
     }
 
     /// Returns: `true` iff `this` equals `rhs`.
@@ -148,9 +137,7 @@ pragma(inline, true):
     {
         version(DigitalMars) pragma(inline, false);
         if (_ptr == rhs._ptr)   // fast equality
-        {
             return true;        // fast bailout
-        }
         return __gmpq_equal(_ptr, rhs._ptr) != 0;
     }
     /// ditto
@@ -158,9 +145,7 @@ pragma(inline, true):
     if (isIntegral!T)
     {
         if (rhs == 0)
-        {
             return numerator.isZero; // optimization
-        }
         return numerator == rhs && denominator == 1;
     }
 
@@ -169,9 +154,7 @@ pragma(inline, true):
     {
         version(DigitalMars) pragma(inline, false);
         if (rhs.numerator == 0)
-        {
             return sgn;         // optimization
-        }
         return __gmpq_cmp(_ptr, rhs._ptr);
     }
     /// Compare `this` to `rhs`.
@@ -179,9 +162,7 @@ pragma(inline, true):
     {
         version(DigitalMars) pragma(inline, false);
         if (rhs == 0)
-        {
             return sgn;         // optimization
-        }
         return __gmpq_cmp_z(_ptr,
                             cast(const(__mpz_struct)*)&rhs); // TODO: wrap cast?
     }
@@ -190,17 +171,11 @@ pragma(inline, true):
     if (isIntegral!T)
     {
         if (rhs == 0)
-        {
             return sgn;         // optimization
-        }
         static if (isUnsigned!T)
-        {
             return __gmpq_cmp_ui(_ptr, rhs, 1UL);
-        }
         else                    // isSigned integral
-        {
             return __gmpq_cmp_si(_ptr, rhs, 1UL);
-        }
     }
 
     /// Get the hash suitable for use in a hash table.
@@ -258,9 +233,7 @@ pragma(inline, true):
             numerator.negate();           // fast inline
         }
         else
-        {
             swap(numerator, denominator); // fast inline
-        }
     }
 
     /** Returns: sign as either
@@ -292,26 +265,18 @@ pragma(inline, true):
         {
             MpQ* mut_rhs = (cast(MpQ*)(&rhs)); // @trusted because `MpQ` has no aliased indirections
             static      if (s == "+")
-            {
-                __gmpq_add(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
-            }
+                __gmpq_add(mut_rhs._ptr, _ptr, rhs._ptr);
             else static if (s == "-")
-            {
-                __gmpq_sub(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
-            }
+                __gmpq_sub(mut_rhs._ptr, _ptr, rhs._ptr);
             else static if (s == "*")
-            {
-                __gmpq_mul(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
-            }
+                __gmpq_mul(mut_rhs._ptr, _ptr, rhs._ptr);
             else static if (s == "/")
             {
                 assert(rhs != 0, "Divison by zero");
-                __gmpq_div(mut_rhs._ptr, _ptr, rhs._ptr); version(ccc) ++mut_rhs._ccc;
+                __gmpq_div(mut_rhs._ptr, _ptr, rhs._ptr);
             }
             else
-            {
                 static assert(false);
-            }
             import core.lifetime : move;
             return move(*mut_rhs); // TODO: shouldn't have to call `move` here
         }
@@ -319,26 +284,18 @@ pragma(inline, true):
         {
             typeof(return) y = null;
             static      if (s == "+")
-            {
-                __gmpq_add(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
-            }
+                __gmpq_add(y._ptr, _ptr, rhs._ptr);
             else static if (s == "-")
-            {
-                __gmpq_sub(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
-            }
+                __gmpq_sub(y._ptr, _ptr, rhs._ptr);
             else static if (s == "*")
-            {
-                __gmpq_mul(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
-            }
+                __gmpq_mul(y._ptr, _ptr, rhs._ptr);
             else static if (s == "/")
             {
                 assert(rhs != 0, "Divison by zero");
-                __gmpq_div(y._ptr, _ptr, rhs._ptr); version(ccc) ++y._ccc;
+                __gmpq_div(y._ptr, _ptr, rhs._ptr);
             }
             else
-            {
                 static assert(false);
-            }
             return y;
         }
     }
@@ -355,7 +312,6 @@ pragma(inline, true):
     //     else
     //     {
     //         MpQ y = null; // TODO: avoid if !__traits(isRef, this)
-    //         version(ccc) ++y._ccc;
     //         assert(this != 0, "Divison by zero");
     //         denominator *= lhs;
     //         __gmpq_div(y._ptr, MpZ(lhs)._ptr, _ptr);
@@ -371,7 +327,7 @@ private:
     /** Initialize internal struct. */
     private void initialize() @trusted // cannot be called `init` as that will override builtin type property
     {
-        __gmpq_init(_ptr); version(ccc) ++_ccc;
+        __gmpq_init(_ptr);
     }
 
     /// Returns: pointer to internal rational C struct.
