@@ -258,12 +258,9 @@ nothrow:
         // {
         pragma(inline, true);
 
-        static      if (isUnsigned!T)
-            __gmpz_init_set_ui(_ptr, value);
-        else static if (isFloating!T)
-            __gmpz_init_set_d(_ptr, value);
-        else                    // isSigned integral
-            __gmpz_init_set_si(_ptr, value);
+        static if      (isUnsigned!T) __gmpz_init_set_ui(_ptr, value);
+        else static if (isFloating!T) __gmpz_init_set_d(_ptr, value);
+        else                          __gmpz_init_set_si(_ptr, value); // isSigned integral
         // }
         // else
         // {
@@ -390,15 +387,10 @@ nothrow:
         version(LDC) pragma(inline, true);
         assertInitialized();
 		static if (cow) { selfdupIfAliased(); }
-        static if      (isUnsigned!T)
-            __gmpz_set_ui(_ptr, rhs);
-        else static if (isFloating!T)
-            __gmpz_set_d(_ptr, rhs);
-        else static if (isSigned!T)
-            __gmpz_set_si(_ptr, rhs);
-        else
-            static assert(0);
-
+        static      if (isUnsigned!T) __gmpz_set_ui(_ptr, rhs);
+        else static if (isFloating!T) __gmpz_set_d(_ptr, rhs);
+        else static if (isSigned!T)   __gmpz_set_si(_ptr, rhs);
+        else static assert(0);
         return this;
     }
 
@@ -440,9 +432,7 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
         if (_ptr == rhs._ptr)   // fast equality
-        {
             return true;        // fast bailout
-        }
         return __gmpz_cmp(_ptr, rhs._ptr) == 0;
     }
     /// ditto
@@ -452,12 +442,9 @@ nothrow:
         pragma(inline, true)
         if (rhs == 0)
             return isZero;      // optimization
-        static      if (isUnsigned!Rhs)
-            return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
-        else static if (isFloating!Rhs)
-            return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO: correct to do this cast here?
-        else                    // isSigned integral
-            return __gmpz_cmp_si(_ptr, cast(long)rhs) == 0;
+        static      if (isUnsigned!Rhs) return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
+        else static if (isFloating!Rhs) return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO: correct to do this cast here?
+        else                            return __gmpz_cmp_si(_ptr, cast(long)rhs) == 0;	// isSigned integral
     }
 
     /// Compare `this` to `rhs`.
@@ -475,12 +462,9 @@ nothrow:
         pragma(inline, true);
         if (rhs == 0)
             return sgn();       // optimization
-        static      if (isUnsigned!T)
-            return __gmpz_cmp_ui(_ptr, rhs);
-        else static if (isFloating!T)
-            return __gmpz_cmp_d(_ptr, rhs);
-        else                    // isSigned integral
-            return __gmpz_cmp_si(_ptr, rhs);
+        static      if (isUnsigned!T) return __gmpz_cmp_ui(_ptr, rhs);
+        else static if (isFloating!T) return __gmpz_cmp_d(_ptr, rhs);
+        else                          return __gmpz_cmp_si(_ptr, rhs); // isSigned integral
     }
 
     /// Cast to `bool`.
@@ -495,12 +479,9 @@ nothrow:
     if (isArithmetic!T)
     {
         pragma(inline, true);
-        static      if (isUnsigned!T)
-            return cast(T)__gmpz_get_ui(_ptr);
-        else static if (isFloating!T)
-            return cast(T)__gmpz_get_d(_ptr);
-        else                    // isSigned integral
-            return cast(T)__gmpz_get_si(_ptr);
+        static      if (isUnsigned!T) return cast(T)__gmpz_get_ui(_ptr);
+        else static if (isFloating!T) return cast(T)__gmpz_get_d(_ptr);
+        else                          return cast(T)__gmpz_get_si(_ptr); // isSigned integral
     }
 
     /** Get the value of this as a `long`, or +/- `long.max` if outside the
@@ -543,12 +524,9 @@ nothrow:
         static if (!__traits(isRef, rhs)) // r-value `rhs`
         {
             _Z* mut_rhs = (cast(_Z*)(&rhs)); // @trusted because `_Z` has no aliased indirections
-            static      if (s == "+")
-                __gmpz_add(mut_rhs._ptr, _ptr, rhs._ptr);
-            else static if (s == "-")
-                __gmpz_sub(mut_rhs._ptr, _ptr, rhs._ptr);
-            else static if (s == "*")
-                __gmpz_mul(mut_rhs._ptr, _ptr, rhs._ptr);
+            static      if (s == "+") __gmpz_add(mut_rhs._ptr, _ptr, rhs._ptr);
+            else static if (s == "-") __gmpz_sub(mut_rhs._ptr, _ptr, rhs._ptr);
+            else static if (s == "*") __gmpz_mul(mut_rhs._ptr, _ptr, rhs._ptr);
             else static if (s == "/")
             {
                 assert(rhs != 0, "Divison by zero");
@@ -559,30 +537,19 @@ nothrow:
                 assert(rhs != 0, "Divison by zero");
                 __gmpz_tdiv_r(mut_rhs._ptr, _ptr, rhs._ptr);
             }
-            else static if (s == "&")
-                __gmpz_and(mut_rhs._ptr, _ptr, rhs._ptr);
-            else static if (s == "|")
-                __gmpz_ior(mut_rhs._ptr, _ptr, rhs._ptr);
-            else static if (s == "^")
-                __gmpz_xor(mut_rhs._ptr, _ptr, rhs._ptr);
-            else static if (s == "<<")
-            {
-                const rhs_ulong = cast(ulong)rhs;
-                __gmpz_mul_2exp(mut_rhs._ptr, _ptr, rhs_ulong);
-            }
-            else
-                static assert(0);
+            else static if (s == "&") __gmpz_and(mut_rhs._ptr, _ptr, rhs._ptr);
+            else static if (s == "|") __gmpz_ior(mut_rhs._ptr, _ptr, rhs._ptr);
+            else static if (s == "^") __gmpz_xor(mut_rhs._ptr, _ptr, rhs._ptr);
+            else static if (s == "<<") __gmpz_mul_2exp(mut_rhs._ptr, _ptr, cast(ulong)rhs);
+            else static assert(0);
             return move(*mut_rhs); // TODO: shouldn't have to call `move` here
         }
         else
         {
             typeof(return) y = null;
-            static      if (s == "+")
-                __gmpz_add(y._ptr, _ptr, rhs._ptr);
-            else static if (s == "-")
-                __gmpz_sub(y._ptr, _ptr, rhs._ptr);
-            else static if (s == "*")
-                __gmpz_mul(y._ptr, _ptr, rhs._ptr);
+            static      if (s == "+") __gmpz_add(y._ptr, _ptr, rhs._ptr);
+            else static if (s == "-") __gmpz_sub(y._ptr, _ptr, rhs._ptr);
+            else static if (s == "*") __gmpz_mul(y._ptr, _ptr, rhs._ptr);
             else static if (s == "/")
             {
                 assert(rhs != 0, "Divison by zero");
@@ -593,19 +560,11 @@ nothrow:
                 assert(rhs != 0, "Divison by zero");
                 __gmpz_tdiv_r(y._ptr, _ptr, rhs._ptr);
             }
-            else static if (s == "&")
-                __gmpz_and(y._ptr, _ptr, rhs._ptr);
-            else static if (s == "|")
-                __gmpz_ior(y._ptr, _ptr, rhs._ptr);
-            else static if (s == "^")
-                __gmpz_xor(y._ptr, _ptr, rhs._ptr);
-            else static if (s == "<<")
-            {
-                const rhs_ulong = cast(ulong)rhs;
-                __gmpz_mul_2exp(y._ptr, _ptr, rhs_ulong);
-            }
-            else
-                static assert(0);
+            else static if (s == "&") __gmpz_and(y._ptr, _ptr, rhs._ptr);
+            else static if (s == "|") __gmpz_ior(y._ptr, _ptr, rhs._ptr);
+            else static if (s == "^") __gmpz_xor(y._ptr, _ptr, rhs._ptr);
+            else static if (s == "<<") __gmpz_mul_2exp(y._ptr, _ptr, cast(ulong)rhs);
+            else static assert(0);
             return y;
         }
     }
@@ -621,29 +580,28 @@ nothrow:
 
     /// ditto
     _Z opBinary(string s, Rhs)(Rhs rhs) const @trusted
-    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^" || s == "<<") &&
+    if ((s == "+" || s == "-" || s == "*" || s == "/" /* || s == "%"*/ || s == "^^" || s == "<<") &&
         isUnsigned!Rhs)
     {
         version(LDC) pragma(inline, true);
         typeof(return) y = null;
-
-        static      if (s == "+")
-            __gmpz_add_ui(y._ptr, _ptr, rhs);
-        else static if (s == "-")
-            __gmpz_sub_ui(y._ptr, _ptr, rhs);
-        else static if (s == "*")
-            __gmpz_mul_ui(y._ptr, _ptr, rhs);
+        static      if (s == "+") __gmpz_add_ui(y._ptr, _ptr, rhs);
+        else static if (s == "-") __gmpz_sub_ui(y._ptr, _ptr, rhs);
+        else static if (s == "*") __gmpz_mul_ui(y._ptr, _ptr, rhs);
         else static if (s == "/")
-        {
+		{
             assert(rhs != 0, "Divison by zero");
             __gmpz_tdiv_q_ui(y._ptr, _ptr, rhs);
         }
-        else static if (s == "^^")
-            __gmpz_pow_ui(y._ptr, _ptr, rhs);
-        else static if (s == "<<")
-            __gmpz_mul_2exp(y._ptr, _ptr, rhs);
-        else
-            static assert(0);
+		// NOTE: handled by call to `mpz_tdiv_r_ui` below
+        // else static if (s == "%")
+		// {
+        //     assert(rhs != 0, "Divison by zero");
+        //     __gmpz_mod_ui(y._ptr, _ptr, rhs);
+        // }
+        else static if (s == "^^") __gmpz_pow_ui(y._ptr, _ptr, rhs);
+        else static if (s == "<<") __gmpz_mul_2exp(y._ptr, _ptr, rhs);
+        else static assert(0);
         return y;
     }
 
@@ -2670,6 +2628,8 @@ unittest
     assert(27.Z /   10   == 2);
     assert(27.Z /   10UL == 2);
 
+	assert(27.Z % 10UL == 7);
+
     assert(27.Z / -3   == -9);
     assert(27.Z /  3UL ==  9);
 
@@ -3591,93 +3551,94 @@ extern(C) pragma(inline, false)
 
     pure nothrow @nogc:
 
-    void __gmpz_init (mpz_ptr);
-    void __gmpz_init_set (mpz_ptr, mpz_srcptr);
+    void __gmpz_init(mpz_ptr);
+    void __gmpz_init_set(mpz_ptr, mpz_srcptr);
 
-    void __gmpz_init_set_d (mpz_ptr, double);
-    void __gmpz_init_set_si (mpz_ptr, long);
-    void __gmpz_init_set_ui (mpz_ptr, ulong);
-    int __gmpz_init_set_str (mpz_ptr, const char*, int);
+    void __gmpz_init_set_d(mpz_ptr, double);
+    void __gmpz_init_set_si(mpz_ptr, long);
+    void __gmpz_init_set_ui(mpz_ptr, ulong);
+    int __gmpz_init_set_str(mpz_ptr, const char*, int);
 
-    void __gmpz_set (mpz_ptr rop, mpz_srcptr op);
-    void __gmpz_set_ui (mpz_ptr rop, ulong op);
-    void __gmpz_set_si (mpz_ptr rop, long op);
-    void __gmpz_set_d (mpz_ptr rop, double op);
-    int __gmpz_set_str (mpz_ptr, const char*, int);
+    void __gmpz_set(mpz_ptr rop, mpz_srcptr op);
+    void __gmpz_set_ui(mpz_ptr rop, ulong op);
+    void __gmpz_set_si(mpz_ptr rop, long op);
+    void __gmpz_set_d(mpz_ptr rop, double op);
+    int __gmpz_set_str(mpz_ptr, const char*, int);
 
-    void __gmpz_clear (mpz_ptr);
+    void __gmpz_clear(mpz_ptr);
 
-    void __gmpz_abs (mpz_ptr, mpz_srcptr);
-    void __gmpz_neg (mpz_ptr, mpz_srcptr);
+    void __gmpz_abs(mpz_ptr, mpz_srcptr);
+    void __gmpz_neg(mpz_ptr, mpz_srcptr);
 
-    void __gmpz_add (mpz_ptr, mpz_srcptr, mpz_srcptr);
-    void __gmpz_add_ui (mpz_ptr, mpz_srcptr, ulong);
-    void __gmpz_addmul (mpz_ptr, mpz_srcptr, mpz_srcptr);
-    void __gmpz_addmul_ui (mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_add(mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_add_ui(mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_addmul(mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_addmul_ui(mpz_ptr, mpz_srcptr, ulong);
 
-    void __gmpz_sub (mpz_ptr, mpz_srcptr, mpz_srcptr);
-    void __gmpz_sub_ui (mpz_ptr, mpz_srcptr, ulong);
-    void __gmpz_ui_sub (mpz_ptr, ulong, mpz_srcptr);
+    void __gmpz_sub(mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_sub_ui(mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_ui_sub(mpz_ptr, ulong, mpz_srcptr);
 
-    void __gmpz_mul (mpz_ptr, mpz_srcptr, mpz_srcptr);
-    void __gmpz_mul_2exp (mpz_ptr, mpz_srcptr, mp_bitcnt_t);
-    void __gmpz_mul_si (mpz_ptr, mpz_srcptr, long);
-    void __gmpz_mul_ui (mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_mul(mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_mul_2exp(mpz_ptr, mpz_srcptr, mp_bitcnt_t);
+    void __gmpz_mul_si(mpz_ptr, mpz_srcptr, long);
+    void __gmpz_mul_ui(mpz_ptr, mpz_srcptr, ulong);
 
-    void __gmpz_cdiv_q_ui (mpz_ptr, mpz_srcptr, ulong);
-    ulong __gmpz_cdiv_r_ui (mpz_ptr, mpz_srcptr, ulong);
-    void __gmpz_cdiv_qr_ui (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
-    void __gmpz_cdiv_ui (mpz_srcptr, ulong);
+    void __gmpz_cdiv_q_ui(mpz_ptr, mpz_srcptr, ulong);
+    ulong __gmpz_cdiv_r_ui(mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_cdiv_qr_ui(mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_cdiv_ui(mpz_srcptr, ulong);
 
-    void __gmpz_fdiv_q_ui (mpz_ptr, mpz_srcptr, ulong);
-    ulong __gmpz_fdiv_r_ui (mpz_ptr, mpz_srcptr, ulong);
-    void __gmpz_fdiv_qr_ui (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
-    void __gmpz_fdiv_ui (mpz_srcptr, ulong);
+    void __gmpz_fdiv_q_ui(mpz_ptr, mpz_srcptr, ulong);
+    ulong __gmpz_fdiv_r_ui(mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_fdiv_qr_ui(mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_fdiv_ui(mpz_srcptr, ulong);
 
-    void __gmpz_tdiv_q (mpz_ptr, mpz_srcptr, mpz_srcptr);
-    void __gmpz_tdiv_r (mpz_ptr, mpz_srcptr, mpz_srcptr);
-    void __gmpz_tdiv_q_ui (mpz_ptr, mpz_srcptr, ulong);
-    ulong __gmpz_tdiv_r_ui (mpz_ptr, mpz_srcptr, ulong);
-    void __gmpz_tdiv_qr_ui (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
-    void __gmpz_tdiv_ui (mpz_srcptr, ulong);
+    void __gmpz_tdiv_q(mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_tdiv_r(mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_tdiv_q_ui(mpz_ptr, mpz_srcptr, ulong);
+    ulong __gmpz_tdiv_r_ui(mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_tdiv_qr_ui(mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_tdiv_ui(mpz_srcptr, ulong);
 
-    void __gmpz_mod (mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_mod(mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_mod_ui(mpz_ptr, mpz_srcptr, ulong);
 
-    void __gmpz_pow_ui (mpz_ptr, mpz_srcptr, ulong);
-    void __gmpz_ui_pow_ui (mpz_ptr, ulong, ulong);
+    void __gmpz_pow_ui(mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_ui_pow_ui(mpz_ptr, ulong, ulong);
 
-    void __gmpz_swap (mpz_ptr, mpz_ptr);
+    void __gmpz_swap(mpz_ptr, mpz_ptr);
 
-    int __gmpz_cmp (mpz_srcptr, mpz_srcptr);
-    int __gmpz_cmp_d (mpz_srcptr, double);
-    int __gmpz_cmp_si (mpz_srcptr, long);
-    int __gmpz_cmp_ui (mpz_srcptr, ulong);
+    int __gmpz_cmp(mpz_srcptr, mpz_srcptr);
+    int __gmpz_cmp_d(mpz_srcptr, double);
+    int __gmpz_cmp_si(mpz_srcptr, long);
+    int __gmpz_cmp_ui(mpz_srcptr, ulong);
 
-    int __gmpz_cmpabs (mpz_srcptr, mpz_srcptr);
-    int __gmpz_cmpabs_d (mpz_srcptr, double);
-    int __gmpz_cmpabs_ui (mpz_srcptr, ulong);
+    int __gmpz_cmpabs(mpz_srcptr, mpz_srcptr);
+    int __gmpz_cmpabs_d(mpz_srcptr, double);
+    int __gmpz_cmpabs_ui(mpz_srcptr, ulong);
 
-    void __gmpz_nextprime (mpz_ptr, mpz_srcptr);
+    void __gmpz_nextprime(mpz_ptr, mpz_srcptr);
 
-    void __gmpz_gcd (mpz_ptr, mpz_srcptr, mpz_srcptr);
-    ulong __gmpz_gcd_ui (mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_gcd(mpz_ptr, mpz_srcptr, mpz_srcptr);
+    ulong __gmpz_gcd_ui(mpz_ptr, mpz_srcptr, ulong);
 
-    void __gmpz_lcm (mpz_ptr, mpz_srcptr, mpz_srcptr);
-    void __gmpz_lcm_ui (mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_lcm(mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_lcm_ui(mpz_ptr, mpz_srcptr, ulong);
 
-    char *__gmpz_get_str (char*, int, mpz_srcptr);
-    size_t __gmpz_sizeinbase (mpz_srcptr, int);
-    void *__gmpz_export (void* , size_t*, int, size_t, int, size_t, mpz_srcptr);
-    void __gmpz_import (mpz_ptr, size_t, int, size_t, int, size_t, const void *);
+    char *__gmpz_get_str(char*, int, mpz_srcptr);
+    size_t __gmpz_sizeinbase(mpz_srcptr, int);
+    void *__gmpz_export(void* , size_t*, int, size_t, int, size_t, mpz_srcptr);
+    void __gmpz_import(mpz_ptr, size_t, int, size_t, int, size_t, const void *);
 
-    void __gmpz_powm (mpz_ptr, mpz_srcptr, mpz_srcptr, mpz_srcptr);
-    void __gmpz_powm_ui (mpz_ptr, mpz_srcptr, ulong, mpz_srcptr);
+    void __gmpz_powm(mpz_ptr, mpz_srcptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_powm_ui(mpz_ptr, mpz_srcptr, ulong, mpz_srcptr);
 
-    int __gmpz_invert (mpz_ptr, mpz_srcptr, mpz_srcptr);
+    int __gmpz_invert(mpz_ptr, mpz_srcptr, mpz_srcptr);
 
-    ulong __gmpz_get_ui (mpz_srcptr);
-    long __gmpz_get_si (mpz_srcptr);
-    double __gmpz_get_d (mpz_srcptr);
+    ulong __gmpz_get_ui(mpz_srcptr);
+    long __gmpz_get_si(mpz_srcptr);
+    double __gmpz_get_d(mpz_srcptr);
 
     int __gmpz_fits_ulong_p(mpz_srcptr);
     int __gmpz_fits_slong_p(mpz_srcptr);
@@ -3686,24 +3647,24 @@ extern(C) pragma(inline, false)
     int __gmpz_fits_ushort_p(mpz_srcptr);
     int __gmpz_fits_sshort_p(mpz_srcptr);
 
-    void __gmpz_and (mpz_ptr, mpz_srcptr, mpz_srcptr);
-    void __gmpz_ior (mpz_ptr, mpz_srcptr, mpz_srcptr);
-    void __gmpz_xor (mpz_ptr, mpz_srcptr, mpz_srcptr);
-    void __gmpz_com (mpz_ptr, mpz_srcptr);
+    void __gmpz_and(mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_ior(mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_xor(mpz_ptr, mpz_srcptr, mpz_srcptr);
+    void __gmpz_com(mpz_ptr, mpz_srcptr);
 
-    void __gmpz_setbit (mpz_ptr, mp_bitcnt_t);
-    void __gmpz_clrbit (mpz_ptr, mp_bitcnt_t);
-    void __gmpz_combit (mpz_ptr, mp_bitcnt_t);
-    int __gmpz_tstbit (mpz_srcptr, mp_bitcnt_t);
+    void __gmpz_setbit(mpz_ptr, mp_bitcnt_t);
+    void __gmpz_clrbit(mpz_ptr, mp_bitcnt_t);
+    void __gmpz_combit(mpz_ptr, mp_bitcnt_t);
+    int __gmpz_tstbit(mpz_srcptr, mp_bitcnt_t);
 
-    mp_bitcnt_t __gmpz_popcount (mpz_srcptr);
+    mp_bitcnt_t __gmpz_popcount(mpz_srcptr);
 
-    int  __gmpz_root (mpz_ptr, mpz_srcptr, ulong);
-    void __gmpz_rootrem (mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
-    void __gmpz_sqrt (mpz_ptr, mpz_srcptr);
-    void __gmpz_sqrtrem (mpz_ptr, mpz_ptr, mpz_srcptr);
-    int __gmpz_perfect_power_p (mpz_srcptr);
-    int __gmpz_perfect_square_p (mpz_srcptr);
+    int  __gmpz_root(mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_rootrem(mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
+    void __gmpz_sqrt(mpz_ptr, mpz_srcptr);
+    void __gmpz_sqrtrem(mpz_ptr, mpz_ptr, mpz_srcptr);
+    int __gmpz_perfect_power_p(mpz_srcptr);
+    int __gmpz_perfect_square_p(mpz_srcptr);
 }
 
 pragma(lib, "gmp");
