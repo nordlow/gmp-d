@@ -68,7 +68,8 @@ private struct _Z(bool cow)
 		   +2 <= base && base <= +62)
     {
         import core.memory : pureMalloc;
-        if (isZero) { sink(`0`); }
+        if (isZero) { return sink(`0`); }
+        if (isOne) { return sink(`1`); }
         const size = sizeInBase(base); // NOTE: one too much for some values
         scope char[] str = (cast(char*)pureMalloc(size + 1))[0 .. size + 1]; // one extra for minus sign
 		scope(exit) qualifiedFree(str.ptr);
@@ -146,6 +147,7 @@ nothrow:
 		   +2 <= base && base <= +62)
     {
         if (isZero) { return `0`; }
+        if (isOne) { return `1`; }
         const size = sizeInBase(base); // NOTE: one too much for some values
         char[] str = new char[](size + 1); // one extra for minus sign
         __gmpz_get_str(str.ptr, base, _ptr); // fill it
@@ -163,10 +165,14 @@ nothrow:
 		   +2 <= base && base <= +62)
     {
         import core.memory : pureMalloc;
-        if (isZero)
+        if (isZero ||
+			isOne)
         {
             char[] chars = (cast(char*)pureMalloc(1))[0 .. 1];
-            chars[0] = '0';
+			if (isZero)
+				chars[0] = '0';
+			else if (isOne)
+				chars[0] = '1';
             return chars;
         }
         const size = sizeInBase(base); // NOTE: one too much for some values
@@ -199,6 +205,7 @@ nothrow:
 	{
         import core.memory : pureFree;
         if (isZero) { return writer.put("0"); }
+        if (isOne) { return writer.put("1"); }
 		auto chars = toChars(base, upperCaseDigits);
 		scope(exit) pureFree(chars.ptr);
 		writer.put(chars);
@@ -448,9 +455,11 @@ nothrow:
     bool opEquals(Rhs)(Rhs rhs) const @trusted
     if (isArithmetic!Rhs)
     {
-        pragma(inline, true)
+		version(LDC) pragma(inline, true);
         if (rhs == 0)
             return isZero;      // optimization
+        if (rhs == 1)
+            return isOne;      // optimization
         static      if (isUnsigned!Rhs) return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
         else static if (isFloating!Rhs) return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO: correct to do this cast here?
         else                            return __gmpz_cmp_si(_ptr, cast(long)rhs) == 0;	// isSigned integral
@@ -971,6 +980,7 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
         if (isZero) { return; } // `__gmpz_abs` cannot handle default-constructed `this`
+        if (isOne) { return; } // `__gmpz_abs` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
         __gmpz_abs(_ptr, _ptr);
     }
@@ -996,6 +1006,7 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
         if (isZero) { return; } // `__gmpz_co` cannot handle default-constructed `this`
+        if (isOne) { return; } // `__gmpz_co` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
         __gmpz_sqrt(_ptr, _ptr);
     }
@@ -1008,6 +1019,7 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
         if (isZero) { return true; } // `__gmpz_co` cannot handle default-constructed `this`
+        if (isOne) { return true; } // `__gmpz_co` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
         const status = __gmpz_root(_ptr, _ptr, n);
 		return status != 0;
@@ -1021,6 +1033,7 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
         if (isZero) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
+        if (isOne) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
 		_Z rem;
         __gmpz_rootrem(_ptr, rem._ptr, _ptr, n);
@@ -1036,6 +1049,7 @@ nothrow:
     {
         version(LDC) pragma(inline, true);
         if (isZero) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
+        if (isOne) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
 		_Z rem;
         __gmpz_sqrtrem(_ptr, rem._ptr, _ptr);
@@ -1106,7 +1120,8 @@ nothrow:
     size_t sizeInBase(uint base) const @trusted
     {
         pragma(inline, true);
-        if (isZero)
+        if (isZero ||
+			isOne)
             return 1;
         else
             return __gmpz_sizeinbase(_ptr, base);
@@ -1163,7 +1178,8 @@ nothrow:
     if (isIntegral!T)
     {
         pragma(inline, true);
-        if (isZero) { return true; } // default-constructed `this`
+        if (isZero ||
+			isOne) { return true; } // default-constructed `this`
         static      if (is(T == ulong))  { return __gmpz_fits_ulong_p(_ptr) != 0; }
         else static if (is(T ==  long))  { return __gmpz_fits_slong_p(_ptr) != 0; }
         else static if (is(T ==  uint))  { return __gmpz_fits_uint_p(_ptr) != 0; }
@@ -1181,8 +1197,9 @@ nothrow:
 	*/
     @property mp_bitcnt_t populationCount() const @trusted
     {
-        pragma(inline, true);
+        version(LDC) pragma(inline, true);
         if (isZero) { return 0; } // default-constructed `this`
+        if (isOne) { return 1; } // default-constructed `this`
         return __gmpz_popcount(this._ptr); // TODO: use core.bitop `popcnt` inline here instead?
     }
     alias countOnes = populationCount;
@@ -1239,6 +1256,13 @@ nothrow:
         return _z._mp_size == 0; // fast
     }
 
+    /// Check if `this` is one.
+    @property bool isOne() const @safe
+    {
+        pragma(inline, true);
+        return _z._mp_size == 1 && _z._mp_d[0] == 1; // fast
+    }
+
     /// Check if `this` is odd.
     @property bool isOdd() const @safe
     {
@@ -1291,6 +1315,7 @@ nothrow:
     @property bool isDivisibleBy()(auto ref scope const _Z rhs) const @trusted
     {
         version(LDC) pragma(inline, true);
+		if (rhs.isOne) { return true; }
 		return __gmpz_divisible_p(_ptr, rhs._ptr) != 0;
     }
 	/// ditto
@@ -1298,6 +1323,7 @@ nothrow:
 	if (isUnsigned!Rhs)
     {
         version(LDC) pragma(inline, true);
+		if (rhs == 1) { return true; }
 		return __gmpz_divisible_ui_p(_ptr, rhs) != 0;
     }
 
@@ -2890,6 +2916,17 @@ unittest
     assert(!int.max.Z.isZero);
     assert(!long.max.Z.isZero);
 
+    assert(!long.min.Z.isOne);
+    assert(!int.min.Z.isOne);
+    assert(!(-2).Z.isOne);
+    assert(!(-1).Z.isOne);
+    assert(!0.Z.isOne);
+    assert( 1.Z.isOne);
+    assert(! 2.Z.isOne);
+    assert(!int.max.Z.isOne);
+    assert(!long.max.Z.isOne);
+
+    assert(0.Z.populationCount == 0);
     assert(1.Z.populationCount == 1);
     assert(2.Z.populationCount == 1);
     assert(3.Z.populationCount == 2);
