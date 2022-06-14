@@ -31,10 +31,10 @@ buildType "unittest" {
 
 buildType "unittest-sanitized" {
   buildOptions "unittests" "debugMode" "debugInfo"
-  dflags "-checkaction=context" "-fsanitize=address" platform="posix-ldc" # test build uses LDC's sanitizer by default
+  dflags "-checkaction=context" "-preview=dip1000" "-fsanitize=address" platform="posix-ldc" # test build uses LDC's sanitizer by default
 }
 
 buildType "release-unittest" {
   buildOptions "releaseMode" "optimize" "inline" # TODO: -march=native -ffast-math
-  dflags "-checkaction=context" "-unittest"
+  dflags "-checkaction=context" "-preview=dip1000" "-unittest"
 }
