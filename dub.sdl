@@ -26,24 +26,12 @@ buildType "release" {
 
 buildType "unittest" {
   buildOptions "unittests" "debugMode" "debugInfo"
-  dflags "-checkaction=context"
-}
-
-buildType "unittest-dip1000" {
-  buildOptions "unittests" "debugMode" "debugInfo"
-  dflags "-preview=dip1000" # TODO: "-checkaction=context"
+  dflags "-checkaction=context" "-preview=dip1000" # "-preview=in"
 }
 
 buildType "unittest-sanitized" {
   buildOptions "unittests" "debugMode" "debugInfo"
   dflags "-checkaction=context" "-fsanitize=address" platform="posix-ldc" # test build uses LDC's sanitizer by default
-}
-
-# TODO: this doesn't work
-buildType "unittest-ccc" {
-  buildOptions "unittests" "debugMode" "debugInfo"
-  dflags "-checkaction=context" "-fsanitize=address" platform="posix-ldc" # test build uses LDC's sanitizer by default
-  # TODO: dflags "-d-version=ccc"
 }
 
 buildType "release-unittest" {
