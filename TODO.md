@@ -1,5 +1,9 @@
 # TODO list (in order of priority)
 
+- Implement `Z.this(bool isNegative, Range magnitude)`
+
+as per https://phobos.dpldocs.info/std.bigint.BigInt.this.3.html
+
 - Change `scope` to `scope return` or `return scope` for Z parameters whose
   pointers might be copied to a field in the return Z.
 
