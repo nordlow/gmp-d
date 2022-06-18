@@ -1418,7 +1418,6 @@ private:
 		private __mpz_struct _z; // internal libgmp C struct
 	}
 
-	version(none)
     version(ccc)
     {
         /** Number of calls made to `__gmpz`--functions that construct or changes
