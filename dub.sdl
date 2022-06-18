@@ -31,7 +31,7 @@ buildType "unittest" {
 
 buildType "unittest-dip1000" {
   buildOptions "unittests" "debugMode" "debugInfo"
-  dflags "-preview=dip1000" # TODO: "-checkaction=context"
+  dflags "-checkaction=context" "-preview=dip1000"
 }
 
 buildType "unittest-sanitized" {
