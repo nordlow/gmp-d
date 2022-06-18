@@ -7,33 +7,6 @@ as per https://phobos.dpldocs.info/std.bigint.BigInt.this.3.html
 - Change `scope` to `scope return` or `return scope` for Z parameters whose
   pointers might be copied to a field in the return Z.
 
-- Investigate why `"-checkaction=context"` together with `"-preview=dip1000"` in
-  `dflags` of dub buildType unittest fails in `_d_assert_fail` by adding calls
-  to
-
-```d
-version(none)
-private template _d_assert_fail_copy(A...)
-{
-    string _d_assert_fail(B...)(
-        const scope string comp, auto ref const scope A a, auto ref const scope B b) @safe
-    if (B.length != 0 || A.length != 1) // Resolve ambiguity with unary overload
-    {
-        // Prevent InvalidMemoryOperationError when triggered from a finalizer
-        if (inFinalizer())
-            return "Assertion failed (rich formatting is disabled in finalizers)";
-
-        string[A.length + B.length] vals;
-        static foreach (idx; 0 .. A.length)
-            vals[idx] = miniFormatFakeAttributes(a[idx]);
-        static foreach (idx; 0 .. B.length)
-            vals[A.length + idx] = miniFormatFakeAttributes(b[idx]);
-        immutable token = invertCompToken(comp);
-        return combine(vals[0 .. A.length], token, vals[A.length .. $]);
-    }
-}
-```
-
 - Figure out why statements consisting of a single call to a strongly pure
   function discardig return values, such as `onesComplement(42.Z);`, doesn’t
   trigger a warn-unused.
