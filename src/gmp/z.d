@@ -843,7 +843,7 @@ nothrow:
 
     /// ditto
     ref _Z opOpAssign(string s, Rhs)(Rhs rhs) scope return @trusted
-    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
+    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^" || s == "<<") &&
         isUnsigned!Rhs)
     {
         version(LDC) pragma(inline, true);
@@ -865,6 +865,8 @@ nothrow:
         }
         else static if (s == "^^")
             __gmpz_pow_ui(_ptr, _ptr, rhs);
+        else static if (s == "<<")
+            __gmpz_mul_2exp(_ptr, _ptr, rhs);
         else
             static assert(0);
         return this;
@@ -3008,6 +3010,20 @@ unittest
     assert(1.Z << 2U == 2^^2);
     assert(1.Z << 32U == 2UL^^32);
     assert(1.Z << 63U == 2UL^^63);
+
+    Z a;
+    a = 1;
+    a <<= 1u;
+    assert(a == 2^^1);
+    a = 1;
+    a <<= 2u;
+    assert(a == 2^^2);
+    a = 1;
+    a <<= 32u;
+    assert(a == 2UL^^32);
+    a = 1;
+    a <<= 63u;
+    assert(a == 2UL^^63);
 }
 
 /// verify compliance with Phobos' `BigInt`
