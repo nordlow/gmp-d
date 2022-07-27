@@ -536,7 +536,7 @@ nothrow:
         if ((s == "+" || s == "-" ||
 			 s == "*" || s == "/" || s == "%" ||
 			 s == "&" || s == "|" || s == "^" ||
-			 s == "<<"))            // left shift
+			 s == "<<" || s == ">>"))
     {
         version(LDC) pragma(inline, true);
         static if (!__traits(isRef, rhs)) // r-value `rhs`
@@ -561,7 +561,20 @@ nothrow:
             else static if (s == "&") __gmpz_and(mut_rhs._ptr, _ptr, rhs._ptr);
             else static if (s == "|") __gmpz_ior(mut_rhs._ptr, _ptr, rhs._ptr);
             else static if (s == "^") __gmpz_xor(mut_rhs._ptr, _ptr, rhs._ptr);
-            else static if (s == "<<") __gmpz_mul_2exp(mut_rhs._ptr, _ptr, cast(ulong)rhs);
+            else static if (s == "<<")
+            {
+                if (rhs.isPositive())
+                    __gmpz_mul_2exp(mut_rhs._ptr, _ptr, cast(mp_bitcnt_t)rhs);
+                else
+                    __gmpz_tdiv_q_2exp(mut_rhs._ptr, _ptr, cast(mp_bitcnt_t)-rhs); // `z << -1` becomes `z >> 1`
+            }
+            else static if (s == ">>")
+            {
+                if (rhs.isPositive())
+                    __gmpz_tdiv_q_2exp(mut_rhs._ptr, _ptr, cast(mp_bitcnt_t)rhs);
+                else
+                    __gmpz_mul_2exp(mut_rhs._ptr, _ptr, cast(mp_bitcnt_t)-rhs); // `z >> -1` becomes `z << 1`
+            }
             else static assert(0);
             return move(*mut_rhs); // TODO: shouldn't have to call `move` here
         }
@@ -587,7 +600,20 @@ nothrow:
             else static if (s == "&") __gmpz_and(y._ptr, _ptr, rhs._ptr);
             else static if (s == "|") __gmpz_ior(y._ptr, _ptr, rhs._ptr);
             else static if (s == "^") __gmpz_xor(y._ptr, _ptr, rhs._ptr);
-            else static if (s == "<<") __gmpz_mul_2exp(y._ptr, _ptr, cast(ulong)rhs);
+            else static if (s == "<<")
+            {
+                if (rhs.isPositive())
+                    __gmpz_mul_2exp(y._ptr, _ptr, cast(mp_bitcnt_t)rhs);
+                else
+                    __gmpz_tdiv_q_2exp(y._ptr, _ptr, cast(mp_bitcnt_t)-rhs); // `z << -1` becomes `z >> 1`
+            }
+            else static if (s == ">>")
+            {
+                if (rhs.isPositive())
+                    __gmpz_tdiv_q_2exp(y._ptr, _ptr, cast(mp_bitcnt_t)rhs);
+                else
+                    __gmpz_mul_2exp(y._ptr, _ptr, cast(mp_bitcnt_t)-rhs); // `z >> -1` becomes `z << 1`
+            }
             else static assert(0);
             return y;
         }
@@ -604,7 +630,7 @@ nothrow:
 
     /// ditto
     _Z opBinary(string s, Rhs)(Rhs rhs) const @trusted
-    if ((s == "+" || s == "-" || s == "*" || s == "/" /* || s == "%"*/ || s == "^^" || s == "<<") &&
+    if ((s == "+" || s == "-" || s == "*" || s == "/" /* || s == "%"*/ || s == "^^" || s == "<<" || s == ">>") &&
         isUnsigned!Rhs)
     {
         version(LDC) pragma(inline, true);
@@ -625,13 +651,14 @@ nothrow:
         // }
         else static if (s == "^^") __gmpz_pow_ui(y._ptr, _ptr, rhs);
         else static if (s == "<<") __gmpz_mul_2exp(y._ptr, _ptr, rhs);
+        else static if (s == ">>") __gmpz_tdiv_q_2exp(y._ptr, _ptr, rhs);
         else static assert(0);
         return y;
     }
 
     /// ditto
     _Z opBinary(string s, Rhs)(Rhs rhs) const @trusted
-    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^") &&
+    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^" || s == "<<" || s == ">>") &&
         isSigned!Rhs)
     {
         version(LDC) pragma(inline, true);
@@ -675,8 +702,21 @@ nothrow:
             assert(rhs >= 0, "TODO: Negative power exponent needs MpQ return");
             __gmpz_pow_ui(y._ptr, _ptr, rhs);
         }
-        else
-            static assert(0);
+        else static if (s == "<<")
+        {
+            if (rhs >= 0)
+                __gmpz_mul_2exp(y._ptr, _ptr, rhs);
+            else
+                __gmpz_tdiv_q_2exp(y._ptr, _ptr, -rhs); // `z << -1` becomes `z >> 1`
+        }
+        else static if (s == ">>")
+        {
+            if (rhs >= 0)
+                __gmpz_tdiv_q_2exp(y._ptr, _ptr, rhs);
+            else
+                __gmpz_mul_2exp(y._ptr, _ptr, -rhs); // `z >> -1` becomes `z << 1`
+        }
+        else static assert(0);
         return y;
     }
 
@@ -803,7 +843,8 @@ nothrow:
     ref _Z opOpAssign(string s)(auto ref scope const _Z rhs) scope return @trusted
     if ((s == "+" || s == "-" ||
          s == "*" || s == "/" || s == "%" ||
-         s == "&" || s == "|" || s == "^"))
+         s == "&" || s == "|" || s == "^" ||
+         s == "<<" || s == ">>"))
     {
         version(LDC) pragma(inline, true);
         static      if (s == "+")
@@ -836,6 +877,20 @@ nothrow:
             __gmpz_ior(_ptr, _ptr, rhs._ptr);
         else static if (s == "^")
             __gmpz_xor(_ptr, _ptr, rhs._ptr);
+        else static if (s == "<<")
+        {
+            if (rhs.isPositive())
+                __gmpz_mul_2exp(_ptr, _ptr, cast(mp_bitcnt_t)rhs);
+            else
+                __gmpz_tdiv_q_2exp(_ptr, _ptr, cast(mp_bitcnt_t)rhs); // `z << -1` becomes `z >> 1`
+        }
+        else static if (s == ">>")
+        {
+            if (rhs.isPositive())
+                __gmpz_tdiv_q_2exp(_ptr, _ptr, cast(mp_bitcnt_t)rhs);
+            else
+                __gmpz_mul_2exp(_ptr, _ptr, cast(mp_bitcnt_t)rhs); // `z >> -1` becomes `z << 1`
+        }
         else
             static assert(0);
         return this;
@@ -843,7 +898,7 @@ nothrow:
 
     /// ditto
     ref _Z opOpAssign(string s, Rhs)(Rhs rhs) scope return @trusted
-    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^" || s == "<<") &&
+    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^" || s == "<<" || s == ">>") &&
         isUnsigned!Rhs)
     {
         version(LDC) pragma(inline, true);
@@ -867,6 +922,8 @@ nothrow:
             __gmpz_pow_ui(_ptr, _ptr, rhs);
         else static if (s == "<<")
             __gmpz_mul_2exp(_ptr, _ptr, rhs);
+        else static if (s == ">>")
+            __gmpz_tdiv_q_2exp(_ptr, _ptr, rhs);
         else
             static assert(0);
         return this;
@@ -874,7 +931,7 @@ nothrow:
 
     /// ditto
     ref _Z opOpAssign(string s, Rhs)(Rhs rhs) scope return @trusted
-    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^") &&
+    if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^" || s == "<<" || s == ">>") &&
         isSigned!Rhs)
     {
         version(LDC) pragma(inline, true);
@@ -930,8 +987,22 @@ nothrow:
             assert(rhs >= 0, "Negative exponent");
             __gmpz_pow_ui(_ptr, _ptr, rhs);
         }
-        else
-            static assert(0);
+        else static if (s == "<<")
+        {
+            if (rhs >= 0)
+                __gmpz_mul_2exp(_ptr, _ptr, rhs);
+            else
+                __gmpz_tdiv_q_2exp(_ptr, _ptr, -rhs); // `z << -1` becomes `z >> 1`
+        }
+        else static if (s == ">>")
+        {
+            if (rhs >= 0)
+                __gmpz_tdiv_q_2exp(_ptr, _ptr, rhs);
+            else
+                __gmpz_mul_2exp(_ptr, _ptr, -rhs); // `z >> -1` becomes `z << 1`
+        }
+        else static assert(0);
+
         return this;
     }
 
@@ -3005,11 +3076,13 @@ unittest
     assert(1.Z << 2.Z == 2^^2);
     assert(1.Z << 32.Z == 2UL^^32);
     assert(1.Z << 63.Z == 2UL^^63);
+    assert(16.Z << -3.Z == 2); // `16 << -3` becomes `16 >> 3`
 
     assert(1.Z << 1U == 2^^1);
     assert(1.Z << 2U == 2^^2);
     assert(1.Z << 32U == 2UL^^32);
     assert(1.Z << 63U == 2UL^^63);
+    assert(16.Z << -3 == 2); // `16 << -3` becomes `16 >> 3`
 
     Z a;
     a = 1;
@@ -3024,6 +3097,104 @@ unittest
     a = 1;
     a <<= 63u;
     assert(a == 2UL^^63);
+    a = 16;
+    a <<= -3;
+    assert(a == 2);
+    
+    Z b;
+    a = 1;
+    b = 1;
+    a <<= b;
+    assert(a == 2^^1);
+    a = 1;
+    b = 2;
+    a <<= b;
+    assert(a == 2^^2);
+    a = 1;
+    b = 32;
+    a <<= b;
+    assert(a == 2UL^^32);
+    a = 1;
+    b = 63;
+    a <<= b;
+    assert(a == 2UL^^63);
+    a = 16;
+    b = -3;
+    a <<= b;
+    assert(a == 2); 
+}
+
+/// right shift
+@safe @nogc unittest
+{
+    assert(0x4.Z >> 1.Z == 0x2);
+    assert(0x4.Z >> 2.Z == 0x1);
+    assert(0x4.Z >> 3.Z == 0x0);
+    assert(0x123456789ABCDEF.Z >> 4.Z == 0x123456789ABCDEuL);
+    assert(0xABCDEF.Z >> 8.Z == 0xABCD);
+    assert(0x1234ABCDEF.Z >> 32.Z == 0x12);
+    assert(2.Z >> -3.Z == 16); // `2 >> -3` becomes `2 << 3`
+
+    assert(0x4.Z >> 1 == 0x2);
+    assert(0x4.Z >> 2 == 0x1);
+    assert(0x4.Z >> 3 == 0x0);
+    assert(0x123456789ABCDEF.Z >> 4 == 0x123456789ABCDEuL);
+    assert(0xABCDEF.Z >> 8 == 0xABCD);
+    assert(0x1234ABCDEF.Z >> 32 == 0x12);
+    assert(2.Z >> -3 == 16);
+    
+    Z a, b;
+    a = 4;
+    a >>= 1;
+    assert(a == 0x2);
+    a = 4;
+    a >>= 2;
+    assert(a == 0x1);
+    a = 4;
+    a >>= 3;
+    assert(a == 0x0);
+    a = 0x123456789ABCDEF;
+    a >>= 4;
+    assert(a == 0x123456789ABCDEuL);
+    a = 0xABCDEF;
+    a >>= 8;
+    assert(a == 0xABCD);
+    a = 0x1234ABCDEF;
+    a >>= 32;
+    assert(a == 0x12);
+    a = 2;
+    a >>= -3;
+    assert(a == 16);
+    
+    a = 4;
+    b = 1;
+    a >>= b;
+    assert(a == 0x2);
+    a = 4;
+    b = 2;
+    a >>= b;
+    assert(a == 0x1);
+    a = 4;
+    b = 3;
+    a >>= b;
+    assert(a == 0x0);
+    a = 0x123456789ABCDEF;
+    b = 4;
+    a >>= b;
+    assert(a == 0x123456789ABCDEuL);
+    a = 0xABCDEF;
+    b = 8;
+    a >>= b;
+    assert(a == 0xABCD);
+    a = 0x1234ABCDEF;
+    b = 32;
+    a >>= b;
+    assert(a == 0x12);
+    a = 2;
+    b = -3;
+    a >>= b;
+    assert(a == 16);
+
 }
 
 /// verify compliance with Phobos' `BigInt`
@@ -3706,6 +3877,8 @@ extern(C) pragma(inline, false)
     ulong __gmpz_tdiv_r_ui(mpz_ptr, mpz_srcptr, ulong);
     void __gmpz_tdiv_qr_ui(mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
     void __gmpz_tdiv_ui(mpz_srcptr, ulong);
+    void __gmpz_tdiv_q_2exp (mpz_ptr, mpz_srcptr, mp_bitcnt_t b);
+    //void __gmpz_tdiv_r_2exp (mpz_ptr, mpz_srcptr, mp_bitcnt_t b);
 
     void __gmpz_mod(mpz_ptr, mpz_srcptr, mpz_srcptr);
     void __gmpz_mod_ui(mpz_ptr, mpz_srcptr, ulong);
