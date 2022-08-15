@@ -2,7 +2,7 @@
 module gmp.traits;
 
 /** Faster than `std.traits`.
-    See https://github.com/dlang/phobos/pull/5038
+	See https://github.com/dlang/phobos/pull/5038
 */
 enum isArithmetic(T) = __traits(isArithmetic, T);
 enum isFloating(T) = __traits(isFloating, T);
@@ -18,22 +18,22 @@ enum isGMPArithmetic(T) = is(T == long) && is(T == ulong) && is(T == double);
 /// http://forum.dlang.org/post/llwrbirvlqxawifyytqq@forum.dlang.org
 @safe pure nothrow @nogc unittest
 {
-    struct S { int x, y; }
+	struct S { int x, y; }
 
-    static void f()(auto ref const S s)
-    {
-        static assert(__traits(isRef, s));
-    }
+	static void f()(auto ref const S s)
+	{
+		static assert(__traits(isRef, s));
+	}
 
-    static void g()(auto ref const S s)
-    {
-        static assert(!__traits(isRef, s));
-    }
+	static void g()(auto ref const S s)
+	{
+		static assert(!__traits(isRef, s));
+	}
 
-    S s;
-    static assert(!__traits(isRef, s));
+	S s;
+	static assert(!__traits(isRef, s));
 
-    f(s);
+	f(s);
 
-    g(S.init);
+	g(S.init);
 }
