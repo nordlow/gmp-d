@@ -37,6 +37,8 @@ enum WordOrder
 }
 
 /** Rounding used in division variants `cdiv`, `fdiv` and `tdiv`.
+
+	TODO: Make use of.
  */
 enum Rounding
 {
