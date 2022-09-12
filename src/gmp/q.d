@@ -21,9 +21,9 @@ struct MpQ
 		assert((base >= -2 && base <= -36) ||
 			   (base >= 2 && base <= 62));
 		// TODO: use on allocation only
-		return (numerator.toString(base) ~
+		return (numerator.toString(base, upperCaseDigits) ~
 				"/" ~
-				denominator.toString(base));
+				denominator.toString(base, upperCaseDigits));
 	}
 
 	/** Convert in base `base` into `chars` of length `length`.
