@@ -26,13 +26,8 @@ buildType "release" {
 
 buildType "unittest" {
   buildOptions "unittests" "debugMode" "debugInfo"
-  dflags "-checkaction=context"
-  dflags "-fsanitize=address" platform="posix-ldc"
-}
-
-buildType "unittest-dip1000" {
-  buildOptions "unittests" "debugMode" "debugInfo"
   dflags "-checkaction=context" "-preview=dip1000"
+  dflags "-fsanitize=address" platform="posix-ldc"
 }
 
 # TODO: this doesn't work
