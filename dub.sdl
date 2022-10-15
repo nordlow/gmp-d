@@ -27,7 +27,7 @@ buildType "release" {
 buildType "unittest" {
   buildOptions "unittests" "debugMode" "debugInfo"
   dflags "-checkaction=context"
-  dflags "-fsanitize=address" platform="posix-ldc" # test build uses LDC's sanitizer by default
+  dflags "-fsanitize=address" platform="posix-ldc"
 }
 
 buildType "unittest-dip1000" {
