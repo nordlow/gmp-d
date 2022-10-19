@@ -1538,11 +1538,13 @@ private:
 	`CopyableMpZ`.
 */
 alias MpZ = _Z!(false);
+static assert(MpZ.sizeof == 16);
 
 /** Arbitrary precision integer (BigInt) with copy-on-write (CoW) automatic
 	reference counting (ARC) API-compatible with `std.bigint`.
 */
 alias CopyableMpZ = _Z!(true);
+static assert(CopyableMpZ.sizeof == 24);
 
 version(unittest) static assert(isMpZExpr!(MpZ));
 
