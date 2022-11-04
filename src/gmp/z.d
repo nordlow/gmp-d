@@ -236,7 +236,7 @@ nothrow:
 	Word[] serialize(Word)(WordOrder order, WordEndianess endian, size_t nails) const @trusted
 	if (isUnsigned!Word)
 	{
-		auto numb = 8 * Word.sizeof - nails;
+		const numb = 8 * Word.sizeof - nails;
 		size_t count = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
 		return serialize(new Word[count], order, Word.sizeof, endian, nails);
 	}
@@ -1223,7 +1223,7 @@ nothrow:
 		debug
 		{
 			const numb = 8 * size - nails;
-			size_t items = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
+			const items = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
 			assert(Word.sizeof * words.length >= items * size ,
 				   "Words has not enough space pre-allocated");
 		}
@@ -1538,13 +1538,13 @@ private:
 	`CopyableMpZ`.
 */
 alias MpZ = _Z!(false);
-static assert(MpZ.sizeof == 16);
+static assert(MpZ.sizeof == __mpz_struct.sizeof);
 
 /** Arbitrary precision integer (BigInt) with copy-on-write (CoW) automatic
 	reference counting (ARC) API-compatible with `std.bigint`.
 */
 alias CopyableMpZ = _Z!(true);
-static assert(CopyableMpZ.sizeof == 24);
+static assert(CopyableMpZ.sizeof == __mpz_struct.sizeof + size_t.sizeof);
 
 version(unittest) static assert(isMpZExpr!(MpZ));
 
@@ -1555,7 +1555,7 @@ version(benchmark)
 	bool odd;
 	void test()
 	{
-		odd = (9.Z^^333333L).isOdd;
+		odd = (9.Z^^333_333L).isOdd;
 	}
 	immutable results = benchmark!test(1);
 	import std.stdio;
@@ -2084,7 +2084,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 	{
 		typeof(return)* mut_base = (cast(typeof(return)*)(&base)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { mut_base.selfdupIfAliased(); }
-		auto success = __gmpz_invert(mut_base._ptr, base._ptr, mod._ptr);
+		const success = __gmpz_invert(mut_base._ptr, base._ptr, mod._ptr);
 		assert(success >= 0, "Cannot invert");
 		return move(*mut_base);	// TODO: shouldn't have to call `move` here
 	}
@@ -2092,7 +2092,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 	{
 		typeof(return)* mut_mod = (cast(typeof(return)*)(&mod)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { mut_mod.selfdupIfAliased(); }
-		auto success = __gmpz_invert(mut_mod._ptr, base._ptr, mod._ptr);
+		const success = __gmpz_invert(mut_mod._ptr, base._ptr, mod._ptr);
 		assert(success >= 0, "Cannot invert");
 		return move(*mut_mod);  // TODO: shouldn't have to call `move` here
 	}
@@ -2100,7 +2100,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 	{
 		typeof(return) y = 0; // result, TODO: reuse `exp` or `mod` if any is an r-value
 		static if (cow) { y.selfdupIfAliased(); }
-		auto success = __gmpz_invert(y._ptr, base._ptr, mod._ptr);
+		const success = __gmpz_invert(y._ptr, base._ptr, mod._ptr);
 		assert(success >= 0, "Cannot invert");
 		return y;
 	}
@@ -2116,7 +2116,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 	x = y;
 	y = x;
 
-	Z z = 42;
+	const Z z = 42;
 	x = z;
 
 	assert(Z.init.dup == Z.init);
@@ -2133,7 +2133,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 @trusted nothrow unittest
 {
 	import core.memory : pureFree;
-	Z w = null;
+	const Z w = null;
 	auto chars = w.toChars;
 	scope(exit) pureFree(chars.ptr);
 	assert(chars == `0`);
@@ -2308,8 +2308,8 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 /// null construction
 @safe nothrow @nogc unittest
 {
-	Z x = null;
-	Z y = null;
+	const Z x = null;
+	const Z y = null;
 	assert(x == y);
 	assert(x is y);	// TODO: this behaviour recently changed. is this correct?
 }
@@ -2348,25 +2348,25 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 @nogc unittest
 {
 	ubyte[int.sizeof] storage;
-	ubyte[1] expected = [2];
+	const ubyte[1] expected = [2];
 	assert(storage[0] == 0);
-	auto storage2 =  2.Z.serialize(storage, WordOrder.mostSignificantWordFirst, 1, WordEndianess.littleEndian, 0);
+	const storage2 =  2.Z.serialize(storage, WordOrder.mostSignificantWordFirst, 1, WordEndianess.littleEndian, 0);
 	assert(storage2.ptr == storage.ptr);
 	assert(storage2 == expected);
 }
 
 unittest
 {
-	ubyte[int.sizeof] storage;
-	ubyte[1] expected = [2];
-	ubyte[] storage2 = 2.Z.serialize!(ubyte)(WordOrder.mostSignificantWordFirst, WordEndianess.littleEndian, 0);
+	const ubyte[int.sizeof] storage;
+	const ubyte[1] expected = [2];
+	const ubyte[] storage2 = 2.Z.serialize!(ubyte)(WordOrder.mostSignificantWordFirst, WordEndianess.littleEndian, 0);
 	assert(storage2 == expected);
 }
 
 ///
 unittest
 {
-	auto prime = 33391.Z;
+	auto prime = 33_391.Z;
 	for (int i = 0; i < 20; ++i)
 	{
 		prime = nextPrime(prime);
@@ -2375,7 +2375,7 @@ unittest
 			for (auto endianess = WordEndianess.min; endianess < WordEndianess.max; ++endianess)
 			{
 				ubyte[] data = prime.serialize!(ubyte)(order, endianess, 0);
-				auto samePrime = Z(data, order, 1, endianess, 0);
+				const samePrime = Z(data, order, 1, endianess, 0);
 				assert(prime == samePrime);
 			}
 		}
@@ -2385,29 +2385,29 @@ unittest
 /// opBinary with r-value right-hand-side
 @safe @nogc unittest
 {
-	Z a = 42;
+	const Z a = 42;
 	{
-		Z b = a + 1.Z;			  // r-value `rhs`
+		const Z b = a + 1.Z;	// r-value `rhs`
 		assert(b == 43);
 	}
 
 	{
-		Z b = a - 1.Z;			  // r-value `rhs`
+		const Z b = a - 1.Z;	// r-value `rhs`
 		assert(b == 41);
 	}
 
 	{
-		Z b = a * 2.Z;			  // r-value `rhs`
+		const Z b = a * 2.Z;	// r-value `rhs`
 		assert(b == 84);
 	}
 
 	{
-		Z b = a / 2.Z;			  // r-value `rhs`
+		const Z b = a / 2.Z;	// r-value `rhs`
 		assert(b == 21);
 	}
 
 	{
-		Z b = a % 10.Z;			  // r-value `rhs`
+		const Z b = a % 10.Z;	// r-value `rhs`
 		assert(b == 2);
 	}
 }
@@ -2706,7 +2706,7 @@ unittest
 		static S!int f()() @safe pure nothrow @nogc { return typeof(return).init; }
 		static S!int g()(scope S!int x) @safe pure nothrow @nogc { return x; }
 		static const(S!int) h1()(scope const(S!int) x) @safe pure nothrow @nogc { return x; }
-		static S!int h2()(scope const(S!int) x) @safe pure nothrow @nogc { return typeof(return).init; }
+		static S!int h2()(scope const(S!int) _) @safe pure nothrow @nogc { return typeof(return).init; }
 		g(S!int(32));
 		f();
 		h1(S!int(32));
@@ -3780,13 +3780,13 @@ if (isIntegral!T)
 {
 	alias CZ = CopyableMpZ;
 
-	CZ a = 42;
+	const CZ a = 42;
 
-	CZ b = a;				   // copy
+	const CZ b = a;				// copy
 	assert(a == b);			 // should equal
 	assert(a !is b);			// but not the same
 
-	CZ c = null;				// other value
+	const CZ c = null;			// other value
 	assert(a != c);			 // should diff
 }
 
