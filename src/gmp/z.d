@@ -1968,7 +1968,7 @@ _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 	}
 }
 /// ditto
-_Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @trusted
+_Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, in ulong y) nothrow @nogc @trusted
 {
 	version(LDC) pragma(inline, true);
 	static if (__traits(isRef, x)) // l-value `x`
