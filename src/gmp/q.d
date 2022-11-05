@@ -642,7 +642,7 @@ version(unittest)
 }
 
 // C API
-extern(C) pragma(inline, false)
+package extern(C) pragma(inline, false)
 {
 	struct __mpq_struct
 	{
