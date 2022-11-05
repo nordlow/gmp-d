@@ -3820,7 +3820,7 @@ version(unittest)
 }
 
 // C API
-private extern(C) pragma(inline, false)
+package extern(C) pragma(inline, false)
 {
 	alias __mp_limb_t = ulong;	// see `mp_limb_t` gmp.h. TODO: detect when it is `uint` instead
 	struct __mpz_struct
