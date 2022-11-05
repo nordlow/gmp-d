@@ -1766,7 +1766,8 @@ _Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 
 /** Get absolute value of `x`.
 
-	Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
+	Written as a free function instead of `MpZ`-member because `__traits(isRef,
+	this)` doesn't currently support member functions.
 */
 _Z!(cow) abs(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 {
@@ -1788,7 +1789,8 @@ _Z!(cow) abs(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 
 /** Get one's complement of `x`.
 
-	Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
+	Written as a free function instead of `MpZ`-member because `__traits(isRef,
+	this)` doesn't currently support member functions.
 */
 _Z!(cow) onesComplement(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 {
@@ -1810,7 +1812,8 @@ alias com = onesComplement;
 
 /** Get truncated integer part of the square root of `x`.
 
-	Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
+	Written as a free function instead of `MpZ`-member because `__traits(isRef,
+	this)` doesn't currently support member functions.
 
 	See: https://gmplib.org/manual/Integer-Roots
 */
@@ -1908,7 +1911,8 @@ int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @tr
 
 /** Get next prime greater than `x`.
 
-	Written as a free function instead of `MpZ`-member because `__traits(isRef, this)` cannot be used.
+	Written as a free function instead of `MpZ`-member because `__traits(isRef,
+	this)` doesn't currently support member functions.
 */
 _Z!(cow) nextPrime(bool cow)(auto ref scope const _Z!(cow) x) nothrow @nogc @trusted
 {
