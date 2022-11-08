@@ -27,13 +27,13 @@ buildType "release" {
 buildType "unittest" {
   buildOptions "unittests" "debugMode" "debugInfo"
   dflags "-checkaction=context" "-preview=dip1000"
-  dflags "-fsanitize=address" platform="posix-ldc"
+  dflags "-fsanitize=address" "-fsanitize=leak" platform="posix-ldc"
 }
 
 # TODO: this doesn't work
 buildType "unittest-ccc" {
   buildOptions "unittests" "debugMode" "debugInfo"
-  dflags "-checkaction=context" "-fsanitize=address" platform="posix-ldc" # test build uses LDC's sanitizer by default
+  dflags "-checkaction=context" "-fsanitize=address" "-fsanitize=leak" platform="posix-ldc" # test build uses LDC's sanitizer by default
   # TODO: dflags "-d-version=ccc"
 }
 
