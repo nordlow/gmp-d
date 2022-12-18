@@ -1,0 +1,37 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+name: D
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Build and Test
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        dc:
+        - dmd-latest
+        - dmd-2.100.0 # must be supported for GDC support
+        - ldc-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v3
+    - uses: dlang-community/setup-dlang@v1.3.0
+      with:
+        compiler: ${{ matrix.dc }}
+
+    - name: 'Build & Test'
+      run: |
+        dub build
+        dub test
