@@ -22,7 +22,6 @@ jobs:
         os: [ubuntu-latest] # TODO: provision gmp.lib using https://github.com/marketplace/actions/run-vcpkg and then add ‘windows-latest’ to list of os
         dc:
         - dmd-latest
-        - dmd-2.100.0 # must be supported for GDC support
         - ldc-latest
     runs-on: ${{ matrix.os }}
     steps:
