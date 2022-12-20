@@ -48,9 +48,11 @@ jobs:
         - ldc-latest
     runs-on: ${{ matrix.os }}
     steps:
+    - uses: lukka/run-vcpkg@v10
+      with:
+        vcpkgGitCommitId: "9bf374fb6d99f8973ec8781d3b41ffac2defee63"
     - uses: actions/checkout@v3
     - uses: dlang-community/setup-dlang@v1.3.0
-    - uses: lukka/run-vcpkg@v10
       with:
         compiler: ${{ matrix.dc }}
     - name: 'Provision dependencies via vcpkg'
