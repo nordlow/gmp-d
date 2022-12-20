@@ -29,7 +29,10 @@ jobs:
     - uses: dlang-community/setup-dlang@v1.3.0
       with:
         compiler: ${{ matrix.dc }}
-
+    - name: 'Provision dependencies via APT'
+      run: |
+        sudo apt install -y llvm
+        llvm-symbolizer --version
     - name: 'Build & Test'
       run: |
         dub build
