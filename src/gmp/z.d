@@ -3961,5 +3961,4 @@ package extern(C) pragma(inline, false)
 	int __gmpz_divisible_ui_p(mpz_srcptr, ulong);
 }
 
-pragma(lib, "gmp");
 pragma(lib, "c");				// needed by `malloc` and `free`

@@ -686,5 +686,3 @@ package extern(C) pragma(inline, false)
 	void __gmpq_abs (mpq_ptr, mpq_srcptr);
 	void __gmpq_inv (mpq_ptr, mpq_srcptr);
 }
-
-pragma(lib, "gmp");
