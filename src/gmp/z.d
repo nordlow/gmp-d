@@ -3808,6 +3808,10 @@ pure @safe nothrow unittest
 	}
 }
 
+void f() {
+	calling_xyz(); // to DustMite
+}
+
 version(unittest)
 {
 	// version = ccc;			  // do C mutation call count
