@@ -418,7 +418,7 @@ MpQ inverse()(auto ref const MpQ x) @trusted
 alias inv = inverse;
 
 /// construction and assignment
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	Q x = null;
 	assert(x.numerator == 0);
@@ -450,7 +450,7 @@ alias inv = inverse;
 }
 
 /// canonicalization
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	Q x = Q(2, 4);
 	assert(x.numerator == 2);
@@ -461,7 +461,7 @@ alias inv = inverse;
 }
 
 /// negative numerator canonicalization
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	Q x = Q(-2, 4);
 	assert(x.numerator == -2);
@@ -472,7 +472,7 @@ alias inv = inverse;
 }
 
 /// swap
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	Q x = Q(1, 2);
 	Q y = Q(1, 3);
@@ -482,7 +482,7 @@ alias inv = inverse;
 }
 
 /// invert
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	Q x = Q(1, 2);
 	assert(x.numerator == 1);
@@ -504,7 +504,7 @@ alias inv = inverse;
 }
 
 /// inversion
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	const Q q = Q(-2, 3);
 	assert(inverse(q) == Q(-3, 2));
@@ -515,7 +515,7 @@ alias inv = inverse;
 }
 
 /// absolute value
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	const Q q = Q(-2, 3);
 	assert(abs(q) == Q(2, 3));
@@ -523,7 +523,7 @@ alias inv = inverse;
 }
 
 /// integer and fractional part
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	Q x = Q(5, 2);
 
@@ -548,7 +548,7 @@ alias inv = inverse;
 }
 
 /// casting
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	assert(cast(double)Q(1, 2) == 0.5f);
 	assert(cast(double)Q(1, 2) == 0.5);
@@ -557,7 +557,7 @@ alias inv = inverse;
 }
 
 /// equality
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	assert(Q(1, 1) == 1);
 	assert(Q(2, 1) == 2);
@@ -568,7 +568,7 @@ alias inv = inverse;
 }
 
 /// sign
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	assert(Q(-1, 3).sgn == -1);
 	assert(Q( 0, 3).sgn ==  0);
@@ -576,7 +576,7 @@ alias inv = inverse;
 }
 
 /// comparison
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	assert(Q( 1, 3) < Q(1, 2));
 	assert(Q( 1, 2) > Q(1, 3));
@@ -599,7 +599,7 @@ alias inv = inverse;
 }
 
 /// addition
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	assert(Q(1, 2) + Q(1, 2) == Q(1, 1));
 	assert(Q(1, 3) + Q(1, 3) == Q(2, 3));
@@ -607,7 +607,7 @@ alias inv = inverse;
 }
 
 /// subtraction
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	assert(Q(1, 2) - Q(1, 2) == Q( 0, 1));
 	assert(Q(1, 2) - Q(1, 3) == Q (1, 6));
@@ -615,7 +615,7 @@ alias inv = inverse;
 }
 
 /// multiplication
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	assert(Q(1, 2) * Q(1, 2) == Q(1, 4));
 	assert(Q(2, 3) * Q(2, 3) == Q(4, 9));
@@ -623,7 +623,7 @@ alias inv = inverse;
 }
 
 /// division
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	assert(Q(2, 3) / Q(2, 3) == Q(1, 1));
 	assert(Q(2, 3) / Q(2, 3) == 1);
@@ -632,7 +632,7 @@ alias inv = inverse;
 	// TODO: assert(1 / Q(2, 3) == Q(3, 2));
 }
 
-version(unittest)
+version(gmp_test) version(unittest)
 {
 	// version = ccc;			  // do C mutation call count
 	alias Z = MpZ;

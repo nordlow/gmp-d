@@ -7,8 +7,8 @@ import core.lifetime : move;
 import std.traits : Unsigned, Unqual, isIntegral, isUnsigned; // used by expression templates
 import gmp.traits;
 
-/// Call unittests taking long to execute.
-// version = unittestLong;
+/// Call version(gmp_test) unittests taking long to execute.
+// version = version(gmp_test) unittestLong;
 
 /// Is `true` if type `T` can be evaluated to a `MpZ` value.
 enum isMpZExpr(T) = (is(Unqual!(typeof(T.eval())) == MpZ) ||
@@ -1546,10 +1546,10 @@ static assert(MpZ.sizeof == __mpz_struct.sizeof);
 alias CopyableMpZ = _Z!(true);
 static assert(CopyableMpZ.sizeof == __mpz_struct.sizeof + size_t.sizeof);
 
-version(unittest) static assert(isMpZExpr!(MpZ));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(MpZ));
 
 version(benchmark)
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	import std.datetime.stopwatch : benchmark;
 	bool odd;
@@ -1644,7 +1644,7 @@ _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 }
 
 ///
-@safe nothrow @nogc unittest
+version(gmp_test) @safe nothrow @nogc unittest
 {
 	const Z x = Z(2)^^100;
 	const Z y = 12;
@@ -1696,7 +1696,7 @@ _Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 }
 
 ///
-@safe nothrow @nogc unittest
+version(gmp_test) @safe nothrow @nogc unittest
 {
 	Z x = 2.Z^^100;
 	Z y = 12;
@@ -1752,7 +1752,7 @@ _Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 }
 
 ///
-@safe nothrow @nogc unittest
+version(gmp_test) @safe nothrow @nogc unittest
 {
 	Z x = 2.Z^^100;
 	Z y = 12;
@@ -2115,7 +2115,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 }
 
 /// default construction
-@safe nothrow @nogc unittest
+version(gmp_test) @safe nothrow @nogc unittest
 {
 	Z x = null;
 	Z y = null;
@@ -2138,7 +2138,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 }
 
 /// @nogc to ASCII generation
-@trusted nothrow unittest
+version(gmp_test) @trusted nothrow unittest
 {
 	import core.memory : pureFree;
 	const Z w = null;
@@ -2148,7 +2148,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 }
 
 /// operate on default-constructed instances
-@safe nothrow unittest
+version(gmp_test) @safe nothrow unittest
 {
 	Z w;
 
@@ -2314,7 +2314,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 }
 
 /// null construction
-@safe nothrow @nogc unittest
+version(gmp_test) @safe nothrow @nogc unittest
 {
 	const Z x = null;
 	const Z y = null;
@@ -2323,7 +2323,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 }
 
 ///
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	const x = 42.Z;
 	assert(x.unaryMinus() == -42);   // l-value `this`
@@ -2331,7 +2331,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 }
 
 /// convert to string
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	assert(mpz(	42).toString ==   `42`);
 	assert(mpz(   -42).toString ==  `-42`);
@@ -2353,7 +2353,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 }
 
 ///
-@nogc unittest
+version(gmp_test) @nogc unittest
 {
 	ubyte[int.sizeof] storage;
 	const ubyte[1] expected = [2];
@@ -2363,7 +2363,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 	assert(storage2 == expected);
 }
 
-unittest
+version(gmp_test) unittest
 {
 	const ubyte[int.sizeof] storage;
 	const ubyte[1] expected = [2];
@@ -2372,7 +2372,7 @@ unittest
 }
 
 ///
-unittest
+version(gmp_test) unittest
 {
 	auto prime = 33_391.Z;
 	for (int i = 0; i < 20; ++i)
@@ -2391,7 +2391,7 @@ unittest
 }
 
 /// opBinary with r-value right-hand-side
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	const Z a = 42;
 	{
@@ -2421,7 +2421,7 @@ unittest
 }
 
 ///
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	const _ = (cast(uint)42).Z;
 	const a = 42.Z;
@@ -3075,14 +3075,14 @@ unittest
 }
 
 /// generators
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	assert(Z.mersennePrime(15) == 2^^15 - 1);
 	assert(Z.mersennePrime(15UL) == 2^^15 - 1);
 }
 
 /// left shift
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	assert(1.Z << 1.Z == 2^^1);
 	assert(1.Z << 2.Z == 2^^2);
@@ -3137,7 +3137,7 @@ unittest
 }
 
 /// right shift
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	assert(0x4.Z >> 1.Z == 0x2);
 	assert(0x4.Z >> 2.Z == 0x1);
@@ -3210,7 +3210,7 @@ unittest
 }
 
 /// verify compliance with Phobos' `BigInt`
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	alias bigInt = mpz;
 	alias BigInt = Z;	 // Phobos naming convention
@@ -3433,7 +3433,7 @@ unittest
 }
 
 /// Fermats Little Theorem
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	version (unittestLong)
 	{
@@ -3456,7 +3456,7 @@ unittest
 }
 
 // Euler's Sum of Powers Conjecture counter example
-pure @nogc unittest
+version(gmp_test) pure @nogc unittest
 {
 	/*
 	  a^5 + b^5 + c^5 + d^5 = e^5 Lander & Parkin, 1966 found the first counter
@@ -3521,9 +3521,9 @@ private struct AddExpr(bool cow)
 		__gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(AddExpr!(true)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(AddExpr!(true)));
 
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	assert(AddExpr!(false)(3.Z, 4.Z).eval() == 3 + 4);
 
@@ -3554,9 +3554,9 @@ private struct SubExpr(bool cow)
 		__gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(SubExpr!(false)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(SubExpr!(false)));
 
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	assert(SubExpr!(false)(3.Z, 4.Z).eval() == 3 - 4);
 	const Z x = SubExpr!(false)(3.Z, 4.Z);
@@ -3581,9 +3581,9 @@ private struct MulExpr(bool cow)
 		__gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(MulExpr!(false)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(MulExpr!(false)));
 
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	assert(MulExpr!(false)(3.Z, 4.Z).eval() == 3 * 4);
 
@@ -3609,9 +3609,9 @@ private struct DivExpr(bool cow)
 		__gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(DivExpr!(false)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(DivExpr!(false)));
 
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	assert(DivExpr!(false)(27.Z, 3.Z).eval() == 27 / 3);
 	assert(DivExpr!(false)(28.Z, 3.Z).eval() == 28 / 3);
@@ -3640,9 +3640,9 @@ private struct ModExpr(bool cow)
 		__gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(ModExpr!(false)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(ModExpr!(false)));
 
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	assert(ModExpr!(false)(27.Z, 3.Z).eval() == 27 % 3);
 	assert(ModExpr!(false)(28.Z, 3.Z).eval() == 28 % 3);
@@ -3673,9 +3673,9 @@ if (isMpZExpr!P &&
 		__gmpz_pow_ui(y._ptr, e1.eval()._ptr, e2);
 	}
 }
-version(unittest) static assert(isMpZExpr!(PowUExpr!(MpZ, ulong)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(PowUExpr!(MpZ, ulong)));
 
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	assert(PowUExpr!(Z, ulong)(3.Z, 3).eval() == 3^^3);
 }
@@ -3702,9 +3702,9 @@ if (isMpZExpr!P &&
 		__gmpz_powm_ui(y._ptr, base.eval()._ptr, exp, mod._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(PowMUExpr!(MpZ, ulong, MpZ)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(PowMUExpr!(MpZ, ulong, MpZ)));
 
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	assert(PowMUExpr!(Z, ulong, Z)(3.Z, 3, 20.Z).eval() == 3^^3 % 20);
 }
@@ -3726,9 +3726,9 @@ private struct NegExpr(bool cow)
 		__gmpz_neg(y._ptr, e1.eval()._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(NegExpr!(false)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(NegExpr!(false)));
 
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	assert(NegExpr!(false)(27.Z).eval() == -27);
 	const Z x = NegExpr!(false)(27.Z);
@@ -3755,9 +3755,9 @@ private struct SqrtExpr(bool cow)
 		__gmpz_sqrt(y._ptr, e1.eval()._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(SqrtExpr!(false)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(SqrtExpr!(false)));
 
-@safe @nogc unittest
+version(gmp_test) @safe @nogc unittest
 {
 	foreach (const n; 16 .. 25)
 		assert(SqrtExpr!(false)(n.Z).eval() == 4);
@@ -3773,7 +3773,7 @@ if (isIntegral!T)
 }
 
 /// as hash table key
-@safe unittest
+version(gmp_test) @safe unittest
 {
 	// TODO: disabled until non-copyable types work in AA's
 	// string[Z] aa;
@@ -3784,7 +3784,7 @@ if (isIntegral!T)
 }
 
 /// copyable integer
-@trusted unittest
+version(gmp_test) @trusted unittest
 {
 	alias CZ = CopyableMpZ;
 
@@ -3799,7 +3799,7 @@ if (isIntegral!T)
 }
 
 /// to string conversion
-pure @safe nothrow unittest
+version(gmp_test) pure @safe nothrow unittest
 {
 	for (int i = -100; i < 100; ++i)
 	{
@@ -3808,7 +3808,7 @@ pure @safe nothrow unittest
 	}
 }
 
-version(unittest)
+version(gmp_test) version(unittest)
 {
 	// version = ccc;			  // do C mutation call count
 	debug import core.stdc.stdio : printf;

@@ -1,6 +1,7 @@
 # DUB stuff
 .dub
 dub.selections.json
+dub.sdl.redub_cache_json
 
 # DMD coverage output
 *.lst

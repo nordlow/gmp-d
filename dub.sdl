@@ -26,7 +26,7 @@ buildType "release" {
 
 buildType "unittest" {
   buildOptions "unittests" "debugMode" "debugInfo"
-  dflags "-checkaction=context" "-preview=dip1000"
+  dflags "-checkaction=context" "-preview=dip1000" # TODO: "-preview=dip1021"
   dflags "-fsanitize=address" "-fsanitize=leak" platform="posix-ldc"
 }
 
