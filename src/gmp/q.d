@@ -632,7 +632,7 @@ version(gmp_test) @safe unittest
 	// TODO: assert(1 / Q(2, 3) == Q(3, 2));
 }
 
-version(unittest)
+version(gmp_test) version(unittest)
 {
 	// version = ccc;			  // do C mutation call count
 	alias Z = MpZ;

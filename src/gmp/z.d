@@ -1546,7 +1546,7 @@ static assert(MpZ.sizeof == __mpz_struct.sizeof);
 alias CopyableMpZ = _Z!(true);
 static assert(CopyableMpZ.sizeof == __mpz_struct.sizeof + size_t.sizeof);
 
-version(unittest) static assert(isMpZExpr!(MpZ));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(MpZ));
 
 version(benchmark)
 version(gmp_test) @safe unittest
@@ -3521,7 +3521,7 @@ private struct AddExpr(bool cow)
 		__gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(AddExpr!(true)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(AddExpr!(true)));
 
 version(gmp_test) @safe @nogc unittest
 {
@@ -3554,7 +3554,7 @@ private struct SubExpr(bool cow)
 		__gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(SubExpr!(false)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(SubExpr!(false)));
 
 version(gmp_test) @safe @nogc unittest
 {
@@ -3581,7 +3581,7 @@ private struct MulExpr(bool cow)
 		__gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(MulExpr!(false)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(MulExpr!(false)));
 
 version(gmp_test) @safe @nogc unittest
 {
@@ -3609,7 +3609,7 @@ private struct DivExpr(bool cow)
 		__gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(DivExpr!(false)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(DivExpr!(false)));
 
 version(gmp_test) @safe @nogc unittest
 {
@@ -3640,7 +3640,7 @@ private struct ModExpr(bool cow)
 		__gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(ModExpr!(false)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(ModExpr!(false)));
 
 version(gmp_test) @safe @nogc unittest
 {
@@ -3673,7 +3673,7 @@ if (isMpZExpr!P &&
 		__gmpz_pow_ui(y._ptr, e1.eval()._ptr, e2);
 	}
 }
-version(unittest) static assert(isMpZExpr!(PowUExpr!(MpZ, ulong)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(PowUExpr!(MpZ, ulong)));
 
 version(gmp_test) @safe @nogc unittest
 {
@@ -3702,7 +3702,7 @@ if (isMpZExpr!P &&
 		__gmpz_powm_ui(y._ptr, base.eval()._ptr, exp, mod._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(PowMUExpr!(MpZ, ulong, MpZ)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(PowMUExpr!(MpZ, ulong, MpZ)));
 
 version(gmp_test) @safe @nogc unittest
 {
@@ -3726,7 +3726,7 @@ private struct NegExpr(bool cow)
 		__gmpz_neg(y._ptr, e1.eval()._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(NegExpr!(false)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(NegExpr!(false)));
 
 version(gmp_test) @safe @nogc unittest
 {
@@ -3755,7 +3755,7 @@ private struct SqrtExpr(bool cow)
 		__gmpz_sqrt(y._ptr, e1.eval()._ptr);
 	}
 }
-version(unittest) static assert(isMpZExpr!(SqrtExpr!(false)));
+version(gmp_test) version(unittest) static assert(isMpZExpr!(SqrtExpr!(false)));
 
 version(gmp_test) @safe @nogc unittest
 {
@@ -3808,7 +3808,7 @@ version(gmp_test) pure @safe nothrow unittest
 	}
 }
 
-version(unittest)
+version(gmp_test) version(unittest)
 {
 	// version = ccc;			  // do C mutation call count
 	debug import core.stdc.stdio : printf;
