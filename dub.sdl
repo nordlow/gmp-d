@@ -13,9 +13,7 @@ dflags "-vcolumns"
 
 libs "gmp" "c"
 
-# use better linker
-dflags "-Xcc=-fuse-ld=gold" platform="linux-ldc" # use GNU gold linker
-# TODO: benchmark LDC's new -link-internally
+dflags "-Xcc=-fuse-ld=lld" platform="linux-ldc" # use better linker
 
 importPaths "src"
 
