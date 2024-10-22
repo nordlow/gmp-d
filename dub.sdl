@@ -13,7 +13,9 @@ dflags "-vcolumns"
 
 libs "gmp" "c"
 
-dflags "-Xcc=-fuse-ld=lld" # use better linker
+# use better linker
+dflags "-Xcc=-fuse-ld=lld"
+lflags "-fuse-ld=lld"
 
 importPaths "src"
 
