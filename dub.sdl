@@ -13,7 +13,7 @@ dflags "-vcolumns"
 
 libs "gmp" "c"
 
-dflags "-Xcc=-fuse-ld=lld" platform="linux-ldc" # use better linker
+dflags "-Xcc=-fuse-ld=lld" # use better linker
 
 importPaths "src"
 
