@@ -13,10 +13,6 @@ dflags "-vcolumns"
 
 libs "gmp" "c"
 
-# use better linker
-dflags "-Xcc=-fuse-ld=lld"
-lflags "-fuse-ld=lld"
-
 importPaths "src"
 
 buildType "release" {
@@ -28,13 +24,7 @@ buildType "unittest" {
   buildOptions "unittests" "debugMode" "debugInfo"
   dflags "-checkaction=context" "-preview=dip1000" # TODO: "-preview=dip1021"
   dflags "-fsanitize=address" "-fsanitize=leak" platform="posix-ldc"
-}
-
-# TODO: this doesn't work
-buildType "unittest-ccc" {
-  buildOptions "unittests" "debugMode" "debugInfo"
-  dflags "-checkaction=context" "-fsanitize=address" "-fsanitize=leak" platform="posix-ldc" # test build uses LDC's sanitizer by default
-  # TODO: dflags "-d-version=ccc"
+  dflags "-Xcc=-fuse-ld=lld"  # use better linker
 }
 
 buildType "release-unittest" {
