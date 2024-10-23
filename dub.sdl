@@ -13,6 +13,7 @@ dflags "-vcolumns"
 
 libs "gmp" "c"
 
+targetPath "bin"
 importPaths "src"
 
 buildType "release" {

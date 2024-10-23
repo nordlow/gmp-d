@@ -2,18 +2,11 @@
 .dub
 dub.selections.json
 dub.sdl.redub_cache_json
+bin
 
 # DMD coverage output
 *.lst
 
-# DUB test artifacts
-__test__library__
-
-# library
-libgmp-d.a
-
 # core dumps
 core
 src/core
-
-gmp-d-test-library
