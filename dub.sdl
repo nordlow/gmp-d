@@ -22,6 +22,7 @@ buildType "release" {
 }
 
 buildType "unittest" {
+  versions "gmp_test"
   buildOptions "unittests" "debugMode" "debugInfo"
   dflags "-checkaction=context" "-preview=dip1000" # TODO: "-preview=dip1021"
   dflags "-fsanitize=address" "-fsanitize=leak" platform="posix-ldc"
@@ -29,6 +30,7 @@ buildType "unittest" {
 }
 
 buildType "release-unittest" {
+  versions "gmp_test"
   buildOptions "releaseMode" "optimize" "inline" # TODO: -march=native -ffast-math
   dflags "-checkaction=context" "-unittest"
 }

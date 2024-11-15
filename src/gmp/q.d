@@ -418,7 +418,7 @@ MpQ inverse()(auto ref const MpQ x) @trusted
 alias inv = inverse;
 
 /// construction and assignment
-version(gmp_test) @safe @nogc unittest
+@safe @nogc version(gmp_test) unittest
 {
 	Q x = null;
 	assert(x.numerator == 0);
@@ -450,7 +450,7 @@ version(gmp_test) @safe @nogc unittest
 }
 
 /// canonicalization
-version(gmp_test) @safe @nogc unittest
+@safe @nogc version(gmp_test) unittest
 {
 	Q x = Q(2, 4);
 	assert(x.numerator == 2);
@@ -461,7 +461,7 @@ version(gmp_test) @safe @nogc unittest
 }
 
 /// negative numerator canonicalization
-version(gmp_test) @safe @nogc unittest
+@safe @nogc version(gmp_test) unittest
 {
 	Q x = Q(-2, 4);
 	assert(x.numerator == -2);
@@ -472,7 +472,7 @@ version(gmp_test) @safe @nogc unittest
 }
 
 /// swap
-version(gmp_test) @safe @nogc unittest
+@safe @nogc version(gmp_test) unittest
 {
 	Q x = Q(1, 2);
 	Q y = Q(1, 3);
@@ -482,7 +482,7 @@ version(gmp_test) @safe @nogc unittest
 }
 
 /// invert
-version(gmp_test) @safe unittest
+@safe version(gmp_test) unittest
 {
 	Q x = Q(1, 2);
 	assert(x.numerator == 1);
@@ -504,7 +504,7 @@ version(gmp_test) @safe unittest
 }
 
 /// inversion
-version(gmp_test) @safe unittest
+@safe version(gmp_test) unittest
 {
 	const Q q = Q(-2, 3);
 	assert(inverse(q) == Q(-3, 2));
@@ -515,7 +515,7 @@ version(gmp_test) @safe unittest
 }
 
 /// absolute value
-version(gmp_test) @safe unittest
+@safe version(gmp_test) unittest
 {
 	const Q q = Q(-2, 3);
 	assert(abs(q) == Q(2, 3));
@@ -523,7 +523,7 @@ version(gmp_test) @safe unittest
 }
 
 /// integer and fractional part
-version(gmp_test) @safe unittest
+@safe version(gmp_test) unittest
 {
 	Q x = Q(5, 2);
 
@@ -548,7 +548,7 @@ version(gmp_test) @safe unittest
 }
 
 /// casting
-version(gmp_test) @safe @nogc unittest
+@safe @nogc version(gmp_test) unittest
 {
 	assert(cast(double)Q(1, 2) == 0.5f);
 	assert(cast(double)Q(1, 2) == 0.5);
@@ -557,7 +557,7 @@ version(gmp_test) @safe @nogc unittest
 }
 
 /// equality
-version(gmp_test) @safe unittest
+@safe version(gmp_test) unittest
 {
 	assert(Q(1, 1) == 1);
 	assert(Q(2, 1) == 2);
@@ -568,7 +568,7 @@ version(gmp_test) @safe unittest
 }
 
 /// sign
-version(gmp_test) @safe unittest
+@safe version(gmp_test) unittest
 {
 	assert(Q(-1, 3).sgn == -1);
 	assert(Q( 0, 3).sgn ==  0);
@@ -576,7 +576,7 @@ version(gmp_test) @safe unittest
 }
 
 /// comparison
-version(gmp_test) @safe unittest
+@safe version(gmp_test) unittest
 {
 	assert(Q( 1, 3) < Q(1, 2));
 	assert(Q( 1, 2) > Q(1, 3));
@@ -599,7 +599,7 @@ version(gmp_test) @safe unittest
 }
 
 /// addition
-version(gmp_test) @safe unittest
+@safe version(gmp_test) unittest
 {
 	assert(Q(1, 2) + Q(1, 2) == Q(1, 1));
 	assert(Q(1, 3) + Q(1, 3) == Q(2, 3));
@@ -607,7 +607,7 @@ version(gmp_test) @safe unittest
 }
 
 /// subtraction
-version(gmp_test) @safe unittest
+@safe version(gmp_test) unittest
 {
 	assert(Q(1, 2) - Q(1, 2) == Q( 0, 1));
 	assert(Q(1, 2) - Q(1, 3) == Q (1, 6));
@@ -615,7 +615,7 @@ version(gmp_test) @safe unittest
 }
 
 /// multiplication
-version(gmp_test) @safe unittest
+@safe version(gmp_test) unittest
 {
 	assert(Q(1, 2) * Q(1, 2) == Q(1, 4));
 	assert(Q(2, 3) * Q(2, 3) == Q(4, 9));
@@ -623,7 +623,7 @@ version(gmp_test) @safe unittest
 }
 
 /// division
-version(gmp_test) @safe unittest
+@safe version(gmp_test) unittest
 {
 	assert(Q(2, 3) / Q(2, 3) == Q(1, 1));
 	assert(Q(2, 3) / Q(2, 3) == 1);

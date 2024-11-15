@@ -1644,7 +1644,7 @@ _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 }
 
 ///
-version(gmp_test) @safe nothrow @nogc unittest
+@safe nothrow @nogc version(gmp_test) unittest
 {
 	const Z x = Z(2)^^100;
 	const Z y = 12;
@@ -1696,7 +1696,7 @@ _Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 }
 
 ///
-version(gmp_test) @safe nothrow @nogc unittest
+@safe nothrow @nogc version(gmp_test) unittest
 {
 	Z x = 2.Z^^100;
 	Z y = 12;
@@ -1752,7 +1752,7 @@ _Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 }
 
 ///
-version(gmp_test) @safe nothrow @nogc unittest
+@safe nothrow @nogc version(gmp_test) unittest
 {
 	Z x = 2.Z^^100;
 	Z y = 12;
@@ -2115,7 +2115,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 }
 
 /// default construction
-version(gmp_test) @safe nothrow @nogc unittest
+@safe nothrow @nogc version(gmp_test) unittest
 {
 	Z x = null;
 	Z y = null;
@@ -2314,7 +2314,7 @@ version(gmp_test) @safe nothrow unittest
 }
 
 /// null construction
-version(gmp_test) @safe nothrow @nogc unittest
+@safe nothrow @nogc version(gmp_test) unittest
 {
 	const Z x = null;
 	const Z y = null;
