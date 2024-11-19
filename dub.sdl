@@ -16,9 +16,12 @@ libs "gmp" "c"
 targetPath "bin"
 importPaths "src"
 
-buildType "release" {
-  buildOptions "releaseMode" "optimize" "inline" # TODO: -march=native -ffast-math
-  dflags "-flto=full" platform="posix-ldc"
+configuration "unittest" {
+  versions "gmp_test"
+  buildOptions "unittests" "debugMode" "debugInfo"
+  dflags "-checkaction=context" "-preview=dip1000" # TODO: "-preview=dip1021"
+  dflags "-fsanitize=address" "-fsanitize=leak" platform="posix-ldc"
+  dflags "-Xcc=-fuse-ld=lld"  # use better linker
 }
 
 buildType "unittest" {
@@ -33,4 +36,9 @@ buildType "release-unittest" {
   versions "gmp_test"
   buildOptions "releaseMode" "optimize" "inline" # TODO: -march=native -ffast-math
   dflags "-checkaction=context" "-unittest"
+}
+
+buildType "release" {
+  buildOptions "releaseMode" "optimize" "inline" # TODO: -march=native -ffast-math
+  dflags "-flto=full" platform="posix-ldc"
 }
