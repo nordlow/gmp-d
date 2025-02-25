@@ -365,7 +365,7 @@ nothrow:
 	}
 
 	/// Swap content of `this` with `rhs`.
-	void swap()(ref _Z rhs) scope pure nothrow @nogc @safe
+	void swap()(ref _Z rhs) pure nothrow @nogc @safe
 	{
 		pragma(inline, true);
 		import std.algorithm.mutation : swap;
