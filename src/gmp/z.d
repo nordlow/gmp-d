@@ -348,7 +348,7 @@ nothrow:
 	 *
 	 * See Also: `mpz_probab_prime_p`.
 	 */
-	@property int isProbablyPrime(int repetitionCount) @trusted
+	@property int isProbablyPrime(in int repetitionCount = 25) @trusted
 	{
 		version(LDC) pragma(inline, true);
 		return __gmpz_probab_prime_p(_ptr, repetitionCount);
@@ -357,7 +357,7 @@ nothrow:
 	/** Checks if the number is definitely a prime using a probabilistic primality test.
 		Returns: `true` if `this` is a prime, `false` if computation could determine.
 	 */
-	@property bool isDefinitelyPrime(int repetitionCount) @trusted
+	@property bool isDefinitelyPrime(in int repetitionCount = 25) @trusted
 	{
 		return isProbablyPrime(repetitionCount) == 2;
 	}
@@ -3840,6 +3840,7 @@ version(gmp_test) pure @safe nothrow unittest
 /// `isProbablyPrime`
 version(gmp_test) pure @safe nothrow @nogc unittest
 {
+	static immutable ulong[] samplePrimes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41];
 	import std.algorithm.searching : canFind;
 	foreach (const i; 2 .. 41) {
 		const result = Z(i).isProbablyPrime(1);
@@ -3853,14 +3854,9 @@ version(gmp_test) pure @safe nothrow @nogc unittest
 /// `isDefinitelyPrime`
 version(gmp_test) pure @safe nothrow @nogc unittest
 {
-	// foreach (const i; samplePrimes)
-	// 	assert(Z(i).isDefinitelyPrime(1));
-}
-
-/// `isDefinitelyPrime`
-version(gmp_test) pure @safe unittest {
-	version(none)
-	assert(Z("1585250484931980838183060155054946059483320251147754165507727181345942858102375825447700201083437453").isProbablyPrime(100000000));
+	static immutable ulong[] samplePrimes = [257, 65_537, 8_191, 131_071, 524_287, 2_147_483_647];
+	foreach (const i; samplePrimes)
+	 	assert(Z(i).isDefinitelyPrime(1));
 }
 
 version(gmp_test) version(unittest)
@@ -3872,7 +3868,6 @@ version(gmp_test) version(unittest)
 	alias Z = MpZ;
 	alias CZ = CopyableMpZ;
 	alias RZ = _Z!(true);
-	static immutable ulong[] samplePrimes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 257, 65_537, 8_191, 131_071, 524_287, 2_147_483_647, 2305843009213693951];
 }
 
 // C API
