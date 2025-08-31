@@ -3801,17 +3801,6 @@ if (__traits(isIntegral, T))
 	return x >= 0 ? x : -x;
 }
 
-/// as hash table key
-version(gmp_test) @safe unittest
-{
-	// TODO: disabled until non-copyable types work in AA's
-	// string[Z] aa;
-	// aa[123.Z] = "abc";
-	// aa[456.Z] = "def";
-	// assert(aa[123.Z] == "abc");
-	// assert(aa[456.Z] == "def");
-}
-
 /// copyable integer
 version(gmp_test) @trusted unittest
 {
