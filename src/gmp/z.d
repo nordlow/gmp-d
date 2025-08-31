@@ -357,7 +357,7 @@ nothrow:
 	/** Checks if the number is definitely a prime using a probabilistic primality test.
 		Returns: `true` if `this` is a prime, `false` if computation could determine.
 	 */
-	@property int isDefinitelyPrime(int repetitionCount) @trusted
+	@property bool isDefinitelyPrime(int repetitionCount) @trusted
 	{
 		return isProbablyPrime(repetitionCount) == 2;
 	}
