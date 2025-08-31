@@ -81,7 +81,7 @@ struct MpQ
 	{
 		initialize();
 
-		static if (isSigned!Q)
+		static if (__traits(isArithmetic, Q) && !__traits(isUnsigned, Q))
 			assert(qValue >= 1, "Negative denominator");
 
 		// dln("qValue:", qValue);

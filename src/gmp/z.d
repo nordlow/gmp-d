@@ -437,7 +437,7 @@ nothrow:
 		static if (cow) { selfdupIfAliased(); }
 		static	  if (__traits(isUnsigned, T)) __gmpz_set_ui(_ptr, rhs);
 		else static if (__traits(isFloating, T)) __gmpz_set_d(_ptr, rhs);
-		else static if (isSigned!T)   __gmpz_set_si(_ptr, rhs);
+		else static if (__traits(isArithmetic, T) && !__traits(isUnsigned, T))   __gmpz_set_si(_ptr, rhs);
 		else static assert(0);
 		return this;
 	}
@@ -691,7 +691,7 @@ nothrow:
 	/// ditto
 	_Z opBinary(string s, Rhs)(Rhs rhs) const @trusted
 	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^" || s == "<<" || s == ">>") &&
-		isSigned!Rhs)
+		__traits(isArithmetic, Rhs) && !__traits(isUnsigned, Rhs))
 	{
 		version(LDC) pragma(inline, true);
 		typeof(return) y = null;
@@ -761,7 +761,7 @@ nothrow:
 		assert(rhs != 0, "Divison by zero");
 		_Z y = null;
 
-		static if (isSigned!Rhs)
+		static if (__traits(isArithmetic, Rhs) && !__traits(isUnsigned, Rhs))
 		{
 			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
 			{
@@ -804,7 +804,7 @@ nothrow:
 	/// Get a signed type `lhs` divided by `this`.
 	_Z opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
 	if ((s == "+" || s == "-" || s == "*" || s == "%") &&
-		isSigned!Lhs)
+		__traits(isArithmetic, Lhs) && !__traits(isUnsigned, Lhs))
 	{
 		version(LDC) pragma(inline, true);
 		static if (s == "+" ||
@@ -848,7 +848,7 @@ nothrow:
 
 		assert(this != 0, "Divison by zero");
 		__gmpz_tdiv_q(y._ptr, _Z(lhs)._ptr, _ptr);
-		static	  if (isSigned!Lhs)
+		static	  if (__traits(isArithmetic, Lhs) && !__traits(isUnsigned, Lhs))
 			return cast(typeof(return))y;
 		else static if (__traits(isUnsigned, Lhs))
 		{
@@ -964,7 +964,7 @@ nothrow:
 	/// ditto
 	ref _Z opOpAssign(string s, Rhs)(Rhs rhs) scope return @trusted
 	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^" || s == "<<" || s == ">>") &&
-		isSigned!Rhs)
+		__traits(isArithmetic, Rhs) && !__traits(isUnsigned, Rhs))
 	{
 		version(LDC) pragma(inline, true);
 		static	  if (s == "+")
@@ -1193,7 +1193,7 @@ nothrow:
 		__traits(isIntegral, Exp))
 	{
 		version(LDC) pragma(inline, true);
-		static if (isSigned!Base)
+		static if (__traits(isArithmetic, Base) && !__traits(isUnsigned, Base))
 		{
 			immutable bool negate = base < 0;
 			immutable ubase = cast(ulong)(negate ? -base : base);
@@ -1204,7 +1204,7 @@ nothrow:
 			immutable ubase = base;
 		}
 
-		static if (isSigned!Exp)
+		static if (__traits(isArithmetic, Exp) && !__traits(isUnsigned, Exp))
 		{
 			assert(exp >= 0, "Negative exponent"); // TODO: return mpq?
 			immutable uexp = cast(ulong)exp;
