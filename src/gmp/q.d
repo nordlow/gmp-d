@@ -1,7 +1,6 @@
 /// Multiple precision rational numbers (Q).
 module gmp.q;
 
-import gmp.traits;
 import gmp.z;
 
 @safe:
