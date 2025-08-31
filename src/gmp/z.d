@@ -333,6 +333,37 @@ nothrow:
 		return typeof(this).pow(2UL, p) - 1;
 	}
 
+	/**
+	 * Checks if the number is probably a prime using a probabilistic primality test.
+	 *
+	 * It performs a specified number of Miller-Rabin probabilistic tests to determine the
+	 * primality of the `MpZ` instance.
+	 *
+	 * Params:
+	 * - repetitionCount: The number of Miller-Rabin tests to perform. A higher value
+	 * increases the certainty of the result for a composite number.
+	 *
+	 * Returns: An integer representing the test result:
+	 * - **0**: The number is definitely composite.
+	 * - **1**: The number is probably prime.
+	 * - **2**: The number is definitely prime.
+	 *
+	 * See Also: `mpz_probab_prime_p`.
+	 */
+	@property int isProbablyPrime(int repetitionCount) @trusted
+	{
+		version(LDC) pragma(inline, true);
+		return __gmpz_probab_prime_p(_ptr, repetitionCount);
+	}
+
+	/** Checks if the number is definitely a prime using a probabilistic primality test.
+		Returns: `true` if `this` is a prime, `false` if computation could determine.
+	 */
+	@property int isDefinitelyPrime(int repetitionCount) @trusted
+	{
+		return isProbablyPrime(repetitionCount) == 2;
+	}
+
 	// /// Construct copy of `value`.
 	// this(ref const _Z value) @trusted
 	// {
@@ -3808,6 +3839,13 @@ version(gmp_test) pure @safe nothrow unittest
 	}
 }
 
+/// `isDefinitelyPrime`
+version(gmp_test) pure @safe nothrow unittest
+{
+	foreach (const i; [3, 5, 7])
+		assert(Z(i).isDefinitelyPrime(1));
+}
+
 version(gmp_test) version(unittest)
 {
 	// version = ccc;			  // do C mutation call count
@@ -3959,6 +3997,8 @@ package extern(C) pragma(inline, false)
 
 	int __gmpz_divisible_p(mpz_srcptr, mpz_srcptr);
 	int __gmpz_divisible_ui_p(mpz_srcptr, ulong);
+
+	int __gmpz_probab_prime_p (const mpz_srcptr, int);
 }
 
 pragma(lib, "gmp");
