@@ -3842,8 +3842,14 @@ version(gmp_test) pure @safe nothrow unittest
 /// `isDefinitelyPrime`
 version(gmp_test) pure @safe nothrow unittest
 {
-	foreach (const i; [3, 5, 7])
-		assert(Z(i).isDefinitelyPrime(1));
+	import std.algorithm.searching : canFind;
+	const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41];
+	foreach (const i; 0 .. 42) {
+		if (primes.canFind(i))
+			assert(Z(i).isDefinitelyPrime(1));
+		else
+			assert(!Z(i).isDefinitelyPrime(1));
+	}
 }
 
 version(gmp_test) version(unittest)
