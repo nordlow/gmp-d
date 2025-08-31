@@ -181,16 +181,16 @@ nothrow:
 		return chars;
 	}
 
-	void toString(Writer)(ref Writer writer, // `mir.appender` compliant
-						  in uint base = defaultBase,
-						  in bool upperCaseDigits = false) const @nogc @trusted
-		if (is(typeof(writer.put((const(char)[]).init)))) {
+	void toString(Sink)(ref Sink sink, // `mir.appender` compliant
+					 in uint base = defaultBase,
+					 in bool upperCaseDigits = false) const @nogc @trusted
+		if (is(typeof(sink.put((const(char)[]).init)))) {
 		import core.memory : pureFree;
-		if (isZero) { return writer.put("0"); }
-		if (isOne) { return writer.put("1"); }
+		if (isZero) { return sink.put("0"); }
+		if (isOne) { return sink.put("1"); }
 		auto chars = toChars(base, upperCaseDigits);
 		scope(exit) pureFree(chars.ptr);
-		writer.put(chars);
+		sink.put(chars);
 	}
 
 	/// Get the unique hash of the `_Z` value suitable for use in a hash table.
