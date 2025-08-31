@@ -2,7 +2,7 @@
 module gmp.z;
 
 import core.lifetime : move;
-import std.traits : Unsigned, Unqual, isUnsigned; // used by expression templates
+import std.traits : Unsigned, Unqual; // used by expression templates
 
 /// Call version(gmp_test) unittests taking long to execute.
 // version = version(gmp_test) unittestLong;
