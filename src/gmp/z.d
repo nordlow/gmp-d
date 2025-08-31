@@ -3839,17 +3839,24 @@ version(gmp_test) pure @safe nothrow unittest
 	}
 }
 
-/// `isDefinitelyPrime`
-version(gmp_test) pure @safe nothrow unittest
+/// `isProbablyPrime`
+version(gmp_test) pure @safe nothrow @nogc unittest
 {
 	import std.algorithm.searching : canFind;
-	const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41];
 	foreach (const i; 0 .. 42) {
-		if (primes.canFind(i))
-			assert(Z(i).isDefinitelyPrime(1));
+		const result = Z(i).isProbablyPrime(1);
+		if (samplePrimes.canFind(i))
+			assert(result == 2);
 		else
-			assert(!Z(i).isDefinitelyPrime(1));
+			assert(result == 0);
 	}
+}
+
+/// `isDefinitelyPrime`
+version(gmp_test) pure @safe nothrow @nogc unittest
+{
+	foreach (const i; samplePrimes)
+		assert(Z(i).isDefinitelyPrime(i));
 }
 
 version(gmp_test) version(unittest)
@@ -3861,6 +3868,7 @@ version(gmp_test) version(unittest)
 	alias Z = MpZ;
 	alias CZ = CopyableMpZ;
 	alias RZ = _Z!(true);
+	static immutable samplePrimes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41];
 }
 
 // C API
