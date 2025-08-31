@@ -86,7 +86,7 @@ struct MpQ
 
 		// dln("qValue:", qValue);
 
-		static	  if (isUnsigned!P)
+		static	  if (__traits(isUnsigned, P))
 			__gmpq_set_ui(_ptr, pValue, qValue);
 		else					// signed integral
 			__gmpq_set_si(_ptr, pValue, qValue);
@@ -111,7 +111,7 @@ struct MpQ
 	{
 		version(DigitalMars) pragma(inline, false);
 
-		static	  if (isUnsigned!P)
+		static	  if (__traits(isUnsigned, P))
 			__gmpq_set_ui(_ptr, value, 1);
 		else					// signed integral
 			__gmpq_set_si(_ptr, value, 1);
@@ -172,7 +172,7 @@ struct MpQ
 	{
 		if (rhs == 0)
 			return sgn;		 // optimization
-		static if (isUnsigned!T)
+		static if (__traits(isUnsigned, T))
 			return __gmpq_cmp_ui(_ptr, rhs, 1UL);
 		else					// isSigned integral
 			return __gmpq_cmp_si(_ptr, rhs, 1UL);

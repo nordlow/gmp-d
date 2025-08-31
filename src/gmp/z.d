@@ -233,7 +233,7 @@ nothrow:
 		Returns: a new GC-allocated slice containing the words produced.
 	*/
 	Word[] serialize(Word)(WordOrder order, WordEndianess endian, size_t nails) const @trusted
-	if (isUnsigned!Word)
+	if (__traits(isUnsigned, Word))
 	{
 		const numb = 8 * Word.sizeof - nails;
 		size_t count = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
@@ -275,7 +275,7 @@ nothrow:
 		// {
 		pragma(inline, true);
 
-		static if	  (isUnsigned!T) __gmpz_init_set_ui(_ptr, value);
+		static if	  (__traits(isUnsigned, T)) __gmpz_init_set_ui(_ptr, value);
 		else static if (__traits(isFloating, T)) __gmpz_init_set_d(_ptr, value);
 		else						  __gmpz_init_set_si(_ptr, value); // isSigned integral
 		// }
@@ -302,7 +302,7 @@ nothrow:
 		- the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
 	*/
 	this(T)(const T[] rop, WordOrder order, size_t size, WordEndianess endian, size_t nails)
-	if (isUnsigned!T)
+	if (__traits(isUnsigned, T))
 	{
 
 		int realOrder;
@@ -435,7 +435,7 @@ nothrow:
 		version(LDC) pragma(inline, true);
 		assertInitialized();
 		static if (cow) { selfdupIfAliased(); }
-		static	  if (isUnsigned!T) __gmpz_set_ui(_ptr, rhs);
+		static	  if (__traits(isUnsigned, T)) __gmpz_set_ui(_ptr, rhs);
 		else static if (__traits(isFloating, T)) __gmpz_set_d(_ptr, rhs);
 		else static if (isSigned!T)   __gmpz_set_si(_ptr, rhs);
 		else static assert(0);
@@ -492,7 +492,7 @@ nothrow:
 			return isZero;	  // optimization
 		if (rhs == 1)
 			return isOne;	  // optimization
-		static	  if (isUnsigned!Rhs) return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
+		static	  if (__traits(isUnsigned, Rhs)) return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
 		else static if (__traits(isFloating, Rhs)) return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO: correct to do this cast here?
 		else							return __gmpz_cmp_si(_ptr, cast(long)rhs) == 0;	// isSigned integral
 	}
@@ -512,7 +512,7 @@ nothrow:
 		pragma(inline, true);
 		if (rhs == 0)
 			return sgn();	   // optimization
-		static	  if (isUnsigned!T) return __gmpz_cmp_ui(_ptr, rhs);
+		static	  if (__traits(isUnsigned, T)) return __gmpz_cmp_ui(_ptr, rhs);
 		else static if (__traits(isFloating, T)) return __gmpz_cmp_d(_ptr, rhs);
 		else						  return __gmpz_cmp_si(_ptr, rhs); // isSigned integral
 	}
@@ -529,7 +529,7 @@ nothrow:
 	if (__traits(isArithmetic, T))
 	{
 		pragma(inline, true);
-		static	  if (isUnsigned!T) return cast(T)__gmpz_get_ui(_ptr);
+		static	  if (__traits(isUnsigned, T)) return cast(T)__gmpz_get_ui(_ptr);
 		else static if (__traits(isFloating, T)) return cast(T)__gmpz_get_d(_ptr);
 		else						  return cast(T)__gmpz_get_si(_ptr); // isSigned integral
 	}
@@ -663,7 +663,7 @@ nothrow:
 	/// ditto
 	_Z opBinary(string s, Rhs)(Rhs rhs) const @trusted
 	if ((s == "+" || s == "-" || s == "*" || s == "/" /* || s == "%"*/ || s == "^^" || s == "<<" || s == ">>") &&
-		isUnsigned!Rhs)
+		__traits(isUnsigned, Rhs))
 	{
 		version(LDC) pragma(inline, true);
 		typeof(return) y = null;
@@ -771,7 +771,7 @@ nothrow:
 			else
 				return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
 		}
-		else static if (isUnsigned!Rhs)
+		else static if (__traits(isUnsigned, Rhs))
 			return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
 		else
 			static assert(0);
@@ -780,7 +780,7 @@ nothrow:
 	/// Get an unsigned type `lhs` divided by `this`.
 	_Z opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
 	if ((s == "+" || s == "-" || s == "*" || s == "%") &&
-		isUnsigned!Lhs)
+		__traits(isUnsigned, Lhs))
 	{
 		version(LDC) pragma(inline, true);
 		typeof(return) y = null;
@@ -850,7 +850,7 @@ nothrow:
 		__gmpz_tdiv_q(y._ptr, _Z(lhs)._ptr, _ptr);
 		static	  if (isSigned!Lhs)
 			return cast(typeof(return))y;
-		else static if (isUnsigned!Lhs)
+		else static if (__traits(isUnsigned, Lhs))
 		{
 			import std.traits : Signed;
 			return cast(Signed!(typeof(return)))y;
@@ -931,7 +931,7 @@ nothrow:
 	/// ditto
 	ref _Z opOpAssign(string s, Rhs)(Rhs rhs) scope return @trusted
 	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^" || s == "<<" || s == ">>") &&
-		isUnsigned!Rhs)
+		__traits(isUnsigned, Rhs))
 	{
 		version(LDC) pragma(inline, true);
 		static	  if (s == "+")
@@ -1245,7 +1245,7 @@ nothrow:
 	*/
 	Word[] serialize(Word)(return scope Word[] words,
 						   WordOrder order, size_t size, WordEndianess endian, size_t nails) const @trusted
-	if (isUnsigned!Word)
+	if (__traits(isUnsigned, Word))
 	{
 		assert(words, "Words is empty");
 
@@ -1428,7 +1428,7 @@ nothrow:
 	}
 	/// ditto
 	@property bool isDivisibleBy(Rhs)(auto ref scope const Rhs rhs) const @trusted
-	if (isUnsigned!Rhs)
+	if (__traits(isUnsigned, Rhs))
 	{
 		version(LDC) pragma(inline, true);
 		if (rhs == 1) { return true; }
@@ -3686,7 +3686,7 @@ version(gmp_test) @safe @nogc unittest
 /// `MpZ`-`ulong` power expression.
 private struct PowUExpr(P, Q)
 if (isMpZExpr!P &&
-	isUnsigned!Q)
+	__traits(isUnsigned, Q))
 {
 	P e1;					   // base
 	Q e2;					   // exponent
@@ -3713,7 +3713,7 @@ version(gmp_test) @safe @nogc unittest
 /// `MpZ`-`ulong`-`MpZ` power-modulo expression.
 private struct PowMUExpr(P, Q, M)
 if (isMpZExpr!P &&
-	isUnsigned!Q &&
+	__traits(isUnsigned, Q) &&
 	isMpZExpr!M)
 {
 	P base;					 // base

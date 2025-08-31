@@ -4,7 +4,6 @@ module gmp.traits;
 /** Faster than `std.traits`.
 	See https://github.com/dlang/phobos/pull/5038
 */
-enum isUnsigned(T) = __traits(isUnsigned, T);
 enum isSigned(T) = __traits(isArithmetic, T) && !__traits(isUnsigned, T);
 
 /** Is `true` iff `T` is a GNU MP arithmetic type (`long`, `ulong` or `double`). */
