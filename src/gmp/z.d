@@ -3843,7 +3843,7 @@ version(gmp_test) pure @safe nothrow unittest
 version(gmp_test) pure @safe nothrow @nogc unittest
 {
 	import std.algorithm.searching : canFind;
-	foreach (const i; 0 .. 42) {
+	foreach (const i; 0 .. samplePrimes[$-1] + 1) {
 		const result = Z(i).isProbablyPrime(1);
 		if (samplePrimes.canFind(i))
 			assert(result == 2);
