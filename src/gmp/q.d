@@ -63,7 +63,7 @@ struct MpQ
 	/** Construct from floating-point `value`.
 	 */
 	this(P)(in P value) @safe
-	if (isFloating!P)
+	if (__traits(isFloating, P))
 	{
 		initialize();
 		this = value;		   // reuse opAssign
@@ -98,7 +98,7 @@ struct MpQ
 	/** Construct from floating-point `value`.
 	 */
 	ref MpQ opAssign(P)(P value) @trusted scope return
-	if (isFloating!P)
+	if (__traits(isFloating, P))
 	{
 		version(DigitalMars) pragma(inline, false);
 		__gmpq_set_d(_ptr, value);
@@ -212,7 +212,7 @@ struct MpQ
 
 	/// Cast to arithmetic type `T`.
 	T opCast(T)() const @trusted /*TODO: scope*/
-	if (isFloating!T)
+	if (__traits(isFloating, T))
 	{
 		return cast(T)__gmpq_get_d(_ptr);
 	}

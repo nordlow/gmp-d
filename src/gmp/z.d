@@ -1,7 +1,6 @@
 /// Multiple precision integers (Z).
 module gmp.z;
 
-import std.exception : enforce;
 import core.lifetime : move;
 import std.traits : Unsigned, Unqual, isIntegral, isUnsigned; // used by expression templates
 import gmp.traits;
@@ -126,6 +125,7 @@ pure:
 				qualifiedFree(stringz);
 		}
 		immutable int status = __gmpz_init_set_str(_ptr, stringz, base);
+		import std.exception : enforce;
 		enforce(status == 0, "Parameter `value` does not contain an integer");
 	}
 
@@ -268,7 +268,7 @@ nothrow:
 
 	/** Construct from `value`. */
 	this(T)(T value) @trusted
-	if (isArithmetic!T)
+	if (__traits(isArithmetic, T))
 	{
 		// TODO: add support for static initialization
 		// if (!__ctfe)
@@ -276,7 +276,7 @@ nothrow:
 		pragma(inline, true);
 
 		static if	  (isUnsigned!T) __gmpz_init_set_ui(_ptr, value);
-		else static if (isFloating!T) __gmpz_init_set_d(_ptr, value);
+		else static if (__traits(isFloating, T)) __gmpz_init_set_d(_ptr, value);
 		else						  __gmpz_init_set_si(_ptr, value); // isSigned integral
 		// }
 		// else
@@ -430,13 +430,13 @@ nothrow:
 	}
 	/// ditto
 	ref _Z opAssign(T)(T rhs) scope return @trusted
-	if (isArithmetic!T)
+	if (__traits(isArithmetic, T))
 	{
 		version(LDC) pragma(inline, true);
 		assertInitialized();
 		static if (cow) { selfdupIfAliased(); }
 		static	  if (isUnsigned!T) __gmpz_set_ui(_ptr, rhs);
-		else static if (isFloating!T) __gmpz_set_d(_ptr, rhs);
+		else static if (__traits(isFloating, T)) __gmpz_set_d(_ptr, rhs);
 		else static if (isSigned!T)   __gmpz_set_si(_ptr, rhs);
 		else static assert(0);
 		return this;
@@ -485,7 +485,7 @@ nothrow:
 	}
 	/// ditto
 	bool opEquals(Rhs)(Rhs rhs) const @trusted
-	if (isArithmetic!Rhs)
+	if (__traits(isArithmetic, Rhs))
 	{
 		version(LDC) pragma(inline, true);
 		if (rhs == 0)
@@ -493,7 +493,7 @@ nothrow:
 		if (rhs == 1)
 			return isOne;	  // optimization
 		static	  if (isUnsigned!Rhs) return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
-		else static if (isFloating!Rhs) return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO: correct to do this cast here?
+		else static if (__traits(isFloating, Rhs)) return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO: correct to do this cast here?
 		else							return __gmpz_cmp_si(_ptr, cast(long)rhs) == 0;	// isSigned integral
 	}
 
@@ -507,13 +507,13 @@ nothrow:
 	}
 	/// ditto
 	int opCmp(T)(T rhs) const @trusted
-	if (isArithmetic!T)
+	if (__traits(isArithmetic, T))
 	{
 		pragma(inline, true);
 		if (rhs == 0)
 			return sgn();	   // optimization
 		static	  if (isUnsigned!T) return __gmpz_cmp_ui(_ptr, rhs);
-		else static if (isFloating!T) return __gmpz_cmp_d(_ptr, rhs);
+		else static if (__traits(isFloating, T)) return __gmpz_cmp_d(_ptr, rhs);
 		else						  return __gmpz_cmp_si(_ptr, rhs); // isSigned integral
 	}
 
@@ -526,11 +526,11 @@ nothrow:
 
 	/// Cast to arithmetic type `T`.
 	T opCast(T)() scope const @trusted
-	if (isArithmetic!T)
+	if (__traits(isArithmetic, T))
 	{
 		pragma(inline, true);
 		static	  if (isUnsigned!T) return cast(T)__gmpz_get_ui(_ptr);
-		else static if (isFloating!T) return cast(T)__gmpz_get_d(_ptr);
+		else static if (__traits(isFloating, T)) return cast(T)__gmpz_get_d(_ptr);
 		else						  return cast(T)__gmpz_get_si(_ptr); // isSigned integral
 	}
 
