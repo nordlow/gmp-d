@@ -76,8 +76,8 @@ struct MpQ
 	 */
 	this(P, Q)(P pValue, Q qValue,
 			   in bool canonicalizeFlag = false) @trusted
-	if (isIntegral!P &&
-		isIntegral!Q)
+	if (__traits(isIntegral, P) &&
+		__traits(isIntegral, Q))
 	{
 		initialize();
 
@@ -107,7 +107,7 @@ struct MpQ
 
 	/** Assign from integer `value`. */
 	ref MpQ opAssign(P)(P value) @trusted scope return
-	if (isIntegral!P)
+	if (__traits(isIntegral, P))
 	{
 		version(DigitalMars) pragma(inline, false);
 
@@ -142,7 +142,7 @@ struct MpQ
 	}
 	/// ditto
 	int opEquals(T)(T rhs) const @safe
-	if (isIntegral!T)
+	if (__traits(isIntegral, T))
 	{
 		if (rhs == 0)
 			return numerator.isZero; // optimization
@@ -168,7 +168,7 @@ struct MpQ
 	}
 	/// ditto
 	int opCmp(T)(T rhs) const @trusted
-	if (isIntegral!T)
+	if (__traits(isIntegral, T))
 	{
 		if (rhs == 0)
 			return sgn;		 // optimization
@@ -303,7 +303,7 @@ struct MpQ
 	// /// Divided integral with `this`.
 	// Unqual!Lhs opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
 	//	 if ((s == "/") &&
-	//		 isIntegral!Lhs)
+	//		 __traits(isIntegral, Lhs))
 	// {
 	//	 if (lhs == 1)
 	//	 {

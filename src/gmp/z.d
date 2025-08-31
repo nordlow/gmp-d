@@ -2,7 +2,7 @@
 module gmp.z;
 
 import core.lifetime : move;
-import std.traits : Unsigned, Unqual, isIntegral, isUnsigned; // used by expression templates
+import std.traits : Unsigned, Unqual, isUnsigned; // used by expression templates
 import gmp.traits;
 
 /// Call version(gmp_test) unittests taking long to execute.
@@ -326,7 +326,7 @@ nothrow:
 
 	/// Mersenne prime, M(p) = 2 ^^ p - 1
 	static _Z mersennePrime(Integral)(Integral p)
-	if (isIntegral!Integral)
+	if (__traits(isIntegral, Integral))
 	{
 		version(LDC) pragma(inline, true);
 		return typeof(this).pow(2UL, p) - 1;
@@ -755,7 +755,7 @@ nothrow:
 	/// Remainer propagates modulus type.
 	Unqual!Rhs opBinary(string s, Rhs)(Rhs rhs) const @trusted
 	if ((s == "%") &&
-		isIntegral!Rhs)
+		__traits(isIntegral, Rhs))
 	{
 		version(LDC) pragma(inline, true);
 		assert(rhs != 0, "Divison by zero");
@@ -841,7 +841,7 @@ nothrow:
 	/// Dividend propagates quotient type to signed.
 	Unqual!Lhs opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
 	if ((s == "/") &&
-		isIntegral!Lhs)
+		__traits(isIntegral, Lhs))
 	{
 		version(LDC) pragma(inline, true);
 		_Z y = null; // TODO: avoid if !__traits(isRef, this)
@@ -862,7 +862,7 @@ nothrow:
 	/// Exponentation.
 	_Z opBinaryRight(string s, Base)(Base base) const
 	if ((s == "^^") &&
-		isIntegral!Base)
+		__traits(isIntegral, Base))
 	{
 		pragma(inline, true);
 		static assert(false, "Convert `this _Z` exponent to `ulong` and calculate power via static method `pow()`");
@@ -1189,8 +1189,8 @@ nothrow:
 
 	/// Get `base` raised to the power of `exp`.
 	static typeof(this) pow(Base, Exp)(Base base, Exp exp) @trusted
-	if (isIntegral!Base &&
-		isIntegral!Exp)
+	if (__traits(isIntegral, Base) &&
+		__traits(isIntegral, Exp))
 	{
 		version(LDC) pragma(inline, true);
 		static if (isSigned!Base)
@@ -1280,7 +1280,7 @@ nothrow:
 
 	/// Returns: `true` iff `this` fits in a `T`.
 	bool fitsIn(T)() const @trusted
-	if (isIntegral!T)
+	if (__traits(isIntegral, T))
 	{
 		pragma(inline, true);
 		if (isZero ||
@@ -1628,7 +1628,7 @@ alias toHex = toHexadecimalString;
 
 /// Get the absolute value of `x` converted to the corresponding unsigned type.
 Unsigned!T absUnsign(T, bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe // for `std.bigint.BigInt` compatibility
-if (isIntegral!T)
+if (__traits(isIntegral, T))
 {
 	version(LDC) pragma(inline, true);
 	return _integralAbs(cast(T)x);
@@ -3796,7 +3796,7 @@ version(gmp_test) @safe @nogc unittest
 
 // Copied from `std.numeric` to prevent unnecessary Phobos deps.
 private T _integralAbs(T)(scope const T x) @safe
-if (isIntegral!T)
+if (__traits(isIntegral, T))
 {
 	pragma(inline, true);
 	return x >= 0 ? x : -x;
