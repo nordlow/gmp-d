@@ -1,7 +1,6 @@
 /// Multiple precision integers (Z).
 module gmp.z;
 
-debug import std.stdio : writeln;
 import std.exception : enforce;
 import core.lifetime : move;
 import std.traits : Unsigned, Unqual, isIntegral, isUnsigned; // used by expression templates
@@ -1590,7 +1589,7 @@ version(gmp_test) @safe unittest
 	}
 	immutable results = benchmark!test(1);
 	import std.stdio;
-	writeln("Took:", results[0]);
+	debug writeln("Took:", results[0]);
 }
 
 pure:
