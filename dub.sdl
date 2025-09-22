@@ -14,7 +14,7 @@ libs "gmp" "c"
 targetPath "bin"
 importPaths "src"
 
-configuration "unittest" { # `redub` doesn't support custom `buildType`
+configuration "unittest" {
   versions "gmp_test"
   buildOptions "unittests" "debugMode" "debugInfo"
   dflags "-checkaction=context" "-allinst" "-preview=dip1000" # TODO: "-preview=dip1021"
