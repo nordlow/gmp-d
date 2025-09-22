@@ -21,7 +21,6 @@ configuration "unittest" { # `redub` doesn't support custom `buildType`
   buildOptions "unittests" "debugMode" "debugInfo"
   dflags "-checkaction=context" "-allinst" "-preview=dip1000" # TODO: "-preview=dip1021"
   dflags "-fsanitize=address" "-fsanitize=leak" platform="posix-ldc"
-  dflags "-Xcc=-fuse-ld=lld"  # use better linker
 }
 
 buildType "unittest" {
@@ -29,7 +28,6 @@ buildType "unittest" {
   buildOptions "unittests" "debugMode" "debugInfo"
   dflags "-checkaction=context" "-allinst" "-preview=dip1000" # TODO: "-preview=dip1021"
   dflags "-fsanitize=address" "-fsanitize=leak" platform="posix-ldc"
-  dflags "-Xcc=-fuse-ld=lld"  # use better linker
 }
 
 buildType "release-unittest" {
