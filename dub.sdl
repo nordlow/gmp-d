@@ -6,8 +6,6 @@ authors "Per Nordlöw"
 license "BSL-1.0"
 copyright "Per Nordlöw"
 
-# TODO: dependency "libgmp" version="~>1.0.0"
-
 dflags "-vcolumns"
 # dflags "-preview=dtorfields" "-preview=markdown" "-preview=in"
 
