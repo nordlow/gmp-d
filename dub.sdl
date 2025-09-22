@@ -1,6 +1,6 @@
 name "gmp-d"
 targetType "library"
-description "D wrapper for GNU MP (GMP)"
+description "High-level D wrapper for GNU MP (GMP)"
 
 authors "Per Nordlöw"
 license "BSL-1.0"
