@@ -1,6 +1,6 @@
 name "pidigits"
 authors "Per Nordlöw"
-copyright "Copyright © 2019, Per Nordlöw"
+copyright "Copyright © 2025, Per Nordlöw"
 license "Boost Software License, Version 1.0"
 
 dependency "gmp-d" path="../../"
