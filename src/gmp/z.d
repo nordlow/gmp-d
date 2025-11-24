@@ -1318,10 +1318,8 @@ if (isIntegral!T)
 	return _integralAbs(cast(T)x);
 }
 
-/** Get sum of `x` and `y` (`x` + `y`).
- */
-_Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted
-{
+/** Get sum of `x` and `y` (`x` + `y`). */
+_Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted {
 	version(LDC) pragma(inline, true);
 	static if (!__traits(isRef, x) || // r-value `x`
 			   !__traits(isRef, y))	  // r-value `y`
