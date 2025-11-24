@@ -1277,8 +1277,7 @@ version(gmp_test) @safe unittest
 {
 	import std.datetime.stopwatch : benchmark;
 	bool odd;
-	void test()
-	{
+	void test() {
 		odd = (9.Z^^333_333L).isOdd;
 	}
 	immutable results = benchmark!test(1);
