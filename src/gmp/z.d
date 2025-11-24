@@ -236,7 +236,6 @@ nothrow:
 	/// Construct from expression `expr`.
 	this(Expr)(Expr expr)
 	if (isLazyMpZExpr!Expr) {
-		version(DigitalMars) pragma(inline);
 		// TODO: ok to just assume zero-initialized contents at `_z` before...
 		this = expr;			// ...calling this.opAssign ?x
 	}
@@ -425,7 +424,6 @@ nothrow:
 	/// ditto
 	int opCmp(T)(T rhs) const @trusted
 	if (isArithmetic!T) {
-		pragma(inline, true);
 		if (rhs == 0)
 			return sgn();	   // optimization
 		static if (isUnsigned!T) return __gmpz_cmp_ui(_ptr, rhs);
@@ -434,16 +432,11 @@ nothrow:
 	}
 
 	/// Cast to `bool`.
-	bool opCast(T : bool)() scope const {
-		pragma(inline, true);
-		return !isZero;
-	}
+	bool opCast(T : bool)() scope const => !isZero;
 
 	/// Cast to arithmetic type `T`.
-	T opCast(T)() scope const @trusted
-	if (isArithmetic!T) {
-		pragma(inline, true);
-		static	  if (isUnsigned!T) return cast(T)__gmpz_get_ui(_ptr);
+	T opCast(T)() scope const @trusted if (isArithmetic!T) {
+		static if (isUnsigned!T) return cast(T)__gmpz_get_ui(_ptr);
 		else static if (isFloating!T) return cast(T)__gmpz_get_d(_ptr);
 		else return cast(T)__gmpz_get_si(_ptr); // isSigned integral
 	}
