@@ -754,8 +754,7 @@ nothrow:
 
 	/// ditto
 	ref _Z opOpAssign(string s, Rhs)(Rhs rhs) scope return @trusted
-	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^" || s == "<<" || s == ">>") &&
-		isUnsigned!Rhs)
+	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^" || s == "<<" || s == ">>") && isUnsigned!Rhs)
 	{
 		version(LDC) pragma(inline, true);
 		static	  if (s == "+")
