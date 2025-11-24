@@ -3253,8 +3253,7 @@ version(gmp_test) @safe @nogc unittest {
 }
 
 /// `MpZ`-`MpZ` multiplication expression.
-private struct MulExpr(bool cow)
-{
+private struct MulExpr(bool cow) {
 	_Z!(cow) e1;				// first factor
 	_Z!(cow) e2;				// second factor
 	_Z!(cow) eval() const nothrow @nogc @trusted	 // TODO: move to common place
@@ -3264,8 +3263,7 @@ private struct MulExpr(bool cow)
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
-	{
+	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted {
 		version(LDC) pragma(inline, true);
 		__gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
@@ -3280,8 +3278,7 @@ version(gmp_test) @safe @nogc unittest {
 }
 
 /// `MpZ`-`MpZ` division expression.
-private struct DivExpr(bool cow)
-{
+private struct DivExpr(bool cow) {
 	_Z!(cow) e1;				// divisor
 	_Z!(cow) e2;				// dividend
 	_Z!(cow) eval() const nothrow @nogc @trusted	// TODO: move to common place
@@ -3291,8 +3288,7 @@ private struct DivExpr(bool cow)
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
-	{
+	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted {
 		version(LDC) pragma(inline, true);
 		__gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
