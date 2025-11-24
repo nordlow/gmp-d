@@ -508,38 +508,29 @@ nothrow:
 			} else
 				static assert(0);
 			return move(*mut_rhs); // TODO: shouldn't have to call `move` here
-		}
-		else
-		{
+		} else {
 			typeof(return) y = null;
 			static	  if (s == "+") __gmpz_add(y._ptr, _ptr, rhs._ptr);
 			else static if (s == "-") __gmpz_sub(y._ptr, _ptr, rhs._ptr);
 			else static if (s == "*") __gmpz_mul(y._ptr, _ptr, rhs._ptr);
-			else static if (s == "/")
-			{
+			else static if (s == "/") {
 				assert(rhs != 0, "Divison by zero");
 				__gmpz_tdiv_q(y._ptr, _ptr, rhs._ptr);
-			}
-			else static if (s == "%")
-			{
+			} else static if (s == "%") {
 				assert(rhs != 0, "Divison by zero");
 				const neg = rhs.isNegative;
 				__gmpz_mod(y._ptr, _ptr, rhs._ptr);
 				if (neg)
 					y.negate();
-			}
-			else static if (s == "&") __gmpz_and(y._ptr, _ptr, rhs._ptr);
+			} else static if (s == "&") __gmpz_and(y._ptr, _ptr, rhs._ptr);
 			else static if (s == "|") __gmpz_ior(y._ptr, _ptr, rhs._ptr);
 			else static if (s == "^") __gmpz_xor(y._ptr, _ptr, rhs._ptr);
-			else static if (s == "<<")
-			{
+			else static if (s == "<<") {
 				if (rhs.isPositive())
 					__gmpz_mul_2exp(y._ptr, _ptr, cast(mp_bitcnt_t)rhs);
 				else
 					__gmpz_tdiv_q_2exp(y._ptr, _ptr, cast(mp_bitcnt_t)-rhs); // `z << -1` becomes `z >> 1`
-			}
-			else static if (s == ">>")
-			{
+			} else static if (s == ">>") {
 				if (rhs.isPositive())
 					__gmpz_tdiv_q_2exp(y._ptr, _ptr, cast(mp_bitcnt_t)rhs);
 				else
