@@ -1115,11 +1115,8 @@ nothrow:
 			((_z._mp_size != 0) & cast(int)(_z._mp_d[0]))); // fast C macro `mpz_odd_p` in gmp.h
 
 	/// Check if `this` is odd.
-	@property bool isEven() const @safe
-	{
-		pragma(inline, true);
-		return !isOdd;			// fast C macro `mpz_even_p` in gmp.h
-	}
+	pragma(inline, true) @property bool isEven() const @safe
+		=> !isOdd;			// fast C macro `mpz_even_p` in gmp.h
 
 	/// Check if `this` is negative.
 	@property bool isNegative() const @safe
