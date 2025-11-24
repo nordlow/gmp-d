@@ -3195,8 +3195,7 @@ version(gmp_test) pure @nogc unittest {
 /// expression template types
 
 /// `MpZ`-`MpZ` adding expression.
-private struct AddExpr(bool cow)
-{
+private struct AddExpr(bool cow) {
 	_Z!(cow) e1;				// first term
 	_Z!(cow) e2;				// second term
 	_Z!(cow) eval() const nothrow @nogc @trusted
@@ -3206,8 +3205,7 @@ private struct AddExpr(bool cow)
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
-	{
+	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted {
 		version(LDC) pragma(inline, true);
 		__gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
@@ -3227,8 +3225,7 @@ version(gmp_test) @safe @nogc unittest {
 }
 
 /// `MpZ`-`MpZ` subtraction expression.
-private struct SubExpr(bool cow)
-{
+private struct SubExpr(bool cow) {
 	_Z!(cow) e1;					  // first term
 	_Z!(cow) e2;					  // second term
 	_Z!(cow) eval() const nothrow @nogc @trusted	 // TODO: move to common place
@@ -3238,8 +3235,7 @@ private struct SubExpr(bool cow)
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
-	{
+	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted {
 		version(LDC) pragma(inline, true);
 		__gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
