@@ -3489,11 +3489,9 @@ version(gmp_test) version(unittest) {
 }
 
 // C API
-package extern(C) pragma(inline, false)
-{
+package extern(C) pragma(inline, false) {
 	alias __mp_limb_t = ulong;	// see `mp_limb_t` gmp.h. TODO: detect when it is `uint` instead
-	struct __mpz_struct
-	{
+	struct __mpz_struct {
 		int _mp_alloc;			/* Number of *limbs* allocated and pointed to by
 								   the _mp_d field.	 */
 		int _mp_size;			/* abs(_mp_size) is the number of limbs the last
