@@ -1140,20 +1140,12 @@ nothrow:
 		=> __gmpz_perfect_square_p(_ptr) != 0;
 
 	/// Returns: `true` iff `this` is exactly divisible by `rhs`.
-	@property bool isDivisibleBy()(auto ref scope const _Z rhs) const @trusted
-	{
-		version(LDC) pragma(inline, true);
-		if (rhs.isOne) { return true; }
-		return __gmpz_divisible_p(_ptr, rhs._ptr) != 0;
-	}
+	pragma(inline, true)@property bool isDivisibleBy()(auto ref scope const _Z rhs) const @trusted
+		=> rhs.isOne ? true : __gmpz_divisible_p(_ptr, rhs._ptr) != 0;
 	/// ditto
-	@property bool isDivisibleBy(Rhs)(auto ref scope const Rhs rhs) const @trusted
+	pragma(inline, true) @property bool isDivisibleBy(Rhs)(auto ref scope const Rhs rhs) const @trusted
 	if (isUnsigned!Rhs)
-	{
-		version(LDC) pragma(inline, true);
-		if (rhs == 1) { return true; }
-		return __gmpz_divisible_ui_p(_ptr, rhs) != 0;
-	}
+		=> rhs == 1 ? true : __gmpz_divisible_ui_p(_ptr, rhs) != 0;
 
 	/** Returns: sign as either
 
