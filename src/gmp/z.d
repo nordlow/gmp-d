@@ -1288,31 +1288,24 @@ version(gmp_test) @safe unittest
 pure:
 
 /** Instantiator for `MpZ`. */
-_Z!(cow) mpz(bool cow = true, Args...)(Args args) @safe
-{
+_Z!(cow) mpz(bool cow = true, Args...)(Args args) @safe {
 	version(LDC) pragma(inline, true);
 	return typeof(return)(args);
 }
 
 /// Swap contents of `x` with contents of `y`.
-void swap(bool cow)(ref _Z!(cow) x, ref _Z!(cow) y) nothrow
-{
-	pragma(inline, true);
+pragma(inline, true) void swap(bool cow)(ref _Z!(cow) x, ref _Z!(cow) y) nothrow {
 	import std.algorithm.mutation : swap;
 	swap(x, y); // x.swap(y);
 }
 
 /// Get `x` as a `string` in decimal base.
-string toDecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe // for `std.bigint.BigInt` compatibility
-{
-	version(LDC) pragma(inline, true);
+pragma(inline, true) string toDecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe /+ for `std.bigint.BigInt` compatibility +/ {
 	return x.toString(10);
 }
 
 /// Get `x` as a uppercased `string` in hexadecimal base without any base prefix (0x).
-string toHexadecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe
-{
-	version(LDC) pragma(inline, true);
+pragma(inline, true) string toHexadecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe {
 	return x.toString(16, true);
 }
 
