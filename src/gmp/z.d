@@ -1110,12 +1110,9 @@ nothrow:
 		=> _z._mp_size == 1 && _z._mp_d[0] == 1; // fast
 
 	/// Check if `this` is odd.
-	@property bool isOdd() const @safe
-	{
-		pragma(inline, true);
-		return ((_z._mp_alloc != 0) && // this is needed for default (zero) initialized `__mpz_structs`
-				((_z._mp_size != 0) & cast(int)(_z._mp_d[0]))); // fast C macro `mpz_odd_p` in gmp.h
-	}
+	pragma(inline, true) @property bool isOdd() const @safe
+		=> ((_z._mp_alloc != 0) && // this is needed for default (zero) initialized `__mpz_structs`
+			((_z._mp_size != 0) & cast(int)(_z._mp_d[0]))); // fast C macro `mpz_odd_p` in gmp.h
 
 	/// Check if `this` is odd.
 	@property bool isEven() const @safe
