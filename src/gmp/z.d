@@ -1153,11 +1153,8 @@ nothrow:
 	  -	 0 (`this` == 0), or
 	  - +1 (`this` > 0).
 	 */
-	@property int sgn() const @safe
-	{
-		pragma(inline, true);
-		return _z._mp_size < 0 ? -1 : _z._mp_size > 0; // fast C macro `mpz_sgn` in gmp.h
-	}
+	pragma(inline, true) @property int sgn() const @safe
+		=> _z._mp_size < 0 ? -1 : _z._mp_size > 0; // fast C macro `mpz_sgn` in gmp.h
 
 	/// Number of significant `uint`s used for storing `this`.
 	@property size_t uintLength() const
@@ -1174,11 +1171,8 @@ nothrow:
 	}
 
 	/// Get number of limbs in internal representation.
-	@property uint limbCount() const @safe
-	{
-		pragma(inline, true);
-		return _integralAbs(_z._mp_size);
-	}
+	pragma(inline, true) @property uint limbCount() const @safe
+		=> _integralAbs(_z._mp_size);
 
 private:
 
@@ -3507,12 +3501,9 @@ version(gmp_test) @safe @nogc unittest
 }
 
 // Copied from `std.numeric` to prevent unnecessary Phobos deps.
-private T _integralAbs(T)(scope const T x) @safe
+pragma(inline, true) private T _integralAbs(T)(scope const T x) @safe
 if (isIntegral!T)
-{
-	pragma(inline, true);
-	return x >= 0 ? x : -x;
-}
+	=> x >= 0 ? x : -x;
 
 /// as hash table key
 version(gmp_test) @safe unittest
