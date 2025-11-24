@@ -711,57 +711,43 @@ nothrow:
 
 	/// Operate-assign to `this` from `rhs`.
 	ref _Z opOpAssign(string s)(auto ref scope const _Z rhs) scope return @trusted
-	if ((s == "+" || s == "-" ||
-		 s == "*" || s == "/" || s == "%" ||
-		 s == "&" || s == "|" || s == "^" ||
-		 s == "<<" || s == ">>"))
-	{
+	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "&" || s == "|" || s == "^" || s == "<<" || s == ">>")) {
 		version(LDC) pragma(inline, true);
 		static	  if (s == "+")
 			__gmpz_add(_ptr, _ptr, rhs._ptr);
 		else static if (s == "-")
 			__gmpz_sub(_ptr, _ptr, rhs._ptr);
-		else static if (s == "*")
-		{
+		else static if (s == "*") {
 			if (rhs == -1)
 				negate();
 			else
 				__gmpz_mul(_ptr, _ptr, rhs._ptr);
-		}
-		else static if (s == "/")
-		{
+		} else static if (s == "/") {
 			assert(rhs != 0, "Divison by zero");
 			if (rhs == -1)
 				negate();
 			else
 				__gmpz_tdiv_q(_ptr, _ptr, rhs._ptr);
-		}
-		else static if (s == "%")
-		{
+		} else static if (s == "%") {
 			assert(rhs != 0, "Divison by zero");
 			__gmpz_tdiv_r(_ptr, _ptr, rhs._ptr);
-		}
-		else static if (s == "&")
+		} else static if (s == "&")
 			__gmpz_and(_ptr, _ptr, rhs._ptr);
 		else static if (s == "|")
 			__gmpz_ior(_ptr, _ptr, rhs._ptr);
 		else static if (s == "^")
 			__gmpz_xor(_ptr, _ptr, rhs._ptr);
-		else static if (s == "<<")
-		{
+		else static if (s == "<<") {
 			if (rhs.isPositive())
 				__gmpz_mul_2exp(_ptr, _ptr, cast(mp_bitcnt_t)rhs);
 			else
 				__gmpz_tdiv_q_2exp(_ptr, _ptr, cast(mp_bitcnt_t)rhs); // `z << -1` becomes `z >> 1`
-		}
-		else static if (s == ">>")
-		{
+		} else static if (s == ">>") {
 			if (rhs.isPositive())
 				__gmpz_tdiv_q_2exp(_ptr, _ptr, cast(mp_bitcnt_t)rhs);
 			else
 				__gmpz_mul_2exp(_ptr, _ptr, cast(mp_bitcnt_t)rhs); // `z >> -1` becomes `z << 1`
-		}
-		else
+		} else
 			static assert(0);
 		return this;
 	}
