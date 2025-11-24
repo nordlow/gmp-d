@@ -543,9 +543,8 @@ nothrow:
 
 	/// ditto
 	_Z opBinary(string s, Rhs)(auto ref const Rhs rhs) const
-	if (isLazyMpZExpr!Rhs && // lazy value
-		(s == "+" || s == "-" || s == "*" || s == "/" || s == "%"))
-	{
+	if (isLazyMpZExpr!Rhs &&
+		(s == "+" || s == "-" || s == "*" || s == "/" || s == "%")) {
 		pragma(inline, true);
 		static assert(false, "TODO");
 	}
@@ -553,15 +552,13 @@ nothrow:
 	/// ditto
 	_Z opBinary(string s, Rhs)(Rhs rhs) const @trusted
 	if ((s == "+" || s == "-" || s == "*" || s == "/" /* || s == "%"*/ || s == "^^" || s == "<<" || s == ">>") &&
-		isUnsigned!Rhs)
-	{
+		isUnsigned!Rhs) {
 		version(LDC) pragma(inline, true);
 		typeof(return) y = null;
 		static	  if (s == "+") __gmpz_add_ui(y._ptr, _ptr, rhs);
 		else static if (s == "-") __gmpz_sub_ui(y._ptr, _ptr, rhs);
 		else static if (s == "*") __gmpz_mul_ui(y._ptr, _ptr, rhs);
-		else static if (s == "/")
-		{
+		else static if (s == "/") {
 			assert(rhs != 0, "Divison by zero");
 			__gmpz_tdiv_q_ui(y._ptr, _ptr, rhs);
 		}
@@ -580,59 +577,41 @@ nothrow:
 
 	/// ditto
 	_Z opBinary(string s, Rhs)(Rhs rhs) const @trusted
-	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^" || s == "<<" || s == ">>") &&
-		isSigned!Rhs)
-	{
+	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^" || s == "<<" || s == ">>") && isSigned!Rhs) {
 		version(LDC) pragma(inline, true);
 		typeof(return) y = null;
-
-		static	  if (s == "+")
-		{
+		static if (s == "+") {
 			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
 			{
 				immutable ulong pos_rhs = -rhs; // make it positive
 				__gmpz_sub_ui(y._ptr, _ptr, pos_rhs);
-			}
-			else
+			} else
 				__gmpz_add_ui(y._ptr, _ptr, rhs);
-		}
-		else static if (s == "-")
-		{
+		} else static if (s == "-") {
 			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
 				__gmpz_add_ui(y._ptr, _ptr, -rhs); // x - (-y) == x + y
 			else
 				__gmpz_sub_ui(y._ptr, _ptr, rhs); // rhs is positive
-		}
-		else static if (s == "*")
-		{
+		} else static if (s == "*") {
 			__gmpz_mul_si(y._ptr, _ptr, rhs);
-		}
-		else static if (s == "/")
-		{
+		} else static if (s == "/") {
 			assert(rhs != 0, "Divison by zero");
 			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
 			{
 				immutable ulong pos_rhs = -rhs; // make it positive
 				__gmpz_tdiv_q_ui(y._ptr, _ptr, pos_rhs);
 				y.negate();	 // negate result
-			}
-			else
+			} else
 				__gmpz_tdiv_q_ui(y._ptr, _ptr, rhs);
-		}
-		else static if (s == "^^")
-		{
+		} else static if (s == "^^") {
 			assert(rhs >= 0, "TODO: Negative power exponent needs MpQ return");
 			__gmpz_pow_ui(y._ptr, _ptr, rhs);
-		}
-		else static if (s == "<<")
-		{
+		} else static if (s == "<<") {
 			if (rhs >= 0)
 				__gmpz_mul_2exp(y._ptr, _ptr, rhs);
 			else
 				__gmpz_tdiv_q_2exp(y._ptr, _ptr, -rhs); // `z << -1` becomes `z >> 1`
-		}
-		else static if (s == ">>")
-		{
+		} else static if (s == ">>") {
 			if (rhs >= 0)
 				__gmpz_tdiv_q_2exp(y._ptr, _ptr, rhs);
 			else
