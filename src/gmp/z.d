@@ -992,13 +992,8 @@ nothrow:
 	}
 
 	/// Get number of digits in base `base`.
-	size_t sizeInBase(uint base) const @trusted {
-		pragma(inline, true);
-		if (isZero || isOne)
-			return 1;
-		else
-			return __gmpz_sizeinbase(_ptr, base);
-	}
+	pragma(inline, true) size_t sizeInBase(uint base) const @trusted
+		=> isZero || isOne ? 1 : __gmpz_sizeinbase(_ptr, base);
 
 	/** Serialize `this` into an existing pre-allocated slice of words `words`,
 		each word of type `Word`.
