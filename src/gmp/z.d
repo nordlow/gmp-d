@@ -311,12 +311,11 @@ nothrow:
 	// }
 
 	static if (cow) {
-		void selfdupIfAliased() scope pure nothrow @nogc @safe { pragma(inline, true);
+		void selfdupIfAliased() scope pure nothrow @nogc @safe {
 			if (_refCountCopies >= 1)
 				this = this.dup();
 		}
 		this(this) scope pure nothrow @nogc @safe {
-			pragma(inline, true);
 			_refCountCopies += 1;
 		}
 	} else {
@@ -325,7 +324,6 @@ nothrow:
 
 	/// Swap content of `this` with `rhs`.
 	void swap()(ref _Z rhs) scope pure nothrow @nogc @safe {
-		pragma(inline, true);
 		import std.algorithm.mutation : swap;
 		swap(this, rhs); // faster than __gmpz_swap(_ptr, rhs._ptr);
 	}
@@ -1143,16 +1141,12 @@ nothrow:
 		=> _z._mp_size < 0 ? -1 : _z._mp_size > 0; // fast C macro `mpz_sgn` in gmp.h
 
 	/// Number of significant `uint`s used for storing `this`.
-	@property size_t uintLength() const
-	{
-		pragma(inline, true);
+	@property size_t uintLength() const {
 		assert(false, "TODO: use mpz_size");
 	}
 
 	/// Number of significant `ulong`s used for storing `this`.
-	@property size_t uintLong() const
-	{
-		pragma(inline, true);
+	@property size_t uintLong() const {
 		assert(false, "TODO: use mpz_size");
 	}
 
@@ -1163,15 +1157,12 @@ nothrow:
 private:
 
 	/** Initialize internal struct. */
-	void initialize() @system // cannot be called `init` as that will override builtin type property
-	{
-		pragma(inline, true);
+	void initialize() @system /+ cannot be called `init` as that will override builtin type property +/ {
 		__gmpz_init(_ptr);
 	}
 
 	/** Initialize internal struct if needed. */
 	void assertInitialized() @system {
-		pragma(inline, true);
 		if (isDefaultConstructed)
 			__gmpz_init(_ptr);
 	}
@@ -1180,26 +1171,16 @@ private:
 	enum defaultBase = 10;
 
 	/// Returns: evaluation of `this` expression which in this is a no-op.
-	ref inout(_Z) eval() @safe inout scope return {
-		pragma(inline, true);
-		return this;
-	}
+	ref inout(_Z) eval() @safe inout scope return => this;
 
 	/// Type of limb in internal representation.
 	alias Limb = __mp_limb_t;	// GNU MP alias
 
 	/** Returns: limbs. */
-	inout(Limb)[] _limbs() inout return @system {
-		pragma(inline, true);
-		// import std.math : abs;
-		return _z._mp_d[0 .. limbCount];
-	}
+	inout(Limb)[] _limbs() inout return @system => _z._mp_d[0 .. limbCount];
 
 	/// Returns: pointer to internal C struct.
-	inout(__mpz_struct)* _ptr() inout return @system {
-		pragma(inline, true);
-		return &_z;
-	}
+	inout(__mpz_struct)* _ptr() inout return @system => &_z;
 
 	static if (cow) {
 		private __mpz_struct _z; // internal libgmp C struct
