@@ -1119,11 +1119,8 @@ nothrow:
 		=> !isOdd;			// fast C macro `mpz_even_p` in gmp.h
 
 	/// Check if `this` is negative.
-	@property bool isNegative() const @safe
-	{
-		pragma(inline, true);
-		return _z._mp_size < 0; // fast
-	}
+	pragma(inline, true) @property bool isNegative() const @safe
+		=> _z._mp_size < 0; // fast
 
 	/// Check if `this` is positive.
 	@property bool isPositive() const @safe
