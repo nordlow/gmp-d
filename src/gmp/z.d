@@ -542,7 +542,6 @@ nothrow:
 	_Z opBinary(string s, Rhs)(auto ref const Rhs rhs) const
 	if (isLazyMpZExpr!Rhs &&
 		(s == "+" || s == "-" || s == "*" || s == "/" || s == "%")) {
-		pragma(inline, true);
 		static assert(false, "TODO");
 	}
 
@@ -699,7 +698,6 @@ nothrow:
 	/// Exponentation.
 	_Z opBinaryRight(string s, Base)(Base base) const
 	if ((s == "^^") && isIntegral!Base) {
-		pragma(inline, true);
 		static assert(false, "Convert `this _Z` exponent to `ulong` and calculate power via static method `pow()`");
 		// _Z exp = null;
 		// __gmpz_pow();
@@ -833,10 +831,7 @@ nothrow:
 	}
 
 	/// Returns: `this`.
-	ref inout(_Z) opUnary(string s)() inout scope return if (s == "+") {
-		pragma(inline, true);
-		return this;
-	}
+	ref inout(_Z) opUnary(string s)() inout scope return if (s == "+") => this;
 
 	/// Negation of `this`.
 	_Z opUnary(string s)() const if (s == "-") {
@@ -861,7 +856,6 @@ nothrow:
 	*/
 	void negate() @safe {
 		static if (cow) { selfdupIfAliased(); }
-		pragma(inline, true);
 		_z._mp_size = -_z._mp_size; // fast C macro `mpz_neg` in gmp.h
 	}
 
@@ -989,7 +983,7 @@ nothrow:
 	}
 
 	/// Get number of digits in base `base`.
-	pragma(inline, true) size_t sizeInBase(uint base) const @trusted
+	size_t sizeInBase(uint base) const @trusted
 		=> isZero || isOne ? 1 : __gmpz_sizeinbase(_ptr, base);
 
 	/** Serialize `this` into an existing pre-allocated slice of words `words`,
@@ -1032,7 +1026,6 @@ nothrow:
 	/// Returns: `true` iff `this` fits in a `T`.
 	bool fitsIn(T)() const @trusted
 	if (isIntegral!T) {
-		pragma(inline, true);
 		if (isZero || isOne) { return true; } // default-constructed `this`
 		static if (is(T == ulong))  { return __gmpz_fits_ulong_p(_ptr) != 0; }
 		else static if (is(T ==  long))  { return __gmpz_fits_slong_p(_ptr) != 0; }
@@ -1059,28 +1052,24 @@ nothrow:
 
 	/// Set bit at 0-offset index `bitIndex` (to one).
 	void setBit(mp_bitcnt_t bitIndex) @trusted {
-		pragma(inline, true);
 		static if (cow) { selfdupIfAliased(); }
 		__gmpz_setbit(_ptr, bitIndex);
 	}
 
 	/// Clear bit at 0-offset index `bitIndex` (to zero).
 	void clearBit(mp_bitcnt_t bitIndex) @trusted {
-		pragma(inline, true);
 		static if (cow) { selfdupIfAliased(); }
 		__gmpz_clrbit(_ptr, bitIndex);
 	}
 
 	/// Complement bit at 0-offset index `bitIndex` (to zero).
 	void complementBit(mp_bitcnt_t bitIndex) @trusted {
-		pragma(inline, true);
 		static if (cow) { selfdupIfAliased(); }
 		__gmpz_combit(_ptr, bitIndex);
 	}
 
 	/// Test/Get bit at 0-offset index `bitIndex`.
 	bool testBit(mp_bitcnt_t bitIndex) const @trusted {
-		pragma(inline, true);
 		return __gmpz_tstbit(_ptr, bitIndex) != 0;
 	}
 	alias getBit = testBit;
@@ -1092,55 +1081,55 @@ nothrow:
 		handle the case when the membere `_mp_alloc` is zero and, in turn,
 		`_mp_d` is `null`.
 	 */
-	pragma(inline, true) @property bool isDefaultConstructed() const @safe
+	@property bool isDefaultConstructed() const @safe
 		=> _z._mp_alloc == 0; // fast, actually enough to just test this
 
 	/// Check if `this` is zero (either via default-construction or `__gmpz_...`-operations).
-	pragma(inline, true) @property bool isZero() const @safe
+	@property bool isZero() const @safe
 		=> _z._mp_size == 0; // fast
 
 	/// Check if `this` is one.
-	pragma(inline, true) @property bool isOne() const @safe
+	@property bool isOne() const @safe
 		/* NOTE: cannot use _z._mp_d !is null && _z._mp_d[0] == 1 because that’s
 		   true for -1 because sign is stored in `_z._mp_size`
 		*/
 		=> _z._mp_size == 1 && _z._mp_d[0] == 1; // fast
 
 	/// Check if `this` is odd.
-	pragma(inline, true) @property bool isOdd() const @safe
+	@property bool isOdd() const @safe
 		=> ((_z._mp_alloc != 0) && // this is needed for default (zero) initialized `__mpz_structs`
 			((_z._mp_size != 0) & cast(int)(_z._mp_d[0]))); // fast C macro `mpz_odd_p` in gmp.h
 
 	/// Check if `this` is odd.
-	pragma(inline, true) @property bool isEven() const @safe
+	@property bool isEven() const @safe
 		=> !isOdd;			// fast C macro `mpz_even_p` in gmp.h
 
 	/// Check if `this` is negative.
-	pragma(inline, true) @property bool isNegative() const @safe
+	@property bool isNegative() const @safe
 		=> _z._mp_size < 0; // fast
 
 	/// Check if `this` is positive.
-	pragma(inline, true) @property bool isPositive() const @safe
+	@property bool isPositive() const @safe
 		=> _z._mp_size >= 0; // fast
 
 	/** Check if `this` is a perfect power, i.e., if there exist integers A and
 	 * B, with B>1, such that `this` equals A raised to the power B.
 	 */
-	pragma(inline, true) @property bool isPerfectPower() const @trusted
+	@property bool isPerfectPower() const @trusted
 		=> __gmpz_perfect_power_p(_ptr) != 0;
 
 	/** Return non-zero if `this` is a perfect square, i.e., if the square root
 	 * of op is an integer. Under this definition both 0 and 1 are considered to
 	 * be perfect squares.
 	 */
-	pragma(inline, true) @property bool isPerfectSquare() const @trusted
+	@property bool isPerfectSquare() const @trusted
 		=> __gmpz_perfect_square_p(_ptr) != 0;
 
 	/// Returns: `true` iff `this` is exactly divisible by `rhs`.
 	pragma(inline, true)@property bool isDivisibleBy()(auto ref scope const _Z rhs) const @trusted
 		=> rhs.isOne ? true : __gmpz_divisible_p(_ptr, rhs._ptr) != 0;
 	/// ditto
-	pragma(inline, true) @property bool isDivisibleBy(Rhs)(auto ref scope const Rhs rhs) const @trusted
+	@property bool isDivisibleBy(Rhs)(auto ref scope const Rhs rhs) const @trusted
 	if (isUnsigned!Rhs)
 		=> rhs == 1 ? true : __gmpz_divisible_ui_p(_ptr, rhs) != 0;
 
@@ -1150,7 +1139,7 @@ nothrow:
 	  -	 0 (`this` == 0), or
 	  - +1 (`this` > 0).
 	 */
-	pragma(inline, true) @property int sgn() const @safe
+	@property int sgn() const @safe
 		=> _z._mp_size < 0 ? -1 : _z._mp_size > 0; // fast C macro `mpz_sgn` in gmp.h
 
 	/// Number of significant `uint`s used for storing `this`.
@@ -1168,7 +1157,7 @@ nothrow:
 	}
 
 	/// Get number of limbs in internal representation.
-	pragma(inline, true) @property uint limbCount() const @safe
+	@property uint limbCount() const @safe
 		=> _integralAbs(_z._mp_size);
 
 private:
