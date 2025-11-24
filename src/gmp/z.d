@@ -754,8 +754,7 @@ nothrow:
 
 	/// ditto
 	ref _Z opOpAssign(string s, Rhs)(Rhs rhs) scope return @trusted
-	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^" || s == "<<" || s == ">>") && isUnsigned!Rhs)
-	{
+	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^" || s == "<<" || s == ">>") && isUnsigned!Rhs) {
 		version(LDC) pragma(inline, true);
 		static	  if (s == "+")
 			__gmpz_add_ui(_ptr, _ptr, rhs);
@@ -763,17 +762,13 @@ nothrow:
 			__gmpz_sub_ui(_ptr, _ptr, rhs);
 		else static if (s == "*")
 			__gmpz_mul_ui(_ptr, _ptr, rhs);
-		else static if (s == "/")
-		{
+		else static if (s == "/") {
 			assert(rhs != 0, "Divison by zero");
 			__gmpz_tdiv_q_ui(_ptr, _ptr, rhs);
-		}
-		else static if (s == "%")
-		{
+		} else static if (s == "%") {
 			assert(rhs != 0, "Divison by zero");
 			__gmpz_tdiv_r_ui(_ptr, _ptr, rhs);
-		}
-		else static if (s == "^^")
+		} else static if (s == "^^")
 			__gmpz_pow_ui(_ptr, _ptr, rhs);
 		else static if (s == "<<")
 			__gmpz_mul_2exp(_ptr, _ptr, rhs);
@@ -786,42 +781,30 @@ nothrow:
 
 	/// ditto
 	ref _Z opOpAssign(string s, Rhs)(Rhs rhs) scope return @trusted
-	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^" || s == "<<" || s == ">>") &&
-		isSigned!Rhs)
-	{
+	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^" || s == "<<" || s == ">>") && isSigned!Rhs) {
 		version(LDC) pragma(inline, true);
-		static	  if (s == "+")
-		{
+		static if (s == "+") {
 			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
 			{
 				assert(rhs != rhs.min);
 				immutable ulong pos_rhs = -rhs; // make it positive
 				__gmpz_sub_ui(_ptr, _ptr, pos_rhs);
-			}
-			else
+			} else
 				__gmpz_add_ui(_ptr, _ptr, rhs);
-		}
-		else static if (s == "-")
-		{
+		} else static if (s == "-") {
 			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
 			{
 				assert(rhs != rhs.min);
-
 				immutable ulong pos_rhs = -rhs; // make it positive
 				__gmpz_add_ui(_ptr, _ptr, pos_rhs);
-			}
-			else
+			} else
 				__gmpz_sub_ui(_ptr, _ptr, rhs);
-		}
-		else static if (s == "*")
-		{
+		} else static if (s == "*") {
 			if (rhs == -1)
 				negate();	   // optimization
 			else
 				__gmpz_mul_si(_ptr, _ptr, rhs);
-		}
-		else static if (s == "/")
-		{
+		} else static if (s == "/") {
 			assert(rhs != 0, "Divison by zero");
 			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
 			{
@@ -831,33 +814,24 @@ nothrow:
 			}
 			else
 				__gmpz_tdiv_q_ui(_ptr, _ptr, rhs);
-		}
-		else static if (s == "%")
-		{
+		} else static if (s == "%") {
 			assert(rhs != 0, "Divison by zero");
 			__gmpz_tdiv_r_ui(_ptr, _ptr, rhs);
-		}
-		else static if (s == "^^")
-		{
+		} else static if (s == "^^") {
 			assert(rhs >= 0, "Negative exponent");
 			__gmpz_pow_ui(_ptr, _ptr, rhs);
-		}
-		else static if (s == "<<")
-		{
+		} else static if (s == "<<") {
 			if (rhs >= 0)
 				__gmpz_mul_2exp(_ptr, _ptr, rhs);
 			else
 				__gmpz_tdiv_q_2exp(_ptr, _ptr, -rhs); // `z << -1` becomes `z >> 1`
-		}
-		else static if (s == ">>")
-		{
+		} else static if (s == ">>") {
 			if (rhs >= 0)
 				__gmpz_tdiv_q_2exp(_ptr, _ptr, rhs);
 			else
 				__gmpz_mul_2exp(_ptr, _ptr, -rhs); // `z >> -1` becomes `z << 1`
-		}
-		else static assert(0);
-
+		} else
+			static assert(0);
 		return this;
 	}
 
