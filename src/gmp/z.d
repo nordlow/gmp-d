@@ -992,11 +992,9 @@ nothrow:
 	}
 
 	/// Get number of digits in base `base`.
-	size_t sizeInBase(uint base) const @trusted
-	{
+	size_t sizeInBase(uint base) const @trusted {
 		pragma(inline, true);
-		if (isZero ||
-			isOne)
+		if (isZero || isOne)
 			return 1;
 		else
 			return __gmpz_sizeinbase(_ptr, base);
