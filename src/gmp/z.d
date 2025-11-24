@@ -1184,8 +1184,7 @@ private:
 	}
 
 	/** Initialize internal struct if needed. */
-	void assertInitialized() @system
-	{
+	void assertInitialized() @system {
 		pragma(inline, true);
 		if (isDefaultConstructed)
 			__gmpz_init(_ptr);
@@ -1195,8 +1194,7 @@ private:
 	enum defaultBase = 10;
 
 	/// Returns: evaluation of `this` expression which in this is a no-op.
-	ref inout(_Z) eval() @safe inout scope return
-	{
+	ref inout(_Z) eval() @safe inout scope return {
 		pragma(inline, true);
 		return this;
 	}
@@ -1205,32 +1203,26 @@ private:
 	alias Limb = __mp_limb_t;	// GNU MP alias
 
 	/** Returns: limbs. */
-	inout(Limb)[] _limbs() inout return @system
-	{
+	inout(Limb)[] _limbs() inout return @system {
 		pragma(inline, true);
 		// import std.math : abs;
 		return _z._mp_d[0 .. limbCount];
 	}
 
 	/// Returns: pointer to internal C struct.
-	inout(__mpz_struct)* _ptr() inout return @system
-	{
+	inout(__mpz_struct)* _ptr() inout return @system {
 		pragma(inline, true);
 		return &_z;
 	}
 
-	static if (cow)
-	{
+	static if (cow) {
 		private __mpz_struct _z; // internal libgmp C struct
 		private size_t _refCountCopies; ///< Number of copies.
-	}
-	else
-	{
+	} else {
 		private __mpz_struct _z; // internal libgmp C struct
 	}
 
-	version(ccc)
-	{
+	version(ccc) {
 		/** Number of calls made to `__gmpz`--functions that construct or changes
 			this value. Used to verify correct lowering and evaluation of template
 			expressions.
@@ -1243,15 +1235,12 @@ private:
 	}
 
 	/// @nogc-variant of `toStringz` with heap allocation of null-terminated C-string `stringz`.
-	char* _allocStringzCopyOf(in char[] value) @nogc @trusted
-	{
+	char* _allocStringzCopyOf(in char[] value) @nogc @trusted {
 		import core.memory : pureMalloc;
 		char* stringz = cast(char*)pureMalloc(value.length + 1); // maximum this many characters
 		size_t i = 0;
-		foreach (immutable char ch; value[])
-		{
-			if (ch != '_')
-			{
+		foreach (immutable char ch; value[]) {
+			if (ch != '_') {
 				stringz[i] = ch;
 				i += 1;
 			}
@@ -1261,8 +1250,7 @@ private:
 	}
 
 	// qualified C memory managment
-	static @trusted extern(C) // locally `@trusted`
-	{
+	static @trusted extern(C) /+ locally `@trusted` +/ {
 		pragma(mangle, "free")
 		void qualifiedFree(void* ptr);
 	}
