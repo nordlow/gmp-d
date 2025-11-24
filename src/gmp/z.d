@@ -1034,11 +1034,9 @@ nothrow:
 
 	/// Returns: `true` iff `this` fits in a `T`.
 	bool fitsIn(T)() const @trusted
-	if (isIntegral!T)
-	{
+	if (isIntegral!T) {
 		pragma(inline, true);
-		if (isZero ||
-			isOne) { return true; } // default-constructed `this`
+		if (isZero || isOne) { return true; } // default-constructed `this`
 		static	  if (is(T == ulong))  { return __gmpz_fits_ulong_p(_ptr) != 0; }
 		else static if (is(T ==  long))  { return __gmpz_fits_slong_p(_ptr) != 0; }
 		else static if (is(T ==  uint))  { return __gmpz_fits_uint_p(_ptr) != 0; }
