@@ -1037,7 +1037,7 @@ nothrow:
 	if (isIntegral!T) {
 		pragma(inline, true);
 		if (isZero || isOne) { return true; } // default-constructed `this`
-		static	  if (is(T == ulong))  { return __gmpz_fits_ulong_p(_ptr) != 0; }
+		static if (is(T == ulong))  { return __gmpz_fits_ulong_p(_ptr) != 0; }
 		else static if (is(T ==  long))  { return __gmpz_fits_slong_p(_ptr) != 0; }
 		else static if (is(T ==  uint))  { return __gmpz_fits_uint_p(_ptr) != 0; }
 		else static if (is(T ==	int))  { return __gmpz_fits_sint_p(_ptr) != 0; }
