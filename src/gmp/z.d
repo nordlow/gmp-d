@@ -1052,8 +1052,7 @@ nothrow:
 		- `this` >= 0, number of 1 bits in the binary representation
 		- otherwise, ???
 	*/
-	@property mp_bitcnt_t populationCount() const @trusted
-	{
+	@property mp_bitcnt_t populationCount() const @trusted {
 		version(LDC) pragma(inline, true);
 		if (isZero) { return 0; } // default-constructed `this`
 		if (isOne) { return 1; } // default-constructed `this`
@@ -1062,32 +1061,28 @@ nothrow:
 	alias countOnes = populationCount;
 
 	/// Set bit at 0-offset index `bitIndex` (to one).
-	void setBit(mp_bitcnt_t bitIndex) @trusted
-	{
+	void setBit(mp_bitcnt_t bitIndex) @trusted {
 		pragma(inline, true);
 		static if (cow) { selfdupIfAliased(); }
 		__gmpz_setbit(_ptr, bitIndex);
 	}
 
 	/// Clear bit at 0-offset index `bitIndex` (to zero).
-	void clearBit(mp_bitcnt_t bitIndex) @trusted
-	{
+	void clearBit(mp_bitcnt_t bitIndex) @trusted {
 		pragma(inline, true);
 		static if (cow) { selfdupIfAliased(); }
 		__gmpz_clrbit(_ptr, bitIndex);
 	}
 
 	/// Complement bit at 0-offset index `bitIndex` (to zero).
-	void complementBit(mp_bitcnt_t bitIndex) @trusted
-	{
+	void complementBit(mp_bitcnt_t bitIndex) @trusted {
 		pragma(inline, true);
 		static if (cow) { selfdupIfAliased(); }
 		__gmpz_combit(_ptr, bitIndex);
 	}
 
 	/// Test/Get bit at 0-offset index `bitIndex`.
-	bool testBit(mp_bitcnt_t bitIndex) const @trusted
-	{
+	bool testBit(mp_bitcnt_t bitIndex) const @trusted {
 		pragma(inline, true);
 		return __gmpz_tstbit(_ptr, bitIndex) != 0;
 	}
