@@ -3214,10 +3214,8 @@ version(gmp_test) version(unittest) static assert(isMpZExpr!(AddExpr!(true)));
 
 version(gmp_test) @safe @nogc unittest {
 	assert(AddExpr!(false)(3.Z, 4.Z).eval() == 3 + 4);
-
 	const Z x = AddExpr!(false)(3.Z, 4.Z);
 	assert(x == 7);
-
 	Z y = null;
 	y = AddExpr!(false)(3.Z, 4.Z);
 	assert(y == 7);
@@ -3268,7 +3266,6 @@ version(gmp_test) version(unittest) static assert(isMpZExpr!(MulExpr!(false)));
 
 version(gmp_test) @safe @nogc unittest {
 	assert(MulExpr!(false)(3.Z, 4.Z).eval() == 3 * 4);
-
 	const Z x = MulExpr!(false)(3.Z, 4.Z);
 	assert(x == 12);
 }
@@ -3296,7 +3293,6 @@ version(gmp_test) @safe @nogc unittest {
 	assert(DivExpr!(false)(28.Z, 3.Z).eval() == 28 / 3);
 	assert(DivExpr!(false)(29.Z, 3.Z).eval() == 29 / 3);
 	assert(DivExpr!(false)(30.Z, 3.Z).eval() == 30 / 3);
-
 	const Z x = DivExpr!(false)(28.Z, 3.Z);
 	assert(x == 9);
 }
