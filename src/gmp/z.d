@@ -1123,11 +1123,8 @@ nothrow:
 		=> _z._mp_size < 0; // fast
 
 	/// Check if `this` is positive.
-	@property bool isPositive() const @safe
-	{
-		pragma(inline, true);
-		return _z._mp_size >= 0; // fast
-	}
+	pragma(inline, true) @property bool isPositive() const @safe
+		=> _z._mp_size >= 0; // fast
 
 	/** Check if `this` is a perfect power, i.e., if there exist integers A and
 	 * B, with B>1, such that `this` equals A raised to the power B.
