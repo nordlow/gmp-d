@@ -1129,11 +1129,8 @@ nothrow:
 	/** Check if `this` is a perfect power, i.e., if there exist integers A and
 	 * B, with B>1, such that `this` equals A raised to the power B.
 	 */
-	@property bool isPerfectPower() const @trusted
-	{
-		pragma(inline, true);
-		return __gmpz_perfect_power_p(_ptr) != 0;
-	}
+	pragma(inline, true) @property bool isPerfectPower() const @trusted
+		=> __gmpz_perfect_power_p(_ptr) != 0;
 
 	/** Return non-zero if `this` is a perfect square, i.e., if the square root
 	 * of op is an integer. Under this definition both 0 and 1 are considered to
