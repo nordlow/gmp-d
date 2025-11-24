@@ -3495,14 +3495,10 @@ version(gmp_test) @safe unittest
 /// copyable integer
 version(gmp_test) @trusted unittest
 {
-	alias CZ = CopyableMpZ;
-
 	const CZ a = 42;
-
 	const CZ b = a;				// copy
 	assert(a == b);			 // should equal
 	assert(a !is b);			// but not the same
-
 	const CZ c = null;			// other value
 	assert(a != c);			 // should diff
 }
@@ -3510,15 +3506,13 @@ version(gmp_test) @trusted unittest
 /// to string conversion
 version(gmp_test) pure @safe nothrow unittest
 {
-	for (int i = -100; i < 100; ++i)
-	{
+	for (int i = -100; i < 100; ++i) {
 		import std.conv : to;
 		assert(i.Z.toString == i.to!string);
 	}
 }
 
-version(gmp_test) version(unittest)
-{
+version(gmp_test) version(unittest) {
 	// version = ccc;			  // do C mutation call count
 	debug import core.stdc.stdio : printf;
 	static assert(!isMpZExpr!int);
