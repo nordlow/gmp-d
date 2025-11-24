@@ -1095,28 +1095,19 @@ nothrow:
 		handle the case when the membere `_mp_alloc` is zero and, in turn,
 		`_mp_d` is `null`.
 	 */
-	@property bool isDefaultConstructed() const @safe
-	{
-		pragma(inline, true);
-		return _z._mp_alloc == 0; // fast, actually enough to just test this
-	}
+	pragma(inline, true) @property bool isDefaultConstructed() const @safe
+		=> _z._mp_alloc == 0; // fast, actually enough to just test this
 
 	/// Check if `this` is zero (either via default-construction or `__gmpz_...`-operations).
-	@property bool isZero() const @safe
-	{
-		pragma(inline, true);
-		return _z._mp_size == 0; // fast
-	}
+	pragma(inline, true) @property bool isZero() const @safe
+		=> _z._mp_size == 0; // fast
 
 	/// Check if `this` is one.
-	@property bool isOne() const @safe
-	{
-		pragma(inline, true);
+	pragma(inline, true) @property bool isOne() const @safe
 		/* NOTE: cannot use _z._mp_d !is null && _z._mp_d[0] == 1 because that’s
 		   true for -1 because sign is stored in `_z._mp_size`
 		*/
-		return _z._mp_size == 1 && _z._mp_d[0] == 1; // fast
-	}
+		=> _z._mp_size == 1 && _z._mp_d[0] == 1; // fast
 
 	/// Check if `this` is odd.
 	@property bool isOdd() const @safe
