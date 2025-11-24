@@ -616,8 +616,8 @@ nothrow:
 				__gmpz_tdiv_q_2exp(y._ptr, _ptr, rhs);
 			else
 				__gmpz_mul_2exp(y._ptr, _ptr, -rhs); // `z >> -1` becomes `z << 1`
-		}
-		else static assert(0);
+		} else
+			static assert(0);
 		return y;
 	}
 
