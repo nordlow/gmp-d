@@ -836,17 +836,13 @@ nothrow:
 	}
 
 	/// Returns: `this`.
-	ref inout(_Z) opUnary(string s)() inout scope return
-	if (s == "+")
-	{
+	ref inout(_Z) opUnary(string s)() inout scope return if (s == "+") {
 		pragma(inline, true);
 		return this;
 	}
 
 	/// Negation of `this`.
-	_Z opUnary(string s)() const
-	if (s == "-")
-	{
+	_Z opUnary(string s)() const if (s == "-") {
 		version(LDC) pragma(inline, true);
 		typeof(return) y = this.dup;
 		y.negate();
@@ -854,8 +850,7 @@ nothrow:
 	}
 
 	/// Negation of `this`.
-	_Z unaryMinus() const @safe
-	{
+	_Z unaryMinus() const @safe {
 		version(LDC) pragma(inline, true);
 		// pragma(msg, "memberFun:", __traits(isRef, this) ? "ref" : "non-ref", " this");
 		typeof(return) y = this.dup;
@@ -867,8 +862,7 @@ nothrow:
 
 		Returns: `void` to make it obvious that `this` is mutated.
 	*/
-	void negate() @safe
-	{
+	void negate() @safe {
 		static if (cow) { selfdupIfAliased(); }
 		pragma(inline, true);
 		_z._mp_size = -_z._mp_size; // fast C macro `mpz_neg` in gmp.h
@@ -878,8 +872,7 @@ nothrow:
 
 		Returns: `void` to make it obvious that `this` is mutated.
 	*/
-	void absolute() @trusted
-	{
+	void absolute() @trusted {
 		version(LDC) pragma(inline, true);
 		if (isZero) { return; } // `__gmpz_abs` cannot handle default-constructed `this`
 		if (isOne) { return; } // `__gmpz_abs` cannot handle default-constructed `this`
@@ -892,8 +885,7 @@ nothrow:
 
 		Returns: `void` to make it obvious that `this` is mutated.
 	*/
-	void onesComplementSelf() @trusted
-	{
+	void onesComplementSelf() @trusted {
 		version(LDC) pragma(inline, true);
 		if (isZero) { return; } // `__gmpz_com` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
@@ -904,8 +896,7 @@ nothrow:
 
 		Returns: `void` to make it obvious that `this` is mutated.
 	*/
-	void sqrtSelf() @trusted
-	{
+	void sqrtSelf() @trusted {
 		version(LDC) pragma(inline, true);
 		if (isZero) { return; } // `__gmpz_co` cannot handle default-constructed `this`
 		if (isOne) { return; } // `__gmpz_co` cannot handle default-constructed `this`
@@ -917,8 +908,7 @@ nothrow:
 
 		Returns: `true` if computation was exact.
 	*/
-	bool rootSelf(ulong n) @trusted
-	{
+	bool rootSelf(ulong n) @trusted {
 		version(LDC) pragma(inline, true);
 		if (isZero) { return true; } // `__gmpz_co` cannot handle default-constructed `this`
 		if (isOne) { return true; } // `__gmpz_co` cannot handle default-constructed `this`
@@ -931,8 +921,7 @@ nothrow:
 
 		Returns: `rem` to the remainder, u-root ^^ `n`.
 	*/
-	_Z rootremSelf(ulong n) @trusted
-	{
+	_Z rootremSelf(ulong n) @trusted {
 		version(LDC) pragma(inline, true);
 		if (isZero) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
 		if (isOne) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
@@ -947,8 +936,7 @@ nothrow:
 
 		Returns: `rem` to the remainder.
 	*/
-	_Z sqrtremSelf() @trusted
-	{
+	_Z sqrtremSelf() @trusted {
 		version(LDC) pragma(inline, true);
 		if (isZero) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
 		if (isOne) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
@@ -959,9 +947,7 @@ nothrow:
 	}
 
 	/// Increase `this` by one.
-	ref _Z opUnary(string s)() scope return @trusted
-	if (s == "++")
-	{
+	ref _Z opUnary(string s)() scope return @trusted if (s == "++") {
 		version(LDC) pragma(inline, true);
 		static if (cow) { selfdupIfAliased(); }
 		if (isDefaultConstructed) // `__gmpz_add_ui` cannot handle default-constructed `this`
@@ -972,9 +958,7 @@ nothrow:
 	}
 
 	/// Decrease `this` by one.
-	ref _Z opUnary(string s)() scope return @trusted
-	if (s == "--")
-	{
+	ref _Z opUnary(string s)() scope return @trusted if (s == "--") {
 		version(LDC) pragma(inline, true);
 		static if (cow) { selfdupIfAliased(); }
 		if (isDefaultConstructed) // `__gmpz_sub_ui` cannot handle default-constructed `this`
@@ -986,35 +970,24 @@ nothrow:
 
 	/// Get `base` raised to the power of `exp`.
 	static typeof(this) pow(Base, Exp)(Base base, Exp exp) @trusted
-	if (isIntegral!Base &&
-		isIntegral!Exp)
-	{
+	if (isIntegral!Base && isIntegral!Exp) {
 		version(LDC) pragma(inline, true);
-		static if (isSigned!Base)
-		{
+		static if (isSigned!Base) {
 			immutable bool negate = base < 0;
 			immutable ubase = cast(ulong)(negate ? -base : base);
-		}
-		else
-		{
+		} else {
 			immutable bool negate = false;
 			immutable ubase = base;
 		}
-
-		static if (isSigned!Exp)
-		{
+		static if (isSigned!Exp) {
 			assert(exp >= 0, "Negative exponent"); // TODO: return mpq?
 			immutable uexp = cast(ulong)exp;
-		}
-		else
+		} else
 			immutable uexp = exp;
-
 		typeof(return) y = null;
 		__gmpz_ui_pow_ui(y._ptr, ubase, uexp);
-		if (negate &&
-			exp & 1)  // if negative odd exponent
+		if (negate && exp & 1)  // if negative odd exponent
 			y.negate();
-
 		return y;
 	}
 
