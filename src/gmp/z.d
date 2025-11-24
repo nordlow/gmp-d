@@ -3519,7 +3519,6 @@ version(gmp_test) version(unittest) {
 	import std.meta : AliasSeq;
 	alias Z = MpZ;
 	alias CZ = CopyableMpZ;
-	alias RZ = _Z!(true);
 }
 
 // C API
