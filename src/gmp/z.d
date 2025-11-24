@@ -3341,9 +3341,7 @@ version(gmp_test) @safe @nogc unittest {
 
 /// `MpZ`-`ulong` power expression.
 private struct PowUExpr(P, Q)
-if (isMpZExpr!P &&
-	isUnsigned!Q)
-{
+if (isMpZExpr!P && isUnsigned!Q) {
 	P e1;					   // base
 	Q e2;					   // exponent
 	MpZ eval() const nothrow @nogc @trusted	// TODO: move to common place
@@ -3353,8 +3351,7 @@ if (isMpZExpr!P &&
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref MpZ y) const nothrow @nogc @trusted
-	{
+	void evalTo(ref MpZ y) const nothrow @nogc @trusted {
 		version(LDC) pragma(inline, true);
 		__gmpz_pow_ui(y._ptr, e1.eval()._ptr, e2);
 	}
@@ -3367,10 +3364,7 @@ version(gmp_test) @safe @nogc unittest {
 
 /// `MpZ`-`ulong`-`MpZ` power-modulo expression.
 private struct PowMUExpr(P, Q, M)
-if (isMpZExpr!P &&
-	isUnsigned!Q &&
-	isMpZExpr!M)
-{
+if (isMpZExpr!P && isUnsigned!Q && isMpZExpr!M) {
 	P base;					 // base
 	Q exp;					  // exponent
 	M mod;					  // modulo
@@ -3381,8 +3375,7 @@ if (isMpZExpr!P &&
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref MpZ y) const nothrow @nogc @trusted
-	{
+	void evalTo(ref MpZ y) const nothrow @nogc @trusted {
 		version(LDC) pragma(inline, true);
 		__gmpz_powm_ui(y._ptr, base.eval()._ptr, exp, mod._ptr);
 	}
@@ -3394,8 +3387,7 @@ version(gmp_test) @safe @nogc unittest {
 }
 
 /// `MpZ` negation expression.
-private struct NegExpr(bool cow)
-{
+private struct NegExpr(bool cow) {
 	_Z!(cow) e1;
 	_Z!(cow) eval() const nothrow @nogc @trusted	 // TODO: move to common place
 	{
@@ -3404,8 +3396,7 @@ private struct NegExpr(bool cow)
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
-	{
+	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted {
 		version(LDC) pragma(inline, true);
 		__gmpz_neg(y._ptr, e1.eval()._ptr);
 	}
