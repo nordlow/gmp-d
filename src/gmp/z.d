@@ -3422,8 +3422,7 @@ version(gmp_test) @safe @nogc unittest {
 
 	See: https://gmplib.org/manual/Integer-Roots
  */
-private struct SqrtExpr(bool cow)
-{
+private struct SqrtExpr(bool cow) {
 	_Z!(cow) e1;
 	_Z!(cow) eval() const nothrow @nogc @trusted	 // TODO: move to common place
 	{
@@ -3432,8 +3431,7 @@ private struct SqrtExpr(bool cow)
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
-	{
+	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted {
 		version(LDC) pragma(inline, true);
 		__gmpz_sqrt(y._ptr, e1.eval()._ptr);
 	}
