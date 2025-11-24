@@ -1136,11 +1136,8 @@ nothrow:
 	 * of op is an integer. Under this definition both 0 and 1 are considered to
 	 * be perfect squares.
 	 */
-	@property bool isPerfectSquare() const @trusted
-	{
-		pragma(inline, true);
-		return __gmpz_perfect_square_p(_ptr) != 0;
-	}
+	pragma(inline, true) @property bool isPerfectSquare() const @trusted
+		=> __gmpz_perfect_square_p(_ptr) != 0;
 
 	/// Returns: `true` iff `this` is exactly divisible by `rhs`.
 	@property bool isDivisibleBy()(auto ref scope const _Z rhs) const @trusted
