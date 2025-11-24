@@ -701,9 +701,7 @@ nothrow:
 
 	/// Exponentation.
 	_Z opBinaryRight(string s, Base)(Base base) const
-	if ((s == "^^") &&
-		isIntegral!Base)
-	{
+	if ((s == "^^") && isIntegral!Base) {
 		pragma(inline, true);
 		static assert(false, "Convert `this _Z` exponent to `ulong` and calculate power via static method `pow()`");
 		// _Z exp = null;
