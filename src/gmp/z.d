@@ -623,24 +623,17 @@ nothrow:
 
 	/// Remainer propagates modulus type.
 	Unqual!Rhs opBinary(string s, Rhs)(Rhs rhs) const @trusted
-	if ((s == "%") &&
-		isIntegral!Rhs)
-	{
+	if ((s == "%") && isIntegral!Rhs) {
 		version(LDC) pragma(inline, true);
 		assert(rhs != 0, "Divison by zero");
 		_Z y = null;
-
-		static if (isSigned!Rhs)
-		{
-			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
-			{
+		static if (isSigned!Rhs) {
+			if (rhs < 0) { /+ TODO: handle `rhs == rhs.min` +/
 				immutable ulong pos_rhs = -cast(int)rhs; // make it positive
 				return cast(typeof(return))-__gmpz_tdiv_r_ui(y._ptr, _ptr, pos_rhs);
-			}
-			else
+			} else
 				return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
-		}
-		else static if (isUnsigned!Rhs)
+		} else static if (isUnsigned!Rhs)
 			return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
 		else
 			static assert(0);
@@ -648,62 +641,45 @@ nothrow:
 
 	/// Get an unsigned type `lhs` divided by `this`.
 	_Z opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
-	if ((s == "+" || s == "-" || s == "*" || s == "%") &&
-		isUnsigned!Lhs)
-	{
+	if ((s == "+" || s == "-" || s == "*" || s == "%") && isUnsigned!Lhs) {
 		version(LDC) pragma(inline, true);
 		typeof(return) y = null;
-
-		static	  if (s == "+")
+		static if (s == "+")
 			__gmpz_add_ui(y._ptr, _ptr, lhs); // commutative
 		else static if (s == "-")
 			__gmpz_ui_sub(y._ptr, lhs, _ptr);
 		else static if (s == "*")
 			__gmpz_mul_ui(y._ptr, _ptr, lhs); // commutative
-		else static if (s == "%")
-		{
+		else static if (s == "%") {
 			assert(this != 0, "Divison by zero");
 			__gmpz_tdiv_r(y._ptr, _Z(lhs)._ptr, _ptr); // convert `lhs` to _Z
-		}
-		else
+		} else
 			static assert(0);
 		return y;
 	}
 
 	/// Get a signed type `lhs` divided by `this`.
 	_Z opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
-	if ((s == "+" || s == "-" || s == "*" || s == "%") &&
-		isSigned!Lhs)
-	{
+	if ((s == "+" || s == "-" || s == "*" || s == "%") && isSigned!Lhs) {
 		version(LDC) pragma(inline, true);
-		static if (s == "+" ||
-				   s == "*")
-		{
+		static if (s == "+" || s == "*") {
 			return opBinary!s(lhs); // commutative reuse
-		}
-		else static if (s == "-")
-		{
+		} else static if (s == "-") {
 			typeof(return) y = null;
-
 			if (lhs < 0)		// TODO: handle `lhs == lhs.min`
 			{
 				immutable ulong pos_rhs = -lhs; // make it positive
 				__gmpz_add_ui(y._ptr, _ptr, pos_rhs);
-			}
-			else
+			} else
 				__gmpz_sub_ui(y._ptr, _ptr, lhs);
 			y.negate();
 			return y;
-		}
-		else static if (s == "%")
-		{
+		} else static if (s == "%") {
 			typeof(return) y = null;
-
 			assert(this != 0, "Divison by zero");
 			__gmpz_tdiv_r(y._ptr, _Z(lhs)._ptr, _ptr); // convert `lhs` to _Z
 			return y;
-		}
-		else
+		} else
 			static assert(0);
 	}
 
