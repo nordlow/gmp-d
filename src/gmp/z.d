@@ -1006,10 +1006,9 @@ nothrow:
 
 		Returns: a (sub-)slice of `words` containing only the words produced.
 	*/
-	Word[] serialize(Word)(return scope Word[] words,
-						   WordOrder order, size_t size, WordEndianess endian, size_t nails) const @trusted
-	if (isUnsigned!Word) {
-		assert(words, "Words is empty");
+	Word[] serialize(Word)(return scope Word[] words, WordOrder order, size_t size, WordEndianess endian, size_t nails) const @trusted
+	if (isUnsigned!Word)
+	in(words) {
 		size_t count;
 		debug {
 			const numb = 8 * size - nails;
