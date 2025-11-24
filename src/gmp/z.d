@@ -685,22 +685,17 @@ nothrow:
 
 	/// Dividend propagates quotient type to signed.
 	Unqual!Lhs opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
-	if ((s == "/") &&
-		isIntegral!Lhs)
-	{
+	if ((s == "/") && isIntegral!Lhs) {
 		version(LDC) pragma(inline, true);
 		_Z y = null; // TODO: avoid if !__traits(isRef, this)
-
 		assert(this != 0, "Divison by zero");
 		__gmpz_tdiv_q(y._ptr, _Z(lhs)._ptr, _ptr);
 		static	  if (isSigned!Lhs)
 			return cast(typeof(return))y;
-		else static if (isUnsigned!Lhs)
-		{
+		else static if (isUnsigned!Lhs) {
 			import std.traits : Signed;
 			return cast(Signed!(typeof(return)))y;
-		}
-		else
+		} else
 			static assert(0);
 	}
 
