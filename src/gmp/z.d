@@ -1008,34 +1008,26 @@ nothrow:
 	*/
 	Word[] serialize(Word)(return scope Word[] words,
 						   WordOrder order, size_t size, WordEndianess endian, size_t nails) const @trusted
-	if (isUnsigned!Word)
-	{
+	if (isUnsigned!Word) {
 		assert(words, "Words is empty");
-
 		size_t count;
-		debug
-		{
+		debug {
 			const numb = 8 * size - nails;
 			const items = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
 			assert(Word.sizeof * words.length >= items * size ,
 				   "Words has not enough space pre-allocated");
 		}
-
 		int realOrder;
-		final switch(order)
-		{
+		final switch(order) {
 			case WordOrder.mostSignificantWordFirst:  realOrder = 1;  break;
 			case WordOrder.leastSignificantWordFirst: realOrder = -1; break;
 		}
-
 		int realEndian;
-		final switch(endian)
-		{
+		final switch(endian) {
 			case WordEndianess.littleEndian: realEndian = -1; break;
 			case WordEndianess.bigEndian:	realEndian =  1; break;
 			case WordEndianess.host:		 realEndian =  0; break;
 		}
-
 		__gmpz_export(words.ptr, &count, realOrder, size, realEndian, nails, _ptr);
 		return words[0 .. count];
 	}
