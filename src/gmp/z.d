@@ -61,7 +61,7 @@ pragma(inline, true):
 
 	/// Put `string` to sink in base `base`.
 	void toString(scope void delegate(scope const(char)[]) sink, in uint base = defaultBase, in bool upperCaseDigits = false) const @trusted
-	in(-2 <= base && base <= -36 || +2 <= base && base <= +62) {
+	in((-2 <= base && base <= -36) || (+2 <= base && base <= +62)) {
 		pragma(inline);
 		import core.memory : pureMalloc;
 		if (isZero) { return sink(`0`); }
@@ -127,7 +127,7 @@ nothrow:
 
 	/// Convert to `string` in base `base`.
 	string toString(in uint base = defaultBase, in bool upperCaseDigits = false) scope const @trusted
-	in(-2 <= base && base <= -36 || +2 <= base && base <= +62) {
+	in((-2 <= base && base <= -36) || (+2 <= base && base <= +62)) {
 		pragma(inline);
 		if (isZero) { return `0`; }
 		if (isOne) { return `1`; }
@@ -143,7 +143,7 @@ nothrow:
 		making this `@system`.
 	*/
 	char[] toChars(in uint base = defaultBase, in bool upperCaseDigits = false) scope const @system @nogc
-	in(-2 <= base && base <= -36 || +2 <= base && base <= +62) {
+	in((-2 <= base && base <= -36) || (+2 <= base && base <= +62)) {
 		pragma(inline);
 		import core.memory : pureMalloc;
 		if (isZero || isOne) {
@@ -160,7 +160,7 @@ nothrow:
 	}
 
 	private char[] fillChars(char[] chars, in uint base = defaultBase, in bool upperCaseDigits = false) const @system @nogc
-	in(-2 <= base && base <= -36 || +2 <= base && base <= +62) {
+	in((-2 <= base && base <= -36) || (+2 <= base && base <= +62)) {
 		pragma(inline);
 		__gmpz_get_str(chars.ptr, base, _ptr); // fill it
 		import std.ascii : isAlphaNum, isLower, toUpper;
