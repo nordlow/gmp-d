@@ -166,8 +166,7 @@ nothrow:
 		pragma(inline);
 		__gmpz_get_str(chars.ptr, base, _ptr); // fill it
 		import std.ascii : isAlphaNum, isLower, toUpper;
-		while (chars.length &&
-			   !chars[$ - 1].isAlphaNum)
+		while (chars.length && !chars[$ - 1].isAlphaNum)
 			chars = chars[0 .. $ - 1]; // skip trailing garbage
 		if (upperCaseDigits)
 			foreach (ref e; chars)
@@ -1922,8 +1921,7 @@ version(gmp_test) @safe nothrow unittest {
 	{ bool isExact; assert(root(27.Z, 3, isExact) == 3 && isExact); }
 	{ bool isExact; assert(root(28.Z, 3, isExact) == 3 && !isExact); }
 
-	foreach (const ui; 16 .. 20)
-	{
+	foreach (const ui; 16 .. 20) {
 		{
 			Z u = ui;
 			Z rem;
@@ -1939,8 +1937,7 @@ version(gmp_test) @safe nothrow unittest {
 		}
 	}
 
-	foreach (const ui; 16 .. 20)
-	{
+	foreach (const ui; 16 .. 20) {
 		{
 			Z u = ui;
 			Z rem;
@@ -2565,10 +2562,8 @@ version(gmp_test) @safe unittest {
 	// bitwise and, or and xor
 
 	{
-		foreach (immutable i; 0 .. 10)
-		{
-			foreach (immutable j; 0 .. 10)
-			{
+		foreach (immutable i; 0 .. 10) {
+			foreach (immutable j; 0 .. 10) {
 				assert((i.Z & j.Z) == (i & j));
 				assert((i.Z | j.Z) == (i | j));
 				assert((i.Z ^ j.Z) == (i ^ j));
@@ -2654,16 +2649,14 @@ version(gmp_test) @safe unittest {
 	// TODO: assert(!(2.Z.isNegative));
 	// TODO: assert(!(3.Z.isNegative));
 
-	foreach (const p; 1 .. 10)
-	{
+	foreach (const p; 1 .. 10) {
 		assert((p^^2).Z.isPerfectSquare);
 		assert(!(p^^2 + 1).Z.isPerfectSquare);
 		foreach (const q; 2 .. 5)
 			assert((p^^q).Z.isPerfectPower);
 	}
 
-	foreach (const d; 1UL .. 10UL)
-	{
+	foreach (const d; 1UL .. 10UL) {
 		assert( d.Z.isDivisibleBy(d));
 		assert( d.Z.isDivisibleBy(d.Z));
 		assert(!d.Z.isDivisibleBy(d + 1));
