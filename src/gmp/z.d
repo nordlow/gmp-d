@@ -1436,17 +1436,13 @@ _Z!(cow) abs(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc {
 	Written as a free function instead of `MpZ`-member because `__traits(isRef,
 	this)` doesn't currently support member functions.
 */
-_Z!(cow) onesComplement(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
-{
+_Z!(cow) onesComplement(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) /+ l-value `x` +/
-	{
+	static if (__traits(isRef, x)) /+ l-value `x` +/ {
 		typeof(return) y = null; // must use temporary
 		__gmpz_com(y._ptr, x._ptr);
 		return y;
-	}
-	else						/+ r-value `x` +/
-	{
+	} else /+ r-value `x` +/ {
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		zp.onesComplementSelf();
 		return move(*zp);	// TODO: shouldn't have to call `move` here
@@ -1461,34 +1457,26 @@ alias com = onesComplement;
 
 	See: https://gmplib.org/manual/Integer-Roots
 */
-_Z!(cow) sqrt(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
-{
+_Z!(cow) sqrt(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) /+ l-value `x` +/
-	{
+	static if (__traits(isRef, x)) /+ l-value `x` +/ {
 		typeof(return) y = null; // must use temporary
 		__gmpz_sqrt(y._ptr, x._ptr);
 		return y;
-	}
-	else						/+ r-value `x` +/
-	{
+	} else /+ r-value `x` +/ {
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		zp.sqrtSelf();
 		return move(*zp);	// TODO: shouldn't have to call `move` here
 	}
 }
 
-_Z!(cow) sqrtrem(bool cow)(auto ref scope const _Z!(cow) x, out scope _Z!(cow) rem) @trusted nothrow @nogc
-{
+_Z!(cow) sqrtrem(bool cow)(auto ref scope const _Z!(cow) x, out scope _Z!(cow) rem) @trusted nothrow @nogc {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) /+ l-value `x` +/
-	{
+	static if (__traits(isRef, x)) /+ l-value `x` +/ {
 		typeof(return) y = null; // must use temporary
 		__gmpz_sqrtrem(y._ptr, rem._ptr, x._ptr);
 		return y;
-	}
-	else						/+ r-value `x` +/
-	{
+	} else /+ r-value `x` +/ {
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		rem = zp.sqrtremSelf();
 		return move(*zp);
@@ -1499,35 +1487,27 @@ _Z!(cow) sqrtrem(bool cow)(auto ref scope const _Z!(cow) x, out scope _Z!(cow) r
 
 	See: https://gmplib.org/manual/Integer-Roots
 */
-_Z!(cow) root(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out bool isExact) @trusted nothrow @nogc
-{
+_Z!(cow) root(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out bool isExact) @trusted nothrow @nogc {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) /+ l-value `x` +/
-	{
+	static if (__traits(isRef, x)) /+ l-value `x` +/ {
 		typeof(return) y = null; // must use temporary
 		const status = __gmpz_root(y._ptr, x._ptr, n);
 		isExact = status != 0;
 		return y;
-	}
-	else						/+ r-value `x` +/
-	{
+	} else /+ r-value `x` +/ {
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		isExact = zp.rootSelf(n);
 		return move(*zp);	// TODO: shouldn't have to call `move` here
 	}
 }
 
-_Z!(cow) rootrem(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out scope _Z!(cow) rem) @trusted nothrow @nogc
-{
+_Z!(cow) rootrem(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out scope _Z!(cow) rem) @trusted nothrow @nogc {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) /+ l-value `x` +/
-	{
+	static if (__traits(isRef, x)) /+ l-value `x` +/ {
 		typeof(return) y = null; // must use temporary
 		__gmpz_rootrem(y._ptr, rem._ptr, x._ptr, n);
 		return y;
-	}
-	else						/+ r-value `x` +/
-	{
+	} else /+ r-value `x` +/ {
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		rem = zp.rootremSelf(n);
 		return move(*zp);
