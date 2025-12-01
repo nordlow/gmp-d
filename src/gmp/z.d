@@ -41,6 +41,8 @@ enum Rounding {
 	truncate					///< Used by functions named `..._tdiv_...`
 }
 
+@safe:
+
 // TODO: use these imports instead of the ones below
 // import deimos.gmp.gmp;
 // import deimos.gmp.integer;
