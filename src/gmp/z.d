@@ -1336,9 +1336,9 @@ _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 @safe nothrow @nogc version(gmp_test) unittest {
 	const Z x = Z(2)^^100;
 	const Z y = 12;
-	assert(add(x, Z(12)) ==	   // l-value, r-value
+	assert(add(x, Z(12)) ==	   /+ l-value, r-value +/
 		   add(Z(12), x));		/+ r-value, l-value +/
-	assert(add(x, y) ==		   // l-value, l-value
+	assert(add(x, y) ==		   /+ l-value, l-value +/
 		   add(Z(2)^^100, Z(12)));	/+ r-value, r-value +/
 	assert(add(Z(12), Z(2)^^100) == /+ r-value, r-value +/
 		   add(Z(2)^^100, Z(12)));	/+ r-value, r-value +/
@@ -1375,7 +1375,7 @@ _Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 		__gmpz_sub(zp._ptr, x._ptr, y._ptr);
 		return move(*zp);	// TODO: shouldn't have to call `move` here
 	}
-	else						// l-value `x` and `y`, no reuse in output
+	else						/+ l-value `x` and `y`, no reuse in output +/
 	{
 		typeof(return) z = null;
 		__gmpz_sub(z._ptr, x._ptr, y._ptr);
@@ -1387,9 +1387,9 @@ _Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 @safe nothrow @nogc version(gmp_test) unittest {
 	Z x = 2.Z^^100;
 	Z y = 12;
-	assert(sub(x, Z(12)) ==	   // l-value, r-value
+	assert(sub(x, Z(12)) ==	   /+ l-value, r-value +/
 		   -sub(Z(12), x));	   /+ r-value, l-value +/
-	assert(sub(x, y) ==		   // l-value, l-value
+	assert(sub(x, y) ==		   /+ l-value, l-value +/
 		   sub(2.Z^^100, 12.Z));  /+ r-value, r-value +/
 	assert(sub(12.Z, 2.Z^^100) == /+ r-value, r-value +/
 		   -sub(2.Z^^100, 12.Z)); /+ r-value, r-value +/
@@ -1430,7 +1430,7 @@ _Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 		__gmpz_mul(zp._ptr, x._ptr, y._ptr);
 		return move(*zp);	// TODO: shouldn't have to call `move` here
 	}
-	else						// l-value `x` and `y`, no reuse in output
+	else						/+ l-value `x` and `y`, no reuse in output +/
 	{
 		typeof(return) z = null;
 		__gmpz_mul(z._ptr, x._ptr, y._ptr);
@@ -1442,9 +1442,9 @@ _Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 @safe nothrow @nogc version(gmp_test) unittest {
 	Z x = 2.Z^^100;
 	Z y = 12;
-	assert(mul(x, Z(12)) ==	   // l-value, r-value
+	assert(mul(x, Z(12)) ==	   /+ l-value, r-value +/
 		   mul(Z(12), x));		/+ r-value, l-value +/
-	assert(mul(x, y) ==		   // l-value, l-value
+	assert(mul(x, y) ==		   /+ l-value, l-value +/
 		   mul(2.Z^^100, 12.Z));  /+ r-value, r-value +/
 	assert(mul(12.Z, 2.Z^^100) == /+ r-value, r-value +/
 		   mul(2.Z^^100, 12.Z));  /+ r-value, r-value +/
@@ -1458,7 +1458,7 @@ _Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 _Z!(cow) abs(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) // l-value `x`
+	static if (__traits(isRef, x)) /+ l-value `x` +/
 	{
 		typeof(return) y = null; // must use temporary
 		__gmpz_abs(y._ptr, x._ptr);
@@ -1481,7 +1481,7 @@ _Z!(cow) abs(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 _Z!(cow) onesComplement(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) // l-value `x`
+	static if (__traits(isRef, x)) /+ l-value `x` +/
 	{
 		typeof(return) y = null; // must use temporary
 		__gmpz_com(y._ptr, x._ptr);
@@ -1506,7 +1506,7 @@ alias com = onesComplement;
 _Z!(cow) sqrt(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) // l-value `x`
+	static if (__traits(isRef, x)) /+ l-value `x` +/
 	{
 		typeof(return) y = null; // must use temporary
 		__gmpz_sqrt(y._ptr, x._ptr);
@@ -1523,7 +1523,7 @@ _Z!(cow) sqrt(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 _Z!(cow) sqrtrem(bool cow)(auto ref scope const _Z!(cow) x, out scope _Z!(cow) rem) @trusted nothrow @nogc
 {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) // l-value `x`
+	static if (__traits(isRef, x)) /+ l-value `x` +/
 	{
 		typeof(return) y = null; // must use temporary
 		__gmpz_sqrtrem(y._ptr, rem._ptr, x._ptr);
@@ -1544,7 +1544,7 @@ _Z!(cow) sqrtrem(bool cow)(auto ref scope const _Z!(cow) x, out scope _Z!(cow) r
 _Z!(cow) root(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out bool isExact) @trusted nothrow @nogc
 {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) // l-value `x`
+	static if (__traits(isRef, x)) /+ l-value `x` +/
 	{
 		typeof(return) y = null; // must use temporary
 		const status = __gmpz_root(y._ptr, x._ptr, n);
@@ -1562,7 +1562,7 @@ _Z!(cow) root(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out bool isExa
 _Z!(cow) rootrem(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out scope _Z!(cow) rem) @trusted nothrow @nogc
 {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) // l-value `x`
+	static if (__traits(isRef, x)) /+ l-value `x` +/
 	{
 		typeof(return) y = null; // must use temporary
 		__gmpz_rootrem(y._ptr, rem._ptr, x._ptr, n);
@@ -1603,7 +1603,7 @@ int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @tr
 _Z!(cow) nextPrime(bool cow)(auto ref scope const _Z!(cow) x) nothrow @nogc @trusted
 {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) // l-value `x`
+	static if (__traits(isRef, x)) /+ l-value `x` +/
 	{
 		typeof(return) y = null; // must use temporary
 		static if (cow) { y.selfdupIfAliased(); }
@@ -1650,7 +1650,7 @@ _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 
 		return move(*zp);	// TODO: shouldn't have to call `move` here
 	}
-	else						// l-value `x` and `y`, no reuse in output
+	else						/+ l-value `x` and `y`, no reuse in output +/
 	{
 		typeof(return) z = null;
 		__gmpz_gcd(z._ptr, x._ptr, y._ptr);
@@ -1661,7 +1661,7 @@ _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, in ulong y) nothrow @nogc @trusted
 {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) // l-value `x`
+	static if (__traits(isRef, x)) /+ l-value `x` +/
 	{
 		typeof(return) z = null;
 		const z_ui = __gmpz_gcd_ui(z._ptr, x._ptr, y);
@@ -1711,7 +1711,7 @@ _Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 
 		return move(*zp);	// TODO: shouldn't have to call `move` here
 	}
-	else						// l-value `x` and `y`, no reuse in output
+	else						/+ l-value `x` and `y`, no reuse in output +/
 	{
 		typeof(return) z = null;
 		__gmpz_lcm(z._ptr, x._ptr, y._ptr);
@@ -1722,7 +1722,7 @@ _Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 _Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @trusted
 {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) // l-value `x`
+	static if (__traits(isRef, x)) /+ l-value `x` +/
 	{
 		typeof(return) z = null;
 		__gmpz_lcm_ui(z._ptr, x._ptr, y);
@@ -1790,7 +1790,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 		assert(success >= 0, "Cannot invert");
 		return move(*mut_mod);  // TODO: shouldn't have to call `move` here
 	}
-	else						// l-value `base` and l-value `mod`
+	else						/+ l-value `base` and l-value `mod` +/
 	{
 		typeof(return) y = 0; // result, TODO: reuse `exp` or `mod` if any is an r-value
 		static if (cow) { y.selfdupIfAliased(); }
@@ -1888,7 +1888,7 @@ version(gmp_test) nothrow unittest {
 
 	static void testSqrt(ulong p, ulong q) pure nothrow @nogc {
 		const x = p.Z;
-		assert(sqrt(x)== q);	// l-value first-parameter
+		assert(sqrt(x)== q);	/+ l-value first-parameter +/
 		assert(sqrt(p.Z) == q);	/+ r-value first-parameter +/
 	}
 	testSqrt(1, 1);
@@ -1911,7 +1911,7 @@ version(gmp_test) nothrow unittest {
 		{
 			Z u = ui;
 			Z rem;
-			const r = rootrem(u, 2, rem); // l-value first-parameter
+			const r = rootrem(u, 2, rem); /+ l-value first-parameter +/
 			assert(r == 4);
 			assert(rem == ui - 16);
 		}
@@ -1927,7 +1927,7 @@ version(gmp_test) nothrow unittest {
 		{
 			Z u = ui;
 			Z rem;
-			const r = sqrtrem(u, rem); // l-value first-parameter
+			const r = sqrtrem(u, rem); /+ l-value first-parameter +/
 			assert(r == 4);
 			assert(rem == ui - 16);
 		}
@@ -2005,7 +2005,7 @@ version(gmp_test) nothrow unittest {
 ///
 version(gmp_test) @nogc unittest {
 	const x = 42.Z;
-	assert(x.unaryMinus() == -42);	// l-value `this`
+	assert(x.unaryMinus() == -42);	/+ l-value `this` +/
 	assert(42.Z.unaryMinus() == -42); /+ r-value `this` +/
 }
 
@@ -2537,12 +2537,12 @@ version(gmp_test) unittest {
 	assert(3.Z.invert(-26.Z) == 9.Z); /+ r-value `base` +/
 	{
 		auto base = 3.Z;
-		assert(base.invert(26.Z) == 9.Z); // l-value `base` and r-value `mod`
+		assert(base.invert(26.Z) == 9.Z); /+ l-value `base` and r-value `mod` +/
 	}
 	{
 		auto base = 3.Z;
 		auto mod = 26.Z;
-		assert(base.invert(mod) == 9.Z); // l-value `base` and l-value `mod
+		assert(base.invert(mod) == 9.Z); /+ l-value `base` and l-value `mod +/
 	}
 
 	// bitwise and, or and xor
