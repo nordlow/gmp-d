@@ -226,9 +226,8 @@ nothrow:
 	// @disable this();
 
 	/// Construct empty (undefined) from explicit `null`.
-	this(typeof(null)) @trusted {
+	this(typeof(null)) @trusted out(_; _ == _Z.init) {
 		initialize();			 // TODO: is there a faster way?
-		assert(this == _Z.init); // if this is same as default
 	}
 
 	/// Construct from expression `expr`.
@@ -243,7 +242,6 @@ nothrow:
 		// TODO: add support for static initialization
 		// if (!__ctfe)
 		// {
-
 		static if (__traits(isUnsigned, T))
 			__gmpz_init_set_ui(_ptr, value);
 		else static if (__traits(isFloating, T))
