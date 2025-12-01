@@ -1551,16 +1551,11 @@ _Z!(cow) nextPrime(bool cow)(auto ref scope const _Z!(cow) x) nothrow @nogc @tru
 }
 
 /// Get greatest common divisor (gcd) of `x` and `y`.
-_Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @nogc @trusted
-{
+_Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @nogc @trusted {
 	version(DigitalMars) pragma(inline);
-	static if (!__traits(isRef, x) || /+ r-value `x` +/
-			   !__traits(isRef, y))	  /+ r-value `y` +/
-	{
+	static if (!__traits(isRef, x) /+ r-value `x` +/ || !__traits(isRef, y)) /+ r-value `y` +/ {
 		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
-		static if (!__traits(isRef, x) && /+ r-value `x` +/
-				   !__traits(isRef, y))	  /+ r-value `y` +/
-		{
+		static if (!__traits(isRef, x) /+ r-value `x` +/ && !__traits(isRef, y)) /+ r-value `y` +/ {
 			if (x.limbCount > y.limbCount) // larger r-value `x`
 				zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 			else					// larger r-value `y`
