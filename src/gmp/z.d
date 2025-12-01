@@ -1569,9 +1569,7 @@ _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_gcd(zp._ptr, x._ptr, y._ptr);
 		return move(*zp);	// TODO: shouldn't have to call `move` here
-	}
-	else						/+ l-value `x` and `y`, no reuse in output +/
-	{
+	} else /+ l-value `x` and `y`, no reuse in output +/ {
 		typeof(return) z = null;
 		__gmpz_gcd(z._ptr, x._ptr, y._ptr);
 		return z;
