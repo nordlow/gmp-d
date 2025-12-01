@@ -1295,9 +1295,7 @@ alias toHex = toHexadecimalString;
 
 /// Get the absolute value of `x` converted to the corresponding unsigned type.
 Unsigned!T absUnsign(T, bool cow)(auto ref scope const _Z!(cow) x) nothrow // for `std.bigint.BigInt` compatibility
-if (__traits(isIntegral, T))
-{
-	version(DigitalMars) pragma(inline);
+if (__traits(isIntegral, T)) {
 	return _integralAbs(cast(T)x);
 }
 
