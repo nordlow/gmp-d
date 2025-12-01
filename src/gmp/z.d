@@ -1300,19 +1300,15 @@ if (__traits(isIntegral, T)) {
 /** Get sum of `x` and `y` (`x` + `y`). */
 _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted {
 	version(DigitalMars) pragma(inline);
-	static if (!__traits(isRef, x) || /+ r-value `x` +/
-			   !__traits(isRef, y)) /+ r-value `y` +/
+	static if (!__traits(isRef, x) /+ r-value `x` +/ || !__traits(isRef, y)) /+ r-value `y` +/
 	{
-		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
-		static if (!__traits(isRef, x) && /+ r-value `x` +/
-				   !__traits(isRef, y)) /+ r-value `y` +/
-		{
+		typeof(return)* zp = null; // reuse: will point to either `x` or `y`
+		static if (!__traits(isRef, x) && /+ r-value `x` +/ !__traits(isRef, y)) /+ r-value `y` +/ {
 			if (x.limbCount > y.limbCount) // larger r-value `x`
 				zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-			else					// larger r-value `y`
+			else // larger r-value `y`
 				zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-		}
-		else static if (!__traits(isRef, x)) /+ r-value `x` +/
+		} else static if (!__traits(isRef, x)) /+ r-value `x` +/
 			zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		else static if (!__traits(isRef, y)) /+ r-value `y` +/
 			zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
@@ -1332,12 +1328,9 @@ _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 @safe nothrow @nogc version(gmp_test) unittest {
 	const Z x = Z(2)^^100;
 	const Z y = 12;
-	assert(add(x, Z(12)) ==	   /+ l-value, r-value +/
-		   add(Z(12), x));		/+ r-value, l-value +/
-	assert(add(x, y) ==		   /+ l-value, l-value +/
-		   add(Z(2)^^100, Z(12)));	/+ r-value, r-value +/
-	assert(add(Z(12), Z(2)^^100) == /+ r-value, r-value +/
-		   add(Z(2)^^100, Z(12)));	/+ r-value, r-value +/
+	assert(add(x, Z(12)) /+ l-value, r-value +/ == add(Z(12), x)); /+ r-value, l-value +/
+	assert(add(x, y) /+ l-value, l-value +/ == add(Z(2)^^100, Z(12))); /+ r-value, r-value +/
+	assert(add(Z(12), Z(2)^^100) /+ r-value, r-value +/ == add(Z(2)^^100, Z(12)));	/+ r-value, r-value +/
 }
 
 /** Get difference of `x` and `y` (`x` - `y`).
