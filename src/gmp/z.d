@@ -3258,9 +3258,9 @@ version(gmp_test) @nogc unittest {
 	See: https://gmplib.org/manual/Integer-Roots
  */
 private struct SqrtExpr(bool cow) {
-	_Z!(cow) e1;
-	_Z!(cow) eval() const nothrow @nogc @trusted	 // TODO: move to common place
-	{
+	_Z!(cow) e1; // (sub-expression)
+pragma(inline, true):
+	_Z!(cow) eval() const nothrow @nogc @trusted /+ TODO: move to common place +/ {
 		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
