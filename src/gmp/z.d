@@ -1515,20 +1515,17 @@ _Z!(cow) rootrem(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out scope _
 }
 
 /// Comparison of the absolute values of `x` and `y`.
-int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @nogc @trusted
-{
+int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @nogc @trusted {
 	version(DigitalMars) pragma(inline);
 	return __gmpz_cmpabs(x._ptr, y._ptr);
 }
 /// ditto
-int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, double y) nothrow @nogc @trusted
-{
+int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, double y) nothrow @nogc @trusted {
 	version(DigitalMars) pragma(inline);
 	return __gmpz_cmpabs_d(x._ptr, y);
 }
 /// ditto
-int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @trusted
-{
+int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @trusted {
 	version(DigitalMars) pragma(inline);
 	return __gmpz_cmpabs_ui(x._ptr, y);
 }
@@ -1538,18 +1535,14 @@ int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @tr
 	Written as a free function instead of `MpZ`-member because `__traits(isRef,
 	this)` doesn't currently support member functions.
 */
-_Z!(cow) nextPrime(bool cow)(auto ref scope const _Z!(cow) x) nothrow @nogc @trusted
-{
+_Z!(cow) nextPrime(bool cow)(auto ref scope const _Z!(cow) x) nothrow @nogc @trusted {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) /+ l-value `x` +/
-	{
+	static if (__traits(isRef, x)) /+ l-value `x` +/ {
 		typeof(return) y = null; // must use temporary
 		static if (cow) { y.selfdupIfAliased(); }
 		__gmpz_nextprime(y._ptr, x._ptr);
 		return y;
-	}
-	else						/+ r-value `x` +/
-	{
+	} else /+ r-value `x` +/ {
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_nextprime(zp._ptr, x._ptr);
