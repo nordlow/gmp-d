@@ -14,7 +14,23 @@ importPaths "src"
 
 libs "gmp" "c"
 
+# WARNING: dub picks the first configuration by default so put debug first here!
+configuration "debug" {
+   dflags "-g" "-checkaction=context" "-allinst"
+   dflags "-debug" platform="dmd"
+   dflags "--d-debug" platform="ldc"
+}
+
+configuration "unittest" {
+   versions "gmp_test"
+   dflags "-g" "-checkaction=context" "-allinst" "-unittest"
+   dflags "-fsanitize=address" "-fsanitize=leak" "-mcpu=native" platform="posix-ldc"
+   dflags "-debug" platform="dmd"
+   dflags "--d-debug" platform="ldc"
+}
+
 buildType "unittest" {
+  versions "gmp_test"
   buildOptions "unittests" "debugMode" "debugInfo"
   dflags "-checkaction=context" "-preview=dip1000" # TODO: "-preview=dip1021"
   dflags "-fsanitize=address" "-fsanitize=leak" platform="posix-ldc"
@@ -22,12 +38,14 @@ buildType "unittest" {
 
 # TODO: this doesn't work
 buildType "unittest-ccc" {
+  versions "gmp_test"
   buildOptions "unittests" "debugMode" "debugInfo"
   dflags "-checkaction=context" "-fsanitize=address" "-fsanitize=leak" platform="posix-ldc" # test build uses LDC's sanitizer by default
   # TODO: dflags "-d-version=ccc"
 }
 
 buildType "release-unittest" {
+  versions "gmp_test"
   buildOptions "releaseMode" "optimize" "inline" # TODO: -march=native -ffast-math
   dflags "-checkaction=context" "-unittest"
 }

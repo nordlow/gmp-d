@@ -209,7 +209,7 @@ nothrow:
 		Returns: a new GC-allocated slice containing the words produced.
 	*/
 	Word[] serialize(Word)(WordOrder order, WordEndianess endian, size_t nails) const @trusted
-	if (isUnsigned!Word) {
+	if (__traits(isUnsigned, Word)) {
 		pragma(inline);
 		const numb = 8 * Word.sizeof - nails;
 		size_t count = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
@@ -1157,7 +1157,7 @@ nothrow:
 		=> rhs.isOne ? true : __gmpz_divisible_p(_ptr, rhs._ptr) != 0;
 	/// ditto
 	@property bool isDivisibleBy(Rhs)(auto ref scope const Rhs rhs) const @trusted
-	if (isUnsigned!Rhs)
+	if (__traits(isUnsigned, Rhs))
 		=> rhs == 1 ? true : __gmpz_divisible_ui_p(_ptr, rhs) != 0;
 
 	/** Returns: sign as either
@@ -3462,7 +3462,7 @@ version(gmp_test) pure @safe nothrow @nogc unittest {
 version(gmp_test) pure @safe nothrow @nogc unittest {
 	static immutable ulong[] samplePrimes = [257, 65_537, 8_191, 131_071, 524_287, 2_147_483_647];
 	foreach (const i; samplePrimes)
-	 	assert(Z(i).isDefinitelyPrime(1));
+		assert(Z(i).isDefinitelyPrime(1));
 }
 
 version(gmp_test) version(unittest) {
