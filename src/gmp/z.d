@@ -1560,20 +1560,14 @@ _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 				zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 			else					// larger r-value `y`
 				zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-		}
-		else static if (!__traits(isRef, x)) /+ r-value `x` +/
-		{
+		} else static if (!__traits(isRef, x)) /+ r-value `x` +/ {
 			zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-		}
-		else static if (!__traits(isRef, y)) /+ r-value `y` +/
-		{
+		} else static if (!__traits(isRef, y)) /+ r-value `y` +/ {
 			zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-		}
-		else
+		} else
 			static assert(0);
 		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_gcd(zp._ptr, x._ptr, y._ptr);
-
 		return move(*zp);	// TODO: shouldn't have to call `move` here
 	}
 	else						/+ l-value `x` and `y`, no reuse in output +/
