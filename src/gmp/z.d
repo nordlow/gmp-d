@@ -173,7 +173,7 @@ nothrow:
 		return chars;
 	}
 
-	// `mir.appender` compliant.
+	// `mir.appender` compliance.
 	void toString(Writer)(ref Writer writer, in uint base = defaultBase, in bool upperCaseDigits = false) const @nogc @trusted
 	if (is(typeof(writer.put((const(char)[]).init)))) {
 		pragma(inline);
