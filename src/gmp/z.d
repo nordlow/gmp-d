@@ -272,6 +272,7 @@ nothrow:
 		- the most significant `nails` bits of each word are unused and set to zero, this can be 0 to produce full words
 	*/
 	this(T)(const T[] rop, WordOrder order, size_t size, WordEndianess endian, size_t nails)	if (__traits(isUnsigned, T)) {
+		pragma(inline);
 		int realOrder;
 		final switch(order) {
 			case WordOrder.mostSignificantWordFirst:  realOrder = 1;  break;
