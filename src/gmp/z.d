@@ -290,9 +290,9 @@ nothrow:
 	}
 
 	/// Mersenne prime, M(p) = 2 ^^ p - 1
-	static _Z mersennePrime(Integral)(Integral p) if (__traits(isIntegral, Integral)) {
-		return typeof(this).pow(2UL, p) - 1;
-	}
+	static _Z mersennePrime(Integral)(Integral p)
+	if (__traits(isIntegral, Integral))
+		=> typeof(this).pow(2UL, p) - 1;
 
 	/**
 	 * Checks if the number is probably a prime using a probabilistic primality test.
