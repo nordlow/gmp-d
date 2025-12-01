@@ -9,16 +9,12 @@ import gmp.z;
  *
  * Wrapper for GNU MP (GMP)'s type `mpq_t` and functions `__gmpq_.*`.
  */
-struct MpQ
-{
+struct MpQ {
 	pure nothrow:
 
 	/// Convert to `string` in base `base`.
-	string toString(in uint base = defaultBase,
-					in bool upperCaseDigits = false) const
-	{
-		assert((base >= -2 && base <= -36) ||
-			   (base >= 2 && base <= 62));
+	string toString(in uint base = defaultBase, in bool upperCaseDigits = false) const {
+		assert((base >= -2 && base <= -36) || (base >= 2 && base <= 62));
 		// TODO: use on allocation only
 		return (numerator.toString(base, upperCaseDigits) ~
 				"/" ~
@@ -29,11 +25,8 @@ struct MpQ
 	 *
 	 * Returns: char[] which must be freed manually with `pureFree`.
 	 */
-	char[] toChars(in uint base = defaultBase,
-				   in bool upperCaseDigits = false) const @system @nogc
-	{
-		assert((base >= -2 && base <= -36) ||
-			   (base >= 2 && base <= 62));
+	char[] toChars(in uint base = defaultBase, in bool upperCaseDigits = false) const @system @nogc {
+		assert((base >= -2 && base <= -36) || (base >= 2 && base <= 62));
 		assert(false, "TODO: use on allocation only");
 	}
 
@@ -54,16 +47,13 @@ struct MpQ
 	@disable this(this);
 
 	/// Construct empty (undefined) from explicit `null`.
-	this(typeof(null)) @safe
-	{
+	this(typeof(null)) @safe {
 		initialize();
 	}
 
 	/** Construct from floating-point `value`.
 	 */
-	this(P)(in P value) @safe
-	if (__traits(isFloating, P))
-	{
+	this(P)(in P value) @safe	if (__traits(isFloating, P)) {
 		initialize();
 		this = value;		   // reuse opAssign
 	}
@@ -73,93 +63,75 @@ struct MpQ
 	 * Note that `qValue` must be explicitly given, to prevent accidental
 	 * storage of integers as rations with denominator being 1.
 	 */
-	this(P, Q)(P pValue, Q qValue,
-			   in bool canonicalizeFlag = false) @trusted
-	if (__traits(isIntegral, P) &&
-		__traits(isIntegral, Q))
-	{
+	this(P, Q)(P pValue, Q qValue, in bool canonicalizeFlag = false) @trusted
+	if (__traits(isIntegral, P) && __traits(isIntegral, Q)) {
 		initialize();
-
 		static if (__traits(isArithmetic, Q) && !__traits(isUnsigned, Q))
 			assert(qValue >= 1, "Negative denominator");
-
 		// dln("qValue:", qValue);
-
 		static	  if (__traits(isUnsigned, P))
 			__gmpq_set_ui(_ptr, pValue, qValue);
 		else					// signed integral
 			__gmpq_set_si(_ptr, pValue, qValue);
-
 		if (canonicalizeFlag)
 			canonicalize();
 	}
 
-	/** Construct from floating-point `value`.
-	 */
+	/** Construct from floating-point `value`. */
 	ref MpQ opAssign(P)(P value) @trusted scope return
-	if (__traits(isFloating, P))
-	{
-		version(DigitalMars) pragma(inline, false);
+	if (__traits(isFloating, P)) {
+		version(DigitalMars) pragma(inline);
 		__gmpq_set_d(_ptr, value);
 		return this;
 	}
 
 	/** Assign from integer `value`. */
 	ref MpQ opAssign(P)(P value) @trusted scope return
-	if (__traits(isIntegral, P))
-	{
-		version(DigitalMars) pragma(inline, false);
-
+	if (__traits(isIntegral, P)) {
+		version(DigitalMars) pragma(inline);
 		static	  if (__traits(isUnsigned, P))
 			__gmpq_set_ui(_ptr, value, 1);
 		else					// signed integral
 			__gmpq_set_si(_ptr, value, 1);
-
 		return this;
 	}
 
 	/** Canonicalize `this`. */
-	void canonicalize() @trusted
-	{
+	void canonicalize() @trusted {
 		__gmpq_canonicalize(_ptr);
 	}
 
 	/// Destruct `this`.
-	~this() @trusted @nogc
-	{
+	~this() @trusted @nogc {
 		assert(_ptr, "Pointer is null");
 		__gmpq_clear(_ptr);
 	}
 
 	/// Returns: `true` iff `this` equals `rhs`.
-	bool opEquals()(auto ref const MpQ rhs) const @trusted
-	{
-		version(DigitalMars) pragma(inline, false);
+	bool opEquals()(auto ref const MpQ rhs) const @trusted {
+		version(DigitalMars) pragma(inline);
 		if (_ptr == rhs._ptr)   // fast equality
 			return true;		// fast bailout
 		return __gmpq_equal(_ptr, rhs._ptr) != 0;
 	}
 	/// ditto
 	int opEquals(T)(T rhs) const @safe
-	if (__traits(isIntegral, T))
-	{
+	if (__traits(isIntegral, T)) {
 		if (rhs == 0)
 			return numerator.isZero; // optimization
 		return numerator == rhs && denominator == 1;
 	}
 
 	/// Compare `this` to `rhs`.
-	int opCmp()(auto ref const MpQ rhs) const @trusted
-	{
-		version(DigitalMars) pragma(inline, false);
+	int opCmp()(auto ref const MpQ rhs) const @trusted {
+		version(DigitalMars) pragma(inline);
 		if (rhs.numerator == 0)
 			return sgn;		 // optimization
 		return __gmpq_cmp(_ptr, rhs._ptr);
 	}
 	/// Compare `this` to `rhs`.
-	int opCmp()(auto ref const MpZ rhs) const @trusted
-	{
-		version(DigitalMars) pragma(inline, false);
+	int opCmp()(auto ref const MpZ rhs) const @trusted {
+		version(DigitalMars) pragma(inline);
 		if (rhs == 0)
 			return sgn;		 // optimization
 		return __gmpq_cmp_z(_ptr,
@@ -167,8 +139,7 @@ struct MpQ
 	}
 	/// ditto
 	int opCmp(T)(T rhs) const @trusted
-	if (__traits(isIntegral, T))
-	{
+	if (__traits(isIntegral, T)) {
 		if (rhs == 0)
 			return sgn;		 // optimization
 		static if (__traits(isUnsigned, T))
@@ -179,28 +150,19 @@ struct MpQ
 
 	/// Get the hash suitable for use in a hash table.
 	size_t toHash() const @safe
-	{
-		return (numerator.toHash ^
-				denominator.toHash);
-	}
+		=> (numerator.toHash ^ denominator.toHash);
 
 	/// Returns: numerator reference of `this`.
 	@property ref inout(MpZ) numerator() @trusted inout scope return
-	{
-		return *(cast(inout(MpZ)*)_num_ptr);
-	}
+		=> *(cast(inout(MpZ)*)_num_ptr);
 
 	/// Returns: denominator reference of `this`.
 	@property ref inout(MpZ) denominator() @trusted inout scope return
-	{
-		return *(cast(inout(MpZ)*)_den_ptr);
-	}
+		=> *(cast(inout(MpZ)*)_den_ptr);
 
 	/// Returns: the integer part of `this`, with any remainder truncated.
 	@property MpZ integerPart() @safe
-	{
-		return numerator / denominator;
-	}
+		=> numerator / denominator;
 
 	/// Returns: the fractional part of `this`.
 	// TODO: activate when sub(MpQ, MpZ) has been added
@@ -212,26 +174,21 @@ struct MpQ
 	/// Cast to arithmetic type `T`.
 	T opCast(T)() const @trusted /*TODO: scope*/
 	if (__traits(isFloating, T))
-	{
-		return cast(T)__gmpq_get_d(_ptr);
-	}
+		=> cast(T)__gmpq_get_d(_ptr);
 
 	/** Invert `this` in-place.
 	 *
 	 * Returns: `void` to make it obvious that `this` is mutated.
 	 */
-	void invert() @trusted
-	{
-		version(DigitalMars) pragma(inline, false);
+	void invert() @trusted {
+		version(DigitalMars) pragma(inline);
 		import std.algorithm.mutation : swap;
 		const bool negative = numerator < 0;
-		if (negative)
-		{
+		if (negative) {
 			numerator.absolute();		 // fast inline
 			swap(numerator, denominator); // fast inline
 			numerator.negate();		   // fast inline
-		}
-		else
+		} else
 			swap(numerator, denominator); // fast inline
 	}
 
@@ -241,25 +198,19 @@ struct MpQ
 		- +1 (`this` > 0).
 	*/
 	@property int sgn() const @safe
-	{
-		assert(denominator >= 1);
-		return numerator.sgn;   // sign always stored in numerator so reuse fast
-	}
+	in(denominator >= 1)
+		=> numerator.sgn;	// sign always stored in numerator so reuse fast
 
 	/** Make `this` the absolute value of itself in-place.
 	 *
 	 * Returns: `void` to make it obvious that `this` is mutated.
 	 */
 	void absolute() @safe
-	{
-		numerator.absolute();
-	}
+		=> numerator.absolute();
 
 	MpQ opBinary(string s)(auto ref const MpQ rhs) const @trusted // direct value
-		if ((s == "+" || s == "-" ||
-			 s == "*" || s == "/"))
-	{
-		version(DigitalMars) pragma(inline, false);
+	if ((s == "+" || s == "-" || s == "*" || s == "/")) {
+		version(DigitalMars) pragma(inline);
 		static if (!__traits(isRef, rhs)) // r-value `rhs`
 		{
 			MpQ* mut_rhs = (cast(MpQ*)(&rhs)); // @trusted because `MpQ` has no aliased indirections
@@ -269,18 +220,14 @@ struct MpQ
 				__gmpq_sub(mut_rhs._ptr, _ptr, rhs._ptr);
 			else static if (s == "*")
 				__gmpq_mul(mut_rhs._ptr, _ptr, rhs._ptr);
-			else static if (s == "/")
-			{
+			else static if (s == "/") {
 				assert(rhs != 0, "Divison by zero");
 				__gmpq_div(mut_rhs._ptr, _ptr, rhs._ptr);
-			}
-			else
+			} else
 				static assert(false);
 			import core.lifetime : move;
 			return move(*mut_rhs); // TODO: shouldn't have to call `move` here
-		}
-		else
-		{
+		} else {
 			typeof(return) y = null;
 			static	  if (s == "+")
 				__gmpq_add(y._ptr, _ptr, rhs._ptr);
@@ -288,12 +235,10 @@ struct MpQ
 				__gmpq_sub(y._ptr, _ptr, rhs._ptr);
 			else static if (s == "*")
 				__gmpq_mul(y._ptr, _ptr, rhs._ptr);
-			else static if (s == "/")
-			{
+			else static if (s == "/") {
 				assert(rhs != 0, "Divison by zero");
 				__gmpq_div(y._ptr, _ptr, rhs._ptr);
-			}
-			else
+			} else
 				static assert(false);
 			return y;
 		}
@@ -324,33 +269,24 @@ private:
 	enum defaultBase = 10;
 
 	/** Initialize internal struct. */
-	private void initialize() @trusted // cannot be called `init` as that will override builtin type property
-	{
-		__gmpq_init(_ptr);
-	}
+	private void initialize() @trusted /+ cannot be called `init` as that will override builtin type property +/
+		=> __gmpq_init(_ptr);
 
 	/// Returns: pointer to internal rational C struct.
 	inout(__mpq_struct)* _ptr() inout return @system
-	{
-		return &_q;
-	}
+		=> &_q;
 
 	/// Returns: pointer to internal numerator C struct.
 	inout(__mpz_struct)* _num_ptr() inout return @system
-	{
-		return cast(typeof(return))&_q._mp_num;
-	}
+		=> cast(typeof(return))&_q._mp_num;
 
 	/// Returns: pointer to internal denominator C struct.
 	inout(__mpz_struct)* _den_ptr() inout return @system
-	{
-		return cast(typeof(return))&_q._mp_den;
-	}
+		=> cast(typeof(return))&_q._mp_den;
 
 	__mpq_struct _q;			// internal libgmp C struct
 
-	version(ccc)
-	{
+	version(ccc) {
 		/** Number of calls made to `__gmpq`--functions that construct or
 		 * changes this value. Used to verify correct lowering and evaluation of
 		 * template expressions.
@@ -358,11 +294,10 @@ private:
 		 * For instance the `x` in `x = y + z` should be assigned only once
 		 * inside a call to `mpq_add`.
 		 */
-		@property size_t mutatingCallCount() const @safe { return _ccc; }
+		@property size_t mutatingCallCount() const @safe => _ccc;
 
 		/** C mutation call count. Number of calls to C GMP function calls that
-		 * mutate this object.
-		 */
+		 * mutate this object. */
 		size_t _ccc;
 	}
 }
@@ -370,25 +305,19 @@ private:
 pure nothrow pragma(inline, true):
 
 /// Swap contents of `x` with contents of `y`.
-void swap()(ref MpQ x,
-			ref MpQ y)
-{
+void swap()(ref MpQ x, ref MpQ y) {
 	import std.algorithm.mutation : swap;
 	swap(x, y); // x.swap(y);
 }
 
 /// Returns: absolute value of `x`.
-MpQ abs()(auto ref const MpQ x) @trusted
-{
-	version(DigitalMars) pragma(inline, false);
-	static if (__traits(isRef, x)) // l-value `x`
-	{
+MpQ abs()(auto ref const MpQ x) @trusted {
+	version(DigitalMars) pragma(inline);
+	static if (__traits(isRef, x)) {
 		MpQ y = null;
 		__gmpq_abs(y._ptr, x._ptr);
 		return y;
-	}
-	else						// r-value `x`
-	{
+	} else {
 		MpQ* mut_x = (cast(MpQ*)(&x)); // @trusted because `MpQ` has no aliased indirections
 		mut_x.absolute();
 		import core.lifetime : move;
@@ -397,17 +326,13 @@ MpQ abs()(auto ref const MpQ x) @trusted
 }
 
 /// Returns: inverse of `x`.
-MpQ inverse()(auto ref const MpQ x) @trusted
-{
-	version(DigitalMars) pragma(inline, false);
-	static if (__traits(isRef, x)) // l-value `x`
-	{
+MpQ inverse()(auto ref const MpQ x) @trusted {
+	version(DigitalMars) pragma(inline);
+	static if (__traits(isRef, x)) {
 		MpQ y = null;
 		__gmpq_inv(y._ptr, x._ptr);
 		return y;
-	}
-	else						// r-value `x`
-	{
+	} else {
 		MpQ* mut_x = (cast(MpQ*)(&x)); // @trusted because `MpQ` has no aliased indirections
 		mut_x.invert();
 		import core.lifetime : move;
@@ -615,8 +540,7 @@ alias inv = inverse;
 	// TODO: assert(1 / Q(2, 3) == Q(3, 2));
 }
 
-version(gmp_test) version(unittest)
-{
+version(gmp_test) version(unittest) {
 	// version = ccc;			  // do C mutation call count
 	alias Z = MpZ;
 	alias Q = MpQ;
@@ -626,8 +550,7 @@ version(gmp_test) version(unittest)
 
 // C API
 package extern(C) pragma(inline, false) {
-	struct __mpq_struct
-	{
+	struct __mpq_struct {
 		__mpz_struct _mp_num;
 		__mpz_struct _mp_den;
 	}
