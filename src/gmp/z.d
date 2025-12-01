@@ -311,16 +311,14 @@ nothrow:
 	 *
 	 * See Also: `mpz_probab_prime_p`.
 	 */
-	@property int isProbablyPrime(in int repetitionCount = 25) @trusted {
-		return __gmpz_probab_prime_p(_ptr, repetitionCount);
-	}
+	@property int isProbablyPrime(in int repetitionCount = 25) @trusted
+		=> __gmpz_probab_prime_p(_ptr, repetitionCount);
 
 	/** Checks if the number is definitely a prime using a probabilistic primality test.
 		Returns: `true` if `this` is a prime, `false` if computation could determine.
 	 */
-	@property bool isDefinitelyPrime(in int repetitionCount = 25) @trusted {
-		return isProbablyPrime(repetitionCount) == 2;
-	}
+	@property bool isDefinitelyPrime(in int repetitionCount = 25) @trusted
+		=> isProbablyPrime(repetitionCount) == 2;
 
 	// /// Construct copy of `value`.
 	// this(ref const _Z value) @trusted
