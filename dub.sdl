@@ -12,29 +12,26 @@ dflags "-vcolumns"
 libs "gmp" "c"
 
 targetPath "bin"
+
+# use better linker
+dflags "-Xcc=-fuse-ld=lld"
+
 importPaths "src"
 
-configuration "unittest" {
-  versions "gmp_test"
+buildType "unittest" {
   buildOptions "unittests" "debugMode" "debugInfo"
-  dflags "-checkaction=context" "-allinst" "-preview=dip1000" # TODO: "-preview=dip1021"
+  dflags "-checkaction=context" "-preview=dip1000" # TODO: "-preview=dip1021"
   dflags "-fsanitize=address" "-fsanitize=leak" platform="posix-ldc"
 }
 
-buildType "unittest" {
-  versions "gmp_test"
+# TODO: this doesn't work
+buildType "unittest-ccc" {
   buildOptions "unittests" "debugMode" "debugInfo"
-  dflags "-checkaction=context" "-allinst" "-preview=dip1000" # TODO: "-preview=dip1021"
-  dflags "-fsanitize=address" "-fsanitize=leak" platform="posix-ldc"
+  dflags "-checkaction=context" "-fsanitize=address" "-fsanitize=leak" platform="posix-ldc" # test build uses LDC's sanitizer by default
+  # TODO: dflags "-d-version=ccc"
 }
 
 buildType "release-unittest" {
-  versions "gmp_test"
   buildOptions "releaseMode" "optimize" "inline" # TODO: -march=native -ffast-math
-  dflags "-checkaction=context" "-allinst" "-unittest"
-}
-
-buildType "release" {
-  buildOptions "releaseMode" "optimize" "inline" # TODO: -march=native -ffast-math
-  dflags "-flto=full" platform="posix-ldc"
+  dflags "-checkaction=context" "-unittest"
 }

@@ -55,12 +55,13 @@ enum Rounding {
 	counting (ARC) (Swift-style).
  */
 private struct _Z(bool cow) {
+pragma(inline, true):
+
 	/// Put `string` to sink in base `base`.
-	void toString(scope void delegate(scope const(char)[]) @safe sink,
-				  in uint base = defaultBase,
-				  in bool upperCaseDigits = false) const @trusted
-		in(((-2 <= base) && (base <= -36)) ||
-		   ((+2 <= base) && (base <= +62))) {
+	void toString(scope void delegate(scope const(char)[]) @safe sink, in uint base = defaultBase, in bool upperCaseDigits = false) const @trusted
+	in(-2 <= base && base <= -36 ||
+	   +2 <= base && base <= +62) {
+		pragma(inline);
 		import core.memory : pureMalloc;
 		if (isZero) { return sink(`0`); }
 		if (isOne) { return sink(`1`); }
@@ -81,8 +82,7 @@ pure:
 		If `base` is 0 it's guessed from contents of `value`.
 	*/
 	this(scope const(char)[] value, uint base = 0) @trusted // TODO: Use Optional/Nullable when value is nan, or inf
-		in(base == 0 ||
-		   (+2 <= base && base <= +62)) {
+	in(base == 0 || (+2 <= base && base <= +62)) {
 		if (value.length >= 2 &&
 			value[0] == '0' &&
 			((base == 16 &&
@@ -96,6 +96,7 @@ pure:
 			   value[1] == 'O')))) {
 			value = value[2 .. $]; // __gmpz_init_set_str doesn’t allow `"0x"` prefix if `base` given
 		}
+		pragma(inline);
 		char[smallBufSize] buf;
 		char* stringz;
 		import std.algorithm.searching : canFind;
@@ -118,21 +119,16 @@ pure:
 		enforce(status == 0, "Parameter `value` does not contain an integer");
 	}
 
-	static typeof(this) fromBinaryString(scope const(char)[] value) pure @safe {
-		return typeof(return)(value, 2);
-	}
-
-	static typeof(this) fromHexString(scope const(char)[] value) pure @safe {
-		return typeof(return)(value, 16);
-	}
+	static typeof(this) fromBinaryString(scope const(char)[] value) pure @safe => typeof(return)(value, 2);
+	static typeof(this) fromHexString(scope const(char)[] value) pure @safe => typeof(return)(value, 16);
 
 nothrow:
 
 	/// Convert to `string` in base `base`.
-	string toString(in uint base = defaultBase,
-					in bool upperCaseDigits = false) scope const @trusted
-		in(((-2 <= base) && (base <= -36)) ||
-		   ((+2 <= base) && (base <= +62))) {
+	string toString(in uint base = defaultBase, in bool upperCaseDigits = false) scope const @trusted
+	in(-2 <= base && base <= -36 ||
+	   +2 <= base && base <= +62) {
+		pragma(inline);
 		if (isZero) { return `0`; }
 		if (isOne) { return `1`; }
 		const size = sizeInBase(base); // NOTE: one too much for some values
@@ -146,10 +142,10 @@ nothrow:
 		Returns: char[] which must be freed manually with `pureFree` thereby
 		making this `@system`.
 	*/
-	char[] toChars(in uint base = defaultBase,
-				   in bool upperCaseDigits = false) scope const @system @nogc
-		in(((-2 <= base) && (base <= -36)) ||
-		   ((+2 <= base) && (base <= +62))) {
+	char[] toChars(in uint base = defaultBase, in bool upperCaseDigits = false) scope const @system @nogc
+	in(-2 <= base && base <= -36 ||
+	   +2 <= base && base <= +62) {
+		pragma(inline);
 		import core.memory : pureMalloc;
 		if (isZero || isOne) {
 			char[] chars = (cast(char*)pureMalloc(1))[0 .. 1];
@@ -164,11 +160,10 @@ nothrow:
 		return fillChars(chars, base, upperCaseDigits);
 	}
 
-	private char[] fillChars(char[] chars,
-							 in uint base = defaultBase,
-							 in bool upperCaseDigits = false) const @system @nogc
-		in(((-2 <= base) && (base <= -36)) ||
-		   ((+2 <= base) && (base <= +62))) {
+	private char[] fillChars(char[] chars, in uint base = defaultBase, in bool upperCaseDigits = false) const @system @nogc
+	in(-2 <= base && base <= -36 ||
+	   +2 <= base && base <= +62) {
+		pragma(inline);
 		__gmpz_get_str(chars.ptr, base, _ptr); // fill it
 		import std.ascii : isAlphaNum, isLower, toUpper;
 		while (chars.length &&
@@ -181,10 +176,10 @@ nothrow:
 		return chars;
 	}
 
-	void toString(Writer)(ref Writer writer, // `mir.appender` compliant
-						  in uint base = defaultBase,
-						  in bool upperCaseDigits = false) const @nogc @trusted
-		if (is(typeof(writer.put((const(char)[]).init)))) {
+	// `mir.appender` compliant.
+	void toString(Writer)(ref Writer writer, in uint base = defaultBase, in bool upperCaseDigits = false) const @nogc @trusted
+	if (is(typeof(writer.put((const(char)[]).init)))) {
+		pragma(inline);
 		import core.memory : pureFree;
 		if (isZero) { return writer.put("0"); }
 		if (isOne) { return writer.put("1"); }
@@ -195,6 +190,7 @@ nothrow:
 
 	/// Get the unique hash of the `_Z` value suitable for use in a hash table.
 	size_t toHash() const @trusted {
+		pragma(inline);
 		import core.internal.hash : hashOf;
 		typeof(return) hash = limbCount;
 		foreach (immutable i; 0 .. limbCount)
@@ -212,7 +208,9 @@ nothrow:
 
 		Returns: a new GC-allocated slice containing the words produced.
 	*/
-	Word[] serialize(Word)(WordOrder order, WordEndianess endian, size_t nails) const @trusted if (__traits(isUnsigned, Word)) {
+	Word[] serialize(Word)(WordOrder order, WordEndianess endian, size_t nails) const @trusted
+	if (isUnsigned!Word) {
+		pragma(inline);
 		const numb = 8 * Word.sizeof - nails;
 		size_t count = (__gmpz_sizeinbase(_ptr, 2) + numb-1) / numb;
 		return serialize(new Word[count], order, Word.sizeof, endian, nails);
@@ -229,14 +227,13 @@ nothrow:
 
 	/// Construct empty (undefined) from explicit `null`.
 	this(typeof(null)) @trusted {
-		pragma(inline, true);
 		initialize();			 // TODO: is there a faster way?
 		assert(this == _Z.init); // if this is same as default
 	}
 
 	/// Construct from expression `expr`.
-	this(Expr)(Expr expr)	if (isLazyMpZExpr!Expr)	{
-		version(LDC) pragma(inline, true);
+	this(Expr)(Expr expr)
+	if (isLazyMpZExpr!Expr) {
 		// TODO: ok to just assume zero-initialized contents at `_z` before...
 		this = expr;			// ...calling this.opAssign ?x
 	}
@@ -246,11 +243,13 @@ nothrow:
 		// TODO: add support for static initialization
 		// if (!__ctfe)
 		// {
-		pragma(inline, true);
 
-		static if	  (__traits(isUnsigned, T)) __gmpz_init_set_ui(_ptr, value);
-		else static if (__traits(isFloating, T)) __gmpz_init_set_d(_ptr, value);
-		else						  __gmpz_init_set_si(_ptr, value); // isSigned integral
+		static if (__traits(isUnsigned, T))
+			__gmpz_init_set_ui(_ptr, value);
+		else static if (__traits(isFloating, T))
+			__gmpz_init_set_d(_ptr, value);
+		else
+			__gmpz_init_set_si(_ptr, value); // isSigned integral
 		// }
 		// else
 		// {
@@ -283,8 +282,8 @@ nothrow:
 		int realEndian;
 		final switch(endian) {
 			case WordEndianess.littleEndian: realEndian = -1; break;
-			case WordEndianess.bigEndian:	realEndian =  1; break;
-			case WordEndianess.host:		 realEndian =  0; break;
+			case WordEndianess.bigEndian: realEndian = 1; break;
+			case WordEndianess.host: realEndian = 0; break;
 		}
 		__gmpz_init(_ptr);
 		__gmpz_import(_ptr, rop.length, realOrder, size, realEndian, nails, rop.ptr);
@@ -292,7 +291,6 @@ nothrow:
 
 	/// Mersenne prime, M(p) = 2 ^^ p - 1
 	static _Z mersennePrime(Integral)(Integral p) if (__traits(isIntegral, Integral)) {
-		version(LDC) pragma(inline, true);
 		return typeof(this).pow(2UL, p) - 1;
 	}
 
@@ -314,7 +312,6 @@ nothrow:
 	 * See Also: `mpz_probab_prime_p`.
 	 */
 	@property int isProbablyPrime(in int repetitionCount = 25) @trusted {
-		version(LDC) pragma(inline, true);
 		return __gmpz_probab_prime_p(_ptr, repetitionCount);
 	}
 
@@ -340,12 +337,10 @@ nothrow:
 
 	static if (cow) {
 		void selfdupIfAliased() scope pure nothrow @nogc @safe {
-			pragma(inline, true);
 			if (_refCountCopies >= 1)
 				this = this.dup();
 		}
 		this(this) scope pure nothrow @nogc @safe {
-			pragma(inline, true);
 			_refCountCopies += 1;
 		}
 	} else {
@@ -354,14 +349,13 @@ nothrow:
 
 	/// Swap content of `this` with `rhs`.
 	void swap()(ref _Z rhs) pure nothrow @nogc @safe {
-		pragma(inline, true);
 		import std.algorithm.mutation : swap;
 		swap(this, rhs); // faster than __gmpz_swap(_ptr, rhs._ptr);
 	}
 
 	/// (Duplicate) Copy `this`.
 	_Z dup() scope const pure nothrow @trusted {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		typeof(return) y = void;
 		__gmpz_init_set(y._ptr, _ptr);
 		static if (cow) { y._refCountCopies = 0; }
@@ -370,20 +364,21 @@ nothrow:
 
 	/// Assign from `rhs`.
 	ref _Z opAssign()(auto ref scope const _Z rhs) scope return @trusted {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		static if (cow) { selfdupIfAliased(); }
 		__gmpz_set(_ptr, rhs._ptr);
 		return this;
 	}
 	/// ditto
-	ref _Z opAssign(Expr)(auto ref Expr rhs) scope return @trusted if (isLazyMpZExpr!Expr) {
-		version(LDC) pragma(inline, true);
+	ref _Z opAssign(Expr)(auto ref Expr rhs) scope return @trusted
+	if (isLazyMpZExpr!Expr) {
+		version(DigitalMars) pragma(inline);
 		rhs.evalTo(this);
 		return this;
 	}
 	/// ditto
 	ref _Z opAssign(T)(T rhs) scope return @trusted if (__traits(isArithmetic, T)) {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		assertInitialized();
 		static if (cow) { selfdupIfAliased(); }
 		static	  if (__traits(isUnsigned, T)) __gmpz_set_ui(_ptr, rhs);
@@ -408,7 +403,7 @@ nothrow:
 
 	/// Destruct `this`.
 	~this() scope @nogc @trusted {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		if (_z._mp_d) {
 			static if (cow) {
 				if (_refCountCopies >= 1) {
@@ -423,58 +418,62 @@ nothrow:
 
 	/// Returns: `true` iff `this` equals `rhs`.
 	bool opEquals()(auto ref scope const _Z rhs) const @trusted {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		if (_ptr == rhs._ptr)   // fast equality
 			return true;		// fast bailout
 		return __gmpz_cmp(_ptr, rhs._ptr) == 0;
 	}
 	/// ditto
 	bool opEquals(Rhs)(Rhs rhs) const @trusted if (__traits(isArithmetic, Rhs)) {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		if (rhs == 0)
 			return isZero;	  // optimization
 		if (rhs == 1)
 			return isOne;	  // optimization
-		static	  if (__traits(isUnsigned, Rhs)) return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
-		else static if (__traits(isFloating, Rhs)) return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO: correct to do this cast here?
-		else							return __gmpz_cmp_si(_ptr, cast(long)rhs) == 0;	// isSigned integral
+		static if (__traits(isUnsigned, Rhs))
+			return __gmpz_cmp_ui(_ptr, cast(ulong)rhs) == 0;
+		else static if (__traits(isFloating, Rhs))
+			return __gmpz_cmp_d(_ptr, cast(double)rhs) == 0; // TODO: correct to do this cast here?
+		else
+			return __gmpz_cmp_si(_ptr, cast(long)rhs) == 0;	// isSigned integral
 	}
 
 	/// Compare `this` to `rhs`.
 	int opCmp()(auto ref scope const _Z rhs) const @trusted {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		if (rhs == 0)
 			return sgn();	   // optimization
 		return __gmpz_cmp(_ptr, rhs._ptr);
 	}
 	/// ditto
 	int opCmp(T)(T rhs) const @trusted if (__traits(isArithmetic, T)) {
-		pragma(inline, true);
 		if (rhs == 0)
 			return sgn();	   // optimization
-		static	  if (__traits(isUnsigned, T)) return __gmpz_cmp_ui(_ptr, rhs);
-		else static if (__traits(isFloating, T)) return __gmpz_cmp_d(_ptr, rhs);
-		else						  return __gmpz_cmp_si(_ptr, rhs); // isSigned integral
+		static if (__traits(isUnsigned, T))
+			return __gmpz_cmp_ui(_ptr, rhs);
+		else static if (__traits(isFloating, T))
+			return __gmpz_cmp_d(_ptr, rhs);
+		else
+			return __gmpz_cmp_si(_ptr, rhs); // isSigned integral
 	}
 
 	/// Cast to `bool`.
-	bool opCast(T : bool)() scope const {
-		pragma(inline, true);
-		return !isZero;
-	}
+	bool opCast(T : bool)() scope const => !isZero;
 
 	/// Cast to arithmetic type `T`.
 	T opCast(T)() scope const @trusted if (__traits(isArithmetic, T)) {
-		pragma(inline, true);
-		static	  if (__traits(isUnsigned, T)) return cast(T)__gmpz_get_ui(_ptr);
-		else static if (__traits(isFloating, T)) return cast(T)__gmpz_get_d(_ptr);
-		else						  return cast(T)__gmpz_get_si(_ptr); // isSigned integral
+		static if (__traits(isUnsigned, T))
+			return cast(T)__gmpz_get_ui(_ptr);
+		else static if (__traits(isFloating, T))
+			return cast(T)__gmpz_get_d(_ptr);
+		else
+			return cast(T)__gmpz_get_si(_ptr); // isSigned integral
 	}
 
 	/** Get the value of this as a `long`, or +/- `long.max` if outside the
 		representable range. */
 	long toLong() scope const @trusted {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		// TODO: can probably be optimized
 		if (this <= long.min)
 			return long.min;
@@ -484,11 +483,9 @@ nothrow:
 			return cast(long)__gmpz_get_si(_ptr);
 	}
 
-	/** Get the value of this as a `int`, or +/- `int.max` if outside the
-		representable range.
-	*/
-	int toInt() const @trusted	{
-		version(LDC) pragma(inline, true);
+	/** Get the value of this as a `int`, or +/- `int.max` if outside the representable range. */
+	int toInt() const @trusted {
+		version(DigitalMars) pragma(inline);
 		// TODO: can probably be optimized
 		if (this <= int.min)
 			return int.min;
@@ -500,48 +497,40 @@ nothrow:
 
 	/** Get `this` `s` `rhs`. */
 	_Z opBinary(string s)(auto ref scope const _Z rhs) const @trusted // direct value
-		if ((s == "+" || s == "-" ||
-			 s == "*" || s == "/" || s == "%" ||
-			 s == "&" || s == "|" || s == "^" ||
-			 s == "<<" || s == ">>")) {
-		version(LDC) pragma(inline, true);
-		static if (!__traits(isRef, rhs)) // r-value `rhs`
-		{
+	if ((s == "+" || s == "-" ||
+		 s == "*" || s == "/" || s == "%" ||
+		 s == "&" || s == "|" || s == "^" ||
+		 s == "<<" || s == ">>")) {
+		version(DigitalMars) pragma(inline);
+		static if (!__traits(isRef, rhs)) /+ r-value `rhs` +/ {
 			_Z* mut_rhs = (cast(_Z*)(&rhs)); // @trusted because `_Z` has no aliased indirections
 			static	  if (s == "+") __gmpz_add(mut_rhs._ptr, _ptr, rhs._ptr);
 			else static if (s == "-") __gmpz_sub(mut_rhs._ptr, _ptr, rhs._ptr);
 			else static if (s == "*") __gmpz_mul(mut_rhs._ptr, _ptr, rhs._ptr);
-			else static if (s == "/")
-			{
+			else static if (s == "/") {
 				assert(rhs != 0, "Divison by zero");
 				__gmpz_tdiv_q(mut_rhs._ptr, _ptr, rhs._ptr);
-			}
-			else static if (s == "%")
-			{
+			} else static if (s == "%") {
 				assert(rhs != 0, "Divison by zero");
 				const neg = rhs.isNegative;
 				__gmpz_mod(mut_rhs._ptr, _ptr, rhs._ptr);
 				if (neg)
 					mut_rhs.negate();
-			}
-			else static if (s == "&") __gmpz_and(mut_rhs._ptr, _ptr, rhs._ptr);
+			} else static if (s == "&") __gmpz_and(mut_rhs._ptr, _ptr, rhs._ptr);
 			else static if (s == "|") __gmpz_ior(mut_rhs._ptr, _ptr, rhs._ptr);
 			else static if (s == "^") __gmpz_xor(mut_rhs._ptr, _ptr, rhs._ptr);
-			else static if (s == "<<")
-			{
+			else static if (s == "<<") {
 				if (rhs.isPositive())
 					__gmpz_mul_2exp(mut_rhs._ptr, _ptr, cast(mp_bitcnt_t)rhs);
 				else
 					__gmpz_tdiv_q_2exp(mut_rhs._ptr, _ptr, cast(mp_bitcnt_t)-rhs); // `z << -1` becomes `z >> 1`
-			}
-			else static if (s == ">>")
-			{
+			} else static if (s == ">>") {
 				if (rhs.isPositive())
 					__gmpz_tdiv_q_2exp(mut_rhs._ptr, _ptr, cast(mp_bitcnt_t)rhs);
 				else
 					__gmpz_mul_2exp(mut_rhs._ptr, _ptr, cast(mp_bitcnt_t)-rhs); // `z >> -1` becomes `z << 1`
-			}
-			else static assert(0);
+			} else
+				static assert(0);
 			return move(*mut_rhs); // TODO: shouldn't have to call `move` here
 		} else {
 			typeof(return) y = null;
@@ -557,8 +546,7 @@ nothrow:
 				__gmpz_mod(y._ptr, _ptr, rhs._ptr);
 				if (neg)
 					y.negate();
-			}
-			else static if (s == "&") __gmpz_and(y._ptr, _ptr, rhs._ptr);
+			} else static if (s == "&") __gmpz_and(y._ptr, _ptr, rhs._ptr);
 			else static if (s == "|") __gmpz_ior(y._ptr, _ptr, rhs._ptr);
 			else static if (s == "^") __gmpz_xor(y._ptr, _ptr, rhs._ptr);
 			else static if (s == "<<") {
@@ -578,16 +566,15 @@ nothrow:
 	}
 
 	/// ditto
-	_Z opBinary(string s, Rhs)(auto ref const Rhs rhs) const if (isLazyMpZExpr!Rhs && // lazy value
-		(s == "+" || s == "-" || s == "*" || s == "/" || s == "%")) {
-		pragma(inline, true);
+	_Z opBinary(string s, Rhs)(auto ref const Rhs rhs) const
+	if (isLazyMpZExpr!Rhs && (s == "+" || s == "-" || s == "*" || s == "/" || s == "%")) {
 		static assert(false, "TODO");
 	}
 
 	/// ditto
 	_Z opBinary(string s, Rhs)(Rhs rhs) const @trusted
 	if ((s == "+" || s == "-" || s == "*" || s == "/" /* || s == "%"*/ || s == "^^" || s == "<<" || s == ">>") && __traits(isUnsigned, Rhs)) {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		static	  if (s == "+") __gmpz_add_ui(y._ptr, _ptr, rhs);
 		else static if (s == "-") __gmpz_sub_ui(y._ptr, _ptr, rhs);
@@ -613,15 +600,14 @@ nothrow:
 	_Z opBinary(string s, Rhs)(Rhs rhs) const @trusted
 	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "^^" || s == "<<" || s == ">>") &&
 		__traits(isArithmetic, Rhs) && !__traits(isUnsigned, Rhs)) {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		static if (s == "+") {
 			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
 			{
 				immutable ulong pos_rhs = -rhs; // make it positive
 				__gmpz_sub_ui(y._ptr, _ptr, pos_rhs);
-			}
-			else
+			} else
 				__gmpz_add_ui(y._ptr, _ptr, rhs);
 		} else static if (s == "-") {
 			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
@@ -652,15 +638,15 @@ nothrow:
 				__gmpz_tdiv_q_2exp(y._ptr, _ptr, rhs);
 			else
 				__gmpz_mul_2exp(y._ptr, _ptr, -rhs); // `z >> -1` becomes `z << 1`
-		}
-		else static assert(0);
-			return y;
+		} else
+			static assert(0);
+		return y;
 	}
 
 	/// Remainer propagates modulus type.
 	Unqual!Rhs opBinary(string s, Rhs)(Rhs rhs) const @trusted
 	if ((s == "%") && __traits(isIntegral, Rhs)) {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		assert(rhs != 0, "Divison by zero");
 		_Z y = null;
 		static if (__traits(isArithmetic, Rhs) && !__traits(isUnsigned, Rhs)) {
@@ -668,8 +654,7 @@ nothrow:
 			{
 				immutable ulong pos_rhs = -cast(int)rhs; // make it positive
 				return cast(typeof(return))-__gmpz_tdiv_r_ui(y._ptr, _ptr, pos_rhs);
-			}
-			else
+			} else
 				return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
 		} else static if (__traits(isUnsigned, Rhs))
 			return cast(typeof(return))__gmpz_tdiv_r_ui(y._ptr, _ptr, rhs);
@@ -680,7 +665,7 @@ nothrow:
 	/// Get an unsigned type `lhs` divided by `this`.
 	_Z opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
 	if ((s == "+" || s == "-" || s == "*" || s == "%") && __traits(isUnsigned, Lhs)) {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		static	  if (s == "+")
 			__gmpz_add_ui(y._ptr, _ptr, lhs); // commutative
@@ -700,7 +685,7 @@ nothrow:
 	_Z opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
 	if ((s == "+" || s == "-" || s == "*" || s == "%") &&
 		__traits(isArithmetic, Lhs) && !__traits(isUnsigned, Lhs)) {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		static if (s == "+" || s == "*") {
 			return opBinary!s(lhs); // commutative reuse
 		} else static if (s == "-") {
@@ -725,7 +710,7 @@ nothrow:
 	/// Dividend propagates quotient type to signed.
 	Unqual!Lhs opBinaryRight(string s, Lhs)(Lhs lhs) const @trusted
 	if ((s == "/") && __traits(isIntegral, Lhs)) {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		_Z y = null; // TODO: avoid if !__traits(isRef, this)
 		assert(this != 0, "Divison by zero");
 		__gmpz_tdiv_q(y._ptr, _Z(lhs)._ptr, _ptr);
@@ -741,7 +726,6 @@ nothrow:
 	/// Exponentation.
 	_Z opBinaryRight(string s, Base)(Base base) const
 	if ((s == "^^") && __traits(isIntegral, Base)) {
-		pragma(inline, true);
 		static assert(false, "Convert `this _Z` exponent to `ulong` and calculate power via static method `pow()`");
 		// _Z exp = null;
 		// __gmpz_pow();
@@ -750,12 +734,8 @@ nothrow:
 
 	/// Operate-assign to `this` from `rhs`.
 	ref _Z opOpAssign(string s)(auto ref scope const _Z rhs) scope return @trusted
-	if ((s == "+" || s == "-" ||
-		 s == "*" || s == "/" || s == "%" ||
-		 s == "&" || s == "|" || s == "^" ||
-		 s == "<<" || s == ">>"))
-	{
-		version(LDC) pragma(inline, true);
+	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "&" || s == "|" || s == "^" || s == "<<" || s == ">>")) {
+		version(DigitalMars) pragma(inline);
 		static	  if (s == "+")
 			__gmpz_add(_ptr, _ptr, rhs._ptr);
 		else static if (s == "-")
@@ -798,7 +778,7 @@ nothrow:
 	/// ditto
 	ref _Z opOpAssign(string s, Rhs)(Rhs rhs) scope return @trusted
 	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^" || s == "<<" || s == ">>") && __traits(isUnsigned, Rhs))	{
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		static	  if (s == "+")
 			__gmpz_add_ui(_ptr, _ptr, rhs);
 		else static if (s == "-")
@@ -827,15 +807,14 @@ nothrow:
 	if ((s == "+" || s == "-" || s == "*" || s == "/" || s == "%" || s == "^^" || s == "<<" || s == ">>") &&
 		__traits(isArithmetic, Rhs) && !__traits(isUnsigned, Rhs))
 	{
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		static	  if (s == "+") {
 			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
 			{
 				assert(rhs != rhs.min);
 				immutable ulong pos_rhs = -rhs; // make it positive
 				__gmpz_sub_ui(_ptr, _ptr, pos_rhs);
-			}
-			else
+			} else
 				__gmpz_add_ui(_ptr, _ptr, rhs);
 		} else static if (s == "-") {
 			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
@@ -877,19 +856,15 @@ nothrow:
 				__gmpz_mul_2exp(_ptr, _ptr, -rhs); // `z >> -1` becomes `z << 1`
 		} else
 			static assert(0);
-
 		return this;
 	}
 
 	/// Returns: `this`.
-	ref inout(_Z) opUnary(string s)() inout scope return if (s == "+") {
-		pragma(inline, true);
-		return this;
-	}
+	ref inout(_Z) opUnary(string s)() inout scope return if (s == "+") => this;
 
 	/// Negation of `this`.
-	_Z opUnary(string s)() const if (s == "-")	{
-		version(LDC) pragma(inline, true);
+	_Z opUnary(string s)() const if (s == "-") {
+		version(DigitalMars) pragma(inline);
 		typeof(return) y = this.dup;
 		y.negate();
 		return y;
@@ -897,7 +872,7 @@ nothrow:
 
 	/// Negation of `this`.
 	_Z unaryMinus() const @safe {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		// pragma(msg, "memberFun:", __traits(isRef, this) ? "ref" : "non-ref", " this");
 		typeof(return) y = this.dup;
 		y.negate();
@@ -909,7 +884,6 @@ nothrow:
 	*/
 	void negate() @safe {
 		static if (cow) { selfdupIfAliased(); }
-		pragma(inline, true);
 		_z._mp_size = -_z._mp_size; // fast C macro `mpz_neg` in gmp.h
 	}
 
@@ -918,7 +892,7 @@ nothrow:
 		Returns: `void` to make it obvious that `this` is mutated.
 	*/
 	void absolute() @trusted {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		if (isZero) { return; } // `__gmpz_abs` cannot handle default-constructed `this`
 		if (isOne) { return; } // `__gmpz_abs` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
@@ -931,7 +905,7 @@ nothrow:
 		Returns: `void` to make it obvious that `this` is mutated.
 	*/
 	void onesComplementSelf() @trusted {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		if (isZero) { return; } // `__gmpz_com` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
 		__gmpz_com(_ptr, _ptr);
@@ -942,7 +916,7 @@ nothrow:
 		Returns: `void` to make it obvious that `this` is mutated.
 	*/
 	void sqrtSelf() @trusted {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		if (isZero) { return; } // `__gmpz_co` cannot handle default-constructed `this`
 		if (isOne) { return; } // `__gmpz_co` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
@@ -954,7 +928,7 @@ nothrow:
 		Returns: `true` if computation was exact.
 	*/
 	bool rootSelf(ulong n) @trusted {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		if (isZero) { return true; } // `__gmpz_co` cannot handle default-constructed `this`
 		if (isOne) { return true; } // `__gmpz_co` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
@@ -967,7 +941,7 @@ nothrow:
 		Returns: `rem` to the remainder, u-root ^^ `n`.
 	*/
 	_Z rootremSelf(ulong n) @trusted {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		if (isZero) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
 		if (isOne) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
@@ -982,7 +956,7 @@ nothrow:
 		Returns: `rem` to the remainder.
 	*/
 	_Z sqrtremSelf() @trusted {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		if (isZero) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
 		if (isOne) { return typeof(return).init; } // `__gmpz_co` cannot handle default-constructed `this`
 		static if (cow) { selfdupIfAliased(); }
@@ -992,9 +966,8 @@ nothrow:
 	}
 
 	/// Increase `this` by one.
-	ref _Z opUnary(string s)() scope return @trusted if (s == "++")
-	{
-		version(LDC) pragma(inline, true);
+	ref _Z opUnary(string s)() scope return @trusted if (s == "++") {
+		version(DigitalMars) pragma(inline);
 		static if (cow) { selfdupIfAliased(); }
 		if (isDefaultConstructed) // `__gmpz_add_ui` cannot handle default-constructed `this`
 			__gmpz_init_set_si(_ptr, 1);
@@ -1004,9 +977,8 @@ nothrow:
 	}
 
 	/// Decrease `this` by one.
-	ref _Z opUnary(string s)() scope return @trusted if (s == "--")
-	{
-		version(LDC) pragma(inline, true);
+	ref _Z opUnary(string s)() scope return @trusted if (s == "--") {
+		version(DigitalMars) pragma(inline);
 		static if (cow) { selfdupIfAliased(); }
 		if (isDefaultConstructed) // `__gmpz_sub_ui` cannot handle default-constructed `this`
 			__gmpz_init_set_si(_ptr, -1);
@@ -1018,8 +990,7 @@ nothrow:
 	/// Get `base` raised to the power of `exp`.
 	static typeof(this) pow(Base, Exp)(Base base, Exp exp) @trusted if (__traits(isIntegral, Base) && __traits(isIntegral, Exp))
 	{
-		version(LDC) pragma(inline, true);
-
+		version(DigitalMars) pragma(inline);
 		static if (__traits(isArithmetic, Base) && !__traits(isUnsigned, Base)) {
 			immutable bool negate = base < 0;
 			immutable ubase = cast(ulong)(negate ? -base : base);
@@ -1027,30 +998,21 @@ nothrow:
 			immutable bool negate = false;
 			immutable ubase = base;
 		}
-
 		static if (__traits(isArithmetic, Exp) && !__traits(isUnsigned, Exp)) {
 			assert(exp >= 0, "Negative exponent"); // TODO: return mpq?
 			immutable uexp = cast(ulong)exp;
 		} else
 			immutable uexp = exp;
-
 		typeof(return) y = null;
 		__gmpz_ui_pow_ui(y._ptr, ubase, uexp);
-		if (negate &&
-			exp & 1)  // if negative odd exponent
+		if (negate && exp & 1)  // if negative odd exponent
 			y.negate();
-
 		return y;
 	}
 
 	/// Get number of digits in base `base`.
-	size_t sizeInBase(uint base) const @trusted {
-		pragma(inline, true);
-		if (isZero || isOne)
-			return 1;
-		else
-			return __gmpz_sizeinbase(_ptr, base);
-	}
+	size_t sizeInBase(uint base) const @trusted
+		=> isZero || isOne ? 1 : __gmpz_sizeinbase(_ptr, base);
 
 	/** Serialize `this` into an existing pre-allocated slice of words `words`,
 		each word of type `Word`.
@@ -1063,11 +1025,9 @@ nothrow:
 
 		Returns: a (sub-)slice of `words` containing only the words produced.
 	*/
-	Word[] serialize(Word)(return scope Word[] words,
-						   WordOrder order, size_t size, WordEndianess endian, size_t nails) const @trusted
-	if (__traits(isUnsigned, Word)) {
-		assert(words, "Words is empty");
-
+	Word[] serialize(Word)(return scope Word[] words, WordOrder order, size_t size, WordEndianess endian, size_t nails) const @trusted
+	if (__traits(isUnsigned, Word))
+	in(words) {
 		size_t count;
 		debug {
 			const numb = 8 * size - nails;
@@ -1075,20 +1035,17 @@ nothrow:
 			assert(Word.sizeof * words.length >= items * size ,
 				   "Words has not enough space pre-allocated");
 		}
-
 		int realOrder;
 		final switch(order) {
 			case WordOrder.mostSignificantWordFirst:  realOrder = 1;  break;
 			case WordOrder.leastSignificantWordFirst: realOrder = -1; break;
 		}
-
 		int realEndian;
 		final switch(endian) {
 			case WordEndianess.littleEndian: realEndian = -1; break;
 			case WordEndianess.bigEndian:	realEndian =  1; break;
 			case WordEndianess.host:		 realEndian =  0; break;
 		}
-
 		__gmpz_export(words.ptr, &count, realOrder, size, realEndian, nails, _ptr);
 		return words[0 .. count];
 	}
@@ -1096,13 +1053,11 @@ nothrow:
 
 	/// Returns: `true` iff `this` fits in a `T`.
 	bool fitsIn(T)() const @trusted if (__traits(isIntegral, T)) {
-		pragma(inline, true);
-		if (isZero ||
-			isOne) { return true; } // default-constructed `this`
-		static	  if (is(T == ulong))  { return __gmpz_fits_ulong_p(_ptr) != 0; }
+		if (isZero || isOne) { return true; } // default-constructed `this`
+		static if (is(T == ulong)) { return __gmpz_fits_ulong_p(_ptr) != 0; }
 		else static if (is(T ==  long))  { return __gmpz_fits_slong_p(_ptr) != 0; }
 		else static if (is(T ==  uint))  { return __gmpz_fits_uint_p(_ptr) != 0; }
-		else static if (is(T ==   int))  { return __gmpz_fits_sint_p(_ptr) != 0; }
+		else static if (is(T ==	int))  { return __gmpz_fits_sint_p(_ptr) != 0; }
 		else static if (is(T == ushort)) { return __gmpz_fits_ushort_p(_ptr) != 0; }
 		else static if (is(T ==  short)) { return __gmpz_fits_sshort_p(_ptr) != 0; }
 		else { static assert(false, "Unsupported type " ~ T.stringof); }
@@ -1115,7 +1070,7 @@ nothrow:
 		- otherwise, ???
 	*/
 	@property mp_bitcnt_t populationCount() const @trusted {
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		if (isZero) { return 0; } // default-constructed `this`
 		if (isOne) { return 1; } // default-constructed `this`
 		return __gmpz_popcount(this._ptr); // TODO: use core.bitop `popcnt` inline here instead?
@@ -1124,28 +1079,24 @@ nothrow:
 
 	/// Set bit at 0-offset index `bitIndex` (to one).
 	void setBit(mp_bitcnt_t bitIndex) @trusted {
-		pragma(inline, true);
 		static if (cow) { selfdupIfAliased(); }
 		__gmpz_setbit(_ptr, bitIndex);
 	}
 
 	/// Clear bit at 0-offset index `bitIndex` (to zero).
 	void clearBit(mp_bitcnt_t bitIndex) @trusted {
-		pragma(inline, true);
 		static if (cow) { selfdupIfAliased(); }
 		__gmpz_clrbit(_ptr, bitIndex);
 	}
 
 	/// Complement bit at 0-offset index `bitIndex` (to zero).
 	void complementBit(mp_bitcnt_t bitIndex) @trusted {
-		pragma(inline, true);
 		static if (cow) { selfdupIfAliased(); }
 		__gmpz_combit(_ptr, bitIndex);
 	}
 
 	/// Test/Get bit at 0-offset index `bitIndex`.
 	bool testBit(mp_bitcnt_t bitIndex) const @trusted {
-		pragma(inline, true);
 		return __gmpz_tstbit(_ptr, bitIndex) != 0;
 	}
 	alias getBit = testBit;
@@ -1157,122 +1108,90 @@ nothrow:
 		handle the case when the membere `_mp_alloc` is zero and, in turn,
 		`_mp_d` is `null`.
 	 */
-	@property bool isDefaultConstructed() const @safe	{
-		pragma(inline, true);
-		return _z._mp_alloc == 0; // fast, actually enough to just test this
-	}
+	@property bool isDefaultConstructed() const @safe
+		=> _z._mp_alloc == 0; // fast, actually enough to just test this
 
 	/// Check if `this` is zero (either via default-construction or `__gmpz_...`-operations).
-	@property bool isZero() const @safe {
-		pragma(inline, true);
-		return _z._mp_size == 0; // fast
-	}
+	@property bool isZero() const @safe
+		=> _z._mp_size == 0; // fast
 
 	/// Check if `this` is one.
-	@property bool isOne() const @safe {
-		pragma(inline, true);
+	@property bool isOne() const @safe
 		/* NOTE: cannot use _z._mp_d !is null && _z._mp_d[0] == 1 because that’s
 		   true for -1 because sign is stored in `_z._mp_size`
 		*/
-		return _z._mp_size == 1 && _z._mp_d[0] == 1; // fast
-	}
+		=> _z._mp_size == 1 && _z._mp_d[0] == 1; // fast
 
 	/// Check if `this` is odd.
-	@property bool isOdd() const @safe {
-		pragma(inline, true);
-		return ((_z._mp_alloc != 0) && // this is needed for default (zero) initialized `__mpz_structs`
-				((_z._mp_size != 0) & cast(int)(_z._mp_d[0]))); // fast C macro `mpz_odd_p` in gmp.h
-	}
+	@property bool isOdd() const @safe
+		=> ((_z._mp_alloc != 0) && // this is needed for default (zero) initialized `__mpz_structs`
+			((_z._mp_size != 0) & cast(int)(_z._mp_d[0]))); // fast C macro `mpz_odd_p` in gmp.h
 
 	/// Check if `this` is odd.
-	@property bool isEven() const @safe {
-		pragma(inline, true);
-		return !isOdd;			// fast C macro `mpz_even_p` in gmp.h
-	}
+	@property bool isEven() const @safe
+		=> !isOdd;			// fast C macro `mpz_even_p` in gmp.h
 
 	/// Check if `this` is negative.
-	@property bool isNegative() const @safe {
-		pragma(inline, true);
-		return _z._mp_size < 0; // fast
-	}
+	@property bool isNegative() const @safe
+		=> _z._mp_size < 0; // fast
 
 	/// Check if `this` is positive.
-	@property bool isPositive() const @safe {
-		pragma(inline, true);
-		return _z._mp_size >= 0; // fast
-	}
+	@property bool isPositive() const @safe
+		=> _z._mp_size >= 0; // fast
 
 	/** Check if `this` is a perfect power, i.e., if there exist integers A and
 	 * B, with B>1, such that `this` equals A raised to the power B.
 	 */
-	@property bool isPerfectPower() const @trusted {
-		pragma(inline, true);
-		return __gmpz_perfect_power_p(_ptr) != 0;
-	}
+	@property bool isPerfectPower() const @trusted
+		=> __gmpz_perfect_power_p(_ptr) != 0;
 
 	/** Return non-zero if `this` is a perfect square, i.e., if the square root
 	 * of op is an integer. Under this definition both 0 and 1 are considered to
 	 * be perfect squares.
 	 */
-	@property bool isPerfectSquare() const @trusted {
-		pragma(inline, true);
-		return __gmpz_perfect_square_p(_ptr) != 0;
-	}
+	@property bool isPerfectSquare() const @trusted
+		=> __gmpz_perfect_square_p(_ptr) != 0;
 
 	/// Returns: `true` iff `this` is exactly divisible by `rhs`.
-	@property bool isDivisibleBy()(auto ref scope const _Z rhs) const @trusted {
-		version(LDC) pragma(inline, true);
-		if (rhs.isOne) { return true; }
-		return __gmpz_divisible_p(_ptr, rhs._ptr) != 0;
-	}
+	pragma(inline, true)@property bool isDivisibleBy()(auto ref scope const _Z rhs) const @trusted
+		=> rhs.isOne ? true : __gmpz_divisible_p(_ptr, rhs._ptr) != 0;
 	/// ditto
-	@property bool isDivisibleBy(Rhs)(auto ref scope const Rhs rhs) const @trusted if (__traits(isUnsigned, Rhs)) {
-		version(LDC) pragma(inline, true);
-		if (rhs == 1) { return true; }
-		return __gmpz_divisible_ui_p(_ptr, rhs) != 0;
-	}
+	@property bool isDivisibleBy(Rhs)(auto ref scope const Rhs rhs) const @trusted
+	if (isUnsigned!Rhs)
+		=> rhs == 1 ? true : __gmpz_divisible_ui_p(_ptr, rhs) != 0;
 
 	/** Returns: sign as either
 
 	  - -1 (`this` < 0),
-	  -  0 (`this` == 0), or
+	  -	 0 (`this` == 0), or
 	  - +1 (`this` > 0).
 	 */
-	@property int sgn() const @safe {
-		pragma(inline, true);
-		return _z._mp_size < 0 ? -1 : _z._mp_size > 0; // fast C macro `mpz_sgn` in gmp.h
-	}
+	@property int sgn() const @safe
+		=> _z._mp_size < 0 ? -1 : _z._mp_size > 0; // fast C macro `mpz_sgn` in gmp.h
 
 	/// Number of significant `uint`s used for storing `this`.
 	@property size_t uintLength() const {
-		pragma(inline, true);
 		assert(false, "TODO: use mpz_size");
 	}
 
 	/// Number of significant `ulong`s used for storing `this`.
 	@property size_t uintLong() const {
-		pragma(inline, true);
 		assert(false, "TODO: use mpz_size");
 	}
 
 	/// Get number of limbs in internal representation.
-	@property uint limbCount() const @safe {
-		pragma(inline, true);
-		return _integralAbs(_z._mp_size);
-	}
+	@property uint limbCount() const @safe
+		=> _integralAbs(_z._mp_size);
 
 private:
 
 	/** Initialize internal struct. */
-	void initialize() @system // cannot be called `init` as that will override builtin type property
-	{
-		pragma(inline, true);
+	void initialize() @system /+ cannot be called `init` as that will override builtin type property +/ {
 		__gmpz_init(_ptr);
 	}
 
 	/** Initialize internal struct if needed. */
 	void assertInitialized() @system {
-		pragma(inline, true);
 		if (isDefaultConstructed)
 			__gmpz_init(_ptr);
 	}
@@ -1281,26 +1200,16 @@ private:
 	enum defaultBase = 10;
 
 	/// Returns: evaluation of `this` expression which in this is a no-op.
-	ref inout(_Z) eval() @safe inout scope return {
-		pragma(inline, true);
-		return this;
-	}
+	ref inout(_Z) eval() @safe inout scope return => this;
 
 	/// Type of limb in internal representation.
-	alias Limb = __mp_limb_t;   // GNU MP alias
+	alias Limb = __mp_limb_t;	// GNU MP alias
 
 	/** Returns: limbs. */
-	inout(Limb)[] _limbs() inout return @system {
-		pragma(inline, true);
-		// import std.math : abs;
-		return _z._mp_d[0 .. limbCount];
-	}
+	inout(Limb)[] _limbs() inout return @system => _z._mp_d[0 .. limbCount];
 
 	/// Returns: pointer to internal C struct.
-	inout(__mpz_struct)* _ptr() inout return @system {
-		pragma(inline, true);
-		return &_z;
-	}
+	inout(__mpz_struct)* _ptr() inout return @system => &_z;
 
 	static if (cow) {
 		private __mpz_struct _z; // internal libgmp C struct
@@ -1309,8 +1218,7 @@ private:
 		private __mpz_struct _z; // internal libgmp C struct
 	}
 
-	version(ccc)
-	{
+	version(ccc) {
 		/** Number of calls made to `__gmpz`--functions that construct or changes
 			this value. Used to verify correct lowering and evaluation of template
 			expressions.
@@ -1323,15 +1231,12 @@ private:
 	}
 
 	/// @nogc-variant of `toStringz` with heap allocation of null-terminated C-string `stringz`.
-	char* _allocStringzCopyOf(in char[] value) @nogc @trusted
-	{
+	char* _allocStringzCopyOf(in char[] value) @nogc @trusted {
 		import core.memory : pureMalloc;
 		char* stringz = cast(char*)pureMalloc(value.length + 1); // maximum this many characters
 		size_t i = 0;
-		foreach (immutable char ch; value[])
-		{
-			if (ch != '_')
-			{
+		foreach (immutable char ch; value[]) {
+			if (ch != '_') {
 				stringz[i] = ch;
 				i += 1;
 			}
@@ -1341,8 +1246,7 @@ private:
 	}
 
 	// qualified C memory managment
-	static @trusted extern(C) // locally `@trusted`
-	{
+	static @trusted extern(C) /+ locally `@trusted` +/ {
 		pragma(mangle, "free")
 		void qualifiedFree(void* ptr);
 	}
@@ -1368,8 +1272,7 @@ version(benchmark)
 version(gmp_test) @safe unittest {
 	import std.datetime.stopwatch : benchmark;
 	bool odd;
-	void test()
-	{
+	void test() {
 		odd = (9.Z^^333_333L).isOdd;
 	}
 	immutable results = benchmark!test(1);
@@ -1380,33 +1283,24 @@ version(gmp_test) @safe unittest {
 pure:
 
 /** Instantiator for `MpZ`. */
-_Z!(cow) mpz(bool cow = true, Args...)(Args args) @safe
-{
-	version(LDC) pragma(inline, true);
+_Z!(cow) mpz(bool cow = true, Args...)(Args args) @safe {
+	version(DigitalMars) pragma(inline);
 	return typeof(return)(args);
 }
 
 /// Swap contents of `x` with contents of `y`.
-void swap(bool cow)(ref _Z!(cow) x, ref _Z!(cow) y) nothrow
-{
-	pragma(inline, true);
+pragma(inline, true) void swap(bool cow)(ref _Z!(cow) x, ref _Z!(cow) y) nothrow {
 	import std.algorithm.mutation : swap;
 	swap(x, y); // x.swap(y);
 }
 
 /// Get `x` as a `string` in decimal base.
-string toDecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe // for `std.bigint.BigInt` compatibility
-{
-	version(LDC) pragma(inline, true);
-	return x.toString(10);
-}
+pragma(inline, true) string toDecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe /+ for `std.bigint.BigInt` compatibility +/
+	=> x.toString(10);
 
 /// Get `x` as a uppercased `string` in hexadecimal base without any base prefix (0x).
-string toHexadecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe
-{
-	version(LDC) pragma(inline, true);
-	return x.toString(16, true);
-}
+pragma(inline, true) string toHexadecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe
+	=> x.toString(16, true);
 
 /// For `std.bigint.BigInt` compatibility.
 alias toHex = toHexadecimalString;
@@ -1415,21 +1309,19 @@ alias toHex = toHexadecimalString;
 Unsigned!T absUnsign(T, bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe // for `std.bigint.BigInt` compatibility
 if (__traits(isIntegral, T))
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	return _integralAbs(cast(T)x);
 }
 
-/** Get sum of `x` and `y` (`x` + `y`).
- */
-_Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted
-{
-	version(LDC) pragma(inline, true);
+/** Get sum of `x` and `y` (`x` + `y`). */
+_Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted {
+	version(DigitalMars) pragma(inline);
 	static if (!__traits(isRef, x) || // r-value `x`
-			   !__traits(isRef, y))   // r-value `y`
+			   !__traits(isRef, y))	  // r-value `y`
 	{
 		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
 		static if (!__traits(isRef, x) && // r-value `x`
-				   !__traits(isRef, y))   // r-value `y`
+				   !__traits(isRef, y))	  // r-value `y`
 		{
 			if (x.limbCount > y.limbCount) // larger r-value `x`
 				zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
@@ -1465,22 +1357,22 @@ _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 	assert(add(x, Z(12)) ==	   // l-value, r-value
 		   add(Z(12), x));		// r-value, l-value
 	assert(add(x, y) ==		   // l-value, l-value
-		   add(Z(2)^^100, Z(12)));  // r-value, r-value
+		   add(Z(2)^^100, Z(12)));	// r-value, r-value
 	assert(add(Z(12), Z(2)^^100) == // r-value, r-value
-		   add(Z(2)^^100, Z(12)));  // r-value, r-value
+		   add(Z(2)^^100, Z(12)));	// r-value, r-value
 }
 
 /** Get difference of `x` and `y` (`x` - `y`).
  */
 _Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	static if (!__traits(isRef, x) || // r-value `x`
-			   !__traits(isRef, y))   // r-value `y`
+			   !__traits(isRef, y))	  // r-value `y`
 	{
 		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
 		static if (!__traits(isRef, x) && // r-value `x`
-				   !__traits(isRef, y))   // r-value `y`
+				   !__traits(isRef, y))	  // r-value `y`
 		{
 			if (x.limbCount > y.limbCount) // larger r-value `x`
 				zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
@@ -1525,13 +1417,13 @@ _Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
  */
 _Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	static if (!__traits(isRef, x) || // r-value `x`
-			   !__traits(isRef, y))   // r-value `y`
+			   !__traits(isRef, y))	  // r-value `y`
 	{
 		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
 		static if (!__traits(isRef, x) && // r-value `x`
-				   !__traits(isRef, y))   // r-value `y`
+				   !__traits(isRef, y))	  // r-value `y`
 		{
 			if (x.limbCount > y.limbCount) // larger r-value `x`
 			{
@@ -1583,7 +1475,7 @@ _Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 */
 _Z!(cow) abs(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	static if (__traits(isRef, x)) // l-value `x`
 	{
 		typeof(return) y = null; // must use temporary
@@ -1606,7 +1498,7 @@ _Z!(cow) abs(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 */
 _Z!(cow) onesComplement(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	static if (__traits(isRef, x)) // l-value `x`
 	{
 		typeof(return) y = null; // must use temporary
@@ -1631,7 +1523,7 @@ alias com = onesComplement;
 */
 _Z!(cow) sqrt(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	static if (__traits(isRef, x)) // l-value `x`
 	{
 		typeof(return) y = null; // must use temporary
@@ -1648,7 +1540,7 @@ _Z!(cow) sqrt(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 
 _Z!(cow) sqrtrem(bool cow)(auto ref scope const _Z!(cow) x, out scope _Z!(cow) rem) @trusted nothrow @nogc
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	static if (__traits(isRef, x)) // l-value `x`
 	{
 		typeof(return) y = null; // must use temporary
@@ -1669,7 +1561,7 @@ _Z!(cow) sqrtrem(bool cow)(auto ref scope const _Z!(cow) x, out scope _Z!(cow) r
 */
 _Z!(cow) root(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out bool isExact) @trusted nothrow @nogc
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	static if (__traits(isRef, x)) // l-value `x`
 	{
 		typeof(return) y = null; // must use temporary
@@ -1687,7 +1579,7 @@ _Z!(cow) root(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out bool isExa
 
 _Z!(cow) rootrem(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out scope _Z!(cow) rem) @trusted nothrow @nogc
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	static if (__traits(isRef, x)) // l-value `x`
 	{
 		typeof(return) y = null; // must use temporary
@@ -1705,19 +1597,19 @@ _Z!(cow) rootrem(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out scope _
 /// Comparison of the absolute values of `x` and `y`.
 int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @nogc @trusted
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	return __gmpz_cmpabs(x._ptr, y._ptr);
 }
 /// ditto
 int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, double y) nothrow @nogc @trusted
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	return __gmpz_cmpabs_d(x._ptr, y);
 }
 /// ditto
 int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @trusted
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	return __gmpz_cmpabs_ui(x._ptr, y);
 }
 
@@ -1728,7 +1620,7 @@ int cmpabs(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @tr
 */
 _Z!(cow) nextPrime(bool cow)(auto ref scope const _Z!(cow) x) nothrow @nogc @trusted
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	static if (__traits(isRef, x)) // l-value `x`
 	{
 		typeof(return) y = null; // must use temporary
@@ -1748,13 +1640,13 @@ _Z!(cow) nextPrime(bool cow)(auto ref scope const _Z!(cow) x) nothrow @nogc @tru
 /// Get greatest common divisor (gcd) of `x` and `y`.
 _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @nogc @trusted
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	static if (!__traits(isRef, x) || // r-value `x`
-			   !__traits(isRef, y))   // r-value `y`
+			   !__traits(isRef, y))	  // r-value `y`
 	{
 		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
 		static if (!__traits(isRef, x) && // r-value `x`
-				   !__traits(isRef, y))   // r-value `y`
+				   !__traits(isRef, y))	  // r-value `y`
 		{
 			if (x.limbCount > y.limbCount) // larger r-value `x`
 				zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
@@ -1786,7 +1678,7 @@ _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 /// ditto
 _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, in ulong y) nothrow @nogc @trusted
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	static if (__traits(isRef, x)) // l-value `x`
 	{
 		typeof(return) z = null;
@@ -1809,13 +1701,13 @@ _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, in ulong y) nothrow @nog
 /// Get least common multiple (lcm) of `x` and `y`.
 _Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @nogc @trusted
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	static if (!__traits(isRef, x) || // r-value `x`
-			   !__traits(isRef, y))   // r-value `y`
+			   !__traits(isRef, y))	  // r-value `y`
 	{
 		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
 		static if (!__traits(isRef, x) && // r-value `x`
-				   !__traits(isRef, y))   // r-value `y`
+				   !__traits(isRef, y))	  // r-value `y`
 		{
 			if (x.limbCount > y.limbCount) // larger r-value `x`
 				zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
@@ -1847,7 +1739,7 @@ _Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 /// ditto
 _Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @trusted
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	static if (__traits(isRef, x)) // l-value `x`
 	{
 		typeof(return) z = null;
@@ -1869,7 +1761,7 @@ _Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @
 */
 _Z!(cow) powm(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope const _Z!(cow) exp, auto ref scope const _Z!(cow) mod) nothrow @nogc @trusted
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	assert(mod != 0, "Zero modulus");
 	typeof(return) y = 0; // result, TODO: reuse `exp` or `mod` if any is an r-value
 	assert(exp >= 0, "Negative exponent");
@@ -1880,7 +1772,7 @@ _Z!(cow) powm(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope const
 /// ditto
 _Z!(cow) powm(bool cow)(auto ref scope const _Z!(cow) base, ulong exp, auto ref scope const _Z!(cow) mod) nothrow @nogc @trusted
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	assert(mod != 0, "Zero modulus");
 	typeof(return) y = 0;	   // result, TODO: reuse `exp` or `mod` if any is an r-value
 	static if (cow) { y.selfdupIfAliased(); }
@@ -1897,7 +1789,7 @@ alias powmod = powm;
 */
 _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope const _Z!(cow) mod) nothrow @nogc @trusted
 {
-	version(LDC) pragma(inline, true);
+	version(DigitalMars) pragma(inline);
 	assert(base != 0, "Zero base");
 	assert(mod != 0, "Zero modulus");
 	static if (!__traits(isRef, base)) // r-value `base`
@@ -2133,14 +2025,14 @@ version(gmp_test) @safe nothrow unittest {
 ///
 version(gmp_test) @safe @nogc unittest {
 	const x = 42.Z;
-	assert(x.unaryMinus() == -42);   // l-value `this`
+	assert(x.unaryMinus() == -42);	// l-value `this`
 	assert(42.Z.unaryMinus() == -42); // r-value `this`
 }
 
 /// convert to string
 version(gmp_test) @safe unittest {
-	assert(mpz(	42).toString ==   `42`);
-	assert(mpz(   -42).toString ==  `-42`);
+	assert(mpz(	42).toString ==	  `42`);
+	assert(mpz(	 -42).toString ==  `-42`);
 	assert(mpz(`-101`).toString == `-101`);
 
 	assert(mpz(-42).toDecimalString == `-42`);
@@ -2414,12 +2306,12 @@ version(gmp_test) @safe unittest {
 
 	// absolute value comparison
 
-	assert(cmpabs(-43.Z,  44.Z) == -1);
+	assert(cmpabs(-43.Z,	 44.Z) == -1);
 	assert(cmpabs(-43.Z, -44.Z) == -1);
 	assert(cmpabs(-44.Z, -43.Z) == +1);
 	assert(cmpabs(-43.Z, -43.Z) ==  0);
 
-	assert(cmpabs(-43.Z,  44.0) == -1);
+	assert(cmpabs(-43.Z,	 44.0) == -1);
 	assert(cmpabs(-43.Z, -44.0) == -1);
 	assert(cmpabs(-44.Z, -43.0) == +1);
 	assert(cmpabs(-43.Z, -43.0) ==  0);
@@ -2428,7 +2320,7 @@ version(gmp_test) @safe unittest {
 	assert(cmpabs( 43.Z, 44) == -1);
 	assert(cmpabs(-44.Z, 43) == +1);
 	assert(cmpabs( 44.Z, 43) == +1);
-	assert(cmpabs(-43.Z, 43) ==  0);
+	assert(cmpabs(-43.Z, 43) ==	0);
 
 	Z _43 = 43;
 	Z _4 = 4;
@@ -2448,34 +2340,34 @@ version(gmp_test) @safe unittest {
 
 	// greatest common divisor
 
-	assert(gcd(43.Z,  44.Z) == 1);
+	assert(gcd(43.Z,	 44.Z) == 1);
 	assert(gcd(4.Z, 24.Z) == 4);
 	assert(gcd(6.Z, 24.Z) == 6);
 	assert(gcd(10.Z, 100.Z) == 10);
 
-	assert(gcd(43.Z,  44) == 1);
+	assert(gcd(43.Z,	 44) == 1);
 	assert(gcd(4.Z, 24) == 4);
 	assert(gcd(6.Z, 24) == 6);
 	assert(gcd(10.Z, 100) == 10);
 
-	assert(gcd(_43,  44) == 1);
+	assert(gcd(_43,	44) == 1);
 	assert(gcd(_4, 24) == 4);
 	assert(gcd(_4, _24) == 4);
 	assert(gcd(_4, 24.Z) == 4);
 
 	// least common multiple
 
-	assert(lcm(43.Z,  44.Z) == 1892);
+	assert(lcm(43.Z,	 44.Z) == 1892);
 	assert(lcm(4.Z, 24.Z) == 24);
 	assert(lcm(6.Z, 24.Z) == 24);
 	assert(lcm(10.Z, 100.Z) == 100);
 
-	assert(lcm(43.Z,  44) == 1892);
+	assert(lcm(43.Z,	 44) == 1892);
 	assert(lcm(4.Z, 24) == 24);
 	assert(lcm(6.Z, 24) == 24);
 	assert(lcm(10.Z, 100) == 100);
 
-	assert(lcm(_43,  44) == 1892);
+	assert(lcm(_43,	44) == 1892);
 	assert(lcm(_4, 24) == 24);
 	assert(lcm(_4, _24) == 24);
 	assert(lcm(_4, 24.Z) == 24);
@@ -2539,7 +2431,7 @@ version(gmp_test) @safe unittest {
 	assert(1UL + a == 43);
 	assert(a + 1 == 1 + a);	   // commutative
 	assert(a + (-1) == (-1) + a); // commutative
-	assert(1UL + a == a + 1UL);   // commutative
+	assert(1UL + a == a + 1UL);	 // commutative
 
 	// subtraction
 
@@ -2568,12 +2460,12 @@ version(gmp_test) @safe unittest {
 	assert(27.Z /   3  == 9);
 
 	assert(27.Z / 10.Z  == 2);
-	assert(27.Z /   10   == 2);
+	assert(27.Z /   10	== 2);
 	assert(27.Z /   10UL == 2);
 
 	assert(27.Z % 10UL == 7);
 
-	assert(27.Z / -3   == -9);
+	assert(27.Z / -3	  == -9);
 	assert(27.Z /  3UL ==  9);
 
 	assert(27.Z / -10   == -2);
@@ -2598,11 +2490,11 @@ version(gmp_test) @safe unittest {
 	assert(28   % 3.Z == 1);
 	assert(28UL % 3.Z == 1);
 
-	assert( 28.Z  % -3 == -1); // negative divisor gives negative remainder according to https://en.wikipedia.org/wiki/Remainder
-	assert(-28.Z  %  3 == 1);  // dividend sign doesn't affect remainder
+	assert( 28.Z	 % -3 == -1); // negative divisor gives negative remainder according to https://en.wikipedia.org/wiki/Remainder
+	assert(-28.Z	 %	3 == 1);  // dividend sign doesn't affect remainder
 
-	assert( 28.Z  % -3.Z == -1);
-	assert(-28.Z  %  3.Z == 2);
+	assert( 28.Z	 % -3.Z == -1);
+	assert(-28.Z	 %	3.Z == 2);
 	assert( 28  % -3.Z == 1);
 	assert(-28  %  3.Z == -1);
 
@@ -2794,13 +2686,13 @@ version(gmp_test) @safe unittest {
 	// sign function (sgn)
 
 	assert(long.min.Z.sgn == -1);
-	assert(int.min.Z.sgn  == -1);
+	assert(int.min.Z.sgn	 == -1);
 	assert(-2.Z.sgn == -1);
 	assert(-1.Z.sgn == -1);
 	assert( 0.Z.sgn ==  0);
 	assert( 1.Z.sgn ==  1);
 	assert( 2.Z.sgn ==  1);
-	assert(int.max.Z.sgn  == 1);
+	assert(int.max.Z.sgn	 == 1);
 	assert(long.max.Z.sgn == 1);
 
 	assert(!long.min.Z.isZero);
@@ -3089,36 +2981,36 @@ version(gmp_test) @safe unittest {
 	}
 
 	{
-		const x  = BigInt("1_000_000_500");
+		const x	 = BigInt("1_000_000_500");
 
 		immutable ulong ul  = 2_000_000UL;
 		immutable uint ui   = 500_000;
 		immutable ushort us = 30_000;
-		immutable ubyte ub  = 50;
+		immutable ubyte ub	 = 50;
 
 		immutable long  l = 1_000_000L;
-		immutable int   i = 500_000;
+		immutable int	i = 500_000;
 		immutable short s = 30_000;
-		immutable byte b  = 50;
+		immutable byte b	= 50;
 
-		static assert(is(typeof(x % ul)  == ulong));
-		static assert(is(typeof(x % ui)  == uint));
-		static assert(is(typeof(x % us)  == ushort));
-		static assert(is(typeof(x % ub)  == ubyte));
+		static assert(is(typeof(x % ul)	 == ulong));
+		static assert(is(typeof(x % ui)	 == uint));
+		static assert(is(typeof(x % us)	 == ushort));
+		static assert(is(typeof(x % ub)	 == ubyte));
 
-		static assert(is(typeof(x % l)  == long));
-		static assert(is(typeof(x % i)  == int));
-		// TODO: static assert(is(typeof(x % s)  == short));
-		// TODO: static assert(is(typeof(x % b)  == byte));
+		static assert(is(typeof(x % l)	== long));
+		static assert(is(typeof(x % i)	== int));
+		// TODO: static assert(is(typeof(x % s)	 == short));
+		// TODO: static assert(is(typeof(x % b)	 == byte));
 
 		assert(x % ul == 500);
 		assert(x % ui == 500);
 		assert(x % us  == 10_500);
 		assert(x % ub == 0);
 
-		assert(x % l  == 500L);
-		assert(x % i  == 500);
-		assert(x % s  == 10_500);
+		assert(x % l	 == 500L);
+		assert(x % i	 == 500);
+		assert(x % s	 == 10_500);
 		assert(x % b == 0);
 	}
 
@@ -3299,20 +3191,18 @@ version(gmp_test) pure @nogc unittest {
 /// expression template types
 
 /// `MpZ`-`MpZ` adding expression.
-private struct AddExpr(bool cow)
-{
+private struct AddExpr(bool cow) {
 	_Z!(cow) e1;				// first term
 	_Z!(cow) e2;				// second term
 	_Z!(cow) eval() const nothrow @nogc @trusted
 	{
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
-	{
-		version(LDC) pragma(inline, true);
+	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted {
+		version(DigitalMars) pragma(inline);
 		__gmpz_add(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
@@ -3320,10 +3210,8 @@ version(gmp_test) version(unittest) static assert(isMpZExpr!(AddExpr!(true)));
 
 version(gmp_test) @safe @nogc unittest {
 	assert(AddExpr!(false)(3.Z, 4.Z).eval() == 3 + 4);
-
 	const Z x = AddExpr!(false)(3.Z, 4.Z);
 	assert(x == 7);
-
 	Z y = null;
 	y = AddExpr!(false)(3.Z, 4.Z);
 	assert(y == 7);
@@ -3331,20 +3219,18 @@ version(gmp_test) @safe @nogc unittest {
 }
 
 /// `MpZ`-`MpZ` subtraction expression.
-private struct SubExpr(bool cow)
-{
+private struct SubExpr(bool cow) {
 	_Z!(cow) e1;					  // first term
 	_Z!(cow) e2;					  // second term
-	_Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
+	_Z!(cow) eval() const nothrow @nogc @trusted	 // TODO: move to common place
 	{
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
-	{
-		version(LDC) pragma(inline, true);
+	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted {
+		version(DigitalMars) pragma(inline);
 		__gmpz_sub(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
@@ -3357,20 +3243,18 @@ version(gmp_test) @safe @nogc unittest {
 }
 
 /// `MpZ`-`MpZ` multiplication expression.
-private struct MulExpr(bool cow)
-{
+private struct MulExpr(bool cow) {
 	_Z!(cow) e1;				// first factor
 	_Z!(cow) e2;				// second factor
-	_Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
+	_Z!(cow) eval() const nothrow @nogc @trusted	 // TODO: move to common place
 	{
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
-	{
-		version(LDC) pragma(inline, true);
+	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted {
+		version(DigitalMars) pragma(inline);
 		__gmpz_mul(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
@@ -3378,26 +3262,23 @@ version(gmp_test) version(unittest) static assert(isMpZExpr!(MulExpr!(false)));
 
 version(gmp_test) @safe @nogc unittest {
 	assert(MulExpr!(false)(3.Z, 4.Z).eval() == 3 * 4);
-
 	const Z x = MulExpr!(false)(3.Z, 4.Z);
 	assert(x == 12);
 }
 
 /// `MpZ`-`MpZ` division expression.
-private struct DivExpr(bool cow)
-{
+private struct DivExpr(bool cow) {
 	_Z!(cow) e1;				// divisor
 	_Z!(cow) e2;				// dividend
 	_Z!(cow) eval() const nothrow @nogc @trusted	// TODO: move to common place
 	{
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
-	{
-		version(LDC) pragma(inline, true);
+	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted {
+		version(DigitalMars) pragma(inline);
 		__gmpz_tdiv_q(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
@@ -3408,7 +3289,6 @@ version(gmp_test) @safe @nogc unittest {
 	assert(DivExpr!(false)(28.Z, 3.Z).eval() == 28 / 3);
 	assert(DivExpr!(false)(29.Z, 3.Z).eval() == 29 / 3);
 	assert(DivExpr!(false)(30.Z, 3.Z).eval() == 30 / 3);
-
 	const Z x = DivExpr!(false)(28.Z, 3.Z);
 	assert(x == 9);
 }
@@ -3418,16 +3298,16 @@ private struct ModExpr(bool cow)
 {
 	_Z!(cow) e1;				// divisor
 	_Z!(cow) e2;				// dividend
-	_Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
+	_Z!(cow) eval() const nothrow @nogc @trusted	 // TODO: move to common place
 	{
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
 		return y;
 	}
 	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
 	{
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		__gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
 }
@@ -3445,21 +3325,18 @@ version(gmp_test) @safe @nogc unittest {
 
 /// `MpZ`-`ulong` power expression.
 private struct PowUExpr(P, Q)
-if (isMpZExpr!P &&
-	__traits(isUnsigned, Q))
-{
+if (isMpZExpr!P && __traits(isUnsigned, Q)) {
 	P e1;					   // base
 	Q e2;					   // exponent
-	MpZ eval() const nothrow @nogc @trusted   // TODO: move to common place
+	MpZ eval() const nothrow @nogc @trusted	// TODO: move to common place
 	{
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref MpZ y) const nothrow @nogc @trusted
-	{
-		version(LDC) pragma(inline, true);
+	void evalTo(ref MpZ y) const nothrow @nogc @trusted {
+		version(DigitalMars) pragma(inline);
 		__gmpz_pow_ui(y._ptr, e1.eval()._ptr, e2);
 	}
 }
@@ -3471,23 +3348,20 @@ version(gmp_test) @safe @nogc unittest {
 
 /// `MpZ`-`ulong`-`MpZ` power-modulo expression.
 private struct PowMUExpr(P, Q, M)
-if (isMpZExpr!P &&
-	__traits(isUnsigned, Q) &&
-	isMpZExpr!M)
+if (isMpZExpr!P && __traits(isUnsigned, Q) && isMpZExpr!M)
 {
 	P base;					 // base
 	Q exp;					  // exponent
 	M mod;					  // modulo
-	MpZ eval() const nothrow @nogc @trusted   // TODO: move to common place
+	MpZ eval() const nothrow @nogc @trusted	// TODO: move to common place
 	{
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref MpZ y) const nothrow @nogc @trusted
-	{
-		version(LDC) pragma(inline, true);
+	void evalTo(ref MpZ y) const nothrow @nogc @trusted {
+		version(DigitalMars) pragma(inline);
 		__gmpz_powm_ui(y._ptr, base.eval()._ptr, exp, mod._ptr);
 	}
 }
@@ -3498,19 +3372,17 @@ version(gmp_test) @safe @nogc unittest {
 }
 
 /// `MpZ` negation expression.
-private struct NegExpr(bool cow)
-{
+private struct NegExpr(bool cow) {
 	_Z!(cow) e1;
-	_Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
+	_Z!(cow) eval() const nothrow @nogc @trusted	 // TODO: move to common place
 	{
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
-	{
-		version(LDC) pragma(inline, true);
+	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted {
+		version(DigitalMars) pragma(inline);
 		__gmpz_neg(y._ptr, e1.eval()._ptr);
 	}
 }
@@ -3526,19 +3398,17 @@ version(gmp_test) @safe @nogc unittest {
 
 	See: https://gmplib.org/manual/Integer-Roots
  */
-private struct SqrtExpr(bool cow)
-{
+private struct SqrtExpr(bool cow) {
 	_Z!(cow) e1;
-	_Z!(cow) eval() const nothrow @nogc @trusted   // TODO: move to common place
+	_Z!(cow) eval() const nothrow @nogc @trusted	 // TODO: move to common place
 	{
-		version(LDC) pragma(inline, true);
+		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
-	{
-		version(LDC) pragma(inline, true);
+	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted {
+		version(DigitalMars) pragma(inline);
 		__gmpz_sqrt(y._ptr, e1.eval()._ptr);
 	}
 }
@@ -3552,7 +3422,6 @@ version(gmp_test) @safe @nogc unittest {
 
 // Copied from `std.numeric` to prevent unnecessary Phobos deps.
 private T _integralAbs(T)(scope const T x) @safe if (__traits(isIntegral, T)) {
-	pragma(inline, true);
 	return x >= 0 ? x : -x;
 }
 
@@ -3561,19 +3430,16 @@ version(gmp_test) @trusted unittest {
 	alias CZ = CopyableMpZ;
 
 	const CZ a = 42;
-
 	const CZ b = a;				// copy
 	assert(a == b);			 // should equal
 	assert(a !is b);			// but not the same
-
 	const CZ c = null;			// other value
 	assert(a != c);			 // should diff
 }
 
 /// to string conversion
 version(gmp_test) pure @safe nothrow unittest {
-	for (int i = -100; i < 100; ++i)
-	{
+	for (int i = -100; i < 100; ++i) {
 		import std.conv : to;
 		assert(i.Z.toString == i.to!string);
 	}
@@ -3606,19 +3472,16 @@ version(gmp_test) version(unittest) {
 	import std.meta : AliasSeq;
 	alias Z = MpZ;
 	alias CZ = CopyableMpZ;
-	alias RZ = _Z!(true);
 }
 
 // C API
-package extern(C) pragma(inline, false)
-{
+package extern(C) pragma(inline, false) {
 	alias __mp_limb_t = ulong;	// see `mp_limb_t` gmp.h. TODO: detect when it is `uint` instead
-	struct __mpz_struct
-	{
+	struct __mpz_struct {
 		int _mp_alloc;			/* Number of *limbs* allocated and pointed to by
-								   the _mp_d field.  */
+								   the _mp_d field.	 */
 		int _mp_size;			/* abs(_mp_size) is the number of limbs the last
-								   field points to.  If _mp_size is negative
+								   field points to.	 If _mp_size is negative
 								   this is a negative number.  */
 		__mp_limb_t* _mp_d;		/* Pointer to the limbs. */
 	}
@@ -3740,7 +3603,7 @@ package extern(C) pragma(inline, false)
 
 	mp_bitcnt_t __gmpz_popcount(mpz_srcptr);
 
-	int  __gmpz_root(mpz_ptr, mpz_srcptr, ulong);
+	int	 __gmpz_root(mpz_ptr, mpz_srcptr, ulong);
 	void __gmpz_rootrem(mpz_ptr, mpz_ptr, mpz_srcptr, ulong);
 	void __gmpz_sqrt(mpz_ptr, mpz_srcptr);
 	void __gmpz_sqrtrem(mpz_ptr, mpz_ptr, mpz_srcptr);

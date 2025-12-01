@@ -481,8 +481,7 @@ alias inv = inverse;
 }
 
 /// invert
-@safe version(gmp_test) unittest
-{
+@safe version(gmp_test) unittest {
 	Q x = Q(1, 2);
 	assert(x.numerator == 1);
 	assert(x.denominator == 2);
@@ -503,8 +502,7 @@ alias inv = inverse;
 }
 
 /// inversion
-@safe version(gmp_test) unittest
-{
+@safe version(gmp_test) unittest {
 	const Q q = Q(-2, 3);
 	assert(inverse(q) == Q(-3, 2));
 
@@ -514,16 +512,14 @@ alias inv = inverse;
 }
 
 /// absolute value
-@safe version(gmp_test) unittest
-{
+@safe version(gmp_test) unittest {
 	const Q q = Q(-2, 3);
 	assert(abs(q) == Q(2, 3));
 	assert(abs(Q(-2, 3)) == Q(2, 3));
 }
 
 /// integer and fractional part
-@safe version(gmp_test) unittest
-{
+@safe version(gmp_test) unittest {
 	Q x = Q(5, 2);
 
 	assert(x.integerPart == 2);
@@ -556,8 +552,7 @@ alias inv = inverse;
 }
 
 /// equality
-@safe version(gmp_test) unittest
-{
+@safe version(gmp_test) unittest {
 	assert(Q(1, 1) == 1);
 	assert(Q(2, 1) == 2);
 	assert(Q(1, 1) == Q(1, 1));
@@ -567,16 +562,14 @@ alias inv = inverse;
 }
 
 /// sign
-@safe version(gmp_test) unittest
-{
+@safe version(gmp_test) unittest {
 	assert(Q(-1, 3).sgn == -1);
 	assert(Q( 0, 3).sgn ==  0);
 	assert(Q( 1, 3).sgn ==  1);
 }
 
 /// comparison
-@safe version(gmp_test) unittest
-{
+@safe version(gmp_test) unittest {
 	assert(Q( 1, 3) < Q(1, 2));
 	assert(Q( 1, 2) > Q(1, 3));
 	assert(Q( 1, 2) > Q(0, 1));
@@ -598,32 +591,28 @@ alias inv = inverse;
 }
 
 /// addition
-@safe version(gmp_test) unittest
-{
+@safe version(gmp_test) unittest {
 	assert(Q(1, 2) + Q(1, 2) == Q(1, 1));
 	assert(Q(1, 3) + Q(1, 3) == Q(2, 3));
 	assert(Q(1, 2) + Q(1, 3) == Q(5, 6));
 }
 
 /// subtraction
-@safe version(gmp_test) unittest
-{
+@safe version(gmp_test) unittest {
 	assert(Q(1, 2) - Q(1, 2) == Q( 0, 1));
 	assert(Q(1, 2) - Q(1, 3) == Q (1, 6));
 	assert(Q(1, 3) - Q(1, 2) == Q(-1, 6));
 }
 
 /// multiplication
-@safe version(gmp_test) unittest
-{
+@safe version(gmp_test) unittest {
 	assert(Q(1, 2) * Q(1, 2) == Q(1, 4));
 	assert(Q(2, 3) * Q(2, 3) == Q(4, 9));
 	assert(Q(1, 2) * Q(1, 3) == Q(1, 6));
 }
 
 /// division
-@safe version(gmp_test) unittest
-{
+@safe version(gmp_test) unittest {
 	assert(Q(2, 3) / Q(2, 3) == Q(1, 1));
 	assert(Q(2, 3) / Q(2, 3) == 1);
 	assert(Q(2, 3) / Q(3, 2) == Q(4, 9));
