@@ -1304,21 +1304,21 @@ if (__traits(isIntegral, T))
 /** Get sum of `x` and `y` (`x` + `y`). */
 _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted {
 	version(DigitalMars) pragma(inline);
-	static if (!__traits(isRef, x) || // r-value `x`
-			   !__traits(isRef, y)) // r-value `y`
+	static if (!__traits(isRef, x) || /+ r-value `x` +/
+			   !__traits(isRef, y)) /+ r-value `y` +/
 	{
 		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
-		static if (!__traits(isRef, x) && // r-value `x`
-				   !__traits(isRef, y)) // r-value `y`
+		static if (!__traits(isRef, x) && /+ r-value `x` +/
+				   !__traits(isRef, y)) /+ r-value `y` +/
 		{
 			if (x.limbCount > y.limbCount) // larger r-value `x`
 				zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 			else					// larger r-value `y`
 				zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
 		}
-		else static if (!__traits(isRef, x)) // r-value `x`
+		else static if (!__traits(isRef, x)) /+ r-value `x` +/
 			zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-		else static if (!__traits(isRef, y)) // r-value `y`
+		else static if (!__traits(isRef, y)) /+ r-value `y` +/
 			zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
 		else
 			static assert(0);
@@ -1337,11 +1337,11 @@ _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 	const Z x = Z(2)^^100;
 	const Z y = 12;
 	assert(add(x, Z(12)) ==	   // l-value, r-value
-		   add(Z(12), x));		// r-value, l-value
+		   add(Z(12), x));		/+ r-value, l-value +/
 	assert(add(x, y) ==		   // l-value, l-value
-		   add(Z(2)^^100, Z(12)));	// r-value, r-value
-	assert(add(Z(12), Z(2)^^100) == // r-value, r-value
-		   add(Z(2)^^100, Z(12)));	// r-value, r-value
+		   add(Z(2)^^100, Z(12)));	/+ r-value, r-value +/
+	assert(add(Z(12), Z(2)^^100) == /+ r-value, r-value +/
+		   add(Z(2)^^100, Z(12)));	/+ r-value, r-value +/
 }
 
 /** Get difference of `x` and `y` (`x` - `y`).
@@ -1349,23 +1349,23 @@ _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 _Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted
 {
 	version(DigitalMars) pragma(inline);
-	static if (!__traits(isRef, x) || // r-value `x`
-			   !__traits(isRef, y))	  // r-value `y`
+	static if (!__traits(isRef, x) || /+ r-value `x` +/
+			   !__traits(isRef, y))	  /+ r-value `y` +/
 	{
 		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
-		static if (!__traits(isRef, x) && // r-value `x`
-				   !__traits(isRef, y))	  // r-value `y`
+		static if (!__traits(isRef, x) && /+ r-value `x` +/
+				   !__traits(isRef, y))	  /+ r-value `y` +/
 		{
 			if (x.limbCount > y.limbCount) // larger r-value `x`
 				zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 			else					// larger r-value `y`
 				zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
 		}
-		else static if (!__traits(isRef, x)) // r-value `x`
+		else static if (!__traits(isRef, x)) /+ r-value `x` +/
 		{
 			zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		}
-		else static if (!__traits(isRef, y)) // r-value `y`
+		else static if (!__traits(isRef, y)) /+ r-value `y` +/
 		{
 			zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
 		}
@@ -1388,11 +1388,11 @@ _Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 	Z x = 2.Z^^100;
 	Z y = 12;
 	assert(sub(x, Z(12)) ==	   // l-value, r-value
-		   -sub(Z(12), x));	   // r-value, l-value
+		   -sub(Z(12), x));	   /+ r-value, l-value +/
 	assert(sub(x, y) ==		   // l-value, l-value
-		   sub(2.Z^^100, 12.Z));  // r-value, r-value
-	assert(sub(12.Z, 2.Z^^100) == // r-value, r-value
-		   -sub(2.Z^^100, 12.Z)); // r-value, r-value
+		   sub(2.Z^^100, 12.Z));  /+ r-value, r-value +/
+	assert(sub(12.Z, 2.Z^^100) == /+ r-value, r-value +/
+		   -sub(2.Z^^100, 12.Z)); /+ r-value, r-value +/
 }
 
 /** Get product of `x` and `y` (`x` + `y`).
@@ -1400,12 +1400,12 @@ _Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 _Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted
 {
 	version(DigitalMars) pragma(inline);
-	static if (!__traits(isRef, x) || // r-value `x`
-			   !__traits(isRef, y))	  // r-value `y`
+	static if (!__traits(isRef, x) || /+ r-value `x` +/
+			   !__traits(isRef, y))	  /+ r-value `y` +/
 	{
 		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
-		static if (!__traits(isRef, x) && // r-value `x`
-				   !__traits(isRef, y))	  // r-value `y`
+		static if (!__traits(isRef, x) && /+ r-value `x` +/
+				   !__traits(isRef, y))	  /+ r-value `y` +/
 		{
 			if (x.limbCount > y.limbCount) // larger r-value `x`
 			{
@@ -1416,11 +1416,11 @@ _Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 				zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
 			}
 		}
-		else static if (!__traits(isRef, x)) // r-value `x`
+		else static if (!__traits(isRef, x)) /+ r-value `x` +/
 		{
 			zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		}
-		else static if (!__traits(isRef, y)) // r-value `y`
+		else static if (!__traits(isRef, y)) /+ r-value `y` +/
 		{
 			zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
 		}
@@ -1443,11 +1443,11 @@ _Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 	Z x = 2.Z^^100;
 	Z y = 12;
 	assert(mul(x, Z(12)) ==	   // l-value, r-value
-		   mul(Z(12), x));		// r-value, l-value
+		   mul(Z(12), x));		/+ r-value, l-value +/
 	assert(mul(x, y) ==		   // l-value, l-value
-		   mul(2.Z^^100, 12.Z));  // r-value, r-value
-	assert(mul(12.Z, 2.Z^^100) == // r-value, r-value
-		   mul(2.Z^^100, 12.Z));  // r-value, r-value
+		   mul(2.Z^^100, 12.Z));  /+ r-value, r-value +/
+	assert(mul(12.Z, 2.Z^^100) == /+ r-value, r-value +/
+		   mul(2.Z^^100, 12.Z));  /+ r-value, r-value +/
 }
 
 /** Get absolute value of `x`.
@@ -1464,7 +1464,7 @@ _Z!(cow) abs(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 		__gmpz_abs(y._ptr, x._ptr);
 		return y;
 	}
-	else						// r-value `x`
+	else						/+ r-value `x` +/
 	{
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { zp.selfdupIfAliased(); }
@@ -1487,7 +1487,7 @@ _Z!(cow) onesComplement(bool cow)(auto ref scope const _Z!(cow) x) @trusted noth
 		__gmpz_com(y._ptr, x._ptr);
 		return y;
 	}
-	else						// r-value `x`
+	else						/+ r-value `x` +/
 	{
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		zp.onesComplementSelf();
@@ -1512,7 +1512,7 @@ _Z!(cow) sqrt(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
 		__gmpz_sqrt(y._ptr, x._ptr);
 		return y;
 	}
-	else						// r-value `x`
+	else						/+ r-value `x` +/
 	{
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		zp.sqrtSelf();
@@ -1529,7 +1529,7 @@ _Z!(cow) sqrtrem(bool cow)(auto ref scope const _Z!(cow) x, out scope _Z!(cow) r
 		__gmpz_sqrtrem(y._ptr, rem._ptr, x._ptr);
 		return y;
 	}
-	else						// r-value `x`
+	else						/+ r-value `x` +/
 	{
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		rem = zp.sqrtremSelf();
@@ -1551,7 +1551,7 @@ _Z!(cow) root(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out bool isExa
 		isExact = status != 0;
 		return y;
 	}
-	else						// r-value `x`
+	else						/+ r-value `x` +/
 	{
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		isExact = zp.rootSelf(n);
@@ -1568,7 +1568,7 @@ _Z!(cow) rootrem(bool cow)(auto ref scope const _Z!(cow) x, ulong n, out scope _
 		__gmpz_rootrem(y._ptr, rem._ptr, x._ptr, n);
 		return y;
 	}
-	else						// r-value `x`
+	else						/+ r-value `x` +/
 	{
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		rem = zp.rootremSelf(n);
@@ -1610,7 +1610,7 @@ _Z!(cow) nextPrime(bool cow)(auto ref scope const _Z!(cow) x) nothrow @nogc @tru
 		__gmpz_nextprime(y._ptr, x._ptr);
 		return y;
 	}
-	else						// r-value `x`
+	else						/+ r-value `x` +/
 	{
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { zp.selfdupIfAliased(); }
@@ -1623,23 +1623,23 @@ _Z!(cow) nextPrime(bool cow)(auto ref scope const _Z!(cow) x) nothrow @nogc @tru
 _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @nogc @trusted
 {
 	version(DigitalMars) pragma(inline);
-	static if (!__traits(isRef, x) || // r-value `x`
-			   !__traits(isRef, y))	  // r-value `y`
+	static if (!__traits(isRef, x) || /+ r-value `x` +/
+			   !__traits(isRef, y))	  /+ r-value `y` +/
 	{
 		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
-		static if (!__traits(isRef, x) && // r-value `x`
-				   !__traits(isRef, y))	  // r-value `y`
+		static if (!__traits(isRef, x) && /+ r-value `x` +/
+				   !__traits(isRef, y))	  /+ r-value `y` +/
 		{
 			if (x.limbCount > y.limbCount) // larger r-value `x`
 				zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 			else					// larger r-value `y`
 				zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
 		}
-		else static if (!__traits(isRef, x)) // r-value `x`
+		else static if (!__traits(isRef, x)) /+ r-value `x` +/
 		{
 			zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		}
-		else static if (!__traits(isRef, y)) // r-value `y`
+		else static if (!__traits(isRef, y)) /+ r-value `y` +/
 		{
 			zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
 		}
@@ -1684,23 +1684,23 @@ _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, in ulong y) nothrow @nog
 _Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @nogc @trusted
 {
 	version(DigitalMars) pragma(inline);
-	static if (!__traits(isRef, x) || // r-value `x`
-			   !__traits(isRef, y))	  // r-value `y`
+	static if (!__traits(isRef, x) || /+ r-value `x` +/
+			   !__traits(isRef, y))	  /+ r-value `y` +/
 	{
 		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
-		static if (!__traits(isRef, x) && // r-value `x`
-				   !__traits(isRef, y))	  // r-value `y`
+		static if (!__traits(isRef, x) && /+ r-value `x` +/
+				   !__traits(isRef, y))	  /+ r-value `y` +/
 		{
 			if (x.limbCount > y.limbCount) // larger r-value `x`
 				zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 			else					// larger r-value `y`
 				zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
 		}
-		else static if (!__traits(isRef, x)) // r-value `x`
+		else static if (!__traits(isRef, x)) /+ r-value `x` +/
 		{
 			zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		}
-		else static if (!__traits(isRef, y)) // r-value `y`
+		else static if (!__traits(isRef, y)) /+ r-value `y` +/
 		{
 			zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
 		}
@@ -1774,7 +1774,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 	version(DigitalMars) pragma(inline);
 	assert(base != 0, "Zero base");
 	assert(mod != 0, "Zero modulus");
-	static if (!__traits(isRef, base)) // r-value `base`
+	static if (!__traits(isRef, base)) /+ r-value `base` +/
 	{
 		typeof(return)* mut_base = (cast(typeof(return)*)(&base)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { mut_base.selfdupIfAliased(); }
@@ -1782,7 +1782,7 @@ _Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope con
 		assert(success >= 0, "Cannot invert");
 		return move(*mut_base);	// TODO: shouldn't have to call `move` here
 	}
-	else static if (!__traits(isRef, mod)) // r-value `mod`
+	else static if (!__traits(isRef, mod)) /+ r-value `mod` +/
 	{
 		typeof(return)* mut_mod = (cast(typeof(return)*)(&mod)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { mut_mod.selfdupIfAliased(); }
@@ -1889,7 +1889,7 @@ version(gmp_test) nothrow unittest {
 	static void testSqrt(ulong p, ulong q) pure nothrow @nogc {
 		const x = p.Z;
 		assert(sqrt(x)== q);	// l-value first-parameter
-		assert(sqrt(p.Z) == q);	// r-value first-parameter
+		assert(sqrt(p.Z) == q);	/+ r-value first-parameter +/
 	}
 	testSqrt(1, 1);
 	testSqrt(2, 1);
@@ -1917,7 +1917,7 @@ version(gmp_test) nothrow unittest {
 		}
 		{
 			Z rem;
-			const r = rootrem(ui.Z, 2, rem); // r-value first-parameter
+			const r = rootrem(ui.Z, 2, rem); /+ r-value first-parameter +/
 			assert(r == 4);
 			assert(rem == ui - 16);
 		}
@@ -1933,7 +1933,7 @@ version(gmp_test) nothrow unittest {
 		}
 		{
 			Z rem;
-			const r = sqrtrem(ui.Z, rem); // r-value first-parameter
+			const r = sqrtrem(ui.Z, rem); /+ r-value first-parameter +/
 			assert(r == 4);
 			assert(rem == ui - 16);
 		}
@@ -2006,7 +2006,7 @@ version(gmp_test) nothrow unittest {
 version(gmp_test) @nogc unittest {
 	const x = 42.Z;
 	assert(x.unaryMinus() == -42);	// l-value `this`
-	assert(42.Z.unaryMinus() == -42); // r-value `this`
+	assert(42.Z.unaryMinus() == -42); /+ r-value `this` +/
 }
 
 /// convert to string
@@ -2069,27 +2069,27 @@ version(gmp_test) unittest {
 version(gmp_test) @nogc unittest {
 	const Z a = 42;
 	{
-		const Z b = a + 1.Z;	// r-value `rhs`
+		const Z b = a + 1.Z;	/+ r-value `rhs` +/
 		assert(b == 43);
 	}
 
 	{
-		const Z b = a - 1.Z;	// r-value `rhs`
+		const Z b = a - 1.Z;	/+ r-value `rhs` +/
 		assert(b == 41);
 	}
 
 	{
-		const Z b = a * 2.Z;	// r-value `rhs`
+		const Z b = a * 2.Z;	/+ r-value `rhs` +/
 		assert(b == 84);
 	}
 
 	{
-		const Z b = a / 2.Z;	// r-value `rhs`
+		const Z b = a / 2.Z;	/+ r-value `rhs` +/
 		assert(b == 21);
 	}
 
 	{
-		const Z b = a % 10.Z;	// r-value `rhs`
+		const Z b = a % 10.Z;	/+ r-value `rhs` +/
 		assert(b == 2);
 	}
 }
@@ -2533,8 +2533,8 @@ version(gmp_test) unittest {
 	assert(3.Z.powm(3, 16.Z) == 11.Z);
 
 	// modular multiplicative inverse
-	assert(3.Z.invert(26.Z) == 9.Z); // r-value `base`
-	assert(3.Z.invert(-26.Z) == 9.Z); // r-value `base`
+	assert(3.Z.invert(26.Z) == 9.Z); /+ r-value `base` +/
+	assert(3.Z.invert(-26.Z) == 9.Z); /+ r-value `base` +/
 	{
 		auto base = 3.Z;
 		assert(base.invert(26.Z) == 9.Z); // l-value `base` and r-value `mod`
