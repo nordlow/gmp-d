@@ -289,8 +289,8 @@ nothrow:
 	}
 
 	/// Mersenne prime, M(p) = 2 ^^ p - 1
-	static _Z mersennePrime(Integral)(Integral p)
-	if (__traits(isIntegral, Integral))
+	static _Z mersennePrime(Int)(Int p)
+	if (__traits(isIntegral, Int))
 		=> typeof(this).pow(2UL, p) - 1;
 
 	/**
@@ -2733,11 +2733,9 @@ version(gmp_test) @safe unittest {
 
 	// fits in type
 
-	foreach (Integral; AliasSeq!(short, int, long,
-								 ushort, uint, ulong))
-	{
-		assert(Integral.min.Z.fitsIn!Integral);
-		assert(Integral.max.Z.fitsIn!Integral);
+	foreach (Int; AliasSeq!(short, int, long, ushort, uint, ulong)) {
+		assert(Int.min.Z.fitsIn!Int);
+		assert(Int.max.Z.fitsIn!Int);
 	}
 
 	// TODO
