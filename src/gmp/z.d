@@ -1576,19 +1576,15 @@ _Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 	}
 }
 /// ditto
-_Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, in ulong y) nothrow @nogc @trusted
-{
+_Z!(cow) gcd(bool cow)(auto ref scope const _Z!(cow) x, in ulong y) nothrow @nogc @trusted {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) /+ l-value `x` +/
-	{
+	static if (__traits(isRef, x)) /+ l-value `x` +/ {
 		typeof(return) z = null;
 		const z_ui = __gmpz_gcd_ui(z._ptr, x._ptr, y);
 		if (z_ui)
 			assert(z == z_ui);
 		return z;
-	}
-	else
-	{
+	} else {
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { zp.selfdupIfAliased(); }
 		const z_ui = __gmpz_gcd_ui(zp._ptr, x._ptr, y);
