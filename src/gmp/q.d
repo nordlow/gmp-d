@@ -417,8 +417,7 @@ MpQ inverse()(auto ref const MpQ x) @trusted
 alias inv = inverse;
 
 /// construction and assignment
-@safe @nogc version(gmp_test) unittest
-{
+@safe @nogc version(gmp_test) unittest {
 	Q x = null;
 	assert(x.numerator == 0);
 	assert(x.denominator == 1);
@@ -449,8 +448,7 @@ alias inv = inverse;
 }
 
 /// canonicalization
-@safe @nogc version(gmp_test) unittest
-{
+@safe @nogc version(gmp_test) unittest {
 	Q x = Q(2, 4);
 	assert(x.numerator == 2);
 	assert(x.denominator == 4);
@@ -460,8 +458,7 @@ alias inv = inverse;
 }
 
 /// negative numerator canonicalization
-@safe @nogc version(gmp_test) unittest
-{
+@safe @nogc version(gmp_test) unittest {
 	Q x = Q(-2, 4);
 	assert(x.numerator == -2);
 	assert(x.denominator == 4);
@@ -471,8 +468,7 @@ alias inv = inverse;
 }
 
 /// swap
-@safe @nogc version(gmp_test) unittest
-{
+@safe @nogc version(gmp_test) unittest {
 	Q x = Q(1, 2);
 	Q y = Q(1, 3);
 	swap(x, y);
@@ -543,8 +539,7 @@ alias inv = inverse;
 }
 
 /// casting
-@safe @nogc version(gmp_test) unittest
-{
+@safe @nogc version(gmp_test) unittest {
 	assert(cast(double)Q(1, 2) == 0.5f);
 	assert(cast(double)Q(1, 2) == 0.5);
 	assert(cast(double)Q(2, 4) == 0.5);
