@@ -684,8 +684,7 @@ nothrow:
 			return opBinary!s(lhs); // commutative reuse
 		} else static if (s == "-") {
 			typeof(return) y = null;
-			if (lhs < 0)		// TODO: handle `lhs == lhs.min`
-			{
+			if (lhs < 0) { // TODO: handle `lhs == lhs.min`
 				immutable ulong pos_rhs = -lhs; // make it positive
 				__gmpz_add_ui(y._ptr, _ptr, pos_rhs);
 			} else
