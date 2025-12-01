@@ -1201,7 +1201,7 @@ private:
 
 	static if (cow) {
 		private __mpz_struct _z; // internal libgmp C struct
-		private size_t _refCountCopies; ///< Number of copies.
+		private size_t _refCountCopies; ///< Number of copies referencing `this` same `_z`.
 	} else {
 		private __mpz_struct _z; // internal libgmp C struct
 	}
