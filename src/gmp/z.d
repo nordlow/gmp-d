@@ -598,14 +598,13 @@ nothrow:
 		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		static if (s == "+") {
-			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
-			{
+			if (rhs < 0) /+ TODO: handle `rhs == rhs.min` +/ {
 				immutable ulong pos_rhs = -rhs; // make it positive
 				__gmpz_sub_ui(y._ptr, _ptr, pos_rhs);
 			} else
 				__gmpz_add_ui(y._ptr, _ptr, rhs);
 		} else static if (s == "-") {
-			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
+			if (rhs < 0) /+ TODO: handle `rhs == rhs.min` +/
 				__gmpz_add_ui(y._ptr, _ptr, -rhs); // x - (-y) == x + y
 			else
 				__gmpz_sub_ui(y._ptr, _ptr, rhs); // rhs is positive
@@ -613,8 +612,7 @@ nothrow:
 			__gmpz_mul_si(y._ptr, _ptr, rhs);
 		} else static if (s == "/") {
 			assert(rhs != 0, "Divison by zero");
-			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
-			{
+			if (rhs < 0) /+ TODO: handle `rhs == rhs.min` +/ {
 				immutable ulong pos_rhs = -rhs; // make it positive
 				__gmpz_tdiv_q_ui(y._ptr, _ptr, pos_rhs);
 				y.negate();	 // negate result
@@ -645,7 +643,7 @@ nothrow:
 		assert(rhs != 0, "Divison by zero");
 		_Z y = null;
 		static if (__traits(isArithmetic, Rhs) && !__traits(isUnsigned, Rhs)) {
-			if (rhs < 0) { // TODO: handle `rhs == rhs.min`
+			if (rhs < 0) { /+ TODO: handle `rhs == rhs.min` +/
 				immutable ulong pos_rhs = -cast(int)rhs; // make it positive
 				return cast(typeof(return))-__gmpz_tdiv_r_ui(y._ptr, _ptr, pos_rhs);
 			} else
@@ -684,7 +682,7 @@ nothrow:
 			return opBinary!s(lhs); // commutative reuse
 		} else static if (s == "-") {
 			typeof(return) y = null;
-			if (lhs < 0) { // TODO: handle `lhs == lhs.min`
+			if (lhs < 0) /+ TODO: handle `lhs == lhs.min` +/ {
 				immutable ulong pos_rhs = -lhs; // make it positive
 				__gmpz_add_ui(y._ptr, _ptr, pos_rhs);
 			} else
@@ -802,16 +800,14 @@ nothrow:
 	{
 		version(DigitalMars) pragma(inline);
 		static	  if (s == "+") {
-			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
-			{
+			if (rhs < 0) /+ TODO: handle `rhs == rhs.min` +/ {
 				assert(rhs != rhs.min);
 				immutable ulong pos_rhs = -rhs; // make it positive
 				__gmpz_sub_ui(_ptr, _ptr, pos_rhs);
 			} else
 				__gmpz_add_ui(_ptr, _ptr, rhs);
 		} else static if (s == "-") {
-			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
-			{
+			if (rhs < 0) /+ TODO: handle `rhs == rhs.min` +/ {
 				assert(rhs != rhs.min);
 				immutable ulong pos_rhs = -rhs; // make it positive
 				__gmpz_add_ui(_ptr, _ptr, pos_rhs);
@@ -824,8 +820,7 @@ nothrow:
 				__gmpz_mul_si(_ptr, _ptr, rhs);
 		} else static if (s == "/") {
 			assert(rhs != 0, "Divison by zero");
-			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
-			{
+			if (rhs < 0) /+ TODO: handle `rhs == rhs.min` +/ {
 				immutable ulong pos_rhs = -rhs; // make it positive
 				__gmpz_tdiv_q_ui(_ptr, _ptr, pos_rhs);
 				negate();
