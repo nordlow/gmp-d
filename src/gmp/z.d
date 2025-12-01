@@ -1305,11 +1305,11 @@ if (__traits(isIntegral, T))
 _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted {
 	version(DigitalMars) pragma(inline);
 	static if (!__traits(isRef, x) || // r-value `x`
-			   !__traits(isRef, y))	  // r-value `y`
+			   !__traits(isRef, y)) // r-value `y`
 	{
 		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
 		static if (!__traits(isRef, x) && // r-value `x`
-				   !__traits(isRef, y))	  // r-value `y`
+				   !__traits(isRef, y)) // r-value `y`
 		{
 			if (x.limbCount > y.limbCount) // larger r-value `x`
 				zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
@@ -1317,21 +1317,15 @@ _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 				zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
 		}
 		else static if (!__traits(isRef, x)) // r-value `x`
-		{
 			zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-		}
 		else static if (!__traits(isRef, y)) // r-value `y`
-		{
 			zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-		}
 		else
 			static assert(0);
 		__gmpz_add(zp._ptr, x._ptr, y._ptr);
 		static if (cow) { zp.selfdupIfAliased(); }
 		return move(*zp);	// TODO: shouldn't have to call `move` here
-	}
-	else						// l-value `x` and `y`, no reuse in output
-	{
+	} else /+ l-value `x` and `y`, no reuse in output +/ {
 		typeof(return) z = null;
 		__gmpz_add(z._ptr, x._ptr, y._ptr);
 		return z;
