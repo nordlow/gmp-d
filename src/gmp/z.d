@@ -1417,17 +1417,13 @@ _Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 	Written as a free function instead of `MpZ`-member because `__traits(isRef,
 	this)` doesn't currently support member functions.
 */
-_Z!(cow) abs(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc
-{
+_Z!(cow) abs(bool cow)(auto ref scope const _Z!(cow) x) @trusted nothrow @nogc {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) /+ l-value `x` +/
-	{
+	static if (__traits(isRef, x)) /+ l-value `x` +/ {
 		typeof(return) y = null; // must use temporary
 		__gmpz_abs(y._ptr, x._ptr);
 		return y;
-	}
-	else						/+ r-value `x` +/
-	{
+	} else /+ r-value `x` +/ {
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { zp.selfdupIfAliased(); }
 		zp.absolute();
