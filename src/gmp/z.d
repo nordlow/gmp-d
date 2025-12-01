@@ -2986,8 +2986,7 @@ version(gmp_test) unittest {
 
 /// Fermats Little Theorem
 version(gmp_test) @nogc unittest {
-	version (unittestLong)
-	{
+	version (unittestLong) {
 		/*
 		  Fermats little theorem: a ^ p ≡ a (mod p) ∀ prime p check Fermats
 		  little theorem for a ≤ 100000 and all mersene primes M(p) : p ≤ 127
@@ -3017,8 +3016,7 @@ version(gmp_test) pure @nogc unittest {
 	enum LIMIT = 144 + 1;
 	enum POWER = 5;
 
-	version (unittestLong)
-	{
+	version (unittestLong) {
 		bool found = false;
 		Z r1 = 0;
 	outermost:
@@ -3055,10 +3053,10 @@ version(gmp_test) pure @nogc unittest {
 
 /// `MpZ`-`MpZ` adding expression.
 private struct AddExpr(bool cow) {
-	_Z!(cow) e1;				// first term
-	_Z!(cow) e2;				// second term
-	_Z!(cow) eval() const nothrow @nogc @trusted
-	{
+	_Z!(cow) e1; // first term (sub-expression)
+	_Z!(cow) e2; // second term (sub-expression)
+pragma(inline, true):
+	_Z!(cow) eval() const nothrow @nogc @trusted {
 		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
@@ -3083,10 +3081,10 @@ version(gmp_test) @nogc unittest {
 
 /// `MpZ`-`MpZ` subtraction expression.
 private struct SubExpr(bool cow) {
-	_Z!(cow) e1;					  // first term
-	_Z!(cow) e2;					  // second term
-	_Z!(cow) eval() const nothrow @nogc @trusted	 // TODO: move to common place
-	{
+	_Z!(cow) e1; // first term (sub-expression)
+	_Z!(cow) e2; // second term (sub-expression)
+pragma(inline, true):
+	_Z!(cow) eval() const nothrow @nogc @trusted /+ TODO: move to common place +/ {
 		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
@@ -3107,10 +3105,10 @@ version(gmp_test) @nogc unittest {
 
 /// `MpZ`-`MpZ` multiplication expression.
 private struct MulExpr(bool cow) {
-	_Z!(cow) e1;				// first factor
-	_Z!(cow) e2;				// second factor
-	_Z!(cow) eval() const nothrow @nogc @trusted	 // TODO: move to common place
-	{
+	_Z!(cow) e1; // first factor (sub-expression)
+	_Z!(cow) e2; // second factor (sub-expression)
+pragma(inline, true):
+	_Z!(cow) eval() const nothrow @nogc @trusted /+ TODO: move to common place +/ {
 		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
@@ -3131,10 +3129,10 @@ version(gmp_test) @nogc unittest {
 
 /// `MpZ`-`MpZ` division expression.
 private struct DivExpr(bool cow) {
-	_Z!(cow) e1;				// divisor
-	_Z!(cow) e2;				// dividend
-	_Z!(cow) eval() const nothrow @nogc @trusted	// TODO: move to common place
-	{
+	_Z!(cow) e1; // divisor (sub-expression)
+	_Z!(cow) e2; // dividend (sub-expression)
+pragma(inline, true):
+	_Z!(cow) eval() const nothrow @nogc @trusted /+ TODO: move to common place +/ {
 		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
@@ -3157,19 +3155,17 @@ version(gmp_test) @nogc unittest {
 }
 
 /// `MpZ`-`MpZ` modulus expression.
-private struct ModExpr(bool cow)
-{
-	_Z!(cow) e1;				// divisor
-	_Z!(cow) e2;				// dividend
-	_Z!(cow) eval() const nothrow @nogc @trusted	 // TODO: move to common place
-	{
+private struct ModExpr(bool cow) {
+	_Z!(cow) e1; // divisor (sub-expression)
+	_Z!(cow) e2; // dividend (sub-expression)
+pragma(inline, true):
+	_Z!(cow) eval() const nothrow @nogc @trusted /+ TODO: move to common place +/ {
 		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
 		return y;
 	}
-	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted
-	{
+	void evalTo(ref _Z!(cow) y) const nothrow @nogc @trusted {
 		version(DigitalMars) pragma(inline);
 		__gmpz_tdiv_r(y._ptr, e1.eval()._ptr, e2.eval()._ptr);
 	}
@@ -3189,10 +3185,10 @@ version(gmp_test) @nogc unittest {
 /// `MpZ`-`ulong` power expression.
 private struct PowUExpr(P, Q)
 if (isMpZExpr!P && __traits(isUnsigned, Q)) {
-	P e1;					   // base
-	Q e2;					   // exponent
-	MpZ eval() const nothrow @nogc @trusted	// TODO: move to common place
-	{
+	P e1; // base (sub-expression)
+	Q e2; // exponent (sub-expression)
+pragma(inline, true):
+	MpZ eval() const nothrow @nogc @trusted	/+ TODO: move to common place +/ {
 		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
@@ -3213,11 +3209,11 @@ version(gmp_test) @nogc unittest {
 private struct PowMUExpr(P, Q, M)
 if (isMpZExpr!P && __traits(isUnsigned, Q) && isMpZExpr!M)
 {
-	P base;					 // base
-	Q exp;					  // exponent
-	M mod;					  // modulo
-	MpZ eval() const nothrow @nogc @trusted	// TODO: move to common place
-	{
+	P base; // base
+	Q exp; // exponent
+	M mod; // // modulo
+pragma(inline, true):
+	MpZ eval() const nothrow @nogc @trusted	/+ TODO: move to common place +/ {
 		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
