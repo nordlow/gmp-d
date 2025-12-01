@@ -1335,37 +1335,25 @@ _Z!(cow) add(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 
 /** Get difference of `x` and `y` (`x` - `y`).
  */
-_Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted
-{
+_Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted {
 	version(DigitalMars) pragma(inline);
-	static if (!__traits(isRef, x) || /+ r-value `x` +/
-			   !__traits(isRef, y))	  /+ r-value `y` +/
-	{
+	static if (!__traits(isRef, x) || /+ r-value `x` +/ !__traits(isRef, y)) /+ r-value `y` +/ {
 		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
-		static if (!__traits(isRef, x) && /+ r-value `x` +/
-				   !__traits(isRef, y))	  /+ r-value `y` +/
-		{
+		static if (!__traits(isRef, x) /+ r-value `x` +/ && !__traits(isRef, y)) /+ r-value `y` +/ {
 			if (x.limbCount > y.limbCount) // larger r-value `x`
 				zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 			else					// larger r-value `y`
 				zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-		}
-		else static if (!__traits(isRef, x)) /+ r-value `x` +/
-		{
+		} else static if (!__traits(isRef, x)) /+ r-value `x` +/ {
 			zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-		}
-		else static if (!__traits(isRef, y)) /+ r-value `y` +/
-		{
+		} else static if (!__traits(isRef, y)) /+ r-value `y` +/ {
 			zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-		}
-		else
+		} else
 			static assert(0);
 		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_sub(zp._ptr, x._ptr, y._ptr);
 		return move(*zp);	// TODO: shouldn't have to call `move` here
-	}
-	else						/+ l-value `x` and `y`, no reuse in output +/
-	{
+	} else /+ l-value `x` and `y`, no reuse in output +/ {
 		typeof(return) z = null;
 		__gmpz_sub(z._ptr, x._ptr, y._ptr);
 		return z;
@@ -1386,41 +1374,26 @@ _Z!(cow) sub(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 
 /** Get product of `x` and `y` (`x` + `y`).
  */
-_Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted
-{
+_Z!(cow) mul(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!(cow) y) nothrow @trusted {
 	version(DigitalMars) pragma(inline);
-	static if (!__traits(isRef, x) || /+ r-value `x` +/
-			   !__traits(isRef, y))	  /+ r-value `y` +/
-	{
-		typeof(return)* zp = null;		// reuse: will point to either `x` or `y`
-		static if (!__traits(isRef, x) && /+ r-value `x` +/
-				   !__traits(isRef, y))	  /+ r-value `y` +/
-		{
-			if (x.limbCount > y.limbCount) // larger r-value `x`
-			{
+	static if (!__traits(isRef, x) /+ r-value `x` +/ || !__traits(isRef, y)) /+ r-value `y` +/ {
+		typeof(return)* zp = null; // reuse: will point to either `x` or `y`
+		static if (!__traits(isRef, x) /+ r-value `x` +/ && !__traits(isRef, y)) /+ r-value `y` +/ {
+			if (x.limbCount > y.limbCount) /+ larger r-value `x` +/ {
 				zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-			}
-			else					// larger r-value `y`
-			{
+			} else /+ larger r-value `y` +/ {
 				zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
 			}
-		}
-		else static if (!__traits(isRef, x)) /+ r-value `x` +/
-		{
+		} else static if (!__traits(isRef, x)) /+ r-value `x` +/ {
 			zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
-		}
-		else static if (!__traits(isRef, y)) /+ r-value `y` +/
-		{
+		} else static if (!__traits(isRef, y)) /+ r-value `y` +/ {
 			zp = (cast(typeof(return)*)(&y)); // @trusted because `MpZ` has no aliased indirections
-		}
-		else
+		} else
 			static assert(0);
 		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_mul(zp._ptr, x._ptr, y._ptr);
 		return move(*zp);	// TODO: shouldn't have to call `move` here
-	}
-	else						/+ l-value `x` and `y`, no reuse in output +/
-	{
+	} else /+ l-value `x` and `y`, no reuse in output +/ {
 		typeof(return) z = null;
 		__gmpz_mul(z._ptr, x._ptr, y._ptr);
 		return z;
