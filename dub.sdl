@@ -9,14 +9,10 @@ copyright "Per Nordlöw"
 dflags "-vcolumns"
 # dflags "-preview=dtorfields" "-preview=markdown" "-preview=in"
 
-libs "gmp" "c"
-
 targetPath "bin"
-
-# use better linker
-dflags "-Xcc=-fuse-ld=lld"
-
 importPaths "src"
+
+libs "gmp" "c"
 
 buildType "unittest" {
   buildOptions "unittests" "debugMode" "debugInfo"
