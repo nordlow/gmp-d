@@ -60,7 +60,7 @@ private struct _Z(bool cow) {
 pragma(inline, true):
 
 	/// Put `string` to sink in base `base`.
-	void toString(scope void delegate(scope const(char)[]) @safe sink, in uint base = defaultBase, in bool upperCaseDigits = false) const @trusted
+	void toString(scope void delegate(scope const(char)[]) sink, in uint base = defaultBase, in bool upperCaseDigits = false) const @trusted
 	in(-2 <= base && base <= -36 || +2 <= base && base <= +62) {
 		pragma(inline);
 		import core.memory : pureMalloc;
@@ -120,8 +120,8 @@ pure:
 		enforce(status == 0, "Parameter `value` does not contain an integer");
 	}
 
-	static typeof(this) fromBinaryString(scope const(char)[] value) pure @safe => typeof(return)(value, 2);
-	static typeof(this) fromHexString(scope const(char)[] value) pure @safe => typeof(return)(value, 16);
+	static typeof(this) fromBinaryString(scope const(char)[] value) pure => typeof(return)(value, 2);
+	static typeof(this) fromHexString(scope const(char)[] value) pure => typeof(return)(value, 16);
 
 nothrow:
 
@@ -331,11 +331,11 @@ nothrow:
 	// }
 
 	static if (cow) {
-		void selfdupIfAliased() scope pure nothrow @nogc @safe {
+		void selfdupIfAliased() scope pure nothrow @nogc {
 			if (_refCountCopies >= 1)
 				this = this.dup();
 		}
-		this(this) scope pure nothrow @nogc @safe {
+		this(this) scope pure nothrow @nogc {
 			_refCountCopies += 1;
 		}
 	} else {
@@ -343,7 +343,7 @@ nothrow:
 	}
 
 	/// Swap content of `this` with `rhs`.
-	void swap()(ref _Z rhs) pure nothrow @nogc @safe {
+	void swap()(ref _Z rhs) pure nothrow @nogc {
 		import std.algorithm.mutation : swap;
 		swap(this, rhs); // faster than __gmpz_swap(_ptr, rhs._ptr);
 	}
@@ -866,7 +866,7 @@ nothrow:
 	}
 
 	/// Negation of `this`.
-	_Z unaryMinus() const @safe {
+	_Z unaryMinus() const {
 		version(DigitalMars) pragma(inline);
 		// pragma(msg, "memberFun:", __traits(isRef, this) ? "ref" : "non-ref", " this");
 		typeof(return) y = this.dup;
@@ -877,7 +877,7 @@ nothrow:
 	/** Negate `this` in-place.
 		Returns: `void` to make it obvious that `this` is mutated.
 	*/
-	void negate() @safe {
+	void negate() {
 		static if (cow) { selfdupIfAliased(); }
 		_z._mp_size = -_z._mp_size; // fast C macro `mpz_neg` in gmp.h
 	}
@@ -1103,35 +1103,35 @@ nothrow:
 		handle the case when the membere `_mp_alloc` is zero and, in turn,
 		`_mp_d` is `null`.
 	 */
-	@property bool isDefaultConstructed() const @safe
+	@property bool isDefaultConstructed() const
 		=> _z._mp_alloc == 0; // fast, actually enough to just test this
 
 	/// Check if `this` is zero (either via default-construction or `__gmpz_...`-operations).
-	@property bool isZero() const @safe
+	@property bool isZero() const
 		=> _z._mp_size == 0; // fast
 
 	/// Check if `this` is one.
-	@property bool isOne() const @safe
+	@property bool isOne() const
 		/* NOTE: cannot use _z._mp_d !is null && _z._mp_d[0] == 1 because that’s
 		   true for -1 because sign is stored in `_z._mp_size`
 		*/
 		=> _z._mp_size == 1 && _z._mp_d[0] == 1; // fast
 
 	/// Check if `this` is odd.
-	@property bool isOdd() const @safe
+	@property bool isOdd() const
 		=> ((_z._mp_alloc != 0) && // this is needed for default (zero) initialized `__mpz_structs`
 			((_z._mp_size != 0) & cast(int)(_z._mp_d[0]))); // fast C macro `mpz_odd_p` in gmp.h
 
 	/// Check if `this` is odd.
-	@property bool isEven() const @safe
+	@property bool isEven() const
 		=> !isOdd;			// fast C macro `mpz_even_p` in gmp.h
 
 	/// Check if `this` is negative.
-	@property bool isNegative() const @safe
+	@property bool isNegative() const
 		=> _z._mp_size < 0; // fast
 
 	/// Check if `this` is positive.
-	@property bool isPositive() const @safe
+	@property bool isPositive() const
 		=> _z._mp_size >= 0; // fast
 
 	/** Check if `this` is a perfect power, i.e., if there exist integers A and
@@ -1161,7 +1161,7 @@ nothrow:
 	  -	 0 (`this` == 0), or
 	  - +1 (`this` > 0).
 	 */
-	@property int sgn() const @safe
+	@property int sgn() const
 		=> _z._mp_size < 0 ? -1 : _z._mp_size > 0; // fast C macro `mpz_sgn` in gmp.h
 
 	/// Number of significant `uint`s used for storing `this`.
@@ -1175,7 +1175,7 @@ nothrow:
 	}
 
 	/// Get number of limbs in internal representation.
-	@property uint limbCount() const @safe
+	@property uint limbCount() const
 		=> _integralAbs(_z._mp_size);
 
 private:
@@ -1195,7 +1195,7 @@ private:
 	enum defaultBase = 10;
 
 	/// Returns: evaluation of `this` expression which in this is a no-op.
-	ref inout(_Z) eval() @safe inout scope return => this;
+	ref inout(_Z) eval() inout scope return => this;
 
 	/// Type of limb in internal representation.
 	alias Limb = __mp_limb_t;	// GNU MP alias
@@ -1221,7 +1221,7 @@ private:
 			For instance the `x` in `x = y + z` should be assigned only once inside
 			a call to `mpz_add`.
 		*/
-		@property size_t mutatingCallCount() const @safe { return _ccc; }
+		@property size_t mutatingCallCount() const { return _ccc; }
 		size_t _ccc;  // C mutation call count. number of calls to C GMP function calls that mutate this object
 	}
 
@@ -1264,7 +1264,7 @@ static assert(CopyableMpZ.sizeof == __mpz_struct.sizeof + size_t.sizeof);
 version(gmp_test) version(unittest) static assert(isMpZExpr!(MpZ));
 
 version(benchmark)
-version(gmp_test) @safe unittest {
+version(gmp_test) unittest {
 	import std.datetime.stopwatch : benchmark;
 	bool odd;
 	void test() {
@@ -1278,7 +1278,7 @@ version(gmp_test) @safe unittest {
 pure:
 
 /** Instantiator for `MpZ`. */
-_Z!(cow) mpz(bool cow = true, Args...)(Args args) @safe {
+_Z!(cow) mpz(bool cow = true, Args...)(Args args) {
 	version(DigitalMars) pragma(inline);
 	return typeof(return)(args);
 }
@@ -1290,18 +1290,18 @@ pragma(inline, true) void swap(bool cow)(ref _Z!(cow) x, ref _Z!(cow) y) nothrow
 }
 
 /// Get `x` as a `string` in decimal base.
-pragma(inline, true) string toDecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe /+ for `std.bigint.BigInt` compatibility +/
+pragma(inline, true) string toDecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow /+ for `std.bigint.BigInt` compatibility +/
 	=> x.toString(10);
 
 /// Get `x` as a uppercased `string` in hexadecimal base without any base prefix (0x).
-pragma(inline, true) string toHexadecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe
+pragma(inline, true) string toHexadecimalString(bool cow)(auto ref scope const _Z!(cow) x) nothrow
 	=> x.toString(16, true);
 
 /// For `std.bigint.BigInt` compatibility.
 alias toHex = toHexadecimalString;
 
 /// Get the absolute value of `x` converted to the corresponding unsigned type.
-Unsigned!T absUnsign(T, bool cow)(auto ref scope const _Z!(cow) x) nothrow @safe // for `std.bigint.BigInt` compatibility
+Unsigned!T absUnsign(T, bool cow)(auto ref scope const _Z!(cow) x) nothrow // for `std.bigint.BigInt` compatibility
 if (__traits(isIntegral, T))
 {
 	version(DigitalMars) pragma(inline);
@@ -1845,7 +1845,7 @@ version(gmp_test) @trusted nothrow unittest {
 }
 
 /// operate on default-constructed instances
-version(gmp_test) @safe nothrow unittest {
+version(gmp_test) nothrow unittest {
 	Z w;
 
 	// should be zeroed
@@ -1899,7 +1899,7 @@ version(gmp_test) @safe nothrow unittest {
 	w.onesComplementSelf();
 	assert(w is Z.init);		// should be unchanged
 
-	static void testSqrt(ulong p, ulong q) @safe pure nothrow @nogc {
+	static void testSqrt(ulong p, ulong q) pure nothrow @nogc {
 		const x = p.Z;
 		assert(sqrt(x)== q);	// l-value first-parameter
 		assert(sqrt(p.Z) == q);	// r-value first-parameter
@@ -2016,14 +2016,14 @@ version(gmp_test) @safe nothrow unittest {
 }
 
 ///
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	const x = 42.Z;
 	assert(x.unaryMinus() == -42);	// l-value `this`
 	assert(42.Z.unaryMinus() == -42); // r-value `this`
 }
 
 /// convert to string
-version(gmp_test) @safe unittest {
+version(gmp_test) unittest {
 	assert(mpz(	42).toString ==	  `42`);
 	assert(mpz(	 -42).toString ==  `-42`);
 	assert(mpz(`-101`).toString == `-101`);
@@ -2079,7 +2079,7 @@ version(gmp_test) unittest {
 }
 
 /// opBinary with r-value right-hand-side
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	const Z a = 42;
 	{
 		const Z b = a + 1.Z;	// r-value `rhs`
@@ -2108,7 +2108,7 @@ version(gmp_test) @safe @nogc unittest {
 }
 
 ///
-version(gmp_test) @safe unittest {
+version(gmp_test) unittest {
 	const _ = (cast(uint)42).Z;
 	const a = 42.Z;
 	const b = 43UL.Z;
@@ -2397,10 +2397,10 @@ version(gmp_test) @safe unittest {
 			T x;
 			T* xp;						// this prevents diagnostics
 		}
-		static S!int f()() @safe pure nothrow @nogc { return typeof(return).init; }
-		static S!int g()(scope S!int x) @safe pure nothrow @nogc { return x; }
-		static const(S!int) h1()(scope const(S!int) x) @safe pure nothrow @nogc { return x; }
-		static S!int h2()(scope const(S!int) _) @safe pure nothrow @nogc { return typeof(return).init; }
+		static S!int f()() pure nothrow @nogc { return typeof(return).init; }
+		static S!int g()(scope S!int x) pure nothrow @nogc { return x; }
+		static const(S!int) h1()(scope const(S!int) x) pure nothrow @nogc { return x; }
+		static S!int h2()(scope const(S!int) _) pure nothrow @nogc { return typeof(return).init; }
 		g(S!int(32));
 		f();
 		h1(S!int(32));
@@ -2755,13 +2755,13 @@ version(gmp_test) @safe unittest {
 }
 
 /// generators
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	assert(Z.mersennePrime(15) == 2^^15 - 1);
 	assert(Z.mersennePrime(15UL) == 2^^15 - 1);
 }
 
 /// left shift
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	assert(1.Z << 1.Z == 2^^1);
 	assert(1.Z << 2.Z == 2^^2);
 	assert(1.Z << 32.Z == 2UL^^32);
@@ -2815,7 +2815,7 @@ version(gmp_test) @safe @nogc unittest {
 }
 
 /// right shift
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	assert(0x4.Z >> 1.Z == 0x2);
 	assert(0x4.Z >> 2.Z == 0x1);
 	assert(0x4.Z >> 3.Z == 0x0);
@@ -2887,7 +2887,7 @@ version(gmp_test) @safe @nogc unittest {
 }
 
 /// verify compliance with Phobos' `BigInt`
-version(gmp_test) @safe unittest {
+version(gmp_test) unittest {
 	alias bigInt = mpz;
 	alias BigInt = Z;	 // Phobos naming convention
 
@@ -3109,7 +3109,7 @@ version(gmp_test) @safe unittest {
 }
 
 /// Fermats Little Theorem
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	version (unittestLong)
 	{
 		/*
@@ -3195,7 +3195,7 @@ private struct AddExpr(bool cow) {
 }
 version(gmp_test) version(unittest) static assert(isMpZExpr!(AddExpr!(true)));
 
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	assert(AddExpr!(false)(3.Z, 4.Z).eval() == 3 + 4);
 	const Z x = AddExpr!(false)(3.Z, 4.Z);
 	assert(x == 7);
@@ -3223,7 +3223,7 @@ private struct SubExpr(bool cow) {
 }
 version(gmp_test) version(unittest) static assert(isMpZExpr!(SubExpr!(false)));
 
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	assert(SubExpr!(false)(3.Z, 4.Z).eval() == 3 - 4);
 	const Z x = SubExpr!(false)(3.Z, 4.Z);
 	assert(x == -1);
@@ -3247,7 +3247,7 @@ private struct MulExpr(bool cow) {
 }
 version(gmp_test) version(unittest) static assert(isMpZExpr!(MulExpr!(false)));
 
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	assert(MulExpr!(false)(3.Z, 4.Z).eval() == 3 * 4);
 	const Z x = MulExpr!(false)(3.Z, 4.Z);
 	assert(x == 12);
@@ -3271,7 +3271,7 @@ private struct DivExpr(bool cow) {
 }
 version(gmp_test) version(unittest) static assert(isMpZExpr!(DivExpr!(false)));
 
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	assert(DivExpr!(false)(27.Z, 3.Z).eval() == 27 / 3);
 	assert(DivExpr!(false)(28.Z, 3.Z).eval() == 28 / 3);
 	assert(DivExpr!(false)(29.Z, 3.Z).eval() == 29 / 3);
@@ -3300,7 +3300,7 @@ private struct ModExpr(bool cow)
 }
 version(gmp_test) version(unittest) static assert(isMpZExpr!(ModExpr!(false)));
 
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	assert(ModExpr!(false)(27.Z, 3.Z).eval() == 27 % 3);
 	assert(ModExpr!(false)(28.Z, 3.Z).eval() == 28 % 3);
 	assert(ModExpr!(false)(29.Z, 3.Z).eval() == 29 % 3);
@@ -3329,7 +3329,7 @@ if (isMpZExpr!P && __traits(isUnsigned, Q)) {
 }
 version(gmp_test) version(unittest) static assert(isMpZExpr!(PowUExpr!(MpZ, ulong)));
 
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	assert(PowUExpr!(Z, ulong)(3.Z, 3).eval() == 3^^3);
 }
 
@@ -3354,7 +3354,7 @@ if (isMpZExpr!P && __traits(isUnsigned, Q) && isMpZExpr!M)
 }
 version(gmp_test) version(unittest) static assert(isMpZExpr!(PowMUExpr!(MpZ, ulong, MpZ)));
 
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	assert(PowMUExpr!(Z, ulong, Z)(3.Z, 3, 20.Z).eval() == 3^^3 % 20);
 }
 
@@ -3375,7 +3375,7 @@ private struct NegExpr(bool cow) {
 }
 version(gmp_test) version(unittest) static assert(isMpZExpr!(NegExpr!(false)));
 
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	assert(NegExpr!(false)(27.Z).eval() == -27);
 	const Z x = NegExpr!(false)(27.Z);
 	assert(x == -27);
@@ -3401,14 +3401,14 @@ private struct SqrtExpr(bool cow) {
 }
 version(gmp_test) version(unittest) static assert(isMpZExpr!(SqrtExpr!(false)));
 
-version(gmp_test) @safe @nogc unittest {
+version(gmp_test) @nogc unittest {
 	foreach (const n; 16 .. 25)
 		assert(SqrtExpr!(false)(n.Z).eval() == 4);
 	assert(SqrtExpr!(false)(25.Z).eval() == 5);
 }
 
 // Copied from `std.numeric` to prevent unnecessary Phobos deps.
-private T _integralAbs(T)(scope const T x) @safe if (__traits(isIntegral, T)) {
+private T _integralAbs(T)(scope const T x) if (__traits(isIntegral, T)) {
 	return x >= 0 ? x : -x;
 }
 
@@ -3425,7 +3425,7 @@ version(gmp_test) @trusted unittest {
 }
 
 /// to string conversion
-version(gmp_test) pure @safe nothrow unittest {
+version(gmp_test) pure nothrow unittest {
 	for (int i = -100; i < 100; ++i) {
 		import std.conv : to;
 		assert(i.Z.toString == i.to!string);
@@ -3433,7 +3433,7 @@ version(gmp_test) pure @safe nothrow unittest {
 }
 
 /// `isProbablyPrime`
-version(gmp_test) pure @safe nothrow @nogc unittest {
+version(gmp_test) pure nothrow @nogc unittest {
 	static immutable ulong[] samplePrimes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41];
 	import std.algorithm.searching : canFind;
 	foreach (const i; 2 .. 41) {
@@ -3446,7 +3446,7 @@ version(gmp_test) pure @safe nothrow @nogc unittest {
 }
 
 /// `isDefinitelyPrime`
-version(gmp_test) pure @safe nothrow @nogc unittest {
+version(gmp_test) pure nothrow @nogc unittest {
 	static immutable ulong[] samplePrimes = [257, 65_537, 8_191, 131_071, 524_287, 2_147_483_647];
 	foreach (const i; samplePrimes)
 		assert(Z(i).isDefinitelyPrime(1));
