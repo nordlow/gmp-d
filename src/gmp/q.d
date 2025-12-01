@@ -625,8 +625,7 @@ version(gmp_test) version(unittest)
 }
 
 // C API
-package extern(C) pragma(inline, false)
-{
+package extern(C) pragma(inline, false) {
 	struct __mpq_struct
 	{
 		__mpz_struct _mp_num;
