@@ -1620,17 +1620,13 @@ _Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, auto ref scope const _Z!
 	}
 }
 /// ditto
-_Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @trusted
-{
+_Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @trusted {
 	version(DigitalMars) pragma(inline);
-	static if (__traits(isRef, x)) /+ l-value `x` +/
-	{
+	static if (__traits(isRef, x)) /+ l-value `x` +/ {
 		typeof(return) z = null;
 		__gmpz_lcm_ui(z._ptr, x._ptr, y);
 		return z;
-	}
-	else
-	{
+	} else {
 		typeof(return)* zp = (cast(typeof(return)*)(&x)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { zp.selfdupIfAliased(); }
 		__gmpz_lcm_ui(zp._ptr, x._ptr, y);
@@ -1642,8 +1638,7 @@ _Z!(cow) lcm(bool cow)(auto ref scope const _Z!(cow) x, ulong y) nothrow @nogc @
 
 	Parameter `exp` must be positive.
 */
-_Z!(cow) powm(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope const _Z!(cow) exp, auto ref scope const _Z!(cow) mod) nothrow @nogc @trusted
-{
+_Z!(cow) powm(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope const _Z!(cow) exp, auto ref scope const _Z!(cow) mod) nothrow @nogc @trusted {
 	version(DigitalMars) pragma(inline);
 	assert(mod != 0, "Zero modulus");
 	typeof(return) y = 0; // result, TODO: reuse `exp` or `mod` if any is an r-value
@@ -1653,8 +1648,7 @@ _Z!(cow) powm(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope const
 	return y;
 }
 /// ditto
-_Z!(cow) powm(bool cow)(auto ref scope const _Z!(cow) base, ulong exp, auto ref scope const _Z!(cow) mod) nothrow @nogc @trusted
-{
+_Z!(cow) powm(bool cow)(auto ref scope const _Z!(cow) base, ulong exp, auto ref scope const _Z!(cow) mod) nothrow @nogc @trusted {
 	version(DigitalMars) pragma(inline);
 	assert(mod != 0, "Zero modulus");
 	typeof(return) y = 0;	   // result, TODO: reuse `exp` or `mod` if any is an r-value
@@ -1670,29 +1664,23 @@ alias powmod = powm;
 
 	Parameter `mod` must be positive.
 */
-_Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope const _Z!(cow) mod) nothrow @nogc @trusted
-{
+_Z!(cow) invert(bool cow)(auto ref scope const _Z!(cow) base, auto ref scope const _Z!(cow) mod) nothrow @nogc @trusted {
 	version(DigitalMars) pragma(inline);
 	assert(base != 0, "Zero base");
 	assert(mod != 0, "Zero modulus");
-	static if (!__traits(isRef, base)) /+ r-value `base` +/
-	{
+	static if (!__traits(isRef, base)) /+ r-value `base` +/ {
 		typeof(return)* mut_base = (cast(typeof(return)*)(&base)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { mut_base.selfdupIfAliased(); }
 		const success = __gmpz_invert(mut_base._ptr, base._ptr, mod._ptr);
 		assert(success >= 0, "Cannot invert");
 		return move(*mut_base);	// TODO: shouldn't have to call `move` here
-	}
-	else static if (!__traits(isRef, mod)) /+ r-value `mod` +/
-	{
+	} else static if (!__traits(isRef, mod)) /+ r-value `mod` +/ {
 		typeof(return)* mut_mod = (cast(typeof(return)*)(&mod)); // @trusted because `MpZ` has no aliased indirections
 		static if (cow) { mut_mod.selfdupIfAliased(); }
 		const success = __gmpz_invert(mut_mod._ptr, base._ptr, mod._ptr);
 		assert(success >= 0, "Cannot invert");
 		return move(*mut_mod);  // TODO: shouldn't have to call `move` here
-	}
-	else						/+ l-value `base` and l-value `mod` +/
-	{
+	} else /+ l-value `base` and l-value `mod` +/ {
 		typeof(return) y = 0; // result, TODO: reuse `exp` or `mod` if any is an r-value
 		static if (cow) { y.selfdupIfAliased(); }
 		const success = __gmpz_invert(y._ptr, base._ptr, mod._ptr);
