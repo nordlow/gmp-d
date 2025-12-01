@@ -3209,9 +3209,9 @@ version(gmp_test) @nogc unittest {
 private struct PowMUExpr(P, Q, M)
 if (isMpZExpr!P && __traits(isUnsigned, Q) && isMpZExpr!M)
 {
-	P base; // base
-	Q exp; // exponent
-	M mod; // // modulo
+	P base; // base (sub-expression)
+	Q exp; // exponent (sub-expression)
+	M mod; // // modulo (sub-expression)
 pragma(inline, true):
 	MpZ eval() const nothrow @nogc @trusted	/+ TODO: move to common place +/ {
 		version(DigitalMars) pragma(inline);
@@ -3232,9 +3232,9 @@ version(gmp_test) @nogc unittest {
 
 /// `MpZ` negation expression.
 private struct NegExpr(bool cow) {
-	_Z!(cow) e1;
-	_Z!(cow) eval() const nothrow @nogc @trusted	 // TODO: move to common place
-	{
+	_Z!(cow) e1; // (sub-expression)
+pragma(inline, true):
+	_Z!(cow) eval() const nothrow @nogc @trusted /+ TODO: move to common place +/ {
 		version(DigitalMars) pragma(inline);
 		typeof(return) y = null;
 		evalTo(y);
