@@ -645,8 +645,7 @@ nothrow:
 		assert(rhs != 0, "Divison by zero");
 		_Z y = null;
 		static if (__traits(isArithmetic, Rhs) && !__traits(isUnsigned, Rhs)) {
-			if (rhs < 0)		// TODO: handle `rhs == rhs.min`
-			{
+			if (rhs < 0) { // TODO: handle `rhs == rhs.min`
 				immutable ulong pos_rhs = -cast(int)rhs; // make it positive
 				return cast(typeof(return))-__gmpz_tdiv_r_ui(y._ptr, _ptr, pos_rhs);
 			} else
