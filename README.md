@@ -1,5 +1,7 @@
 # gmp-d
 
+WARNING: This repo has been moved to https://codeberg.org/nordlow/gmp-d and archived and will be removed.
+
 D-language high-level wrapper for [GNU MP (GMP) library](https://gmplib.org/)
 that aims to be [mostly
 compatible](https://github.com/nordlow/gmp-d/blob/master/src/gmp/z.d#L2030) with
@@ -134,3 +136,11 @@ functions such `add` and `sub`.
 ## Future
 
 There are more `mpz_t`- and `mpq_t`-functions that should be wrapped but these are good start.
+
+<!-- Local Variables: -->
+<!-- gptel-model: grok-beta -->
+<!-- gptel--backend-name: "xAI" -->
+<!-- gptel--system-message: "You are a large language model living in Emacs and a helpful assistant. Respond concisely." -->
+<!-- gptel--tool-names: nil -->
+<!-- gptel--bounds: nil -->
+<!-- End: -->
