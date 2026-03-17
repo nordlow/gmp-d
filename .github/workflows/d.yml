@@ -14,12 +14,12 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    name: Build and Test
+  test-ubuntu:
+    name: Build and Test on Ubuntu
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest] # TODO: provision gmp.lib using https://github.com/marketplace/actions/run-vcpkg and then add ‘windows-latest’ to list of os
+        os: [ubuntu-latest]
         dc:
         - dmd-latest
         - ldc-latest
@@ -33,6 +33,31 @@ jobs:
       run: |
         sudo apt install -y llvm
         llvm-symbolizer --version
+    - name: 'Build & Test'
+      run: |
+        dub build
+        dub test
+  test-windows:
+    name: Build and Test on Windows
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest] # TODO: provision gmp.lib using https://github.com/marketplace/actions/run-vcpkg and then add ‘windows-latest’ to list of os
+        dc:
+        - dmd-latest
+        - ldc-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: lukka/run-vcpkg@v10
+      with:
+        vcpkgGitCommitId: "9bf374fb6d99f8973ec8781d3b41ffac2defee63"
+    - uses: actions/checkout@v3
+    - uses: dlang-community/setup-dlang@v1.3.0
+      with:
+        compiler: ${{ matrix.dc }}
+    - name: 'Provision dependencies via vcpkg'
+      run: |
+        vcpkg install gmp
     - name: 'Build & Test'
       run: |
         dub build
